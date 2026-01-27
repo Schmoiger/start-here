@@ -5,14 +5,18 @@ Unit tests for validating documentation consistency and format.
 ## Quick Start
 
 ```bash
-# Install dependencies
-pip install -r tests/docs-unit-tests/requirements.txt
+# Install dependencies (using uv per tech-standards.md)
+cd tests/docs-unit-tests
+uv sync
 
 # Run all Python tests
-pytest tests/docs-unit-tests/ -v
+uv run pytest . -v
 
 # Run shell tests (requires bats-core)
-bats tests/docs-unit-tests/coordinate.bats
+bats coordinate.bats
+
+# Run LLM consistency check (requires API key)
+ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 ```
 
 ## Test Files
@@ -31,14 +35,16 @@ bats tests/docs-unit-tests/coordinate.bats
 Run on every PR - these tests are fast and don't require API keys:
 
 ```bash
+cd tests/docs-unit-tests
+
 # Format validation
-pytest tests/docs-unit-tests/test_doc_format.py -v
+uv run pytest test_doc_format.py -v
 
 # Cross-reference validation
-pytest tests/docs-unit-tests/test_references.py -v
+uv run pytest test_references.py -v
 
-# Shell script tests
-bats tests/docs-unit-tests/coordinate.bats
+# Shell script tests (requires bats-core)
+bats coordinate.bats
 ```
 
 ### LLM Consistency Check (Slow, Requires API Key)
@@ -46,8 +52,8 @@ bats tests/docs-unit-tests/coordinate.bats
 Run periodically or on significant doc changes:
 
 ```bash
-export ANTHROPIC_API_KEY=your-key
-pytest tests/docs-unit-tests/test_llm_consistency.py -v
+cd tests/docs-unit-tests
+ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 ```
 
 The LLM test performs a single API call to check for:
@@ -99,7 +105,7 @@ The LLM test performs a single API call to check for:
 
 The GitHub Actions workflow (`.github/workflows/docs-test.yml`) runs:
 
-1. **lint** job: Static analysis tests (always runs)
+1. **lint** job: Static analysis tests (always runs, uses uv)
 2. **shell** job: Bats tests for coordinate.sh (always runs)
 3. **llm-consistency** job: LLM checks (optional, requires secret)
 
@@ -117,9 +123,23 @@ When adding new documentation:
 
 ## Dependencies
 
+Managed via `pyproject.toml`:
+
+```toml
+[project]
+dependencies = [
+    "pytest>=7.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+llm = [
+    "anthropic>=0.18.0",
+]
 ```
-pytest>=7.0.0
-pyyaml>=6.0
-anthropic>=0.18.0  # Only for LLM tests
-bats-core           # For shell tests (brew install bats-core)
+
+Shell tests require:
+```bash
+brew install bats-core  # macOS
+apt-get install bats    # Linux
 ```

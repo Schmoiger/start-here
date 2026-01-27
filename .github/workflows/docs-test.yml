@@ -20,20 +20,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+        run: uv python install 3.11
 
       - name: Install dependencies
-        run: |
-          pip install -r tests/docs-unit-tests/requirements.txt
+        working-directory: tests/docs-unit-tests
+        run: uv sync
 
       - name: Run format tests
-        run: pytest tests/docs-unit-tests/test_doc_format.py -v
+        working-directory: tests/docs-unit-tests
+        run: uv run pytest test_doc_format.py -v
 
       - name: Run reference tests
-        run: pytest tests/docs-unit-tests/test_references.py -v
+        working-directory: tests/docs-unit-tests
+        run: uv run pytest test_references.py -v
 
   # Shell script tests
   shell:
@@ -62,19 +65,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
-      - name: Install dependencies
-        run: |
-          pip install -r tests/docs-unit-tests/requirements.txt
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies (with LLM extras)
+        working-directory: tests/docs-unit-tests
+        run: uv sync --extra llm
 
       - name: Run LLM consistency tests
+        working-directory: tests/docs-unit-tests
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: pytest tests/docs-unit-tests/test_llm_consistency.py -v
+        run: uv run pytest test_llm_consistency.py -v
         continue-on-error: true  # Don't block PRs on LLM issues
 
   # Summary job for branch protection
