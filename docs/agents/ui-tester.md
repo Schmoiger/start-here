@@ -1,6 +1,7 @@
 ---
 name: ui-tester
 description: Tests UI behaviour using Chrome DevTools and browser automation. Use for end-to-end user workflow testing, screenshot capture, and accessibility checks. Restricted to Chrome DevTools MCP only.
+model: haiku
 allowed_tools:
   - Read
   - Write
