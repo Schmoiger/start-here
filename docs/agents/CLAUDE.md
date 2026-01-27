@@ -4,54 +4,142 @@ This document is your agent knowledge base. Reference it when coordinating workf
 
 ## Core Principles
 
+**Standards Compliance**: All agents follow the standards in `./docs/standards/` and rules in `./docs/rules/`. Compliance is inherited—agents don't need explicit references.
+
 **Context Isolation**: Each agent has its own focus and tools. Don't ask an agent to do work outside its domain.
 
-**Filesystem as Shared Memory**: All agents read/write to `./artifacts/`. This is the single source of truth for context.
+**Filesystem as Shared Memory**: All agents read/write to `./artifacts/` during development. This is ephemeral workspace that gets promoted to `./docs/` after approval.
 
 **Sequential Dependency**: Agents run in phases, with gates between them.
 
 **No Nested Spawning**: Agents cannot spawn other agents. The main Claude Code session is the orchestrator.
 
+**TDD Workflow**: Tests are written before implementation. See workflow details below.
+
 ---
 
-## Complete Workflow
+## Complete Workflow (TDD)
 
+This workflow follows Test-Driven Development: tests are written BEFORE implementation.
+
+```mermaid
+flowchart TD
+    subgraph Phase0["Phase 0: Discovery"]
+        PO["@product-owner"]
+        PO_OUT["requirements.md, user-stories.md, open-questions.md"]
+        PO --> PO_OUT
+    end
+
+    subgraph Phase1["Phase 1: Design (parallel)"]
+        SA["@solution-architect"]
+        DB["@database-designer"]
+        API["@api-designer"]
+        UI["@ui-designer"]
+        SA_OUT["architecture.md, api-contract.json, data-model.md"]
+        DB_OUT["schema.sql, migrations/, er-diagram.md"]
+        API_OUT["openapi.yaml, api-design-guide.md"]
+        UI_OUT["design-tokens.json, components.md, wireframes.md"]
+        SA --> SA_OUT
+        DB --> DB_OUT
+        API --> API_OUT
+        UI --> UI_OUT
+    end
+
+    subgraph Phase1b["Phase 1b: Visual Assets"]
+        VD["@visual-designer"]
+        VD_OUT["visuals/ (SVGs, mockups, infographics)"]
+        VD --> VD_OUT
+    end
+
+    subgraph Phase2["Phase 2: Tests First (TDD Red)"]
+        FT_RED["@functional-tester"]
+        FT_RED_OUT["Write failing tests from requirements"]
+        FT_RED --> FT_RED_OUT
+    end
+
+    subgraph Phase3["Phase 3: Development (TDD Green)"]
+        PY["@python-coder"]
+        TS["@typescript-coder"]
+        PY_OUT["./artifacts/python/ (make tests pass)"]
+        TS_OUT["./artifacts/typescript/ (make tests pass)"]
+        PY --> PY_OUT
+        TS --> TS_OUT
+    end
+
+    subgraph Phase4["Phase 4: Review"]
+        TL["@tech-lead"]
+        CR["@code-reviewer"]
+        TL_OUT["tech-review.md"]
+        CR_OUT["code-review.md"]
+        TL --> TL_OUT
+        TL_OUT --> GATE{APPROVED?}
+        GATE -->|NO| Phase3
+        GATE -->|YES| CR
+        CR --> CR_OUT
+    end
+
+    subgraph Phase5["Phase 5: Testing (parallel)"]
+        FT_VER["@functional-tester"]
+        UIT["@ui-tester"]
+        SEC["@security-tester"]
+        FT_VER_OUT["coverage report"]
+        UIT_OUT["ui-test-results/"]
+        SEC_OUT["security-audit/"]
+        FT_VER --> FT_VER_OUT
+        UIT --> UIT_OUT
+        SEC --> SEC_OUT
+    end
+
+    subgraph Phase6["Phase 6: Deploy"]
+        GCP["@gcp-devops"]
+        GCP_OUT["gcp/terraform/"]
+        GCP --> GCP_OUT
+    end
+
+    subgraph Phase7["Phase 7: Documentation"]
+        DOC["@documentation"]
+        DOC_OUT["docs/"]
+        DOC --> DOC_OUT
+    end
+
+    Phase0 --> Phase1
+    Phase1 --> Phase1b
+    Phase1b --> Phase2
+    Phase2 --> Phase3
+    Phase3 --> Phase4
+    Phase4 --> Phase5
+    Phase5 --> Phase6
+    Phase6 --> Phase7
 ```
-Phase 0: Discovery
-    @product-owner → requirements.md, user-stories.md, open-questions.md
-        ↓
-Phase 1: Design (can run in parallel)
-    @solution-architect → architecture.md, api-contract.json, data-model.md
-    @database-designer → schema.sql, migrations/, er-diagram.md
-    @api-designer → openapi.yaml, api-design-guide.md
-    @ui-designer → design-tokens.json, components.md, wireframes.md
-        ↓
-Phase 1b: Visual Assets (after ui-designer)
-    @visual-designer → visuals/ (SVGs, mockups, infographics)
-        ↓
-Phase 2: Development (sequential)
-    @python-coder → ./artifacts/python/
-        ↓
-    @typescript-coder → ./artifacts/typescript/
-        ↓
-Phase 3: Review (sequential gate)
-    @tech-lead → tech-review.md [GATE: must approve first]
-        ↓ [APPROVED?]
-        ├─ NO → Back to Phase 2
-        └─ YES ↓
-    @code-reviewer → code-review.md [deep bug hunting]
-        ↓
-        ↓
-Phase 4: Testing (parallel)
-    @functional-tester → test-results/
-    @ui-tester → ui-test-results/
-    @security-tester → security-audit/
-        ↓
-Phase 5: Deploy
-    @gcp-devops → gcp/terraform/
-        ↓
-Phase 6: Documentation
-    @documentation → docs/
+
+### TDD Cycle Detail
+
+```mermaid
+flowchart TD
+    subgraph RED["1. RED: Write Failing Tests"]
+        FT["@functional-tester"]
+        FT_DESC["Based on requirements.md and api-contract.json<br/>Tests define expected behaviour<br/>All tests should FAIL initially"]
+        FT --> FT_DESC
+    end
+
+    subgraph GREEN["2. GREEN: Implement"]
+        CODER["@python-coder / @typescript-coder"]
+        CODER_DESC["Write minimal code to pass tests<br/>Run tests after each change<br/>Continue until all tests pass"]
+        CODER --> CODER_DESC
+    end
+
+    subgraph REFACTOR["3. Refactor"]
+        REF_DESC["Clean up code while tests still pass<br/>No new functionality"]
+    end
+
+    subgraph REPEAT["4. Repeat"]
+        REP_DESC["Move to next requirement"]
+    end
+
+    RED --> GREEN
+    GREEN --> REFACTOR
+    REFACTOR --> REPEAT
+    REPEAT --> RED
 ```
 
 ---
@@ -185,7 +273,7 @@ Phase 6: Documentation
 **Constraints**:
 - Type hints on all functions (Python 3.10+)
 - Assume pytest for testing
-- Keep modules under 300 lines
+- Each module should have a single, clear responsibility
 - Document public APIs with docstrings
 
 **Output**: Code to `./artifacts/python/`, updated `README.md`
@@ -201,7 +289,7 @@ Phase 6: Documentation
 
 **Constraints**:
 - Strict mode tsconfig, no `any` types
-- Keep modules under 250 lines
+- Each module should have a single, clear responsibility
 - Import from Python only via documented contracts
 - Document public exports with JSDoc
 
@@ -220,7 +308,7 @@ Phase 6: Documentation
 
 **Review Areas**:
 - Architecture compliance
-- Code quality and module size limits
+- Code quality and single responsibility
 - Standards compliance (type hints, strict mode)
 - Testability
 
@@ -260,11 +348,12 @@ Phase 6: Documentation
 
 **Constraints**:
 - Never modify production code
-- Aim for 80%+ coverage
+- Minimum 90% coverage, target 100%
+- Document gaps if coverage < 100%
 - Include happy path + edge cases
 - Run tests and capture output
 
-**Output**: Tests to `./artifacts/*/tests/`, results to `./artifacts/test-results/`
+**Output**: Tests to `./artifacts/*/tests/`, results to `./artifacts/test-results/`, gaps to `./artifacts/test-gaps.md`
 
 ---
 
@@ -425,23 +514,25 @@ These rules prevent overlap and clarify who owns what.
 
 ### Review Phase Sequencing
 
-```
-Development complete
-        ↓
-@tech-lead reviews (architecture, standards)
-        ↓
-    [APPROVED?]
-        │
-        ├─ NO → Back to coders (fix blockers)
-        │
-        └─ YES ↓
-              @code-reviewer reviews (bugs, edge cases)
-                    ↓
-              [Issues found?]
-                    │
-                    ├─ YES → Back to coders (fix issues)
-                    │
-                    └─ NO → Proceed to testing
+```mermaid
+flowchart TD
+    DEV["Development complete"]
+    TL["@tech-lead reviews<br/>(architecture, standards)"]
+    GATE1{APPROVED?}
+    CR["@code-reviewer reviews<br/>(bugs, edge cases)"]
+    GATE2{Issues found?}
+    CODERS["Back to coders"]
+    TEST["Proceed to testing"]
+
+    DEV --> TL
+    TL --> GATE1
+    GATE1 -->|NO| CODERS
+    CODERS -->|fix blockers| TL
+    GATE1 -->|YES| CR
+    CR --> GATE2
+    GATE2 -->|YES| CODERS
+    CODERS -->|fix issues| CR
+    GATE2 -->|NO| TEST
 ```
 
 ### Security Review Split
@@ -464,58 +555,87 @@ For development, Mermaid diagrams in `wireframes.md` are sufficient.
 
 ## Workflow Patterns
 
-### Pattern 1: Full Project (All Phases)
-```
-@product-owner define requirements for [project idea]
-    ↓
-@solution-architect design the system
-@database-designer design the data model
-@api-designer create the API specification
-@ui-designer design the UI and components
-@visual-designer generate visual assets from designs
-    ↓
-@python-coder implement the backend
-    ↓
-@typescript-coder implement the frontend
-    ↓
-@tech-lead review the implementation
-    ↓ [if approved]
-@functional-tester write and run tests
-@security-tester audit for vulnerabilities
-    ↓
-@gcp-devops create infrastructure
-    ↓
-@documentation generate user docs
+### Pattern 1: Full Project (TDD)
+
+```mermaid
+flowchart TD
+    PO["@product-owner<br/>define requirements"]
+
+    subgraph Design["Design Phase (parallel)"]
+        SA["@solution-architect"]
+        DB["@database-designer"]
+        API["@api-designer"]
+        UI["@ui-designer"]
+        VD["@visual-designer"]
+    end
+
+    FT_RED["@functional-tester<br/>write failing tests (TDD RED)"]
+    PY["@python-coder<br/>implement backend (make tests pass)"]
+    TS["@typescript-coder<br/>implement frontend (make tests pass)"]
+    TL["@tech-lead<br/>review implementation"]
+    GATE{APPROVED?}
+
+    subgraph Verify["Verification (parallel)"]
+        FT_VER["@functional-tester<br/>verify coverage"]
+        SEC["@security-tester<br/>audit vulnerabilities"]
+    end
+
+    GCP["@gcp-devops<br/>create infrastructure"]
+    DOC["@documentation<br/>generate docs"]
+
+    PO --> Design
+    Design --> FT_RED
+    FT_RED --> PY
+    PY --> TS
+    TS --> TL
+    TL --> GATE
+    GATE -->|YES| Verify
+    GATE -->|NO| PY
+    Verify --> GCP
+    GCP --> DOC
 ```
 
-### Pattern 2: Quick Feature (Skip Planning)
-```
-@python-coder add [feature] to existing code
-    ↓
-@typescript-coder update frontend for new feature
-    ↓
-@code-reviewer review the changes
-    ↓
-@functional-tester add tests for new feature
+### Pattern 2: Quick Feature (TDD)
+
+```mermaid
+flowchart TD
+    FT_RED["@functional-tester<br/>write failing tests for feature"]
+    PY["@python-coder<br/>add feature (make tests pass)"]
+    TS["@typescript-coder<br/>update frontend (make tests pass)"]
+    CR["@code-reviewer<br/>review changes"]
+    FT_VER["@functional-tester<br/>verify coverage"]
+
+    FT_RED --> PY
+    PY --> TS
+    TS --> CR
+    CR --> FT_VER
 ```
 
 ### Pattern 3: Design Only
-```
-@product-owner clarify requirements for [idea]
-    ↓
-@solution-architect propose architecture options
-@api-designer draft API specification
-@ui-designer create wireframes and design system
-@visual-designer generate polished visuals for presentation
+
+```mermaid
+flowchart TD
+    PO["@product-owner<br/>clarify requirements"]
+
+    subgraph Design["Design Outputs (parallel)"]
+        SA["@solution-architect<br/>propose architecture options"]
+        API["@api-designer<br/>draft API specification"]
+        UI["@ui-designer<br/>create wireframes and design system"]
+        VD["@visual-designer<br/>generate polished visuals"]
+    end
+
+    PO --> Design
 ```
 
 ### Pattern 4: Parallel Testing
-```
-@functional-tester run all tests
-    ↑          ↑
-    │          └─ @ui-tester test user workflows
-    │
-@security-tester audit for vulnerabilities
+
+```mermaid
+flowchart LR
+    subgraph Parallel["Run in Parallel"]
+        FT["@functional-tester<br/>run all tests"]
+        UIT["@ui-tester<br/>test user workflows"]
+        SEC["@security-tester<br/>audit vulnerabilities"]
+    end
 ```
 
 ---
@@ -524,12 +644,18 @@ For development, Mermaid diagrams in `wireframes.md` are sufficient.
 
 **Agent → Artifact Updates**:
 - Product owner writes `requirements.md` → Solution architect reads it
-- Solution architect writes `api-contract.json` → Coders read it
+- Solution architect writes `api-contract.json` → Functional tester reads it (TDD)
+- Functional tester writes failing tests → Coders read test expectations
 - UI designer writes `design/` → Visual designer reads for asset generation
 - Visual designer writes `design/visuals/` → Documentation includes in docs
 - UI designer writes `design/` → TypeScript coder reads components and tokens
 - Python coder writes `README.md` → TypeScript coder reads it
 - Tech lead writes `tech-review.md` → Coders read blockers
+
+**TDD Loop**:
+- Functional tester writes failing tests (RED) → Coders make tests pass (GREEN)
+- If tests still fail after implementation → Coder iterates
+- Never add fallbacks to make tests pass artificially
 
 **Review Loop**:
 - Tech lead reviews → CHANGES REQUIRED → Coders fix → Tech lead re-reviews
@@ -537,6 +663,7 @@ For development, Mermaid diagrams in `wireframes.md` are sufficient.
 
 **Test Results as Feedback**:
 - Tests write to `./artifacts/test-results/` with pass/fail summary
+- If coverage < 100%, tester documents gaps in `test-gaps.md`
 - If failures, tester notes them but doesn't fix (coders handle fixes)
 - Rerun agent to iterate
 
@@ -572,24 +699,27 @@ In Claude Code terminal, use `@agent-name` syntax:
 # Phase 1b: Visual Assets
 @visual-designer generate mockups and diagrams from design specs
 
-# Phase 2: Development
-@python-coder implement the task service
-@typescript-coder create the frontend client
+# Phase 2: Tests First (TDD RED)
+@functional-tester write failing tests for task management API
 
-# Phase 3: Review (sequential - tech-lead first!)
+# Phase 3: Development (TDD GREEN)
+@python-coder implement the task service (make tests pass)
+@typescript-coder create the frontend client (make tests pass)
+
+# Phase 4: Review (sequential - tech-lead first!)
 @tech-lead review the implementation
 # Wait for APPROVED, then:
 @code-reviewer perform detailed code review
 
-# Phase 4: Testing
-@functional-tester write and run tests
+# Phase 5: Verify & Additional Testing
+@functional-tester run all tests and verify coverage
 @ui-tester test the user workflows
 @security-tester audit for OWASP vulnerabilities and prompt injection
 
-# Phase 5: Deploy
+# Phase 6: Deploy
 @gcp-devops create Cloud Run deployment
 
-# Phase 6: Documentation
+# Phase 7: Documentation
 @documentation generate API reference and guides
 ```
 
@@ -603,18 +733,26 @@ Don't jump into coding. Let `@product-owner` create `requirements.md` first.
 **2. Design before code**
 Run `@solution-architect`, `@database-designer`, and `@api-designer` before coding.
 
-**3. Respect the review gate**
+**3. Tests before implementation (TDD)**
+Always run `@functional-tester` to write failing tests BEFORE running coders. Tests define the expected behaviour.
+
+**4. Respect the review gate**
 Don't skip `@tech-lead` review. It catches issues before expensive testing.
 
-**4. Let agents fail gracefully**
+**5. Let agents fail gracefully**
 If tests fail, tester reports it. Don't auto-fix; let the coder iterate.
 
-**5. Use filesystem as validation**
+**6. Use filesystem as validation**
 If an agent didn't produce expected files in `./artifacts/`, the work wasn't done.
 
-**6. Iterate in loops**
-```
-code → review → fix → review → approved → test
+**7. Iterate in TDD loops**
+
+```mermaid
+flowchart LR
+    RED["Test (RED)"] --> GREEN["Code (GREEN)"]
+    GREEN --> REFACTOR["Refactor"]
+    REFACTOR --> REVIEW["Review"]
+    REVIEW --> APPROVED["Approved"]
 ```
 
 ---
