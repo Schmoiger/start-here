@@ -1,0 +1,78 @@
+# Conventional Commits
+
+## 1. Introduction
+
+Conventional Commits is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history, which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages.
+
+## 2. Specification
+
+The commit message should be structured as follows:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### 2.1. Type
+
+The type is a noun that describes the category of the change. The following types are allowed:
+
+*   **feat:** A new feature.
+*   **fix:** A bug fix.
+*   **docs:** Documentation only changes.
+*   **style:** Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc).
+*   **refactor:** A code change that neither fixes a bug nor adds a feature.
+*   **perf:** A code change that improves performance.
+*   **test:** Adding missing tests or correcting existing tests.
+*   **build:** Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm).
+*   **ci:** Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs).
+*   **chore:** Other changes that don't modify src or test files.
+*   **revert:** Reverts a previous commit.
+
+### 2.2. Scope
+
+The scope is an optional noun that describes the section of the codebase affected by the change. For example, `feat(api): ...` or `fix(ui): ...`.
+
+### 2.3. Description
+
+The description is a short, imperative-tense summary of the code change.
+
+### 2.4. Body
+
+The body is an optional, longer description of the code change. It should provide context and reasoning for the change.
+
+### 2.5. Footer
+
+The footer is optional and can be used for two purposes:
+
+*   **Breaking Changes:** A commit that introduces a breaking change must include a `BREAKING CHANGE:` footer, followed by a description of the change.
+*   **Issue Tracking:** A commit that references an issue should include a footer with the issue ID (e.g., `Closes #123`).
+
+## 3. Examples
+
+### Commit with a new feature
+
+```
+feat: allow users to upload a profile picture
+```
+
+### Commit with a bug fix and issue reference
+
+```
+fix: correct handling of invalid user input
+
+This fixes the issue where the application would crash if the user entered an invalid email address.
+
+Closes #456
+```
+
+### Commit with a breaking change
+
+```
+refactor(auth)!: remove deprecated login endpoint
+
+BREAKING CHANGE: The `/api/v1/login` endpoint has been removed. Use `/api/v2/login` instead.
+```

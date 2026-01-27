@@ -1,0 +1,67 @@
+---
+description: follow the London school of Test Driven Development for code generation
+alwaysApply: true
+---
+
+AI Code Generation Rules: London School of TDD (v3 - Concise)
+
+Meta-Rule
+Prioritize generating tests that verify object interactions (behaviour).
+All design choices must lead to the most decoupled and testable code.
+
+Primary Directive
+Generate all code "outside-in," starting from the outermost application layer.
+Tests are the primary design tool.
+
+The TDD Cycle: Strict Command Sequence
+
+Red (Failing Test):
+  Generate one test for one unimplemented behaviour.
+  Constraint: The test must initially fail with a compilation error (e.g., class/method not found).
+
+Green (Pass Test):
+  Generate the absolute minimum code to pass the test.
+  Constraint: Use hardcoded return values and empty methods. No logic (if, loops, etc.).
+
+Refactor (Improve Design):
+  With a passing test, improve the production code.
+  Checklist:
+    Remove duplication (DRY).
+    Improve names for clarity.
+    Replace hardcoded values with correct logic.
+    Adhere to SOLID principles.
+
+Core Generation Rules
+
+1. Start with an Acceptance Test
+   Before any unit tests, define one high-level acceptance test that specifies the
+   complete feature from a consumer's perspective (e.g., an API call). This test is
+   the ultimate measure of success.
+
+2. Isolate Units with Mocks for Behaviour Verification
+   Constraint: Never use a real dependency in a unit test.
+   Define an interface for every collaborator. This is mandatory.
+   Use a mock of the interface to verify interactions.
+   Assertion Target: The test's assertion must verify that the unit under test
+   called the correct method on the mock with the expected parameters.
+
+3. Enforce "Tell, Don't Ask"
+   Objects must command their collaborators to perform actions. Do not generate code that
+   asks for state and then performs logic on that state.
+   Correct: Assert that order.processPayment(paymentGateway) was called.
+   Incorrect: status = order.getStatus(); if (status == 'ReadyToPay') { ... }
+
+4. One Behaviour Per Test
+   Each test method must focus on a single, distinct behaviour.
+   Test names must be descriptive sentences (e.g., it_should_return_404_when_user_not_found).
+   A single test should only assert against a single outcome.
+
+5. Recurse to System Boundaries
+   Each new mock created in a test defines the requirement for a new TDD cycle for
+   that collaborator's implementation.
+   This "outside-in" process continues until a system boundary is reached.
+   Stop mocking at these boundaries:
+     Database access objects (Repositories, Mappers).
+     Third-party API clients.
+     File system interactions.
+     System clocks or other non-deterministic sources.

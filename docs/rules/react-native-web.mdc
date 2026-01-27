@@ -1,0 +1,11 @@
+---
+description: React Native patterns to promote reuse from mobile to web
+alwaysApply: false
+---
+Rules to promote a unified codebase: Write Once, Run on Multiple Platforms
+
+1: Organize Your Repository for Shared Code
+2: Reuse Components Across Platforms
+3: Consolidate Your State Management
+4: Optimize Your Build and Deployment Processes
+5: Focus on Developer Experience
