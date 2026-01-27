@@ -17,7 +17,7 @@ This repository is a monorepo, containing multiple projects.
 
 The documentation shall be structured as follows:
 
-*   The system shall store all documentation that applies to all projects at the monorepo root, in the `/docs/` directory (e.g., `/docs/common/`).
+*   The system shall store all documentation that applies to all projects at the monorepo root, in the `/docs/` directory (e.g., `/docs/standards/`, `/docs/rules/`).
 *   The system shall store all documentation specific to a single project within that project's own `docs/` folder (e.g., `/project-a/docs/`).
 
 For example:
@@ -62,7 +62,7 @@ Where a project has a `docs/specs` folder, the system shall include the followin
 
 *   `product.md`: The system shall use this file to detail the user experience of the functionality of the project.
 *   `requirements.md`: The system shall use this file to detail the functional and non-functional requirements of the project.
-    *   The system shall write all requirements using the EARS notation, as specified in `docs/common/rules/EARS-notation-requirements.mdc`.
+    *   The system shall write all requirements using the EARS notation, as specified in `docs/rules/EARS-notation-requirements.mdc`.
 *   `design.md`: The system shall use this file to describe the architectural and design decisions for the project.
 
 ### 2.3. Project `README.md`
@@ -76,32 +76,23 @@ The system shall maintain a `README.md` file in the root of each project. The `R
 
 ## 3. Common Documentation Resources
 
-The system maintains shared documentation resources in `/docs/common/` for use across all projects. 
+The system maintains shared documentation resources in `/docs/` for use across all projects. 
 
 ```
 / (monorepo root)
 ├── docs/
-│   └── common/
-│       ├── ai-allow.json
-│       ├── infrastructure.md
-│       ├── blueprints/
-│       ├── mcp/
-│       ├── rules/
-│       ├── schema/
-│       ├── secrets/
-│       └── standards/
+│   ├── agents/
+│   ├── mcp/
+│   ├── rules/
+│   └── standards/
 └── project-a/ (project root)
 ```
 
 ### 3.1. Common Documentation Resources
 
-*   **`ai-allow.json`**: Defines AI agent permissions for allowed, denied, and approval-required CLI commands across the monorepo.
-*   **`infrastructure.md`**: Comprehensive inventory of hosted services, databases, cloud infrastructure, and deployment configurations.
-*   **`blueprints/`**: Architecture diagrams, flow charts, and design blueprints for prototypes and system components.
+*   **`agents/`**: AI agent definitions and configurations for different roles and responsibilities.
 *   **`mcp/`**: Model Context Protocol configuration and tool definitions for AI agent integration.
 *   **`rules/`**: Development guidelines and coding conventions including EARS requirements notation and TDD practices.
-*   **`schema/`**: Data model definitions, API endpoint references, and type specifications used across the monorepo.
-*   **`secrets/`**: Configuration templates for API keys, service accounts, and environment secrets management.
 *   **`standards/`**: Development standards covering coding, testing, building, documentation, and workflow processes.
 
 ### 3.2. Context File Quality Standards

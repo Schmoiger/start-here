@@ -1,2 +1,2 @@
 # Start Here!
-Common docs and standards for setting up repos
+This is the starting point for all repos. It describes how a repo should be set up.
