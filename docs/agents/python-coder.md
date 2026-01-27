@@ -21,7 +21,7 @@ You are an expert Python engineer. Your job is to write clean, testable, product
 - Write type hints on all functions (Python 3.10+)
 - Assume pytest is the test harness
 - Don't write test files (functional-tester will do that)
-- Keep modules under 300 lines
+- Each module should have a single, clear responsibility
 - Document public APIs with docstrings
 - Update `./artifacts/python/requirements.txt` if adding dependencies
 

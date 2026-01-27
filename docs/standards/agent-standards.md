@@ -4,6 +4,21 @@
 
 This document outlines the standards for how AI agents shall interact with this software development project. Its purpose is to create a predictable and reliable environment where agents can act as effective and autonomous partners in development.
 
+## 1.1. Standards Compliance
+
+All agents shall follow the standards defined in `./docs/standards/` and rules defined in `./docs/rules/`. Agents are not required to explicitly reference individual standards—compliance is inherited by operating within this project.
+
+## 1.2. Working Directory vs Final Documentation
+
+Agents use two distinct locations for their outputs:
+
+| Location | Purpose | Lifecycle |
+|----------|---------|-----------|
+| `./artifacts/` | Working directory for agent outputs during development | Ephemeral—cleared between sprints |
+| `./docs/` | Final documentation after human review and approval | Persistent—version controlled |
+
+**Workflow**: Agents write to `./artifacts/` during development. Upon completion and approval, outputs are promoted to appropriate `./docs/` locations (specs, build, guides).
+
 ## 2. Agent Context Setup Workflow
 
 When an agent is assigned to work on a new product or feature, it shall follow this context setup workflow to ensure proper project initialization and documentation:
@@ -17,11 +32,11 @@ When an agent is assigned to work on a new product or feature, it shall follow t
 
 After obtaining the product description, the agent shall create or amend the following documents in strict order:
 
-1. **`docs/specs/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `docs/common/rules/EARS-notation-requirements.mdc`.
+1. **`docs/specs/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `docs/rules/EARS-notation-requirements.mdc`.
 
 2. **`docs/specs/design.md`**: Architectural and design decisions that describe how the product will be implemented.
 
-3. **`docs/build/tasks.md`**: Comprehensive task breakdown for implementation, verified against standards in `docs/common/standards`.
+3. **`docs/build/tasks.md`**: Comprehensive task breakdown for implementation, verified against standards in `docs/standards`.
 
 **For each document created or amended, the agent shall pause and wait for explicit human review and approval before proceeding to the next document.**
 
@@ -34,7 +49,7 @@ Following the core specification documents, the agent shall create blank placeho
 
 ### 2.4. Documentation Standards Compliance
 
-All documentation created during this workflow shall conform to the standards outlined in `docs/common/standards/doc-standards.md`, including:
+All documentation created during this workflow shall conform to the standards outlined in `docs/standards/doc-standards.md`, including:
 
 *   Proper file location within the project structure (specs in `docs/specs/`, build artifacts in `docs/build/`)
 *   Content formatting and structure requirements
@@ -46,15 +61,13 @@ The agent shall create `(project)/scripts/start.sh` for local development startu
 
 ### 2.6. Build script
 
-The agent shall create `scripts/build.yaml` following the standards in `docs/common/standards/build-standards.md`.
+The agent shall create `scripts/build.yaml` following the standards in `docs/standards/build-standards.md`.
 
 ### 2.7. Workflow Completion
 
-* Upon completion of all build work, the agent shall review common documents as outlined in `docs/common/standards/doc-standards.md` and make very concise changes as required, in particular:
+* Upon completion of all build work, the agent shall review common documents as outlined in `docs/standards/doc-standards.md` and make very concise changes as required, in particular:
 - `README.md`
-- `docs/common/schema/api-endpoints.md`
-- `docs/common/schema/data-model.md`
-- `docs/common/infrastructure.md`
+- Project-specific documentation in `docs/`
 
 * Upon completion of all documents, the agent shall summarize what was created and confirm with the user before beginning any implementation work.
 *   The agent shall not commence task execution until all context documents have been reviewed and approved by humans.

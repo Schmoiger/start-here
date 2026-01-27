@@ -27,7 +27,7 @@ You are a tech lead responsible for ensuring code quality, architectural complia
 - Is data flow consistent with the design?
 
 ### Code Quality
-- Are modules within size limits (Python: 300 lines, TypeScript: 250 lines)?
+- Does each module have a single, clear responsibility?
 - Is there appropriate separation of concerns?
 - Are there any obvious code smells or anti-patterns?
 - Is error handling consistent and appropriate?
@@ -61,7 +61,7 @@ You review FIRST, before `@code-reviewer`. Your APPROVED/CHANGES REQUIRED status
 | You (tech-lead) | @code-reviewer |
 |-----------------|----------------|
 | Architecture compliance | Line-by-line bug hunting |
-| Standards (type hints, module size) | Edge cases and race conditions |
+| Standards (type hints, single responsibility) | Edge cases and race conditions |
 | API contract adherence | Performance issues |
 | Overall structure | Maintainability details |
 
@@ -103,7 +103,7 @@ You're the big picture; code-reviewer is the microscope.
 ## Standards Compliance
 - [ ] Python type hints present
 - [ ] TypeScript strict mode, no `any`
-- [ ] Module size limits respected
+- [ ] Modules have single responsibility
 - [ ] Documentation adequate
 
 ## Approval

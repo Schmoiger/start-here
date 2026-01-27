@@ -44,11 +44,11 @@ Write the specs documents in this order:
 ## 4. Check Specs Against Standards
 Validate all specifications against the following standards:
 
-- **Documentation Standards** (`docs/common/standards/`)
+- **Documentation Standards** (`docs/standards/`)
   - Ensure consistency with existing patterns
   - Verify adherence to formatting and structure guidelines
 
-- **Technical Standards** (`docs/common/standards/tech-standards.md`)
+- **Technical Standards** (`docs/standards/tech-standards.md`)
   - Confirm technical decisions align with approved patterns
   - Validate architectural choices
 
@@ -64,7 +64,7 @@ Break down the specifications into actionable development tasks in `docs/build/t
 ## 6. Check Tasks Against Rules
 Validate tasks against the established rules and guidelines:
 
-- **Development Rules** (`docs/common/rules/`)
+- **Development Rules** (`docs/rules/`)
   - Ensure tasks comply with coding standards
   - Verify testing requirements are included
   - Confirm security considerations are addressed
@@ -85,4 +85,4 @@ Update both project and monorepo-level documentation to reflect completed work.
 
 **Monorepo Documentation:**
 - `README.md` - Update workspace description
-- `docs/common/schema/` - Update API schemas and data models
+- `docs/` - Update API schemas and data models as needed
