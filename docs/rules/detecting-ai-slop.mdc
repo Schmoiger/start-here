@@ -1,0 +1,89 @@
+# AI Slop Checklist
+
+Reference guide for identifying characteristics of AI-generated content ("AI slop"). Use this to evaluate and improve documentation.
+
+---
+
+## Red Herrings (Unreliable Indicators)
+
+These traits do NOT reliably indicate AI generation:
+- ❌ Academic vocabulary
+- ❌ Perfect grammar or absence of typos
+- ❌ Lack of contractions
+
+---
+
+## Stylistic Tics to Avoid
+
+### Em Dash Overuse
+- **Watch for**: Excessive use of em dashes (—) compared to natural writing
+- **Context**: Reddit data showed em dash usage tripled over one year in tech communities
+- **Fix**: Use em dashes sparingly; prefer commas, semicolons, or separate sentences
+
+### Parallelism Patterns
+- **Snappy triads**: Three-beat cadences like "fast, efficient, reliable"
+- **Unearned profundity**: Dramatic shifts without substance ("Something shifted")
+- **Mid-sentence questions**: "But now? You won't unsee this"
+- **Vapid transitions**: "As technology continues to evolve"
+
+### Random Formatting
+- **Watch for**: Bolding words without clear purpose
+- **Watch for**: Unicode characters for stylistic flair (𝗯𝗼𝗹𝗱, 𝘪𝘵𝘢𝘭𝘪𝘤, →, ×)
+- **Fix**: Format with intent; bold only key terms or headings
+
+---
+
+## Structural Problems to Avoid
+
+### Excessive Lists & Emojis
+- **Watch for**: Bullet points with emoji-led formatting in professional contexts
+- **Watch for**: Overuse of ✅, 📊, 💡 and similar emojis
+- **Fix**: Use emojis sparingly or not at all in formal documents
+
+### Monotonous Rhythm
+- **Watch for**: Similar sentence lengths throughout
+- **Watch for**: Uniform paragraph structure
+- **Watch for**: Predictable cadence without variation
+- **Fix**: Vary sentence length; mix short punchy sentences with longer complex ones
+
+---
+
+## Content Issues to Avoid
+
+### Awkward Analogies
+- **Watch for**: Metaphors that are "plausible" yet generic
+- **Watch for**: Analogies that gesture toward meaning without achieving it
+- **Watch for**: Lack of specificity or cultural resonance
+- **Fix**: Use concrete examples; avoid metaphors unless they illuminate
+
+### Filler & Emptiness
+- **Watch for**: "Surface polish with nothing underneath"
+- **Watch for**: Grammatically correct text that communicates no coherent message
+- **Watch for**: Sentences that add zero value
+- **Key insight**: Human writers rarely invest effort creating text that appears correct but conveys nothing meaningful
+- **Fix**: Every sentence must advance the argument or provide information
+
+---
+
+## Self-Evaluation Questions
+
+When reviewing your writing, ask:
+
+1. **Em dashes**: Have I overused them? Could I use other punctuation?
+2. **Triads**: Do I have too many three-beat patterns?
+3. **Transitions**: Are my transitions substantive or filler?
+4. **Formatting**: Is every bold/italic/emoji serving a clear purpose?
+5. **Rhythm**: Do my sentences vary in length and structure?
+6. **Analogies**: Are my metaphors specific and meaningful?
+7. **Content**: Does every sentence add value, or is it filler?
+8. **Emptiness**: If I remove a sentence, is anything lost?
+
+---
+
+## The Core Test
+
+**Human writing has intent behind every choice.**
+
+AI slop appears correct but lacks substance. The ultimate test: does your writing communicate something specific and meaningful, or does it just sound good?
+
+Source: [The Field Guide to AI Slop](https://www.ignorance.ai/p/the-field-guide-to-ai-slop)

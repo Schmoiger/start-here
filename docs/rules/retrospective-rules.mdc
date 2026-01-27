@@ -1,0 +1,41 @@
+# Retrospective Rules
+
+## 1. Introduction
+
+A retrospective is a meeting held at the end of a project or sprint to reflect on what went well, what didn't go well, and what can be improved for the next iteration. The goal is to create a cycle of continuous improvement.
+
+## 2. Participants
+
+All team members involved in the project or sprint should attend the retrospective. This includes developers, project managers, and any other key stakeholders. For agent-based development, this also includes the AI agents or their human representatives.
+
+## 3. Structure
+
+A retrospective should have a clear structure to ensure that all important topics are covered. A common structure is as follows:
+
+*   **Check-in:** A brief activity to get everyone engaged and focused.
+*   **What Went Well?:** A discussion of the successes of the project or sprint.
+*   **What Didn't Go Well?:** A discussion of the challenges and failures.
+*   **Action Items:** A list of specific, actionable steps to be taken to improve in the next iteration.
+*   **Check-out:** A brief activity to close the meeting.
+
+## 4. Rules
+
+To ensure a successful retrospective, all participants should adhere to the following rules:
+
+*   **The Prime Directive:** "Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand."
+*   **Focus on Improvement:** The goal of the retrospective is to improve, not to blame.
+*   **Be Honest and Open:** All participants should feel safe to share their honest opinions without fear of retribution.
+*   **Listen to Others:** Everyone's perspective is valuable.
+*   **Create Actionable Items:** The output of the retrospective should be a list of specific, actionable steps that can be taken to improve.
+
+## 5. Outputs
+
+The primary output of a retrospective is a list of action items. Each action item should be:
+
+*   **Specific:** Clearly defined and easy to understand.
+*   **Measurable:** It should be possible to determine whether the action item has been completed.
+*   **Achievable:** The action item should be realistic and attainable.
+*   **Relevant:** The action item should be relevant to the issues discussed in the retrospective.
+*   **Time-bound:** The action item should have a clear deadline.
+
+These action items should be tracked and reviewed at the next retrospective to ensure that they are being implemented and that they are having the desired effect.
