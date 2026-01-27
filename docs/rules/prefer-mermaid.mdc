@@ -1,0 +1,83 @@
+# Prefer Mermaid Diagrams
+
+## Rule
+
+All diagrams, flowcharts, and visual representations in documentation shall use Mermaid notation instead of ASCII art or other text-based diagram formats.
+
+## Rationale
+
+- **Consistency**: Mermaid provides a standardised syntax across all diagrams
+- **Maintainability**: Easier to update and modify than ASCII art
+- **Rendering**: GitHub, GitLab, Notion, and many tools render Mermaid natively
+- **Accessibility**: Structured format is more accessible than visual ASCII approximations
+- **Tooling**: Can be exported to SVG/PNG via Mermaid Live or similar tools
+
+## Applies To
+
+- Architecture diagrams
+- Flowcharts and workflows
+- Sequence diagrams
+- Entity-relationship diagrams
+- State diagrams
+- User flows and wireframe layouts
+- Component hierarchies
+
+## Examples
+
+### Flowchart
+
+```mermaid
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
+    D --> E
+```
+
+### Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as API
+    participant D as Database
+    U->>A: Request
+    A->>D: Query
+    D-->>A: Result
+    A-->>U: Response
+```
+
+### State Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Review
+    Review --> Approved
+    Review --> Draft: Changes Required
+    Approved --> [*]
+```
+
+### Entity Relationship
+
+```mermaid
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ LINE_ITEM : contains
+    PRODUCT ||--o{ LINE_ITEM : "ordered in"
+```
+
+## Exceptions
+
+- Inline code examples where ASCII is part of the code itself
+- Terminal output representations
+- Simple one-line representations (e.g., `A → B → C`)
+
+## Migration
+
+When updating existing documentation with ASCII diagrams:
+1. Identify the diagram type (flowchart, sequence, etc.)
+2. Convert to equivalent Mermaid syntax
+3. Verify rendering in target platform
+4. Remove ASCII version
