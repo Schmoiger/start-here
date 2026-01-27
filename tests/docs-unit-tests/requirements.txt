@@ -1,0 +1,6 @@
+# Test dependencies
+pytest>=7.0.0
+pyyaml>=6.0
+
+# LLM consistency tests (optional)
+anthropic>=0.18.0

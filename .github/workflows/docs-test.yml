@@ -1,0 +1,86 @@
+name: Documentation Tests
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'tests/**'
+      - '.github/workflows/docs-test.yml'
+  push:
+    branches: [main, master]
+    paths:
+      - 'docs/**'
+      - 'tests/**'
+
+jobs:
+  # Fast static analysis - runs on every PR
+  lint:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r tests/docs-unit-tests/requirements.txt
+
+      - name: Run format tests
+        run: pytest tests/docs-unit-tests/test_doc_format.py -v
+
+      - name: Run reference tests
+        run: pytest tests/docs-unit-tests/test_references.py -v
+
+  # Shell script tests
+  shell:
+    name: Shell Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Make coordinate.sh executable
+        run: chmod +x docs/agents/coordinate.sh
+
+      - name: Run bats tests
+        run: bats tests/docs-unit-tests/coordinate.bats
+
+  # LLM consistency check - runs on PRs but can be skipped
+  llm-consistency:
+    name: LLM Consistency Check
+    runs-on: ubuntu-latest
+    # Only run if ANTHROPIC_API_KEY is available
+    if: ${{ vars.RUN_LLM_TESTS == 'true' || github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r tests/docs-unit-tests/requirements.txt
+
+      - name: Run LLM consistency tests
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: pytest tests/docs-unit-tests/test_llm_consistency.py -v
+        continue-on-error: true  # Don't block PRs on LLM issues
+
+  # Summary job for branch protection
+  tests-passed:
+    name: All Tests Passed
+    needs: [lint, shell]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All required tests passed"
