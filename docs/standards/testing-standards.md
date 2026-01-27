@@ -103,6 +103,94 @@ test('dashboard layout matches design', async ({ page }) => {
 
 ### CI/CD Integration
 - **GitHub Actions**: Automated test execution on PRs
-- **Test Coverage Requirements**: Minimum 90% coverage for new code
 - **Quality Gates**: 100% of tests must pass before merge
 - **Warnings**: Bugs to be raised for all warnings
+
+## Coverage Requirements
+
+| Metric | Threshold | Action |
+|--------|-----------|--------|
+| Minimum | 90% | Build fails below this |
+| Target | 100% | Always aim for full coverage |
+| Gap Documentation | Required | If <100%, document gaps in `./docs/build/test-gaps.md` |
+
+### Gap Documentation Format
+
+When coverage is below 100%, document each gap in `./docs/build/test-gaps.md`:
+
+```markdown
+# Test Coverage Gaps
+
+## [Module/Component Name]
+- **Current Coverage**: 94%
+- **Gap Location**: `src/auth/oauth.py:45-60`
+- **Reason**: External OAuth provider callback - requires live integration
+- **Mitigation**: Manual testing checklist in `docs/guides/oauth-testing.md`
+- **Ticket**: #123 (to address later)
+```
+
+## Anti-Patterns (Forbidden)
+
+These practices undermine test quality and are explicitly prohibited:
+
+### 1. Excessive Fallback Usage
+```python
+# FORBIDDEN: Catching all exceptions to make tests pass
+try:
+    result = risky_operation()
+except Exception:
+    result = default_value  # Hides real failures
+```
+
+### 2. Skipping Tests to Pass CI
+```python
+# FORBIDDEN: Skipping without documented reason
+@pytest.mark.skip("flaky")  # Not acceptable
+def test_critical_feature():
+    ...
+```
+
+### 3. Mocking Away Failures
+```python
+# FORBIDDEN: Mocking to avoid testing real behaviour
+@patch('module.database.query', return_value=[])  # Avoids testing DB errors
+def test_should_handle_empty_results():
+    ...  # Never tests what happens with actual DB failures
+```
+
+### 4. Test Pollution
+```python
+# FORBIDDEN: Tests that depend on execution order or shared state
+class TestUser:
+    user_id = None  # Shared across tests - creates coupling
+```
+
+### 5. Assertion-Free Tests
+```python
+# FORBIDDEN: Tests that don't actually verify anything
+def test_user_creation():
+    create_user("test@example.com")
+    # No assertions - test always passes
+```
+
+### Acceptable Patterns
+
+```python
+# ACCEPTABLE: Specific exception handling with test for error case
+def test_handles_connection_timeout():
+    with pytest.raises(ConnectionTimeout):
+        slow_operation(timeout=0.001)
+
+# ACCEPTABLE: Skip with documented reason and ticket
+@pytest.mark.skip(reason="Requires GCP credentials - see #456")
+def test_cloud_storage_upload():
+    ...
+
+# ACCEPTABLE: Targeted mocking for isolation
+@patch('module.external_api.fetch')
+def test_processes_api_response(mock_fetch):
+    mock_fetch.return_value = {"status": "ok"}
+    result = process_data()
+    assert result.success is True
+    mock_fetch.assert_called_once()
+```

@@ -147,15 +147,15 @@ withineve-prototype-2/
 
 ## Development Workflows
 
-See `docs/common/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
+See `docs/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
 
 ## Coding Standards
 
-See `docs/common/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
+See `docs/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
 
 ## Testing Standards
 
-See `docs/common/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
+See `docs/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
 
 ## Performance Considerations
 
@@ -203,9 +203,8 @@ TODO
 ## Getting Help
 
 ### Documentation Sources
-- `docs/common/standards/` - All development standards (coding, testing, workflows)
-- `docs/monorepo-migration/` - Monorepo organization decisions
-- `docs/common/blueprints/` - System architecture diagrams
+- `docs/standards/` - All development standards (coding, testing, workflows)
+- `docs/` - Project documentation and guides
 - Service-specific READMEs for setup instructions
 
 ### Development Support
