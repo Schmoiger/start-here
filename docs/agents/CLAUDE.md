@@ -423,17 +423,18 @@ flowchart TD
 
 **Context**: All code, architecture, and API specs in `./artifacts/`
 
-**Documentation Types**:
-- API Reference
-- Getting Started Guide
-- Developer Guide
+**Documentation Types** (per doc-standards.md):
+- `docs/specs/` - Product, requirements, design docs
+- `docs/guides/` - Getting started, developer guides
+- `docs/build/` - Tasks, bugs, todo lists
 
 **Constraints**:
 - Write for the audience
 - Use concrete examples
 - Don't duplicate information—link between docs
+- Follow doc-standards.md structure
 
-**Output**: `./artifacts/docs/api-reference.md`, `getting-started.md`, `developer-guide.md`
+**Output**: `./artifacts/docs/specs/`, `./artifacts/docs/guides/`, `./artifacts/docs/build/`
 
 ---
 
@@ -490,11 +491,18 @@ flowchart TD
 │   └── terraform/               # GCP DevOps output
 ├── tech-review.md               # Tech lead output
 ├── code-review.md               # Code reviewer output
-└── docs/
-    ├── README.md                # Documentation output
-    ├── api-reference.md         # Documentation output
-    ├── getting-started.md       # Documentation output
-    └── developer-guide.md       # Documentation output
+└── docs/                        # Documentation output (per doc-standards.md)
+    ├── build/
+    │   ├── bugs.md              # Bug tracking
+    │   ├── tasks.md             # Task tracking
+    │   └── todo.md              # Technical debt
+    ├── specs/
+    │   ├── product.md           # Product/UX documentation
+    │   ├── requirements.md      # Functional requirements (EARS notation)
+    │   └── design.md            # Architecture decisions
+    └── guides/
+        ├── getting-started.md   # Setup and quickstart
+        └── developer-guide.md   # Development workflows
 ```
 
 ---
