@@ -1,23 +1,41 @@
 # Claude Code Multi-Agent Orchestration Setup
 
-You've got everything needed to run six specialised agents in Claude Code. This uses Claude's native subagent system, not external frameworks.
+You've got everything needed to run specialised agents in Claude Code. This uses Claude's native subagent system, not external frameworks.
 
 ## What You Have
 
 ### Subagent Definitions (`.md` files for Claude Code)
-- `python-coder.md` - Python development
-- `typescript-coder.md` - TypeScript development
-- `functional-tester.md` - Testing (pytest + vitest/jest)
+
+**Phase 0: Discovery**
+- `product-owner.md` - Requirements gathering and user stories
+
+**Phase 1: Design**
+- `solution-architect.md` - System architecture and API contracts
+- `database-designer.md` - Database schema and migrations
+- `api-designer.md` - OpenAPI specifications
+- `ui-designer.md` - UI wireframes, components, design tokens
+- `visual-designer.md` - Visual assets using AI tools (Gemini, Napkin, etc.)
+
+**Phase 2-3: Development**
+- `python-coder.md` - Python backend development
+- `typescript-coder.md` - TypeScript frontend development
+
+**Phase 4: Review**
+- `tech-lead.md` - Architecture compliance and standards gate
+- `code-reviewer.md` - Deep bug hunting and code quality
+
+**Phase 5: Testing**
+- `functional-tester.md` - Unit/integration tests (pytest, vitest)
 - `ui-tester.md` - UI testing with Chrome DevTools
-- `security-tester.md` - Security audits and threat modelling
+- `security-tester.md` - Security audits, OWASP, prompt injection
+
+**Phase 6-7: Deploy & Docs**
 - `gcp-devops.md` - Infrastructure-as-code with Terraform
+- `documentation.md` - API references and guides
 
 ### Knowledge Base
-- `CLAUDE.md` - Condensed guide for agent coordination (copy this into your project!)
-
-### Utilities
-- `coordinate.sh` - Helper script for initialising agent directories
-- `*.prompty` files - Legacy prompty format (for reference; Claude Code uses `.md` files instead)
+- `CLAUDE.md` - Orchestration guide for agent coordination
+- `MODEL-RECOMMENDATIONS.md` - Which LLM model for each agent
 
 ## How to Set Up
 
@@ -26,12 +44,7 @@ Place all `.md` files into your project's `.claude/agents/` directory:
 
 ```bash
 mkdir -p your-project/.claude/agents
-cp python-coder.md your-project/.claude/agents/
-cp typescript-coder.md your-project/.claude/agents/
-cp functional-tester.md your-project/.claude/agents/
-cp ui-tester.md your-project/.claude/agents/
-cp security-tester.md your-project/.claude/agents/
-cp gcp-devops.md your-project/.claude/agents/
+cp *.md your-project/.claude/agents/
 ```
 
 ### Step 2: Add CLAUDE.md to your project root
@@ -52,7 +65,7 @@ chmod +x coordinate.sh
 ./coordinate.sh init
 
 # Option B: Create manually
-mkdir -p your-project/artifacts/{python,typescript,test-results,ui-test-results/screenshots,security-audit,gcp/terraform}
+mkdir -p your-project/artifacts/{python/tests,typescript/tests,test-results,ui-test-results/screenshots,security-audit,gcp/terraform,database/migrations,api,design/visuals,docs}
 ```
 
 ### Step 4: Open your project in Claude Code
@@ -61,55 +74,124 @@ cd your-project
 claude
 ```
 
-## How to Use
+## How to Use (TDD Workflow)
 
-In Claude Code, invoke agents using `@agent-name` syntax:
+This system follows **Test-Driven Development**. Tests are written BEFORE implementation.
 
+### The TDD Flow
+
+```mermaid
+flowchart TD
+    PO["1. @product-owner<br/>Define requirements"]
+
+    subgraph Design["2. Design Phase (parallel)"]
+        SA["@solution-architect<br/>Design architecture"]
+        DB["@database-designer<br/>Design schema"]
+        API["@api-designer<br/>Create OpenAPI spec"]
+        UI["@ui-designer<br/>Design components"]
+    end
+
+    FT_RED["3. @functional-tester<br/>Write failing tests (RED)"]
+
+    subgraph Dev["4. Development (TDD GREEN)"]
+        PY["@python-coder<br/>Implement backend"]
+        TS["@typescript-coder<br/>Implement frontend"]
+    end
+
+    TL["5. @tech-lead<br/>Review (GATE)"]
+    GATE{APPROVED?}
+    CR["6. @code-reviewer<br/>Deep code review"]
+
+    subgraph Verify["7. Verification (parallel)"]
+        FT_VER["@functional-tester<br/>Verify coverage"]
+        SEC["@security-tester<br/>Security audit"]
+    end
+
+    GCP["8. @gcp-devops<br/>Deploy"]
+    DOC["9. @documentation<br/>Generate docs"]
+
+    PO --> Design
+    Design --> FT_RED
+    FT_RED --> Dev
+    Dev --> TL
+    TL --> GATE
+    GATE -->|NO| Dev
+    GATE -->|YES| CR
+    CR --> Verify
+    Verify --> GCP
+    GCP --> DOC
 ```
-@python-coder write a function to validate email addresses
 
-@typescript-coder create a TypeScript API client that imports the validator from Python
+### Example Session
 
-@functional-tester write comprehensive tests for both the Python and TypeScript code
+```bash
+# Start with requirements
+@product-owner define requirements for a task management API
 
-@security-tester perform a security audit of the codebase
+# Design the system
+@solution-architect design the system architecture
+@database-designer design the database schema
+@api-designer create OpenAPI specification
 
-@gcp-devops create a Terraform configuration for deploying to Cloud Run
+# Write tests FIRST (TDD RED)
+@functional-tester write failing tests for task management API
+
+# Implement to make tests pass (TDD GREEN)
+@python-coder implement the task service (make tests pass)
+@typescript-coder create the frontend client (make tests pass)
+
+# Review gate
+@tech-lead review the implementation
+# Wait for APPROVED, then:
+@code-reviewer perform detailed code review
+
+# Verify and deploy
+@functional-tester run all tests and verify coverage
+@security-tester audit for vulnerabilities
+@gcp-devops create Cloud Run deployment
+@documentation generate API reference
 ```
-
-## The Flow
-
-1. **Design Phase**
-   - Create `./artifacts/requirements.md` with your project specs
-   - Define API contracts in `./artifacts/api-contract.json`
-
-2. **Development Phase**
-   - `@python-coder` writes backend code
-   - `@typescript-coder` writes frontend/client code
-
-3. **Testing Phase**
-   - `@functional-tester` writes and runs tests
-   - `@ui-tester` tests user workflows
-
-4. **Security Phase**
-   - `@security-tester` audits code and identifies vulnerabilities
-
-5. **Infrastructure Phase**
-   - `@gcp-devops` creates Terraform configs for deployment
 
 ## Key Principles
 
+**Standards Compliance**
+All agents follow standards in `./docs/standards/` and rules in `./docs/rules/`. Compliance is inherited.
+
+**TDD Workflow**
+Tests are written BEFORE implementation. Coders make tests pass, not the other way around.
+
 **All context is in `./artifacts/`**
-Agents read/write from a shared filesystem directory. This is your single source of truth.
+Agents read/write from a shared filesystem directory during development. This is ephemeral workspace.
+
+**Final docs go to `./docs/`**
+After approval, outputs are promoted from `./artifacts/` to `./docs/`.
 
 **Agents don't spawn other agents**
 The main Claude Code session orchestrates everything. Agents are isolated specialists.
 
-**Sequential dependencies**
-Each agent's output becomes the next agent's input. TypeScript coder reads Python README, etc.
+**Sequential dependencies with gates**
+Tech-lead must approve before code-reviewer runs. Tests must exist before coders implement.
 
 **Test failures are reports, not fixes**
 When `@functional-tester` finds failing tests, it reports them. The relevant coder then fixes the code.
+
+## Coverage Requirements
+
+| Metric | Threshold |
+|--------|-----------|
+| Minimum | 90% (build fails below) |
+| Target | 100% |
+| Gap Documentation | Required if < 100% |
+
+## Model Recommendations
+
+| Model | Agents |
+|-------|--------|
+| **Opus** | solution-architect, tech-lead, security-tester |
+| **Sonnet** | Most agents (default) |
+| **Haiku** | visual-designer, ui-tester, documentation |
+
+See `MODEL-RECOMMENDATIONS.md` for rationale.
 
 ## Why This Approach
 
@@ -120,6 +202,7 @@ You're using Claude Code's native architecture instead of external orchestration
 - **Filesystem-based memory** - No database, just `./artifacts/`
 - **Lean system prompts** - CLAUDE.md provides condensed knowledge, not massive prompts
 - **Native parallelisation** - Claude Code handles multiple agent invocations
+- **TDD enforced** - Tests define behaviour before implementation
 
 This maps directly to how Claude natively thinks about work decomposition.
 
@@ -131,6 +214,7 @@ Want to add a new agent? Create a new `.md` file in `.claude/agents/`:
 ---
 name: my-agent
 description: What this agent does and when to use it
+model: sonnet  # or opus, haiku
 allowed_tools:
   - Read
   - Write
@@ -163,8 +247,14 @@ Then invoke it as `@my-agent your task here`.
 **Agents not appearing in Claude Code?**
 → Make sure subagent files are in `.claude/agents/` with `.md` extension.
 
-**TypeScript coder says "no Python README"?**
-→ Let python-coder run first. It writes `./artifacts/python/README.md`.
+**Tests don't exist yet?**
+→ Run `@functional-tester` in TDD mode BEFORE running coders.
+
+**Tech lead says CHANGES REQUIRED?**
+→ Read `tech-review.md` for blockers. Fix with relevant coder, then re-review.
+
+**Coverage below 90%?**
+→ Build will fail. Add more tests or document gaps in `test-gaps.md`.
 
 **Need more detail on coordination?**
 → Read `CLAUDE.md`. It's your knowledge base.
@@ -174,7 +264,8 @@ Then invoke it as `@my-agent your task here`.
 1. Copy all files to your project
 2. Run `claude` to open Claude Code
 3. Run `./coordinate.sh init` to set up directories
-4. Start with `@python-coder` for backend work
-5. Refer to `CLAUDE.md` for patterns and best practices
+4. Start with `@product-owner` for requirements
+5. Follow the TDD workflow: tests first, then implementation
+6. Refer to `CLAUDE.md` for patterns and best practices
 
 Good luck! You're using the same patterns that power Claude Code's own agent architecture.
