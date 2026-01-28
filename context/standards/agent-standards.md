@@ -8,9 +8,17 @@ This document outlines the standards for how AI agents shall interact with this 
 
 All agents shall follow the standards defined in `./context/standards/` and rules defined in `./context/rules/`. Agents are not required to explicitly reference individual standards—compliance is inherited by operating within this project.
 
-## 1.2. Where Agents Write
+## 1.2. Input Standards vs Output Artifacts
 
-Agents write project work output to `./artifacts/`. Shared knowledge (standards, rules, agents, MCP) lives in `./context/`. Structure, locations, and separation of concerns are defined in `context/standards/doc-standards.md` (sections 2.1 and 2.2).
+Agents read from input standards and write to output artifacts:
+
+| Directory | Purpose | Lifecycle |
+|----------|---------|-----------|
+| `/context/` | Input standards and rules for agents to follow | Persistent—version controlled |
+| `{service}/artifacts/` | Service-specific working outputs (bugs, tasks, test results) | Persistent—version controlled |
+| `/artifacts/` | System-wide artifacts (architecture, requirements, API contracts) | Persistent—version controlled |
+
+**Workflow**: Agents read standards from `/context/` and write outputs to `{service}/artifacts/` for service-specific work or `/artifacts/` for system-wide artifacts. All artifacts are version controlled and do not require promotion.
 
 ## 2. Agent Context Setup Workflow
 
@@ -23,23 +31,30 @@ When an agent is assigned to work on a new product or feature, it shall follow t
 
 ### 2.2. Documentation Creation Sequence
 
-After obtaining the product description, the agent shall create or amend documents in `artifacts/` in strict order. Locations and recommended structure are defined in `context/standards/doc-standards.md` (section 2.2). At minimum:
+After obtaining the product description, the agent shall create or amend the following documents in strict order:
 
-1. **`artifacts/product/requirements.md`** (or equivalent): Functional and non-functional requirements using EARS notation as specified in `context/rules/EARS-notation-requirements.mdc`.
+1. **`/artifacts/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `/context/rules/EARS-notation-requirements.mdc`.
 
-2. **`artifacts/architecture/`** (or equivalent): Architecture and design decisions (e.g. `architecture.md`, `data-model.md`).
+2. **`/artifacts/architecture.md`**: Architectural and design decisions that describe how the product will be implemented.
 
-3. **`artifacts/tasks/`**: Task breakdown for implementation, verified against standards in `context/standards`.
+3. **`{service}/artifacts/tasks.md`**: Comprehensive task breakdown for implementation, verified against standards in `/context/standards/`.
 
 **For each document created or amended, the agent shall pause and wait for explicit human review and approval before proceeding to the next document.**
 
 ### 2.3. Placeholder Document Creation
 
-Following the core specification documents, the agent shall create blank placeholder documents as needed (e.g. `artifacts/tasks/todo.md`, `artifacts/bugs/`). See doc-standards section 2.2 for the full recommended structure.
+Following the core specification documents, the agent shall create blank placeholder documents:
+
+*   **`{service}/artifacts/todo.md`**: For listing smaller items, technical debt, or future improvements.
+*   **`{service}/artifacts/bugs.md`**: For listing current and past bugs.
 
 ### 2.4. Documentation Standards Compliance
 
-All documentation created during this workflow shall conform to `context/standards/doc-standards.md`, including file locations under `artifacts/`, content formatting, and required elements for requirements (EARS), design, and tasks.
+All documentation created during this workflow shall conform to the standards outlined in `/context/standards/doc-standards.md`, including:
+
+*   Proper file location within the project structure (system-wide in `/artifacts/`, service-specific in `{service}/artifacts/`)
+*   Content formatting and structure requirements
+*   Required elements for requirements (EARS notation), design decisions, and task specifications
 
 ### 2.5. Start scripts
 
@@ -47,13 +62,13 @@ The agent shall create `(project)/scripts/start.sh` for local development startu
 
 ### 2.6. Build script
 
-The agent shall create `scripts/build.yaml` following the standards in `context/standards/build-standards.md`.
+The agent shall create `scripts/build.yaml` following the standards in `/context/standards/build-standards.md`.
 
 ### 2.7. Workflow Completion
 
-* Upon completion of all build work, the agent shall review common documents as outlined in `context/standards/doc-standards.md` and make very concise changes as required, in particular:
-- `README.md`
-- Project-specific documentation in `artifacts/`
+* Upon completion of all build work, the agent shall review common documents as outlined in `/context/standards/doc-standards.md` and make very concise changes as required, in particular:
+- `README.md` (service root)
+- Project-specific artifacts in `{service}/artifacts/`
 
 * Upon completion of all documents, the agent shall summarize what was created and confirm with the user before beginning any implementation work.
 *   The agent shall not commence task execution until all context documents have been reviewed and approved by humans.
@@ -80,70 +95,47 @@ To operate autonomously but safely, agents shall adhere to the following behavio
 
 *   The agent shall commit its changes to the version control system after completing each task.
 *   The agent shall write a clear and concise commit message that summarizes the purpose of the changes.
-*   The commit message shall include the task ID and follow the format specified in `context/standards/coding-standards.md`.
+*   The commit message shall include the task ID and follow the format specified in `/context/standards/coding-standards.md`.
 
 ### 3.4. Agent Handoffs
 
-Handoff *locations* are defined in `context/standards/doc-standards.md` (section 2.2.1). This section defines format, required elements, workflow, and handoffs to humans.
+Agents shall communicate context and status through structured handoff documents to enable coordination.
 
-#### 3.4.0. Intra-Domain Handoff Format (`HANDOFF.md`)
+#### 3.4.1. Handoff Types
+
+**Intra-domain handoffs** (within same service/package):
+- Location: `{service-directory}/HANDOFF.md`
+- Purpose: Coordinate between agents working on the same context domain
+- Example: functional-tester → python-coder → tech-lead
+
+**Inter-domain handoffs** (between services):
+- Location: `artifacts/shared/handoffs/{service}-api.md`
+- Purpose: Coordinate between agents working on different context domains
+- Example: data-service → vis-service, vis-service → frontend
+
+#### 3.4.2. Handoff Format
 
 Each handoff entry shall include:
-*   **Timestamp**: ISO 8601 with timezone (e.g. `2026-01-27T18:45:32Z`)
-*   **From/To**: Source and destination agent names (e.g. @functional-tester → @python-coder)
-*   **Tasks**: Task IDs covered (e.g. DS-001 through DS-008)
-*   **Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked | 🔴 Failed
-*   **Summary**: Brief description of work completed (2–3 sentences)
-*   **Notes for Next Agent**: Critical information, gotchas, files to review
-*   **Artifacts**: Paths to code, tests, fixtures, documentation
-*   **Blockers**: Any issues preventing progress
-*   **Commit**: Git commit hash linking handoff to code
+- **Timestamp**: ISO 8601 with timezone (e.g., `2026-01-27T18:45:32Z`)
+- **From/To**: Source and destination agent names
+- **Tasks**: Task IDs covered by this handoff
+- **Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked | 🔴 Failed
+- **Summary**: Brief description of work completed
+- **Notes**: Critical information for next agent
+- **Artifacts**: Paths to relevant files (code, tests, docs)
+- **Blockers**: Any blockers preventing progress
+- **Commit**: Git commit hash linking handoff to code
 
-Example:
-```markdown
-### From: @functional-tester
-**To**: @python-coder
-**Timestamp**: 2026-01-27T18:45:32Z
-**Tasks**: DS-001 through DS-008
-**Status**: ✅ Complete
-
-**Summary**: All data-service tests written and failing. Test coverage includes yfinance integration, Bronze/Silver stores, cache management, and API endpoints.
-
-**Notes for Next Agent**:
-- Test fixtures in tests/fixtures/
-- Mock yfinance responses in tests/mocks/
-- Expected cache behaviour documented in DS-005
-
-**Artifacts**:
-- Tests: `services/data-service/tests/`
-- Fixtures: `services/data-service/tests/fixtures/`
-
-**Commit**: abc1234 - test(data-service): DS-001-008 add failing tests
-```
-
-#### 3.4.1. Inter-Domain API Handoff Format (`{service}-api.md`)
-
-Required elements for API handoffs:
-*   **Endpoint Status**: ✅ Stable | 🚧 In Development | ⚠️ Breaking Change | 🔴 Blocked
-*   **Since Timestamp**: When endpoint became stable
-*   **OpenAPI Reference**: Lines in openapi.yaml
-*   **Example Response**: Path to fixture file
-*   **Mock Client**: Path to mock implementation
-*   **Consumers**: Which services depend on this endpoint
-*   **Dependencies**: Which services this endpoint depends on
-*   **Known Issues**: Any bugs or limitations
-*   **Breaking Changes**: Upcoming changes with ETAs
-
-#### 3.4.2. Handoff Workflow
+#### 3.4.3. Handoff Workflow
 
 When completing a group of tasks:
-1. Update the HANDOFF.md file in service directory (intra-domain; format above)
+1. Update the HANDOFF.md file in service directory (intra-domain)
 2. If completing integration-ready work, update `artifacts/shared/handoffs/integration-status.md` (inter-domain)
-3. If API endpoints are stable, create or update `artifacts/shared/handoffs/{service}-api.md` (inter-domain)
+3. If API endpoints are stable, create/update `artifacts/shared/handoffs/{service}-api.md` (inter-domain)
 4. Commit changes with handoff updates included
 5. Mark tasks as complete in task list
 
-#### 3.4.3. Integration Readiness
+#### 3.4.4. Integration Readiness
 
 Before marking a service as "Ready for Integration", the agent shall ensure:
 - All Phase 2 (TDD GREEN) tasks complete
@@ -155,57 +147,16 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 - Example responses in `artifacts/shared/fixtures/`
 - Integration status updated in `artifacts/shared/handoffs/integration-status.md`
 
-#### 3.4.4. Templates
+#### 3.4.5. Templates
 
-Use `artifacts/shared/HANDOFF-TEMPLATE.md` (intra-domain) and `artifacts/shared/handoffs/TEMPLATE-service-api.md` (inter-domain). Locations in doc-standards 2.2.1.
-
-#### 3.4.5. Handoffs to Humans
-
-When an agent pauses or completes work and hands off to a human (e.g. end of day, reboot, or approval gate), it shall create or update a single handoff file so the human knows exactly what to do next.
-
-**Location**: `artifacts/HANDOFF-TO-HUMAN.md` (one file per project; overwrite on each handoff so there is a single place to look.)
-
-**Format**: Concise, clear, and prescriptive. The next step is the primary content.
-
-**Required sections (in order):**
-
-1. **Next step** (required): One to four concrete actions. One line per action. Use imperative mood. No explanation in this section.
-2. **State**: One short paragraph or bullet list: what is done, what is in progress, what is blocked. Optionally one-line metrics (e.g. tests 307/406).
-3. **Context** (if needed): Paths, branch, commit, or key file the next reader needs to execute the next step. Omit if redundant.
-
-**Optional sections (only when needed):**
-
-- **Commands**: Copy-paste commands for the next step.
-- **Blockers**: One line per blocker; omit if none.
-
-**Do not include:** Long narratives, "what went well", "lessons learned", troubleshooting unless it is the next step, or multiple alternative flows. Omit or put elsewhere.
-
-**Example** (concise handoff):
-
-```markdown
-# Handoff to Human — 2026-01-28T14:00:00Z
-
-## Next step
-1. Resume agent aafa0cf to complete data-service (52 tests left).
-2. Resume agent a06f15f to complete vis-service (47 tests left).
-3. When both pass, run full suite: 406/406 expected.
-
-## State
-Phase 2 (TDD GREEN) 76% complete. llm-service 106/106 done. data-service 111/163; vis-service 69/116. All committed on branch `first-version`.
-
-## Context
-- data-service HANDOFF: `services/data-service/HANDOFF.md`
-- vis-service HANDOFF: `services/visualisation-service/HANDOFF.md`
-- Run tests: `cd services/data-service && uv run pytest tests/ -v`
-```
-
-**Template**: Use `artifacts/shared/TEMPLATE-handoff-to-human.md` when creating or updating the handoff. Doc-standards section 2.2 lists this file under `artifacts/shared/`.
+- **Intra-domain**: Use `artifacts/shared/HANDOFF-TEMPLATE.md`
+- **Inter-domain**: Use `artifacts/shared/handoffs/TEMPLATE-service-api.md`
 
 ## 4. Build, Test, and Automation Artifacts
 
 *   The agent shall store all tests in a `tests/` directory within the project.
 *   The agent shall store all scripts used for automation in a `scripts/` directory.
-*   The agent shall store all documentation generated during the build process in an `artifacts/guides` directory (or equivalent under `artifacts/`) within the project. See doc-standards section 2.2 for structure.
+*   The agent shall store all test results and build artifacts in the `{service}/artifacts/` directory within the project.
 
 ## 5. Worktree Isolation
 
@@ -225,7 +176,7 @@ These domains apply during discovery, design, and review phases:
 | **design** | solution-architect, database-designer, api-designer, ui-designer, visual-designer | architecture.md, api-contract.json, data-model.md, schema.sql, openapi.yaml, design/ |
 | **review** | tech-lead, code-reviewer, security-tester | All code (read-only), review reports |
 | **infra** | gcp-devops | ./artifacts/gcp/, terraform/ |
-| **docs** | documentation | ./artifacts/, all specs (read-only) |
+| **docs** | documentation | ./artifacts/docs/, all specs (read-only) |
 
 #### Project-Specific Domains (Implementation Phase)
 

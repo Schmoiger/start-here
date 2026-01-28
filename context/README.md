@@ -113,9 +113,9 @@ Without clear boundaries, the same information ends up in multiple places:
 
 ### 2. Enables Independent Updates
 Each context type can evolve without affecting others:
-- Update coverage requirement in standards → all agents inherit it
-- Add new MCP tool → agents can use it without file changes
-- Change naming convention in rules → applies everywhere
+- Update coverage requirement in standards; all agents inherit it
+- Add new MCP tool; agents can use it without file changes
+- Change naming convention in rules; applies everywhere
 
 ### 3. Clarifies Ownership
 When something needs to change, you know where to look:
@@ -126,7 +126,7 @@ When something needs to change, you know where to look:
 
 ### 4. Reduces Cognitive Load
 Agents don't need to know everything—just their role:
-- Agent reads its own definition + shared standards apply automatically
+- Agent reads its own definition; shared standards apply automatically
 - No need to cross-reference multiple files for basic operations
 
 ## Inheritance Model
