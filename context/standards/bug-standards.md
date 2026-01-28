@@ -38,7 +38,7 @@ Here is an example of a `bugs.md` file for `project-a`:
 ```markdown
 # project-a Bugs
 
-[TODO] | User is sent to /home after logout INSTEAD user is sent to /login | src/auth/logout.js | [tasks.md#L25](./docs/spec/tasks.md#L25)
+[TODO] | User is sent to /home after logout INSTEAD user is sent to /login | src/auth/logout.js | [tasks.md#L25](./context/spec/tasks.md#L25)
 [WIP] | Product page API call fails with 500 error INSTEAD API call returns product data | src/products/api.js | #123
 [WONTFIX] | User cannot export data to CSV INSTEAD user can export data | src/reports/component.js | #125
 ```

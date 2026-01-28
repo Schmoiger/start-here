@@ -118,7 +118,7 @@ withineve-prototype-2/
 │   ├── pii-scrubber/           # PII detection and redaction (Python, FastAPI)
 │   ├── prompts-api/            # Prompts management API (Python, FastAPI)
 │   └── secrets-manager/        # SDK to access GCP secrets (Python/TypeScript)
-├── docs/                       # Documentation
+├── context/                       # Documentation
 │   ├── common/                 # Shared standards, blueprints, and schemas
 │   ├── llm-pipeline/           # LLM pipeline documentation
 │   ├── monorepo-migration/     # Documents related to the monorepo setup
@@ -147,15 +147,15 @@ withineve-prototype-2/
 
 ## Development Workflows
 
-See `docs/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
+See `context/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
 
 ## Coding Standards
 
-See `docs/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
+See `context/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
 
 ## Testing Standards
 
-See `docs/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
+See `context/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
 
 ## Performance Considerations
 
@@ -203,8 +203,8 @@ TODO
 ## Getting Help
 
 ### Documentation Sources
-- `docs/standards/` - All development standards (coding, testing, workflows)
-- `docs/` - Project documentation and guides
+- `context/standards/` - All development standards (coding, testing, workflows)
+- `context/` - Project documentation and guides
 - Service-specific READMEs for setup instructions
 
 ### Development Support

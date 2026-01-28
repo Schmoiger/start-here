@@ -1,6 +1,6 @@
 # Cursor Multi-Agent Workflow Helper
 
-This rule helps you use the agent definitions from `docs/agents/` in Cursor workflows.
+This rule helps you use the agent definitions from `context/agents/` in Cursor workflows.
 
 ## How to Use Agents in Cursor
 
@@ -11,15 +11,15 @@ Since Cursor doesn't have native `@agent-name` syntax like Claude Code, use thes
 When using Cursor Composer, explicitly switch roles:
 
 ```
-Acting as the product-owner agent (see docs/agents/product-owner.md):
+Acting as the product-owner agent (see context/agents/product-owner.md):
 - Define requirements for [your feature]
 - Output to ./artifacts/requirements.md
 
-Then, acting as the solution-architect agent (see docs/agents/solution-architect.md):
+Then, acting as the solution-architect agent (see context/agents/solution-architect.md):
 - Design the system architecture
 - Output to ./artifacts/architecture.md
 
-Then, acting as the python-coder agent (see docs/agents/python-coder.md):
+Then, acting as the python-coder agent (see context/agents/python-coder.md):
 - Implement the backend service
 - Output to ./artifacts/python/
 ```
@@ -29,7 +29,7 @@ Then, acting as the python-coder agent (see docs/agents/python-coder.md):
 In your prompt, reference the agent file:
 
 ```
-Read docs/agents/python-coder.md and act as that agent to implement the auth service.
+Read context/agents/python-coder.md and act as that agent to implement the auth service.
 ```
 
 ### Pattern 3: Create Per-Agent Rules
@@ -39,7 +39,7 @@ Copy agent definitions to `.cursor/rules/`:
 ```bash
 # In your project
 mkdir -p .cursor/rules
-cp docs/agents/python-coder.md .cursor/rules/python-coder.mdc
+cp context/agents/python-coder.md .cursor/rules/python-coder.mdc
 ```
 
 Then reference: "Following the python-coder rule, implement..."
@@ -75,7 +75,7 @@ Then reference: "Following the python-coder rule, implement..."
 
 ## Workflow Sequence
 
-Follow the TDD workflow from `docs/agents/CLAUDE.md`:
+Follow the TDD workflow from `context/agents/CLAUDE.md`:
 
 1. **Discovery**: product-owner → requirements.md
 2. **Design**: solution-architect, database-designer, api-designer (parallel)
@@ -91,23 +91,23 @@ Follow the TDD workflow from `docs/agents/CLAUDE.md`:
 - **No `@agent-name` syntax**: Use explicit role instructions instead
 - **Manual orchestration**: You coordinate agents, not automatic
 - **Same artifacts**: All agents still read/write to `./artifacts/`
-- **Same standards**: Agents inherit from `docs/standards/` and `docs/rules/`
+- **Same standards**: Agents inherit from `context/standards/` and `context/rules/`
 
 ## Example Composer Session
 
 ```
-Step 1: Acting as product-owner (docs/agents/product-owner.md)
+Step 1: Acting as product-owner (context/agents/product-owner.md)
 Define requirements for a user authentication API.
 
-Step 2: Acting as solution-architect (docs/agents/solution-architect.md)
+Step 2: Acting as solution-architect (context/agents/solution-architect.md)
 Design the authentication system architecture.
 
-Step 3: Acting as functional-tester (docs/agents/functional-tester.md)
+Step 3: Acting as functional-tester (context/agents/functional-tester.md)
 Write failing tests for the auth API (TDD RED).
 
-Step 4: Acting as python-coder (docs/agents/python-coder.md)
+Step 4: Acting as python-coder (context/agents/python-coder.md)
 Implement the auth service to make tests pass (TDD GREEN).
 
-Step 5: Acting as tech-lead (docs/agents/tech-lead.md)
+Step 5: Acting as tech-lead (context/agents/tech-lead.md)
 Review the implementation for architecture compliance.
 ```

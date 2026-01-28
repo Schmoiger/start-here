@@ -16,7 +16,7 @@ import yaml
 
 
 BASE_DIR = Path(__file__).parent.parent.parent
-DOCS_ROOT = BASE_DIR / "docs"
+DOCS_ROOT = BASE_DIR / "context"
 AGENTS_DIR = DOCS_ROOT / "agents"
 
 
@@ -100,7 +100,7 @@ class TestAgentReferences:
         # These are known runtime directories that won't exist statically
         known_artifact_patterns = {
             "./artifacts/",
-            "./docs/",
+            "./context/",
         }
 
         issues = []
@@ -128,8 +128,8 @@ class TestAgentReferences:
                 if any(ref.startswith(pat) for pat in known_artifact_patterns):
                     continue
 
-                # Check if it's a docs reference that should exist
-                if ref.startswith("./docs/"):
+                # Check if it's a context reference that should exist
+                if ref.startswith("./context/"):
                     resolved = resolve_path(ref, path)
                     if resolved is None:
                         issues.append((path.name, ref))
@@ -172,7 +172,7 @@ class TestStandardsReferences:
                     continue
 
                 resolved = resolve_path(ref, path)
-                if resolved is None and ref.startswith("./docs/"):
+                if resolved is None and ref.startswith("./context/"):
                     issues.append((path.name, ref))
 
         if issues:
@@ -270,10 +270,10 @@ class TestReadmeLinks:
     """Validate that README files have working internal links."""
 
     def test_docs_readme_links(self):
-        """Links in docs/README.md should point to existing files."""
+        """Links in context/README.md should point to existing files."""
         readme = DOCS_ROOT / "README.md"
         if not readme.exists():
-            pytest.skip("docs/README.md not found")
+            pytest.skip("context/README.md not found")
 
         content = readme.read_text()
 
@@ -304,4 +304,4 @@ class TestReadmeLinks:
                 broken.append(link)
 
         if broken:
-            pytest.fail(f"Broken links in docs/README.md: {', '.join(broken)}")
+            pytest.fail(f"Broken links in context/README.md: {', '.join(broken)}")

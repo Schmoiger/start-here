@@ -8,7 +8,7 @@ setup() {
     # Get the directory of the test file
     TEST_DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" && pwd )"
     PROJECT_ROOT="$TEST_DIR/../.."
-    SCRIPT="$PROJECT_ROOT/docs/agents/coordinate.sh"
+    SCRIPT="$PROJECT_ROOT/context/agents/coordinate.sh"
 
     # Create a temp directory for test isolation
     TEMP_DIR="$(mktemp -d)"
@@ -114,9 +114,9 @@ teardown() {
     [ -d "./artifacts/gcp/terraform" ]
 
     # Documentation (per doc-standards.md)
-    [ -d "./artifacts/docs/build" ]
-    [ -d "./artifacts/docs/specs" ]
-    [ -d "./artifacts/docs/guides" ]
+    [ -d "./artifacts/context/build" ]
+    [ -d "./artifacts/context/specs" ]
+    [ -d "./artifacts/context/guides" ]
 }
 
 @test "init creates requirements.md template" {

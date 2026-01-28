@@ -27,7 +27,7 @@ You are a visual designer who transforms structured design specifications into p
 - Read design tokens from `./artifacts/design/design-tokens.json`
 - Read component specs from `./artifacts/design/components.md`
 - Read architecture from `./artifacts/architecture.md`
-- Read documentation from `./artifacts/docs/`
+- Read documentation from `./artifacts/context/`
 
 ## Tools & Platforms
 
@@ -149,12 +149,12 @@ Generated: [Date]
 | File | Source | Tool | Description |
 |------|--------|------|-------------|
 | `hero-image.png` | requirements.md | Gemini (Imagen 3) | Landing page hero |
-| `feature-preview.png` | docs/getting-started.md | Gemini (Imagen 3) | Feature showcase |
+| `feature-preview.png` | context/getting-started.md | Gemini (Imagen 3) | Feature showcase |
 
 ## Infographics
 | File | Source | Tool | Description |
 |------|--------|------|-------------|
-| `feature-overview.svg` | docs/getting-started.md | Napkin AI | Feature summary visual |
+| `feature-overview.svg` | context/getting-started.md | Napkin AI | Feature summary visual |
 
 ## Prompts Used
 Document the prompts that generated good results for reproducibility:

@@ -5,7 +5,7 @@ This directory contains four types of context that guide AI agents and human dev
 ## The Four Context Types
 
 ```
-docs/
+context/
 ├── agents/      # WHO does the work (roles, responsibilities, tools)
 ├── standards/   # HOW to do the work (processes, patterns, quality bars)
 ├── rules/       # WHAT constraints apply (specific requirements, conventions)
@@ -193,10 +193,10 @@ Claude Code natively supports subagents via the `@agent-name` syntax.
 ```bash
 # Copy agent files to your project
 mkdir -p your-project/.claude/agents
-cp docs/agents/*.md your-project/.claude/agents/
+cp context/agents/*.md your-project/.claude/agents/
 
 # Copy CLAUDE.md to project root for orchestration context
-cp docs/agents/CLAUDE.md your-project/
+cp context/agents/CLAUDE.md your-project/
 ```
 
 **Invocation**:
@@ -222,7 +222,7 @@ Cursor uses `.cursorrules` or `.mdc` files for context injection.
 **Setup**:
 ```bash
 # Option 1: Copy rules directly
-cp docs/rules/*.mdc your-project/.cursor/rules/
+cp context/rules/*.mdc your-project/.cursor/rules/
 
 # Option 2: Reference agents as rules
 # Create .cursorrules that includes agent definitions
@@ -258,7 +258,7 @@ Aider uses convention files and can be prompted with agent roles.
 **Invocation**:
 ```bash
 # Provide agent context in the prompt
-aider --message "Acting as a Python coder following docs/agents/python-coder.md, implement the auth service"
+aider --message "Acting as a Python coder following context/agents/python-coder.md, implement the auth service"
 ```
 
 **Adaptation**:
@@ -278,7 +278,7 @@ from langchain.agents import AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate
 
 # Load agent definition
-with open("docs/agents/python-coder.md") as f:
+with open("context/agents/python-coder.md") as f:
     agent_def = f.read()
 
 # Extract system prompt from markdown
@@ -343,13 +343,13 @@ from autogen import AssistantAgent, UserProxyAgent
 
 python_coder = AssistantAgent(
     name="python_coder",
-    system_message=open("docs/agents/python-coder.md").read(),
+    system_message=open("context/agents/python-coder.md").read(),
     llm_config={"model": "gpt-4"}
 )
 
 tech_lead = AssistantAgent(
     name="tech_lead",
-    system_message=open("docs/agents/tech-lead.md").read(),
+    system_message=open("context/agents/tech-lead.md").read(),
     llm_config={"model": "gpt-4"}
 )
 
@@ -372,7 +372,7 @@ client = OpenAI()
 # Create assistant from agent definition
 assistant = client.beta.assistants.create(
     name="python-coder",
-    instructions=open("docs/agents/python-coder.md").read(),
+    instructions=open("context/agents/python-coder.md").read(),
     model="gpt-4-turbo",
     tools=[
         {"type": "code_interpreter"},
@@ -399,7 +399,7 @@ Write to: [DELIVERABLES]
 [CONSTRAINTS FROM AGENT FILE]
 
 # Standards
-Follow all standards in ./docs/standards/ and rules in ./docs/rules/.
+Follow all standards in ./context/standards/ and rules in ./context/rules/.
 
 # Task
 [USER'S REQUEST]
