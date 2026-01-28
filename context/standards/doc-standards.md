@@ -15,126 +15,117 @@ This repository is a monorepo, containing multiple projects.
 
 (monorepo root)/(major system)/(project root)
 
-The documentation shall be structured as follows:
+The documentation shall be structured with a clear separation of concerns:
 
-*   The system shall store all documentation that applies to all projects at the monorepo root, in the `/context/` directory (e.g., `/context/standards/`, `/context/rules/`).
-*   The system shall store all documentation specific to a single project within that project's own `context/` folder (e.g., `/project-a/context/`).
+*   **`/context/`** (Monorepo Root): Shared input knowledge that applies to all projects—agent definitions, standards, rules, and MCP configurations. This is **input** that guides how work is done.
+*   **`/artifacts/`** (Project Root): Project-specific work output—specifications, tasks, bugs, design documents, and guides. This is **output** produced during development.
 
 For example:
 
 ```
 / (monorepo root)
+├── context/                      # Shared input (applies to all projects)
+│   ├── agents/                   # Agent role definitions
+│   ├── mcp/                      # Model Context Protocol configs
+│   ├── rules/                    # Development rules and conventions
+│   └── standards/                # Development standards
 ├── project-a/ (project root)
-│   ├── context/
-│   │   ├── build/
-│   │   │   ├── bugs.md
-│   │   │   ├── tasks.md
-│   │   │   └── todo.md
-│   │   ├── guides/
-│   │   └── specs/
-│   │       ├── design.md
-│   │       ├── product.md
-│   │       └── requirements.md
+│   ├── artifacts/                # Project work output
+│   │   ├── api/                  # API specifications
+│   │   ├── architecture/         # Architecture decisions
+│   │   ├── bugs/                 # Bug tracking
+│   │   ├── design/               # UI/UX design
+│   │   ├── product/              # Product specs
+│   │   ├── shared/               # Shared fixtures, handoffs, mocks
+│   │   └── tasks/                # Task breakdowns
 │   ├── scripts/
 │   ├── src/
 │   ├── tests/
 │   └── README.md
 ├── project-b/ (project root)
-│   ├── context/
+│   ├── artifacts/                # Project work output
 │   ├── scripts/
 │   ├── src/
 │   ├── tests/
 │   └── README.md
 ```
 
-### 2.2. Recommended Project Context Files
+### 2.1.1. Separation of Concerns: Context vs Artifacts
 
-Where a project has a `context/build` folder, the system shall include the following files:
+**`/context/` = Input (Shared Knowledge)**
+- Contains reusable knowledge that guides how work is done across all projects
+- Includes: agent definitions, coding standards, workflow rules, MCP tool configs
+- **Purpose**: Provides the "how" and "who" for development work
+- **Lifecycle**: Persistent, version-controlled, shared across projects
+- **Location**: Monorepo root only
 
-*   `bugs.md`: The system shall use this file to list current and past bugs.
-*   `tasks.md`: The system shall use this file to list current, past, and future tasks.
+**`/artifacts/` = Output (Project Work)**
+- Contains project-specific deliverables produced during development
+- Includes: specifications, requirements, design docs, tasks, bugs, guides, handoffs
+- **Purpose**: Documents "what" is being built and tracks progress
+- **Lifecycle**: Project-specific, may be ephemeral during development, promoted to final docs after approval
+- **Location**: Each project root has its own `artifacts/` folder
+
+This separation ensures that:
+- Shared knowledge (context) remains clean and reusable
+- Project work (artifacts) is clearly scoped to specific deliverables
+- Agents can distinguish between "how to work" (context) and "what to build" (artifacts)
+
+### 2.2. Recommended Project Artifacts Structure
+
+Projects should organize their work output in the `artifacts/` folder. The following structure is recommended:
+
+**`artifacts/product/`** - Product specifications:
+*   `product.md` (or `user-stories.md`): Product vision, goals, user stories, and success criteria
+*   `requirements.md`: Functional and non-functional requirements using EARS notation (see `context/rules/EARS-notation-requirements.mdc`)
+*   `open-questions.md`: Unresolved product questions and decisions
+
+**`artifacts/architecture/`** - Technical architecture:
+*   `architecture.md`: System architecture and technical design decisions
+*   `data-model.md`: Data models and schemas
+
+**`artifacts/design/`** - UI/UX design:
+*   `design.md` (or `components.md`, `wireframes.md`): UI component specifications and wireframes
+*   `design-tokens.json`: Design system tokens
+*   `user-flows.md`: User interaction flows
+*   `visuals/`: Design assets (SVGs, images, themes)
+
+**`artifacts/api/`** - API specifications:
+*   `openapi.yaml`: OpenAPI specification
+*   `api-contract.json`: API contract definitions
+*   `api-design-guide.md`: API design guidelines
+
+**`artifacts/tasks/`** - Task management:
+*   `tasks.md` (or per-service files like `tasks-data-service.md`): Task breakdowns with task IDs
     *   The project root shall be defined and all file paths shall be relative to the project root.
-    *   For each task assigned to an agent, `tasks.md` shall specify whether the agent shall commit its changes automatically upon completion or shall wait for user approval before committing.
+    *   For each task assigned to an agent, tasks shall specify whether the agent shall commit its changes automatically upon completion or shall wait for user approval before committing.
     *   Each task description shall provide the necessary and sufficient context for an agent to execute the task, assuming it operates in a standalone context. This includes references to relevant requirements, design documents, and source files.
-*   `todo.md`: The system shall use this file for a list of smaller items, technical debt, or future improvements.
+*   `todo.md`: Smaller items, technical debt, or future improvements
 
-Where a project has a `context/specs` folder, the system shall include the following files:
+**`artifacts/bugs/`** - Bug tracking:
+*   `bugs.md` (or per-service files like `*-bugs.md`): Bug tracking following `context/standards/bug-standards.md`
+*   `code-review-*.md`: Detailed code review documentation
 
-*   `product.md`: The system shall use this file to detail the user experience of the functionality of the project.
-*   `requirements.md`: The system shall use this file to detail the functional and non-functional requirements of the project.
-    *   The system shall write all requirements using the EARS notation, as specified in `context/rules/EARS-notation-requirements.mdc`.
-*   `design.md`: The system shall use this file to describe the architectural and design decisions for the project.
+**`artifacts/shared/`** - Cross-cutting artifacts:
+*   `handoffs/`: Agent-to-agent handoff documentation (see section 2.2.1)
+*   `HANDOFF-TEMPLATE.md`: Template for intra-domain agent handoffs
+*   `TEMPLATE-handoff-to-human.md`: Template for handoffs to humans (format and behaviour in `context/standards/agent-standards.md` section 3.4.5)
+*   `fixtures/`: Test fixtures and sample data
+*   `mocks/`: Mock implementations for testing
 
-### 2.2.1. Agent Handoff Files
+Handoffs from agents to humans use a single file `artifacts/HANDOFF-TO-HUMAN.md` (overwritten each time). Format and behaviour are in agent-standards section 3.4.5.
 
-The system shall maintain handoff documentation for agent coordination:
+### 2.2.1. Agent Handoff Files (Locations Only)
 
-#### Service-Level Handoffs (`HANDOFF.md`)
+Handoff *format*, *required elements*, *workflow*, and *handoffs to humans* are defined in `context/standards/agent-standards.md` (section 3.4). This section defines *where* handoff files live.
 
-Each service directory shall contain a `HANDOFF.md` file for intra-domain coordination:
+**Intra-domain** (same service/package):
+*   `{service-directory}/HANDOFF.md`
+*   Template: `artifacts/shared/HANDOFF-TEMPLATE.md`
 
-*   **Location**: `{service-directory}/HANDOFF.md`
-*   **Purpose**: Track handoffs between agents working on the same context domain
-*   **Format**: Use template from `artifacts/shared/HANDOFF-TEMPLATE.md`
-
-Required elements:
-*   **Timestamp**: ISO 8601 with timezone (e.g., `2026-01-27T18:45:32Z`)
-*   **From/To Agents**: Source and destination agent names with @ prefix
-*   **Task IDs**: Range of tasks covered (e.g., `DS-001 through DS-008`)
-*   **Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked | 🔴 Failed
-*   **Summary**: Brief description of work completed (2-3 sentences)
-*   **Notes for Next Agent**: Critical information, gotchas, files to review
-*   **Artifacts**: Paths to code, tests, fixtures, documentation
-*   **Blockers**: Any issues preventing progress
-*   **Commit Hash**: Git commit linking handoff to code changes
-
-Example:
-```markdown
-### From: @functional-tester
-**To**: @python-coder
-**Timestamp**: 2026-01-27T18:45:32Z
-**Tasks**: DS-001 through DS-008
-**Status**: ✅ Complete
-
-**Summary**: All data-service tests written and failing. Test coverage
-includes yfinance integration, Bronze/Silver stores, cache management,
-and API endpoints.
-
-**Notes for Next Agent**:
-- Test fixtures in tests/fixtures/
-- Mock yfinance responses in tests/mocks/
-- Expected cache behaviour documented in DS-005
-
-**Artifacts**:
-- Tests: `services/data-service/tests/`
-- Fixtures: `services/data-service/tests/fixtures/`
-
-**Commit**: abc1234 - test(data-service): DS-001-008 add failing tests
-```
-
-#### Cross-Domain Handoffs
-
-For coordination between services, use `artifacts/shared/handoffs/`:
-
-*   **Integration Status**: `artifacts/shared/handoffs/integration-status.md`
-  - Master coordination file showing readiness of all domains
-  - Updated when services reach integration-ready state
-
-*   **Service API Status**: `artifacts/shared/handoffs/{service}-api.md`
-  - Documents API endpoint stability for consumers
-  - Created when endpoints are stable and ready for integration
-  - Template: `artifacts/shared/handoffs/TEMPLATE-service-api.md`
-
-Required elements for API handoffs:
-*   **Endpoint Status**: ✅ Stable | 🚧 In Development | ⚠️ Breaking Change | 🔴 Blocked
-*   **Since Timestamp**: When endpoint became stable
-*   **OpenAPI Reference**: Lines in openapi.yaml
-*   **Example Response**: Path to fixture file
-*   **Mock Client**: Path to mock implementation
-*   **Consumers**: Which services depend on this endpoint
-*   **Dependencies**: Which services this endpoint depends on
-*   **Known Issues**: Any bugs or limitations
-*   **Breaking Changes**: Upcoming changes with ETAs
+**Inter-domain** (between services), under `artifacts/shared/handoffs/`:
+*   `integration-status.md` — master coordination file for readiness of all domains
+*   `{service}-api.md` — API endpoint stability for consumers; template: `TEMPLATE-service-api.md`
 
 ### 2.3. Project `README.md`
 
@@ -168,10 +159,12 @@ The system maintains shared documentation resources in `/context/` for use acros
 
 ### 3.2. Context File Quality Standards
 
-All project context files shall be reviewed from the perspective of an expert context engineer to ensure they are:
+All files in `/context/` (shared input knowledge) shall be reviewed from the perspective of an expert context engineer to ensure they are:
 
 *   **Necessary**: Each piece of information serves a clear purpose in understanding or developing the project.
 *   **Sufficient**: Contains all essential information needed for autonomous agent understanding and execution.
 *   **Human-Friendly**: Easily understandable by humans without requiring specialized knowledge, avoiding unnecessary technical jargon.
 *   **Non-Verbose**: Concise and focused, avoiding redundancy while not consuming unnecessary tokens in AI context windows.
 *   **Actionable**: Provides clear, specific guidance that enables effective decision-making and implementation.
+
+**Note**: Files in `artifacts/` (project work output) have different quality standards—they are project-specific deliverables that evolve during development. They should be clear and well-structured, but they don't need to meet the same "reusable across all projects" standard as `/context/` files.
