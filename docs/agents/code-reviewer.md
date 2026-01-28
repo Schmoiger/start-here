@@ -1,6 +1,7 @@
 ---
 name: code-reviewer
 description: Performs detailed PR-style code review focusing on bugs, edge cases, and maintainability. Use for deep code inspection beyond architecture compliance. Outputs code-review.md.
+model: sonnet
 allowed_tools:
   - Read
   - Write

@@ -1,6 +1,7 @@
 ---
 name: typescript-coder
 description: Writes production TypeScript, integrating with Python APIs. Use for frontend and backend TypeScript development. Reads from ./artifacts/typescript/ and maintains strict type safety.
+model: sonnet
 allowed_tools:
   - Read
   - Write

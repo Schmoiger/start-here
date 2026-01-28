@@ -92,8 +92,64 @@ To operate autonomously but safely, agents shall adhere to the following behavio
 
 ### 3.3. Version Control
 
-*   The agent shall commit its changes to the version control system after completing a significant group of related tasks.
+*   The agent shall commit its changes to the version control system after completing each task.
 *   The agent shall write a clear and concise commit message that summarizes the purpose of the changes.
+*   The commit message shall include the task ID and follow the format specified in `docs/standards/coding-standards.md`.
+
+### 3.4. Agent Handoffs
+
+Agents shall communicate context and status through structured handoff documents to enable coordination.
+
+#### 3.4.1. Handoff Types
+
+**Intra-domain handoffs** (within same service/package):
+- Location: `{service-directory}/HANDOFF.md`
+- Purpose: Coordinate between agents working on the same context domain
+- Example: functional-tester → python-coder → tech-lead
+
+**Inter-domain handoffs** (between services):
+- Location: `artifacts/shared/handoffs/{service}-api.md`
+- Purpose: Coordinate between agents working on different context domains
+- Example: data-service → vis-service, vis-service → frontend
+
+#### 3.4.2. Handoff Format
+
+Each handoff entry shall include:
+- **Timestamp**: ISO 8601 with timezone (e.g., `2026-01-27T18:45:32Z`)
+- **From/To**: Source and destination agent names
+- **Tasks**: Task IDs covered by this handoff
+- **Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked | 🔴 Failed
+- **Summary**: Brief description of work completed
+- **Notes**: Critical information for next agent
+- **Artifacts**: Paths to relevant files (code, tests, docs)
+- **Blockers**: Any blockers preventing progress
+- **Commit**: Git commit hash linking handoff to code
+
+#### 3.4.3. Handoff Workflow
+
+When completing a group of tasks:
+1. Update the HANDOFF.md file in service directory (intra-domain)
+2. If completing integration-ready work, update `artifacts/shared/handoffs/integration-status.md` (inter-domain)
+3. If API endpoints are stable, create/update `artifacts/shared/handoffs/{service}-api.md` (inter-domain)
+4. Commit changes with handoff updates included
+5. Mark tasks as complete in task list
+
+#### 3.4.4. Integration Readiness
+
+Before marking a service as "Ready for Integration", the agent shall ensure:
+- All Phase 2 (TDD GREEN) tasks complete
+- Phase 3 (Review) approved
+- Test coverage >= 90%
+- API endpoints match OpenAPI specification
+- HANDOFF.md exists in service directory
+- Mock client provided in `artifacts/shared/mocks/`
+- Example responses in `artifacts/shared/fixtures/`
+- Integration status updated in `artifacts/shared/handoffs/integration-status.md`
+
+#### 3.4.5. Templates
+
+- **Intra-domain**: Use `artifacts/shared/HANDOFF-TEMPLATE.md`
+- **Inter-domain**: Use `artifacts/shared/handoffs/TEMPLATE-service-api.md`
 
 ## 4. Build, Test, and Automation Artifacts
 
@@ -109,15 +165,38 @@ To limit the blast radius of agent changes and enable parallel work, agents shal
 
 A context domain groups agents that need to share files or context directly. Agents within the same domain work in the same worktree; agents in different domains work in separate worktrees.
 
+#### Generic Domains (Phase-Based)
+
+These domains apply during discovery, design, and review phases:
+
 | Domain | Agents | Shared Context |
 |--------|--------|----------------|
 | **discovery** | product-owner | requirements.md, user-stories.md |
 | **design** | solution-architect, database-designer, api-designer, ui-designer, visual-designer | architecture.md, api-contract.json, data-model.md, schema.sql, openapi.yaml, design/ |
-| **backend** | python-coder, functional-tester (Python) | ./artifacts/python/, tests/ |
-| **frontend** | typescript-coder, functional-tester (TypeScript) | ./artifacts/typescript/, tests/ |
 | **review** | tech-lead, code-reviewer, security-tester | All code (read-only), review reports |
 | **infra** | gcp-devops | ./artifacts/gcp/, terraform/ |
 | **docs** | documentation | ./artifacts/docs/, all specs (read-only) |
+
+#### Project-Specific Domains (Implementation Phase)
+
+For multi-service architectures, define project-specific domains based on service boundaries. These replace the generic `backend` and `frontend` domains during implementation.
+
+**Example: Bollinger Bands Application**
+
+| Domain | Path | Agents | Shared Context |
+|--------|------|--------|----------------|
+| **shared-types** | `packages/shared-types/` | python-coder, typescript-coder | Pydantic models, TypeScript types, API contracts |
+| **data-service** | `services/data-service/` | python-coder, functional-tester | Bronze/Silver stores, market data, caching |
+| **vis-service** | `services/visualisation-service/` | python-coder, functional-tester | Bollinger calculator, backtest engine, config |
+| **llm-service** | `services/llm-service/` | python-coder, functional-tester | OpenRouter client, narrative generator |
+| **frontend** | `frontend/` | typescript-coder, functional-tester | React UI, state management, API clients |
+
+**Domain Dependencies:**
+- `shared-types` must complete before parallel service work begins
+- Services communicate via REST APIs, not shared code
+- Each domain provides mock implementations for testing during parallel development
+
+**See:** Project architecture documentation (`artifacts/architecture.md`) for complete domain definitions, interface contracts, and mock implementation patterns.
 
 ### 5.2. Worktree Structure
 
