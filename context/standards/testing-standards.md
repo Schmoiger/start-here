@@ -1,10 +1,11 @@
-# withineve Testing Standards
+# Testing Standards
 
 **TDD-First Development**: Write tests before implementation. No code without passing tests.
 
 **Quality Gate**: All tests must pass before commits, reviews, or deployments.
 
 **Testing Pyramid**:
+
 - **Unit Tests (70%)**: Isolated functions/methods with mocked dependencies
 - **Integration Tests (20%)**: Component interactions with real services
 - **E2E Tests (10%)**: Complete user workflows with real browsers
@@ -45,6 +46,7 @@ feat: implement user authentication
 ```
 
 ## Test Organization
+
 ```
 tests/
 ├── unit/test_{service}.py      # Unit tests, mock all dependencies
@@ -53,6 +55,7 @@ tests/
 ```
 
 ## Data & Mocking
+
 - Use factories for consistent test data
 - Mock external services in unit tests
 - Real services for integration tests
@@ -61,12 +64,14 @@ tests/
 ## Visual Testing
 
 ### When to Use Visual Testing
+
 - **UI Components**: Components with visual appearance requirements
 - **Marketing Pages**: Landing pages, dashboards, forms
 - **Responsive Design**: Breakpoint testing across devices
 - **Brand Consistency**: Ensuring UI matches design system
 
 ### Implementation
+
 ```typescript
 // Example visual test with Playwright
 test('dashboard layout matches design', async ({ page }) => {
@@ -81,6 +86,7 @@ test('dashboard layout matches design', async ({ page }) => {
 ```
 
 ### Visual Testing Workflow
+
 1. **Baseline**: Initial approved screenshots become "golden" images
 2. **Regression Detection**: CI catches visual changes from baseline
 3. **Manual Review**: Team reviews and approves or rejects changes
@@ -89,6 +95,7 @@ test('dashboard layout matches design', async ({ page }) => {
 ## Testing Tools & Frameworks
 
 ### Backend (Python)
+
 - **pytest**: Core testing framework
 - **pytest-asyncio**: Async test support
 - **pytest-mock**: Mocking utilities
@@ -96,23 +103,27 @@ test('dashboard layout matches design', async ({ page }) => {
 - **hypothesis**: Property-based testing
 
 ### Frontend (TypeScript/React)
+
 - **Vitest**: Fast unit testing for Vite/React projects
 - **Testing Library**: Component testing utilities
 - **Playwright**: E2E and visual testing
 - **MSW**: Mock Service Worker for API mocking
 
 ### CI/CD Integration
+
 - **GitHub Actions**: Automated test execution on PRs
 - **Quality Gates**: 100% of tests must pass before merge
 - **Warnings**: Bugs to be raised for all warnings
 
 ## Coverage Requirements
 
-| Metric | Threshold | Action |
-|--------|-----------|--------|
-| Minimum | 90% | Build fails below this |
-| Target | 100% | Always aim for full coverage |
-| Gap Documentation | Required | If <100%, document gaps in `{service}/artifacts/test-gaps.md` |
+
+| Metric            | Threshold | Action                                                        |
+| ----------------- | --------- | ------------------------------------------------------------- |
+| Minimum           | 90%       | Build fails below this                                        |
+| Target            | 100%      | Always aim for full coverage                                  |
+| Gap Documentation | Required  | If <100%, document gaps in `{service}/artifacts/test-gaps.md` |
+
 
 ### Gap Documentation Format
 
@@ -134,6 +145,7 @@ When coverage is below 100%, document each gap in `{service}/artifacts/test-gaps
 These practices undermine test quality and are explicitly prohibited:
 
 ### 1. Excessive Fallback Usage
+
 ```python
 # FORBIDDEN: Catching all exceptions to make tests pass
 try:
@@ -143,6 +155,7 @@ except Exception:
 ```
 
 ### 2. Skipping Tests to Pass CI
+
 ```python
 # FORBIDDEN: Skipping without documented reason
 @pytest.mark.skip("flaky")  # Not acceptable
@@ -151,6 +164,7 @@ def test_critical_feature():
 ```
 
 ### 3. Mocking Away Failures
+
 ```python
 # FORBIDDEN: Mocking to avoid testing real behaviour
 @patch('module.database.query', return_value=[])  # Avoids testing DB errors
@@ -159,6 +173,7 @@ def test_should_handle_empty_results():
 ```
 
 ### 4. Test Pollution
+
 ```python
 # FORBIDDEN: Tests that depend on execution order or shared state
 class TestUser:
@@ -166,6 +181,7 @@ class TestUser:
 ```
 
 ### 5. Assertion-Free Tests
+
 ```python
 # FORBIDDEN: Tests that don't actually verify anything
 def test_user_creation():
@@ -194,3 +210,4 @@ def test_processes_api_response(mock_fetch):
     assert result.success is True
     mock_fetch.assert_called_once()
 ```
+

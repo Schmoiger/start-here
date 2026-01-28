@@ -1,8 +1,9 @@
-# withineve Coding Standards
+# Coding Standards
 
 **Languages**: Python (backend), TypeScript (frontend)
 
 ## File Organization
+
 ```
 backend/{service-name}/
 ├── main.py              # FastAPI app entry point
@@ -23,6 +24,7 @@ frontend/
 ```
 
 ## Naming Conventions
+
 ```typescript
 // Files: kebab-case (login-form.tsx)
 // Components: PascalCase (LoginForm)
@@ -31,9 +33,11 @@ frontend/
 ```
 
 ## Virtual Environment
+
 A virtual environment shall be initialised at the project root.
 
 ## Component Structure
+
 ```typescript
 export const ComponentName: FunctionalComponent<Props> = ({ prop }) => {
   // Hooks first (useEffect, useState before conditionals)
@@ -60,6 +64,7 @@ export const ComponentName: FunctionalComponent<Props> = ({ prop }) => {
 ```
 
 ## Import Organization
+
 ```typescript
 // 1. React imports
 import { useState } from 'react';
@@ -75,6 +80,7 @@ import type { User } from '@/types/user';
 ```
 
 ## Python/FastAPI Patterns
+
 ```python
 # Service classes with dependency injection
 class HealthDataService:
@@ -102,6 +108,7 @@ async def get_user_data(
 ```
 
 ## Error Handling
+
 ```typescript
 // Frontend: Custom error types
 class ServiceError extends Error {
@@ -122,6 +129,7 @@ class APIError(HTTPException):
 ```
 
 ## Security Patterns
+
 ```typescript
 // Input validation with Zod
 const Schema = z.object({
@@ -137,6 +145,7 @@ export async function POST(request: Request) {
 ```
 
 ## Performance Patterns
+
 ```typescript
 // Lazy loading
 const Component = lazy(() => import('./Component'));
@@ -152,6 +161,7 @@ user_data, health_data = await asyncio.gather(
 ```
 
 ## Logging Standards
+
 ```python
 # Structured logging
 logger = logging.getLogger(__name__)
@@ -168,6 +178,7 @@ def log_api_call(method: str, endpoint: str, user_id: str, duration_ms: int):
 ```
 
 ## Code Quality Requirements
+
 ```json
 // tsconfig.json (TypeScript strict mode)
 {
@@ -202,17 +213,20 @@ Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
 
 ### Commit Types by TDD Phase
 
-| Phase | Type | Example |
-|-------|------|---------|
-| TDD RED (tests) | `test` | `test(data-service): DS-001 add failing tests for yfinance data fetching` |
-| TDD GREEN (impl) | `feat` | `feat(vis-service): VS-102 implement Bollinger Band calculator` |
-| Review | `docs` | `docs(frontend): FE-301 add tech lead review - APPROVED` |
-| Bug fix | `fix` | `fix(llm-service): LLM-105 handle OpenRouter timeout` |
-| Refactor | `refactor` | `refactor(shared-types): ST-107 simplify model exports` |
+
+| Phase            | Type       | Example                                                                   |
+| ---------------- | ---------- | ------------------------------------------------------------------------- |
+| TDD RED (tests)  | `test`     | `test(data-service): DS-001 add failing tests for yfinance data fetching` |
+| TDD GREEN (impl) | `feat`     | `feat(vis-service): VS-102 implement Bollinger Band calculator`           |
+| Review           | `docs`     | `docs(frontend): FE-301 add tech lead review - APPROVED`                  |
+| Bug fix          | `fix`      | `fix(llm-service): LLM-105 handle OpenRouter timeout`                     |
+| Refactor         | `refactor` | `refactor(shared-types): ST-107 simplify model exports`                   |
+
 
 ### Scopes
 
 Use the service/package name as scope:
+
 - `shared-types` - Shared type definitions
 - `data-service` - Data fetching service
 - `vis-service` - Visualisation service
@@ -250,3 +264,5 @@ feat: add user authentication
 fix: resolve token refresh bug
 docs: update API documentation
 refactor: simplify data service logic
+```
+
