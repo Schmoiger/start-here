@@ -17,15 +17,15 @@ This repository is a monorepo, containing multiple projects.
 
 The documentation shall be structured as follows:
 
-*   The system shall store all documentation that applies to all projects at the monorepo root, in the `/docs/` directory (e.g., `/docs/standards/`, `/docs/rules/`).
-*   The system shall store all documentation specific to a single project within that project's own `docs/` folder (e.g., `/project-a/docs/`).
+*   The system shall store all documentation that applies to all projects at the monorepo root, in the `/context/` directory (e.g., `/context/standards/`, `/context/rules/`).
+*   The system shall store all documentation specific to a single project within that project's own `context/` folder (e.g., `/project-a/context/`).
 
 For example:
 
 ```
 / (monorepo root)
 ├── project-a/ (project root)
-│   ├── docs/
+│   ├── context/
 │   │   ├── build/
 │   │   │   ├── bugs.md
 │   │   │   ├── tasks.md
@@ -40,7 +40,7 @@ For example:
 │   ├── tests/
 │   └── README.md
 ├── project-b/ (project root)
-│   ├── docs/
+│   ├── context/
 │   ├── scripts/
 │   ├── src/
 │   ├── tests/
@@ -49,7 +49,7 @@ For example:
 
 ### 2.2. Recommended Project Context Files
 
-Where a project has a `docs/build` folder, the system shall include the following files:
+Where a project has a `context/build` folder, the system shall include the following files:
 
 *   `bugs.md`: The system shall use this file to list current and past bugs.
 *   `tasks.md`: The system shall use this file to list current, past, and future tasks.
@@ -58,11 +58,11 @@ Where a project has a `docs/build` folder, the system shall include the followin
     *   Each task description shall provide the necessary and sufficient context for an agent to execute the task, assuming it operates in a standalone context. This includes references to relevant requirements, design documents, and source files.
 *   `todo.md`: The system shall use this file for a list of smaller items, technical debt, or future improvements.
 
-Where a project has a `docs/specs` folder, the system shall include the following files:
+Where a project has a `context/specs` folder, the system shall include the following files:
 
 *   `product.md`: The system shall use this file to detail the user experience of the functionality of the project.
 *   `requirements.md`: The system shall use this file to detail the functional and non-functional requirements of the project.
-    *   The system shall write all requirements using the EARS notation, as specified in `docs/rules/EARS-notation-requirements.mdc`.
+    *   The system shall write all requirements using the EARS notation, as specified in `context/rules/EARS-notation-requirements.mdc`.
 *   `design.md`: The system shall use this file to describe the architectural and design decisions for the project.
 
 ### 2.2.1. Agent Handoff Files
@@ -147,11 +147,11 @@ The system shall maintain a `README.md` file in the root of each project. The `R
 
 ## 3. Common Documentation Resources
 
-The system maintains shared documentation resources in `/docs/` for use across all projects. 
+The system maintains shared documentation resources in `/context/` for use across all projects. 
 
 ```
 / (monorepo root)
-├── docs/
+├── context/
 │   ├── agents/
 │   ├── mcp/
 │   ├── rules/

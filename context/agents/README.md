@@ -155,7 +155,7 @@ flowchart TD
 ## Key Principles
 
 **Standards Compliance**
-All agents follow standards in `./docs/standards/` and rules in `./docs/rules/`. Compliance is inherited.
+All agents follow standards in `./context/standards/` and rules in `./context/rules/`. Compliance is inherited.
 
 **TDD Workflow**
 Tests are written BEFORE implementation. Coders make tests pass, not the other way around.
@@ -163,8 +163,8 @@ Tests are written BEFORE implementation. Coders make tests pass, not the other w
 **All context is in `./artifacts/`**
 Agents read/write from a shared filesystem directory during development. This is ephemeral workspace.
 
-**Final docs go to `./docs/`**
-After approval, outputs are promoted from `./artifacts/` to `./docs/`.
+**Final docs go to `./context/`**
+After approval, outputs are promoted from `./artifacts/` to `./context/`.
 
 **Agents don't spawn other agents**
 The main Claude Code session orchestrates everything. Agents are isolated specialists.

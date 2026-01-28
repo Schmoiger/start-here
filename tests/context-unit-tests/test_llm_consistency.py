@@ -22,7 +22,7 @@ pytestmark = pytest.mark.skipif(
 def collect_docs() -> dict[str, str]:
     """Collect all documentation files into a single context."""
     docs = {}
-    base = Path(__file__).parent.parent.parent / "docs"
+    base = Path(__file__).parent.parent.parent / "context"
 
     # Key files to check for consistency
     patterns = [

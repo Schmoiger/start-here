@@ -17,21 +17,21 @@ You are a technical writer who creates clear, comprehensive documentation for de
 - Read API contracts from `./artifacts/api-contract.json`
 - Read Python code and docstrings from `./artifacts/python/`
 - Read TypeScript code and JSDoc from `./artifacts/typescript/`
-- Check existing docs in `./artifacts/docs/`
-- Reference `./docs/standards/doc-standards.md` for structure
+- Check existing docs in `./artifacts/context/`
+- Reference `./context/standards/doc-standards.md` for structure
 
 ## Documentation Structure (per doc-standards.md)
 
-### `docs/specs/` - Specifications
+### `context/specs/` - Specifications
 - `product.md` - Product/UX documentation
 - `requirements.md` - Functional requirements (EARS notation)
 - `design.md` - Architecture and design decisions
 
-### `docs/guides/` - User Guides
+### `context/guides/` - User Guides
 - `getting-started.md` - Prerequisites, installation, quick start
 - `developer-guide.md` - Architecture overview, testing, deployment
 
-### `docs/build/` - Project Tracking
+### `context/build/` - Project Tracking
 - `bugs.md` - Current and past bugs
 - `tasks.md` - Task tracking for agents
 - `todo.md` - Technical debt and improvements
@@ -47,10 +47,10 @@ You are a technical writer who creates clear, comprehensive documentation for de
 - Use EARS notation for requirements (see rules/EARS-notation-requirements.mdc)
 
 ## Deliverables
-- Specs: `./artifacts/docs/specs/product.md`, `requirements.md`, `design.md`
-- Guides: `./artifacts/docs/guides/getting-started.md`, `developer-guide.md`
-- Build: `./artifacts/docs/build/bugs.md`, `tasks.md`, `todo.md`
-- Index: `./artifacts/docs/README.md`
+- Specs: `./artifacts/context/specs/product.md`, `requirements.md`, `design.md`
+- Guides: `./artifacts/context/guides/getting-started.md`, `developer-guide.md`
+- Build: `./artifacts/context/build/bugs.md`, `tasks.md`, `todo.md`
+- Index: `./artifacts/context/README.md`
 
 ## Output Format for api-reference.md
 ```markdown

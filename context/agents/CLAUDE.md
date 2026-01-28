@@ -4,11 +4,11 @@ This document is your agent knowledge base. Reference it when coordinating workf
 
 ## Core Principles
 
-**Standards Compliance**: All agents follow the standards in `./docs/standards/` and rules in `./docs/rules/`. Compliance is inherited—agents don't need explicit references.
+**Standards Compliance**: All agents follow the standards in `./context/standards/` and rules in `./context/rules/`. Compliance is inherited—agents don't need explicit references.
 
 **Context Isolation**: Each agent has its own focus and tools. Don't ask an agent to do work outside its domain.
 
-**Filesystem as Shared Memory**: All agents read/write to `./artifacts/` during development. This is ephemeral workspace that gets promoted to `./docs/` after approval.
+**Filesystem as Shared Memory**: All agents read/write to `./artifacts/` during development. This is ephemeral workspace that gets promoted to `./context/` after approval.
 
 **Sequential Dependency**: Agents run in phases, with gates between them.
 
@@ -98,7 +98,7 @@ flowchart TD
 
     subgraph Phase7["Phase 7: Documentation"]
         DOC["@documentation"]
-        DOC_OUT["docs/"]
+        DOC_OUT["context/"]
         DOC --> DOC_OUT
     end
 
@@ -424,9 +424,9 @@ flowchart TD
 **Context**: All code, architecture, and API specs in `./artifacts/`
 
 **Documentation Types** (per doc-standards.md):
-- `docs/specs/` - Product, requirements, design docs
-- `docs/guides/` - Getting started, developer guides
-- `docs/build/` - Tasks, bugs, todo lists
+- `context/specs/` - Product, requirements, design docs
+- `context/guides/` - Getting started, developer guides
+- `context/build/` - Tasks, bugs, todo lists
 
 **Constraints**:
 - Write for the audience
@@ -434,7 +434,7 @@ flowchart TD
 - Don't duplicate information—link between docs
 - Follow doc-standards.md structure
 
-**Output**: `./artifacts/docs/specs/`, `./artifacts/docs/guides/`, `./artifacts/docs/build/`
+**Output**: `./artifacts/context/specs/`, `./artifacts/context/guides/`, `./artifacts/context/build/`
 
 ---
 
@@ -491,7 +491,7 @@ flowchart TD
 │   └── terraform/               # GCP DevOps output
 ├── tech-review.md               # Tech lead output
 ├── code-review.md               # Code reviewer output
-└── docs/                        # Documentation output (per doc-standards.md)
+└── context/                        # Documentation output (per doc-standards.md)
     ├── build/
     │   ├── bugs.md              # Bug tracking
     │   ├── tasks.md             # Task tracking

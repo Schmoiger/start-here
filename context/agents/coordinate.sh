@@ -79,9 +79,9 @@ init_agent_dirs() {
     mkdir -p ./artifacts/gcp/terraform
 
     # Phase 7: Documentation (per doc-standards.md)
-    mkdir -p ./artifacts/docs/build
-    mkdir -p ./artifacts/docs/specs
-    mkdir -p ./artifacts/docs/guides
+    mkdir -p ./artifacts/context/build
+    mkdir -p ./artifacts/context/specs
+    mkdir -p ./artifacts/context/guides
 
     # Create requirements template if not present
     if [ ! -f "./artifacts/requirements.md" ]; then
@@ -212,7 +212,7 @@ Phase 6: Deploy
                 |
                 v
 Phase 7: Documentation
-    @documentation       -> docs/
+    @documentation       -> context/
 
 COVERAGE REQUIREMENTS
 =====================
@@ -276,7 +276,7 @@ ARTIFACTS DIRECTORY STRUCTURE
 │   └── terraform/               # GCP DevOps
 ├── tech-review.md               # Tech lead
 ├── code-review.md               # Code reviewer
-└── docs/                        # Documentation (per doc-standards.md)
+└── context/                        # Documentation (per doc-standards.md)
     ├── build/
     │   ├── bugs.md              # Bug tracking
     │   ├── tasks.md             # Task tracking
@@ -595,7 +595,7 @@ Example workflow:
   ...continue through domains...
   ./coordinate.sh worktree cleanup auth-feature  # After final PR
 
-See docs/standards/agent-standards.md section 5 for full documentation.
+See context/standards/agent-standards.md section 5 for full documentation.
 
 EOF
 }
@@ -656,7 +656,7 @@ In Claude Code, invoke agents directly:
   @python-coder implement the task service
 
 See CLAUDE.md for full orchestration guide.
-See docs/standards/agent-standards.md section 5 for worktree isolation.
+See context/standards/agent-standards.md section 5 for worktree isolation.
 EOF
 }
 

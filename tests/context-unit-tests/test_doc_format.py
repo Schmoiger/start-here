@@ -11,7 +11,7 @@ import pytest
 import yaml
 
 
-DOCS_ROOT = Path(__file__).parent.parent.parent / "docs"
+DOCS_ROOT = Path(__file__).parent.parent.parent / "context"
 AGENTS_DIR = DOCS_ROOT / "agents"
 
 

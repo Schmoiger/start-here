@@ -14,7 +14,7 @@ The documentation integrity check is an automated process that shall be integrat
 
 The integrity check, typically performed by an autonomous agent or a dedicated script, is responsible for:
 
-1.  **Parsing all documentation files:** This includes, but is not limited to, `README.md`, `tasks.md`, `bugs.md`, and any files within the `docs/` directory.
+1.  **Parsing all documentation files:** This includes, but is not limited to, `README.md`, `tasks.md`, `bugs.md`, and any files within the `context/` directory.
 2.  **Validating Cross-File References:** The check shall identify all references that link to specific lines in other files (e.g., `[tasks.md#L25](./tasks.md#L25)`).
 3.  **Verifying Reference Validity:** For each reference, the check shall confirm that the target file exists and that the referenced line number is within the bounds of the file.
 
