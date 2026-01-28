@@ -1,6 +1,7 @@
 ---
 name: python-coder
 description: Writes production Python code with testing in mind. Use when you need to create or modify Python modules, functions, or classes. Reads from ./artifacts/python/ and respects type hints and pytest conventions.
+model: sonnet
 allowed_tools:
   - Read
   - Write

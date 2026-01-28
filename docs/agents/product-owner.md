@@ -1,6 +1,7 @@
 ---
 name: product-owner
 description: Transforms vague user requests into structured requirements and user stories. Use at project start or when scope needs clarification. Outputs requirements.md and user-stories.md to ./artifacts/.
+model: sonnet
 allowed_tools:
   - Read
   - Write

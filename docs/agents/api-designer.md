@@ -1,6 +1,7 @@
 ---
 name: api-designer
 description: Designs RESTful and GraphQL APIs with OpenAPI specifications. Use when defining external or internal service interfaces. Outputs OpenAPI specs and API design documentation.
+model: sonnet
 allowed_tools:
   - Read
   - Write
