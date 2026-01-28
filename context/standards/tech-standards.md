@@ -1,24 +1,33 @@
-# Technonolgy Context
+# Technology Standards
 
-## System Overview
+## Overview
 
-**withineve** is a monorepo containing multiple applications and services for health and wellness data connectivity. The system integrates with various health/fitness APIs (Vital API, etc.) to provide a unified data platform.
+This document describes preferred technology patterns and architectural decisions. Projects should follow these patterns unless there is a compelling reason to deviate.
 
-### Architecture
+## Architecture Preferences
 
-- **Monorepo Structure**: Single repository with multiple packages using workspaces
+### Monorepo Structure
+
+**Preference**: Monorepo with multiple packages using workspaces.
+
 - **Workspace Management**: Root `package.json` workspaces array must be explicitly maintained
   - **Compliance**: All Node.js workspaces listed explicitly (no wildcards: `backend/*`)
   - **When to Update**: Add/remove projects when creating new Node.js packages or deprecating existing ones
   - **Why Explicit**: Prevents accidental inclusion of incomplete/broken projects and Python projects
-- **Deployment Strategy**:
-  - Backend: Cloud Run Functions Gen 2 direct source deployment
-  - Frontend: Firebase Hosting
-  - Mobile: Native iOS (Swift), Android (Kotlin - future)
-- **Networking**: Frontend accepts public traffic; Backend is internal-only (Google Cloud VPC)
+
+### Deployment Strategy
+
+- **Backend**: Cloud Run Functions Gen 2 direct source deployment (preferred)
+- **Frontend**: Firebase Hosting (preferred)
+- **Mobile**: Native iOS (Swift), Android (Kotlin - future)
+
+### Networking
+
+- **Frontend**: Accepts public traffic
+- **Backend**: Internal-only (Google Cloud VPC or equivalent)
 - **Data Flow**: APIs → Backend → Frontend/Mobile → Users
 
-## Technology Stack
+## Preferred Technology Stack
 
 ### Backend Services
 
@@ -99,14 +108,10 @@ testing: Vitest (frontend), Pytest (backend), XCTest (iOS)
 ### Local Development
 
 ```bash
-# Clone repository
-git clone https://github.com/within-eve/withineve-prototype-2.git
-cd withineve-prototype-2
-
 # Install dependencies
 yarn install
-cd backend/data-api && uv sync
-# iOS dependencies: pod install (from mobile/withineve-ios/)
+cd backend/{service-name} && uv sync
+# iOS dependencies: pod install (from mobile/{app-name}/)
 
 # Environment variables (see .env.example files)
 # Google Cloud service account key file required for local development
@@ -117,55 +122,43 @@ cd backend/data-api && uv sync
 - **Local Development**: `.env` files with development secrets
 - **Production**: Environment variables injected by Cloud Run/Firebase
 
-## Repository Structure
+## Preferred Repository Structure
 
 ```
-withineve-prototype-2/
+{monorepo-root}/
 ├── backend/                    # Backend services
-│   ├── chat-api/               # Chat API (Python, FastAPI)
-│   ├── data-api/               # Data Accessor API (Python, FastAPI)
-│   ├── llm-orchestrator/       # LLM orchestration service (TypeScript)
-│   ├── medgemma-llm/           # MedGemma LLM service (Python)
-│   ├── pii-scrubber/           # PII detection and redaction (Python, FastAPI)
-│   ├── prompts-api/            # Prompts management API (Python, FastAPI)
-│   └── secrets-manager/        # SDK to access GCP secrets (Python/TypeScript)
-├── context/                       # Documentation
-│   ├── common/                 # Shared standards, blueprints, and schemas
-│   ├── llm-pipeline/           # LLM pipeline documentation
-│   ├── monorepo-migration/     # Documents related to the monorepo setup
-│   └── Vital API Reference/    # Documentation for the Vital API
+│   ├── {service-name}/         # Example: API service (Python, FastAPI)
+│   └── {service-name}/         # Example: Background worker (TypeScript)
+├── context/                    # Shared context (standards, rules, agents, MCP)
+│   ├── agents/                 # Agent definitions
+│   ├── mcp/                    # Model Context Protocol configs
+│   ├── rules/                  # Development rules
+│   └── standards/              # Development standards
 ├── frontend/                   # Web applications
-│   ├── admin-frontend/         # Admin dashboard (Next.js)
-│   ├── chat-prototype/         # Chat prototype (Vite + React)
-│   └── user-frontend/          # User interface (Next.js)
+│   ├── {app-name}/            # Example: Admin dashboard (Next.js)
+│   └── {app-name}/             # Example: User interface (Vite + React)
 ├── mobile/                     # Mobile applications
-│   ├── withineve_connect_flutter/ # Flutter application DEPRECATED
-│   ├── withineve-connect/      # React Native application DEPRECATED
-│   ├── withineve-connect-expo/ # React Native (Expo) application DEPRECATED
-│   └── withineve-connect-swift/ # iOS Swift application
+│   └── {app-name}/             # Example: iOS Swift application
 ├── packages/                   # Shared packages
-│   ├── auth/                   # Authentication package
-│   ├── design-system/          # Design system components
-│   ├── prompt-library/         # Prompt management library
-│   ├── shared-types/           # Shared TypeScript types
-│   └── ui/                     # UI component library
+│   ├── {package-name}/        # Example: Authentication package
+│   ├── {package-name}/        # Example: Design system components
+│   └── {package-name}/        # Example: Shared TypeScript types
 └── workflows/                  # CI/CD and other workflows
-    ├── data-pipeline/          # Data processing (BigQuery)
-    ├── gcp-build/              # GCP build workflows (GitHub Actions)
-    └── github-build/           # GitHub build workflows DEPRECATED
+    ├── {workflow-name}/        # Example: Build workflows
+    └── {workflow-name}/        # Example: Data processing pipelines
 ```
 
 ## Development Workflows
 
-See `/context/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
+See `context/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
 
 ## Coding Standards
 
-See `/context/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
+See `context/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
 
 ## Testing Standards
 
-See `/context/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
+See `context/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
 
 ## Performance Considerations
 
@@ -220,8 +213,9 @@ TODO
 
 ### Documentation Sources
 
-- `/context/standards/` - All development standards (coding, testing, workflows)
-- `/context/` - Project documentation and guides
+- `context/standards/` - All development standards (coding, testing, workflows)
+- `context/` - Shared context (agents, rules, standards, MCP)
+- `artifacts/` - Project-specific work output (specs, tasks, bugs, guides)
 - Service-specific READMEs for setup instructions
 
 ### Development Support
@@ -232,6 +226,6 @@ TODO
 
 ## Deployment & Build Pipeline
 
-See [Build & Deployment Standards](../../standards/build-standards.md) for complete build configuration, templates, and deployment patterns.
+See `context/standards/build-standards.md` for complete build configuration, templates, and deployment patterns.
 
-This context should enable autonomous development across the entire withineve platform. Reference this document when making architectural decisions or introducing new patterns.
+Reference this document when making architectural decisions or introducing new patterns. These are preferred patterns; document deviations and rationale when choosing alternatives.
