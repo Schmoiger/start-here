@@ -1,6 +1,7 @@
 ---
 name: gcp-devops
 description: Configures and validates GCP infrastructure using Terraform and gcloud CLI. Use for infrastructure-as-code design, deployment configuration, and GCP security validation.
+model: sonnet
 allowed_tools:
   - Read
   - Write
