@@ -4,11 +4,11 @@ This document is your agent knowledge base. Reference it when coordinating workf
 
 ## Core Principles
 
-**Standards Compliance**: All agents follow the standards in `./context/standards/` and rules in `./context/rules/`. Compliance is inherited—agents don't need explicit references.
+**Standards Compliance**: All agents follow the standards in `./docs/standards/` and rules in `./docs/rules/`. Compliance is inherited—agents don't need explicit references.
 
 **Context Isolation**: Each agent has its own focus and tools. Don't ask an agent to do work outside its domain.
 
-**Filesystem as Shared Memory**: All agents read/write to `./artifacts/` during development. This is ephemeral workspace that gets promoted to `./context/` after approval.
+**Filesystem as Shared Memory**: All agents read/write to `./artifacts/` during development. This is ephemeral workspace that gets promoted to `./docs/` after approval.
 
 **Sequential Dependency**: Agents run in phases, with gates between them.
 
@@ -98,7 +98,7 @@ flowchart TD
 
     subgraph Phase7["Phase 7: Documentation"]
         DOC["@documentation"]
-        DOC_OUT["context/"]
+        DOC_OUT["docs/"]
         DOC --> DOC_OUT
     end
 
@@ -424,9 +424,9 @@ flowchart TD
 **Context**: All code, architecture, and API specs in `./artifacts/`
 
 **Documentation Types** (per doc-standards.md):
-- `context/specs/` - Product, requirements, design docs
-- `context/guides/` - Getting started, developer guides
-- `context/build/` - Tasks, bugs, todo lists
+- `/artifacts/` - System-wide artifacts (architecture, requirements, API contracts)
+- `{service}/artifacts/` - Service-specific artifacts (bugs, tasks, todo, test results)
+- Service `README.md` files - Setup, usage, architectural decisions
 
 **Constraints**:
 - Write for the audience
@@ -434,75 +434,100 @@ flowchart TD
 - Don't duplicate information—link between docs
 - Follow doc-standards.md structure
 
-**Output**: `./artifacts/context/specs/`, `./artifacts/context/guides/`, `./artifacts/context/build/`
+**Output**: System-wide documentation in `/artifacts/`, service-specific documentation in `{service}/artifacts/`
 
 ---
 
 ## Artifacts Directory Structure
 
 ```
-./artifacts/
-├── requirements.md              # Product owner output
-├── user-stories.md              # Product owner output
-├── open-questions.md            # Product owner output
-├── architecture.md              # Solution architect output
-├── api-contract.json            # Solution architect output
-├── data-model.md                # Solution architect output
-├── database/
-│   ├── schema.sql               # Database designer output
-│   ├── migrations/              # Database designer output
-│   ├── er-diagram.md            # Database designer output
-│   └── design-decisions.md      # Database designer output
-├── api/
-│   ├── openapi.yaml             # API designer output
-│   └── api-design-guide.md      # API designer output
-├── design/
-│   ├── design-tokens.json       # UI designer output
-│   ├── components.md            # UI designer output
-│   ├── wireframes.md            # UI designer output
-│   ├── user-flows.md            # UI designer output
-│   ├── accessibility.md         # UI designer output
-│   ├── visuals/                 # Visual designer output
-│   │   ├── *.svg                # Exported diagrams and mockups
-│   │   └── *.png                # Raster images when needed
-│   └── visuals-manifest.md      # Visual designer output
-├── python/
-│   ├── *.py                     # Python coder output
-│   ├── requirements.txt         # Python coder output
-│   ├── README.md                # Python coder output
-│   └── tests/                   # Functional tester output
-├── typescript/
-│   ├── *.ts                     # TypeScript coder output
-│   ├── package.json             # TypeScript coder output
-│   ├── README.md                # TypeScript coder output
-│   └── tests/                   # Functional tester output
-├── test-results/
-│   └── functional-tests.json    # Functional tester output
-├── ui-test-results/
-│   ├── screenshots/             # UI tester output
-│   ├── ui-tests.json            # UI tester output
-│   └── test-log.md              # UI tester output
-├── security-audit/
-│   ├── findings.json            # Security tester output
-│   ├── remediation-guide.md     # Security tester output
-│   ├── threat-model.md          # Security tester output
-│   └── prompt-injection-assessment.md  # Security tester output (if LLM integrations)
-├── gcp/
-│   └── terraform/               # GCP DevOps output
-├── tech-review.md               # Tech lead output
-├── code-review.md               # Code reviewer output
-└── context/                        # Documentation output (per doc-standards.md)
-    ├── build/
-    │   ├── bugs.md              # Bug tracking
-    │   ├── tasks.md             # Task tracking
-    │   └── todo.md              # Technical debt
-    ├── specs/
-    │   ├── product.md           # Product/UX documentation
-    │   ├── requirements.md      # Functional requirements (EARS notation)
-    │   └── design.md            # Architecture decisions
-    └── guides/
-        ├── getting-started.md   # Setup and quickstart
-        └── developer-guide.md   # Development workflows
+/ (monorepo root)
+├── context/                         # INPUT: Standards & rules
+│   ├── standards/
+│   │   ├── coding-standards.md
+│   │   ├── doc-standards.md
+│   │   └── testing-standards.md
+│   └── rules/
+│       └── EARS-notation-requirements.mdc
+│
+├── artifacts/                       # OUTPUT: System-wide
+│   ├── architecture.md              # Cross-service architecture
+│   ├── requirements.md              # System requirements
+│   ├── user-stories.md              # End-to-end user stories
+│   ├── data-model.md                # Conceptual data model
+│   ├── api/
+│   │   ├── openapi.yaml             # System API contracts
+│   │   └── api-design-guide.md
+│   ├── design/                      # System-wide UI design
+│   │   ├── design-tokens.json
+│   │   ├── components.md
+│   │   └── wireframes.md
+│   ├── test-results/                # System-wide test summaries
+│   │   └── functional-tests.json
+│   └── shared/                      # Cross-service coordination
+│       ├── handoffs/
+│       │   ├── integration-status.md
+│       │   └── {service}-api.md
+│       ├── fixtures/                # Shared test data (AAPL_1y.json)
+│       └── mocks/                   # Cross-service mocks
+│
+├── packages/shared-types/python/
+│   ├── artifacts/                   # Package-specific artifacts
+│   │   ├── bugs.md
+│   │   ├── tasks.md
+│   │   ├── todo.md
+│   │   ├── code-review.md
+│   │   └── test-results/
+│   ├── bollinger_types/
+│   ├── tests/
+│   └── README.md
+│
+├── services/data-service/
+│   ├── artifacts/                   # Service-specific artifacts
+│   │   ├── bugs.md
+│   │   ├── tasks.md
+│   │   ├── todo.md
+│   │   ├── code-review.md
+│   │   ├── test-results/
+│   │   └── fixtures/                # Service-specific test data
+│   ├── HANDOFF.md                   # Intra-service coordination
+│   ├── src/
+│   ├── tests/
+│   └── README.md
+│
+├── services/llm-service/
+│   ├── artifacts/                   # Service-specific artifacts
+│   │   ├── bugs.md
+│   │   ├── tasks.md
+│   │   ├── todo.md
+│   │   ├── code-review.md
+│   │   └── test-results/
+│   ├── HANDOFF.md
+│   ├── src/
+│   ├── tests/
+│   └── README.md
+│
+├── services/visualisation-service/
+│   ├── artifacts/                   # Service-specific artifacts
+│   │   ├── bugs.md
+│   │   ├── tasks.md
+│   │   ├── todo.md
+│   │   ├── code-review.md
+│   │   └── test-results/
+│   ├── HANDOFF.md
+│   ├── src/
+│   ├── tests/
+│   └── README.md
+│
+└── frontend/
+    ├── artifacts/                   # Frontend-specific artifacts
+    │   ├── bugs.md
+    │   ├── tasks.md
+    │   ├── todo.md
+    │   └── test-results/
+    ├── HANDOFF.md
+    ├── src/
+    └── README.md
 ```
 
 ---
@@ -558,6 +583,91 @@ flowchart TD
 - Marketing assets
 
 For development, Mermaid diagrams in `wireframes.md` are sufficient.
+
+---
+
+## Agent Handoff Protocol
+
+Agents coordinate through structured handoff documents to enable autonomous parallel work.
+
+### Handoff Types
+
+**1. Intra-Domain (Within Service)**
+- Location: `{service-directory}/HANDOFF.md`
+- Coordination between agents working on same context domain
+- Example: @functional-tester → @python-coder → @tech-lead
+
+**2. Inter-Domain (Between Services)**
+- Location: `artifacts/shared/handoffs/{service}-api.md`
+- Coordination between agents in different context domains
+- Example: data-service → vis-service, vis-service → frontend
+
+**3. Integration Status**
+- Location: `artifacts/shared/handoffs/integration-status.md`
+- Master coordination file showing readiness across all domains
+
+### Handoff Workflow
+
+```mermaid
+flowchart LR
+    subgraph IntraDomain["Intra-Domain"]
+        FT["@functional-tester<br/>writes tests"]
+        PY["@python-coder<br/>implements"]
+        TL["@tech-lead<br/>reviews"]
+
+        FT -->|"Update HANDOFF.md"| PY
+        PY -->|"Update HANDOFF.md"| TL
+    end
+
+    subgraph InterDomain["Inter-Domain"]
+        SVC1["Service Ready"]
+        API["Create {service}-api.md"]
+        MOCK["Provide mock client"]
+        INT["Update integration-status.md"]
+
+        SVC1 --> API
+        API --> MOCK
+        MOCK --> INT
+    end
+
+    TL -->|"When ready"| SVC1
+```
+
+### When to Update Handoffs
+
+**After completing tasks:**
+1. Update `{service}/HANDOFF.md` with:
+   - Timestamp (ISO 8601 with timezone)
+   - Task IDs completed
+   - Status and summary
+   - Notes for next agent
+   - Commit hash
+2. Commit changes (handoff + code together)
+3. Mark tasks complete in task list
+
+**When service reaches integration-ready:**
+1. Create `artifacts/shared/handoffs/{service}-api.md`
+2. Provide mock client in `artifacts/shared/mocks/`
+3. Add example responses to `artifacts/shared/fixtures/`
+4. Update `artifacts/shared/handoffs/integration-status.md`
+
+### Integration Readiness Checklist
+
+Before marking service as "Ready for Integration":
+- ✅ All TDD GREEN tasks complete
+- ✅ Tech lead review approved
+- ✅ Test coverage >= 90%
+- ✅ API endpoints match OpenAPI spec
+- ✅ `HANDOFF.md` exists in service directory
+- ✅ Mock client in `artifacts/shared/mocks/`
+- ✅ Example responses in `artifacts/shared/fixtures/`
+- ✅ API status documented in `artifacts/shared/handoffs/{service}-api.md`
+- ✅ Integration status updated
+
+### Templates
+
+- Intra-domain: `artifacts/shared/HANDOFF-TEMPLATE.md`
+- Inter-domain: `artifacts/shared/handoffs/TEMPLATE-service-api.md`
 
 ---
 

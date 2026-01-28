@@ -112,11 +112,11 @@ test('dashboard layout matches design', async ({ page }) => {
 |--------|-----------|--------|
 | Minimum | 90% | Build fails below this |
 | Target | 100% | Always aim for full coverage |
-| Gap Documentation | Required | If <100%, document gaps in `./context/build/test-gaps.md` |
+| Gap Documentation | Required | If <100%, document gaps in `{service}/artifacts/test-gaps.md` |
 
 ### Gap Documentation Format
 
-When coverage is below 100%, document each gap in `./context/build/test-gaps.md`:
+When coverage is below 100%, document each gap in `{service}/artifacts/test-gaps.md`:
 
 ```markdown
 # Test Coverage Gaps
@@ -125,7 +125,7 @@ When coverage is below 100%, document each gap in `./context/build/test-gaps.md`
 - **Current Coverage**: 94%
 - **Gap Location**: `src/auth/oauth.py:45-60`
 - **Reason**: External OAuth provider callback - requires live integration
-- **Mitigation**: Manual testing checklist in `context/guides/oauth-testing.md`
+- **Mitigation**: Manual testing checklist in `{service}/artifacts/guides/oauth-testing.md`
 - **Ticket**: #123 (to address later)
 ```
 

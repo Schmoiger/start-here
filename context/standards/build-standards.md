@@ -12,7 +12,7 @@ Our CI/CD system balances central control with developer autonomy:
 - **Decentralized Application Manifests**: Each application declares its deployment needs in a `scripts/build.yaml` file. This manifest points to a central template and provides the necessary parameters (substitutions).
 
 ### 2. Dynamic Dispatcher
-A single `cloudbuild.yaml` at the root of the repository acts as a dynamic dispatcher. On every push, it identifies changed applications and triggers the appropriate build template using the parameters from the application's manifest. The dispatcher includes conflict detection to prevent resource conflicts between parallel builds (see `workflows/gcp-build/docs/specs/product.md` for details).
+A single `cloudbuild.yaml` at the root of the repository acts as a dynamic dispatcher. On every push, it identifies changed applications and triggers the appropriate build template using the parameters from the application's manifest. The dispatcher includes conflict detection to prevent resource conflicts between parallel builds (see `workflows/gcp-build/artifacts/requirements.md` for details).
 
 ### 3. Pre-flight Validation (Fail Fast)
 Validation is a key part of the dispatcher pipeline. Before executing a template, the dispatcher MUST validate the application's manifest to ensure all required substitutions are present for the chosen template. This saves time and compute resources by failing fast.
@@ -151,9 +151,8 @@ app.include_router(conversations_router, prefix="/api")
 
 ### Related Documentation
 
-- [chat-prototype API Routing Guide](../../../frontend/chat-prototype/docs/guides/api-routing.md)
-- [data-api API Routing Guide](../../../backend/data-api/docs/guides/api-routing.md)
-- [Firebase Hosting + Cloud Run Documentation](https://firebase.google.com/docs/hosting/cloud-run)
+- Firebase Hosting + Cloud Run: https://firebase.google.com/docs/hosting/cloud-run
+- Project-specific routing guides should be documented in service README.md files
 
 ### Service-to-Service Authentication
 For one service to call another (e.g., chat-api calling llm-orchestrator):
