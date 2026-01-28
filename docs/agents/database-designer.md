@@ -1,6 +1,7 @@
 ---
 name: database-designer
 description: Designs database schemas, relationships, and migrations. Use when the project needs persistent data storage. Outputs schema files and migration scripts to ./artifacts/database/.
+model: sonnet
 allowed_tools:
   - Read
   - Write

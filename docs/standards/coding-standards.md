@@ -186,8 +186,66 @@ def process_data(user_id: str, data: Dict[str, Any]) -> Optional[Result]:
 
 **Linting**: Biome (TS), black + isort (Python) - auto-fix all issues before commits
 
-## Commit Messages
+## Commit Protocol
+
+**Every task completion requires a commit.** This ensures fine-grained history, easy reverts, and clear audit trails.
+
+### Commit Message Format
+
+```
+{type}({scope}): {TASK-ID} {description}
+
+Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
+```
+
+**Note**: Agents must use their actual model name and ID (e.g., "Sonnet 4.5 (claude-sonnet-4-5-20250929)").
+
+### Commit Types by TDD Phase
+
+| Phase | Type | Example |
+|-------|------|---------|
+| TDD RED (tests) | `test` | `test(data-service): DS-001 add failing tests for yfinance data fetching` |
+| TDD GREEN (impl) | `feat` | `feat(vis-service): VS-102 implement Bollinger Band calculator` |
+| Review | `docs` | `docs(frontend): FE-301 add tech lead review - APPROVED` |
+| Bug fix | `fix` | `fix(llm-service): LLM-105 handle OpenRouter timeout` |
+| Refactor | `refactor` | `refactor(shared-types): ST-107 simplify model exports` |
+
+### Scopes
+
+Use the service/package name as scope:
+- `shared-types` - Shared type definitions
+- `data-service` - Data fetching service
+- `vis-service` - Visualisation service
+- `llm-service` - LLM service
+- `frontend` - React frontend
+
+### Workflow
+
+1. Complete task
+2. Run tests (verify expected state: failing for RED, passing for GREEN)
+3. Stage relevant files
+4. Commit with task ID in message
+5. Mark task as complete `[x]`
+
+### Examples
+
 ```bash
+# TDD RED - failing tests
+test(data-service): DS-001 add failing tests for yfinance data fetching
+
+Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
+
+# TDD GREEN - implementation
+feat(data-service): DS-101 create project structure and dependencies
+
+Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
+
+# Review approval
+docs(data-service): DS-301 add tech lead review - APPROVED
+
+Co-Authored-By: Claude Opus 4.5 (claude-opus-4-5-20251101) <noreply@anthropic.com>
+
+# General commits (non-task)
 feat: add user authentication
 fix: resolve token refresh bug
 docs: update API documentation

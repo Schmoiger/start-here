@@ -65,6 +65,77 @@ Where a project has a `docs/specs` folder, the system shall include the followin
     *   The system shall write all requirements using the EARS notation, as specified in `docs/rules/EARS-notation-requirements.mdc`.
 *   `design.md`: The system shall use this file to describe the architectural and design decisions for the project.
 
+### 2.2.1. Agent Handoff Files
+
+The system shall maintain handoff documentation for agent coordination:
+
+#### Service-Level Handoffs (`HANDOFF.md`)
+
+Each service directory shall contain a `HANDOFF.md` file for intra-domain coordination:
+
+*   **Location**: `{service-directory}/HANDOFF.md`
+*   **Purpose**: Track handoffs between agents working on the same context domain
+*   **Format**: Use template from `artifacts/shared/HANDOFF-TEMPLATE.md`
+
+Required elements:
+*   **Timestamp**: ISO 8601 with timezone (e.g., `2026-01-27T18:45:32Z`)
+*   **From/To Agents**: Source and destination agent names with @ prefix
+*   **Task IDs**: Range of tasks covered (e.g., `DS-001 through DS-008`)
+*   **Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked | 🔴 Failed
+*   **Summary**: Brief description of work completed (2-3 sentences)
+*   **Notes for Next Agent**: Critical information, gotchas, files to review
+*   **Artifacts**: Paths to code, tests, fixtures, documentation
+*   **Blockers**: Any issues preventing progress
+*   **Commit Hash**: Git commit linking handoff to code changes
+
+Example:
+```markdown
+### From: @functional-tester
+**To**: @python-coder
+**Timestamp**: 2026-01-27T18:45:32Z
+**Tasks**: DS-001 through DS-008
+**Status**: ✅ Complete
+
+**Summary**: All data-service tests written and failing. Test coverage
+includes yfinance integration, Bronze/Silver stores, cache management,
+and API endpoints.
+
+**Notes for Next Agent**:
+- Test fixtures in tests/fixtures/
+- Mock yfinance responses in tests/mocks/
+- Expected cache behaviour documented in DS-005
+
+**Artifacts**:
+- Tests: `services/data-service/tests/`
+- Fixtures: `services/data-service/tests/fixtures/`
+
+**Commit**: abc1234 - test(data-service): DS-001-008 add failing tests
+```
+
+#### Cross-Domain Handoffs
+
+For coordination between services, use `artifacts/shared/handoffs/`:
+
+*   **Integration Status**: `artifacts/shared/handoffs/integration-status.md`
+  - Master coordination file showing readiness of all domains
+  - Updated when services reach integration-ready state
+
+*   **Service API Status**: `artifacts/shared/handoffs/{service}-api.md`
+  - Documents API endpoint stability for consumers
+  - Created when endpoints are stable and ready for integration
+  - Template: `artifacts/shared/handoffs/TEMPLATE-service-api.md`
+
+Required elements for API handoffs:
+*   **Endpoint Status**: ✅ Stable | 🚧 In Development | ⚠️ Breaking Change | 🔴 Blocked
+*   **Since Timestamp**: When endpoint became stable
+*   **OpenAPI Reference**: Lines in openapi.yaml
+*   **Example Response**: Path to fixture file
+*   **Mock Client**: Path to mock implementation
+*   **Consumers**: Which services depend on this endpoint
+*   **Dependencies**: Which services this endpoint depends on
+*   **Known Issues**: Any bugs or limitations
+*   **Breaking Changes**: Upcoming changes with ETAs
+
 ### 2.3. Project `README.md`
 
 The system shall maintain a `README.md` file in the root of each project. The `README.md` file shall describe:

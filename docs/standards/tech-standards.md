@@ -22,8 +22,8 @@
 ### Backend Services
 ```yaml
 platform: Cloud Run Functions Gen 2 (Google Cloud)
-languages: Python 3.11.9
-frameworks: FastAPI 0.77.1
+languages: Python
+frameworks: FastAPI
 databases: Cloud SQL (PostgreSQL 18) with pgvector (future), BigQuery
 secrets: Google Cloud Secret Manager (env vars only)
 ```
@@ -31,10 +31,10 @@ secrets: Google Cloud Secret Manager (env vars only)
 ### Frontend Applications
 ```yaml
 platforms: Firebase Hosting
-languages: TypeScript 5.0.0 / React 19.x (Next.js/Vite)
-frameworks: Next.js 15.4.5, Vite 5.1.0, React 19.x, TailwindCSS 4.x
-state: Redux Toolkit, React Query 5.90.5
-ui: DaisyUI 5.5.5 + custom components, TailwindCSS 4.x
+languages: TypeScript / React (Next.js/Vite)
+frameworks: Next.js, Vite, React, TailwindCSS
+state: Redux Toolkit, React Query
+ui: DaisyUI + custom components, TailwindCSS
 deployment: Firebase hosting with rewrite rules
 ```
 
@@ -53,12 +53,12 @@ testing_targets:
 ```yaml
 package_manager: Yarn workspaces
 build_tools:
-  - TypeScript: tsx 4.20.6, tsc 5.0.0
+  - TypeScript: tsx, tsc
   - Python: uv
   - Swift: Xcode, Swift Package Manager
 documentation: Mermaid
-linting: Biome 2.2.6 (TypeScript), SwiftLint
-testing: Vitest 3.2.4 (frontend), Pytest 7.4.4 (backend), XCTest (iOS)
+linting: Biome (TypeScript), SwiftLint
+testing: Vitest (frontend), Pytest (backend), XCTest (iOS)
 ```
 
 ## Static Analysis & Code Quality
@@ -81,10 +81,10 @@ testing: Vitest 3.2.4 (frontend), Pytest 7.4.4 (backend), XCTest (iOS)
 ## Development Environment Setup
 
 ### Prerequisites
-- Node.js 20.11.1 LTS (volta recommended)
-- Python 3.11.9
-- Xcode 15.4 (for iOS/Swift development)
-- Google Cloud SDK 483.0.0
+- Node.js
+- Python
+- Xcode (for iOS/Swift development)
+- Google Cloud SDK
 - Firebase CLI (for frontend deployment)
 
 ### Local Development

@@ -1,6 +1,7 @@
 ---
 name: ui-designer
 description: Designs user interfaces, component layouts, and design systems. Use before frontend development to define visual structure, user flows, and accessibility requirements. Outputs wireframes, component specs, and design tokens.
+model: sonnet
 allowed_tools:
   - Read
   - Write

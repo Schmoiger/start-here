@@ -1,6 +1,7 @@
 ---
 name: functional-tester
 description: Writes and runs tests for Python and TypeScript code. Supports TDD (tests before code) and verification (tests after code). Reads from ./artifacts/ without modifying production code.
+model: sonnet
 allowed_tools:
   - Read
   - Write
