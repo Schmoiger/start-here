@@ -45,6 +45,8 @@ Use when implementation exists. Write tests based on actual code behaviour.
 - Never modify production code, only test it
 - Run tests and capture output to `./artefacts/test-results/`
 - Follow anti-pattern rules in testing-standards.md (no excessive fallbacks, no skipping without reason)
+- ALWAYS use `uv run pytest` for Python, `yarn test` for TypeScript (tech-standards.md)
+- Use Write/Edit tools for files, Bash only for running tests (agent-standards.md)
 
 ## Deliverables
 - Test files in `./artefacts/*/tests/` directories

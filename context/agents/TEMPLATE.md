@@ -39,9 +39,9 @@ These are enforceable constraints that MUST be followed in all output.
 
 ## Critical Reminders (from standards above)
 
-- ALWAYS use `uv run` for Python commands (tech-standards.md:34)
-- Type hints on all functions (coding-standards.md:15)
-- Each module should have single responsibility (coding-standards.md:42)
+- ALWAYS use `uv run` for Python commands (tech-standards.md)
+- Type hints on all functions (coding-standards.md)
+- Each module should have single responsibility (coding-standards.md)
 
 Format: `- [Reminder] ([source-file.md]:[line-number])`
 

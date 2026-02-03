@@ -117,7 +117,16 @@ cd backend/{service-name} && uv sync
 
 # Environment variables (see .env.example files)
 # Google Cloud service account key file required for local development
+
+# Run tests
+uv run pytest                    # Python tests
+yarn test                        # TypeScript tests
 ```
+
+**Test Commands:**
+- **Python**: `uv run pytest` (not `pytest` alone, not `pip` or `poetry`)
+- **TypeScript**: `yarn test` (not `npm test`)
+- **Coverage**: `uv run pytest --cov` or `yarn test --coverage`
 
 ### Secret Management
 
