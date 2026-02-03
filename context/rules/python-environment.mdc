@@ -1,0 +1,33 @@
+# Python Environment
+
+**Applies to**: All Python code execution
+
+## Commands
+
+| Action | Correct | Wrong |
+|--------|---------|-------|
+| Run script | `uv run python script.py` | `python script.py` |
+| Run module | `uv run python -m module` | `python -m module` |
+| Run tests | `uv run pytest` | `pytest` |
+| Install package | `uv add package` | `pip install package` |
+| Sync dependencies | `uv sync` | `pip install -r requirements.txt` |
+| Python REPL | `uv run python` | `python` or `python3` |
+
+## Why
+
+Bare `python` or `pytest` commands fail because:
+- No virtual environment is activated
+- Dependencies aren't available
+- Wrong Python version may be used
+
+`uv run` automatically:
+- Uses the project's virtual environment
+- Ensures dependencies are installed
+- Respects `.python-version`
+
+## Project Setup
+
+Each Python project must have:
+- `pyproject.toml` with dependencies
+- `.python-version` specifying Python version
+- Virtual environment managed by `uv`

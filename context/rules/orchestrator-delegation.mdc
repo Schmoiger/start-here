@@ -1,0 +1,55 @@
+# Orchestrator Delegation
+
+**Applies to**: Main Claude session or any coordinating agent
+
+## Delegation Table
+
+| Task Type | Delegate To | Never Do Directly |
+|-----------|-------------|-------------------|
+| Python implementation | `@python-coder` | Write Python code |
+| TypeScript implementation | `@typescript-coder` | Write TypeScript code |
+| Test writing | `@functional-tester` | Write test files |
+| Architecture design | `@solution-architect` | Design system architecture |
+| Code review | `@tech-lead` or `@code-reviewer` | Review code quality |
+| Database design | `@database-designer` | Design schemas |
+| UI testing | `@ui-tester` | Browser testing |
+| Security review | `@security-tester` | Security analysis |
+
+## Orchestrator MAY Do Directly
+
+- File operations (move, rename, delete)
+- Git operations (commit, branch, status)
+- Task management (update tasks.md)
+- Reading and summarising files
+- Coordinating between agents
+- Simple config edits (non-code)
+
+## No Agent Available?
+
+1. **Check if task is really implementation**: If yes, consider creating an agent
+2. **Follow relevant rules directly**: Read applicable rules, state which you're following
+3. **Small one-off task**: Proceed with explicit rule acknowledgement
+
+Example:
+```
+"Following `python-environment.mdc`, I'll use `uv run python` for this script..."
+```
+
+## Why
+
+Specialised agents have rules loaded in context:
+- `@python-coder` follows `python-environment.mdc` automatically
+- `@typescript-coder` follows `typescript-environment.mdc` automatically
+
+Orchestrator writing code directly may:
+- Use bare `python` instead of `uv run python`
+- Use `npm` instead of `yarn`
+- Skip type hints or TDD discipline
+- Output to wrong locations
+
+## Parallel Execution
+
+When running parallel tracks:
+- Launch agents and let them progress independently
+- Do NOT wait for all agents before launching next batch
+- Each track advances on its own timeline
