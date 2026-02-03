@@ -6,23 +6,23 @@ This document outlines the standards for how AI agents shall interact with this 
 
 ## 1.1. Standards Compliance
 
-All agents shall follow the standards defined in `./context/standards/` and rules defined in `./context/rules/`. Agents are not required to explicitly reference individual standards—compliance is inherited by operating within this project.
+All agents shall follow the standards defined in `./context/standards/` and rules defined in `./context/rules/`. Agents are not required to explicitly reference individual standards; compliance is inherited by operating within this project.
 
 ## 1.2. Input Standards vs Output Artifacts
 
-Agents read from input standards and write to output artifacts:
+Agents read from input standards and write to output artifacts. For full directory layout see `doc-standards.md` §2.1.
 
 | Directory | Purpose | Lifecycle |
 |----------|---------|-----------|
-| `/context/` | Input standards and rules for agents to follow | Persistent—version controlled |
-| `{service}/artifacts/` | Service-specific working outputs (bugs, tasks, test results) | Persistent—version controlled |
-| `/artifacts/` | System-wide artifacts (architecture, requirements, API contracts) | Persistent—version controlled |
+| `/context/` | Input standards and rules for agents to follow | Persistent; version controlled |
+| `{service}/artefacts/` | Service-specific working outputs (bugs, tasks, test results) | Persistent; version controlled |
+| `/artefacts/` | System-wide artifacts (architecture, requirements, API contracts) | Persistent; version controlled |
 
-**Workflow**: Agents read standards from `/context/` and write outputs to `{service}/artifacts/` for service-specific work or `/artifacts/` for system-wide artifacts. All artifacts are version controlled and do not require promotion.
+**Workflow**: Agents read standards from `/context/` and write outputs to `{service}/artefacts/` for service-specific work or `/artefacts/` for system-wide artifacts. All artifacts are version controlled and do not require promotion.
 
 ## 2. Agent Context Setup Workflow
 
-When an agent is assigned to work on a new product or feature, it shall follow this context setup workflow to ensure proper project initialization and documentation:
+When an agent is assigned to work on a new product or feature, it shall follow this context setup workflow to ensure proper project initialisation and documentation:
 
 ### 2.1. Product Description Verification
 
@@ -33,11 +33,11 @@ When an agent is assigned to work on a new product or feature, it shall follow t
 
 After obtaining the product description, the agent shall create or amend the following documents in strict order:
 
-1. **`/artifacts/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `/context/rules/EARS-notation-requirements.mdc`.
+1. **`/artefacts/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `/context/rules/EARS-notation-requirements.mdc`.
 
-2. **`/artifacts/architecture.md`**: Architectural and design decisions that describe how the product will be implemented.
+2. **`/artefacts/architecture.md`**: Architectural and design decisions that describe how the product will be implemented.
 
-3. **`{service}/artifacts/tasks.md`**: Comprehensive task breakdown for implementation, verified against standards in `/context/standards/`.
+3. **`{service}/artefacts/tasks.md`**: Comprehensive task breakdown for implementation, verified against standards in `/context/standards/`.
 
 **For each document created or amended, the agent shall pause and wait for explicit human review and approval before proceeding to the next document.**
 
@@ -45,14 +45,14 @@ After obtaining the product description, the agent shall create or amend the fol
 
 Following the core specification documents, the agent shall create blank placeholder documents:
 
-*   **`{service}/artifacts/todo.md`**: For listing smaller items, technical debt, or future improvements.
-*   **`{service}/artifacts/bugs.md`**: For listing current and past bugs.
+*   **`{service}/artefacts/todo.md`**: For listing smaller items, technical debt, or future improvements.
+*   **`{service}/artefacts/bugs.md`**: For listing current and past bugs.
 
 ### 2.4. Documentation Standards Compliance
 
 All documentation created during this workflow shall conform to the standards outlined in `/context/standards/doc-standards.md`, including:
 
-*   Proper file location within the project structure (system-wide in `/artifacts/`, service-specific in `{service}/artifacts/`)
+*   Proper file location within the project structure (system-wide in `/artefacts/`, service-specific in `{service}/artefacts/`)
 *   Content formatting and structure requirements
 *   Required elements for requirements (EARS notation), design decisions, and task specifications
 
@@ -68,9 +68,9 @@ The agent shall create `scripts/build.yaml` following the standards in `/context
 
 * Upon completion of all build work, the agent shall review common documents as outlined in `/context/standards/doc-standards.md` and make very concise changes as required, in particular:
 - `README.md` (service root)
-- Project-specific artifacts in `{service}/artifacts/`
+- Project-specific artifacts in `{service}/artefacts/`
 
-* Upon completion of all documents, the agent shall summarize what was created and confirm with the user before beginning any implementation work.
+* Upon completion of all documents, the agent shall summarise what was created and confirm with the user before beginning any implementation work.
 *   The agent shall not commence task execution until all context documents have been reviewed and approved by humans.
 
 ## 3. Agent Behaviour
@@ -94,7 +94,7 @@ To operate autonomously but safely, agents shall adhere to the following behavio
 ### 3.3. Version Control
 
 *   The agent shall commit its changes to the version control system after completing each task.
-*   The agent shall write a clear and concise commit message that summarizes the purpose of the changes.
+*   The agent shall write a clear and concise commit message that summarises the purpose of the changes.
 *   The commit message shall include the task ID and follow the format specified in `/context/standards/coding-standards.md`.
 
 ### 3.4. Agent Handoffs
@@ -109,7 +109,7 @@ Agents shall communicate context and status through structured handoff documents
 - Example: functional-tester → python-coder → tech-lead
 
 **Inter-domain handoffs** (between services):
-- Location: `artifacts/shared/handoffs/{service}-api.md`
+- Location: `artefacts/shared/handoffs/{service}-api.md`
 - Purpose: Coordinate between agents working on different context domains
 - Example: data-service → vis-service, vis-service → frontend
 
@@ -130,8 +130,8 @@ Each handoff entry shall include:
 
 When completing a group of tasks:
 1. Update the HANDOFF.md file in service directory (intra-domain)
-2. If completing integration-ready work, update `artifacts/shared/handoffs/integration-status.md` (inter-domain)
-3. If API endpoints are stable, create/update `artifacts/shared/handoffs/{service}-api.md` (inter-domain)
+2. If completing integration-ready work, update `artefacts/shared/handoffs/integration-status.md` (inter-domain)
+3. If API endpoints are stable, create/update `artefacts/shared/handoffs/{service}-api.md` (inter-domain)
 4. Commit changes with handoff updates included
 5. Mark tasks as complete in task list
 
@@ -143,20 +143,20 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 - Test coverage >= 90%
 - API endpoints match OpenAPI specification
 - HANDOFF.md exists in service directory
-- Mock client provided in `artifacts/shared/mocks/`
-- Example responses in `artifacts/shared/fixtures/`
-- Integration status updated in `artifacts/shared/handoffs/integration-status.md`
+- Mock client provided in `artefacts/shared/mocks/`
+- Example responses in `artefacts/shared/fixtures/`
+- Integration status updated in `artefacts/shared/handoffs/integration-status.md`
 
 #### 3.4.5. Templates
 
-- **Intra-domain**: Use `context/templates/HANDOFF-TEMPLATE.md`
-- **Inter-domain**: Use `artifacts/shared/handoffs/TEMPLATE-service-api.md`
+- **Intra-domain**: Use `artefacts/shared/HANDOFF-TEMPLATE.md`
+- **Inter-domain**: Use `artefacts/shared/handoffs/TEMPLATE-service-api.md`
 
 ## 4. Build, Test, and Automation Artifacts
 
 *   The agent shall store all tests in a `tests/` directory within the project.
 *   The agent shall store all scripts used for automation in a `scripts/` directory.
-*   The agent shall store all test results and build artifacts in the `{service}/artifacts/` directory within the project.
+*   The agent shall store all test results and build artifacts in the `{service}/artefacts/` directory within the project.
 
 ## 5. Worktree Isolation
 
@@ -175,8 +175,8 @@ These domains apply during discovery, design, and review phases:
 | **discovery** | product-owner | requirements.md, user-stories.md |
 | **design** | solution-architect, database-designer, api-designer, ui-designer, visual-designer | architecture.md, api-contract.json, data-model.md, schema.sql, openapi.yaml, design/ |
 | **review** | tech-lead, code-reviewer, security-tester | All code (read-only), review reports |
-| **infra** | gcp-devops | ./artifacts/gcp/, terraform/ |
-| **docs** | documentation | ./artifacts/docs/, all specs (read-only) |
+| **infra** | gcp-devops | ./artefacts/gcp/, terraform/ |
+| **docs** | documentation | ./artefacts/docs/, all specs (read-only) |
 
 #### Project-Specific Domains (Implementation Phase)
 
@@ -197,7 +197,7 @@ For multi-service architectures, define project-specific domains based on servic
 - Services communicate via REST APIs, not shared code
 - Each domain provides mock implementations for testing during parallel development
 
-**See:** Project architecture documentation (`artifacts/architecture.md`) for complete domain definitions, interface contracts, and mock implementation patterns.
+**See:** Project architecture documentation (`artefacts/architecture.md`) for complete domain definitions, interface contracts, and mock implementation patterns.
 
 ### 5.2. Worktree Structure
 

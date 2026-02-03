@@ -2,7 +2,7 @@
 
 **Languages**: Python (backend), TypeScript (frontend)
 
-## File Organization
+## File Organisation
 
 ```
 backend/{service-name}/
@@ -63,7 +63,7 @@ export const ComponentName: FunctionalComponent<Props> = ({ prop }) => {
 };
 ```
 
-## Import Organization
+## Import Organisation
 
 ```typescript
 // 1. React imports
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
 // Lazy loading
 const Component = lazy(() => import('./Component'));
 
-// Memoization for expensive operations
+// Memoisation for expensive operations
 const processedData = useMemo(() => heavyComputation(data), [data]);
 
 // Concurrent backend operations
@@ -206,10 +206,18 @@ def process_data(user_id: str, data: Dict[str, Any]) -> Optional[Result]:
 ```
 {type}({scope}): {TASK-ID} {description}
 
+{optional body}
+
+Tasks: {task-ids}
+Agent-Session: model={model} agents={list} tokens={in}K/{out}K duration={time}
+
 Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
 ```
 
-**Note**: Agents must use their actual model name and ID (e.g., "Sonnet 4.5 (claude-sonnet-4-5-20250929)").
+**Note**:
+- Agents must use their actual model name and ID (e.g., "Sonnet 4.5 (claude-sonnet-4-5-20250929)")
+- Agent-Session line tracks metrics for session analysis
+- Tasks line references task IDs from tasks.md or artifacts/build/tasks.md
 
 ### Commit Types by TDD Phase
 
@@ -247,22 +255,126 @@ Use the service/package name as scope:
 # TDD RED - failing tests
 test(data-service): DS-001 add failing tests for yfinance data fetching
 
+Tasks: DS-001
+Agent-Session: model=sonnet agents=functional-tester tokens=8.2K/5.1K duration=32m
+
 Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
 
 # TDD GREEN - implementation
 feat(data-service): DS-101 create project structure and dependencies
+
+Tasks: DS-101
+Agent-Session: model=sonnet agents=python-coder tokens=12.4K/8.2K duration=45m
 
 Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
 
 # Review approval
 docs(data-service): DS-301 add tech lead review - APPROVED
 
+Tasks: DS-301
+Agent-Session: model=opus agents=tech-lead tokens=15.6K/6.3K duration=28m
+
 Co-Authored-By: Claude Opus 4.5 (claude-opus-4-5-20251101) <noreply@anthropic.com>
 
-# General commits (non-task)
+# Human commits (no Agent-Session or Co-Authored-By)
 feat: add user authentication
 fix: resolve token refresh bug
 docs: update API documentation
 refactor: simplify data service logic
 ```
 
+
+## Framework-Specific Best Practices
+
+### React/Next.js/TypeScript
+
+**Philosophy:** Functional/declarative, SOLID, Type safety, Component-driven
+
+**Naming Conventions:**
+
+| Case | Use For |
+|------|---------|
+| PascalCase | Components, Types, Interfaces |
+| kebab-case | Directories, files |
+| camelCase | Variables, functions, hooks, props |
+| UPPERCASE | Env vars, constants |
+
+**Prefixes:** handle* (events), is/has/can (booleans), use* (hooks)
+
+**React Patterns:**
+- Functional components with TypeScript interfaces
+- useCallback for memoised callbacks
+- useMemo for expensive computations
+- React.memo() strategically
+- Proper cleanup in useEffect
+
+**Next.js:**
+- App Router, Server Components by default
+- 'use client' only for: events, browser APIs, state, client libs
+- Image/Link/Script components for optimisation
+
+**State Management:**
+
+| Scope | Use |
+|-------|-----|
+| Local | useState, useReducer |
+| Shared | useContext |
+| Global | Redux Toolkit (createSlice) |
+
+**Styling:** Tailwind CSS, Mobile-first, Dark mode via CSS vars, WCAG contrast
+
+**Quality:**
+- Zod for validation
+- Jest + React Testing Library
+- Error boundaries with Sentry
+- Semantic HTML, ARIA, keyboard nav
+
+### SwiftUI/iOS
+
+**Architecture:** MVVM with SwiftUI, Prefer structs over classes
+
+**Structure:** Features/, Core/, UI/, Resources/
+
+**Naming:** camelCase vars/funcs, PascalCase types, Boolean: is/has/should prefix
+
+**Patterns:**
+
+| Area | Use |
+|------|-----|
+| Concurrency | async/await |
+| State | @Published, @StateObject |
+| Errors | Result type |
+| UI | SwiftUI first, UIKit when needed |
+| Icons | SF Symbols |
+
+**Quality:**
+- Profile with Instruments
+- XCTest + XCUITest
+- Support dark mode, dynamic type
+- Keychain for secrets, certificate pinning
+
+### React Native for Web
+
+**Goal:** Write Once, Run on Multiple Platforms
+
+**Principles:**
+
+1. **Organise Repository for Shared Code**
+   - Shared components in `packages/shared-ui/`
+   - Platform-specific overrides in `mobile/` and `web/`
+
+2. **Reuse Components Across Platforms**
+   - Use React Native primitives (View, Text, etc.)
+   - Platform-specific files: `.ios.tsx`, `.android.tsx`, `.web.tsx`
+
+3. **Consolidate State Management**
+   - Shared Redux store
+   - Platform-agnostic business logic
+
+4. **Optimize Build and Deployment**
+   - Separate build pipelines
+   - Shared TypeScript config base
+
+5. **Focus on Developer Experience**
+   - Fast refresh for all platforms
+   - Shared dev tools and debugging
