@@ -1,0 +1,139 @@
+# Default Workflow: Full TDD with Reviews
+#
+# Complete workflow with all quality gates, reviews, and testing phases.
+# Use for production features and critical functionality.
+
+name: default
+description: Full TDD workflow with comprehensive reviews and testing
+
+phases:
+  - id: discovery
+    name: Requirements & Planning
+    sequential: true
+    agents:
+      - product-expert   # First: clarify vague ideas
+      - product-owner    # Then: formalise into requirements
+    outputs:
+      - artefacts/product/discovery-notes.md
+      - artefacts/product/requirements.md
+      - artefacts/product/user-stories.md
+      - artefacts/product/open-questions.md
+
+  - id: design
+    name: Architecture & Design
+    depends_on: [discovery]
+    parallel: true
+    agents:
+      - solution-architect
+      - database-designer
+      - api-designer
+      - ui-designer
+    outputs:
+      - artifacts/architecture/architecture.md
+      - artifacts/architecture/data-model.md
+      - artifacts/api/openapi.yaml
+      - artifacts/design/components.md
+
+  - id: visual-design
+    name: Visual Assets
+    depends_on: [design]
+    optional: true
+    agents:
+      - visual-designer
+    outputs:
+      - artifacts/design/visuals/
+
+  - id: tdd-red
+    name: "TDD: Write Failing Tests"
+    depends_on: [design]
+    agents:
+      - functional-tester
+    outputs:
+      - tests/
+    validation:
+      - All tests must fail initially
+      - Coverage targets defined
+
+  - id: tdd-green
+    name: "TDD: Implement to Pass Tests"
+    depends_on: [tdd-red]
+    parallel: true
+    agents:
+      - python-coder
+      - typescript-coder
+    outputs:
+      - Source code
+      - Tests passing
+    validation:
+      - All tests must pass
+      - No test modifications allowed
+
+  - id: review-gate
+    name: Quality Gate Reviews
+    depends_on: [tdd-green]
+    sequential: true
+    gate: true
+    agents:
+      - tech-lead      # First: architecture compliance
+      - code-reviewer  # After tech-lead approval
+    outputs:
+      - artifacts/build/tech-review.md
+      - artifacts/build/code-review.md
+    validation:
+      - tech-lead must APPROVE before code-reviewer runs
+      - CHANGES REQUIRED → return to tdd-green
+
+  - id: verification
+    name: Comprehensive Testing
+    depends_on: [review-gate]
+    parallel: true
+    agents:
+      - functional-tester  # Verify coverage
+      - ui-tester          # E2E testing
+      - security-tester    # Security audit
+    outputs:
+      - artifacts/test-results/
+    validation:
+      - Coverage >= 90%
+      - No critical security issues
+
+  - id: deployment
+    name: Infrastructure & Deployment
+    depends_on: [verification]
+    agents:
+      - gcp-devops
+    outputs:
+      - Infrastructure code
+      - Deployment configs
+
+  - id: documentation
+    name: User Documentation
+    depends_on: [deployment]
+    agents:
+      - documentation
+    outputs:
+      - User guides
+      - API documentation
+
+quality_gates:
+  - phase: review-gate
+    type: approval
+    required: true
+    description: "Tech lead must approve before proceeding"
+
+  - phase: verification
+    type: metrics
+    required: true
+    criteria:
+      - metric: test_coverage
+        threshold: 90
+        operator: ">="
+      - metric: critical_security_issues
+        threshold: 0
+        operator: "=="
+
+workflow_rules:
+  - Tests written before implementation (TDD)
+  - Sequential review (tech-lead → code-reviewer)
+  - No test modifications during tdd-green phase
+  - All quality gates must pass
