@@ -31,9 +31,20 @@ context/                           # Portable, pre-loadable directory
 ├── workflows/                    # Workflow patterns
 │   ├── default.yaml             # Full TDD with all gates
 │   └── prototype.yaml           # Fast iteration
+├── templates/                    # Output templates
+├── mcp/                          # MCP server configuration (copy to root on instantiation)
 └── scripts/                     # Portable tools
     ├── validators/              # Rule validators
     └── generators/              # Code generators
 ```
 
-For complete documentation, see full content above.
+## Setup for New Repository
+
+When instantiating a new repository with this context:
+
+1. Copy entire `context/` directory to new repo
+2. **Copy MCP config to root**: `cp context/mcp/mcp.json .mcp.json`
+3. Generate CLAUDE.md: `uv run python context/scripts/generators/generate_claude_md.py`
+4. Update API keys in `.mcp.json` for your project
+
+The `context/mcp/mcp.json` file remains as a template; the root `.mcp.json` is the active configuration.
