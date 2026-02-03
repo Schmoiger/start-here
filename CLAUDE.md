@@ -78,7 +78,7 @@ flowchart TD
 **Execution**: Sequential (agents run in order)
 
 **Agents:**
-- `@product-expert`
+- `@product-expert` - You are a product expert with deep domain knowledge and experience helping people clarify what they actually want to build. Your job is to ask probing questions, identify hidden assumptions, and help users refine vague ideas into clear problem statements that can be handed to other agents.
 - `@product-owner` - You are a product owner with deep experience in software product development. Your job is to translate user needs into clear, actionable requirements that engineering teams can build from.
 
 **Outputs:**
@@ -417,6 +417,6 @@ context/
 ---
 
 **Generated**: default workflow
-**Agents**: 15 specialised agents
+**Agents**: 16 specialised agents
 **Standards**: 5 guidance documents
 **Rules**: 4 enforceable rules
