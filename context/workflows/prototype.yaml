@@ -1,0 +1,74 @@
+# Prototype Workflow: Rapid Iteration
+#
+# Minimal workflow for fast prototyping and experimentation.
+# Skips reviews, extensive testing, and infrastructure.
+# Use for spikes, POCs, and throwaway code.
+
+name: prototype
+description: Fast iteration workflow for prototyping and experimentation
+
+phases:
+  - id: quick-plan
+    name: Quick Planning
+    agents:
+      - product-owner
+    outputs:
+      - artefacts/product/requirements.md
+    notes:
+      - Keep requirements lightweight
+      - Focus on core hypothesis to test
+
+  - id: sketch-design
+    name: Minimal Design
+    depends_on: [quick-plan]
+    agents:
+      - solution-architect
+    outputs:
+      - artifacts/architecture/architecture.md
+    notes:
+      - High-level only
+      - Document key decisions
+      - Skip detailed API specs
+
+  - id: build
+    name: Build Prototype
+    depends_on: [sketch-design]
+    parallel: true
+    agents:
+      - python-coder
+      - typescript-coder
+    outputs:
+      - Working prototype
+    notes:
+      - No tests required (prototype only)
+      - Focus on proving concept
+      - Technical debt acceptable
+
+  - id: validate
+    name: Smoke Test
+    depends_on: [build]
+    optional: true
+    agents:
+      - functional-tester
+    outputs:
+      - Basic smoke tests only
+    notes:
+      - Manual testing acceptable
+      - Cover happy path only
+      - Skip edge cases
+
+quality_gates: []
+
+workflow_rules:
+  - Speed over quality (prototype code)
+  - No formal reviews required
+  - Documentation optional
+  - Tests optional (smoke tests only)
+  - Skip deployment infrastructure
+  - Mark all prototype code clearly
+  - Plan for rewrite if promoting to production
+
+warnings:
+  - "⚠️  Prototype code should NOT go to production"
+  - "⚠️  No quality gates - review before promoting"
+  - "⚠️  If prototype succeeds, rewrite with default workflow"
