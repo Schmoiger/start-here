@@ -144,9 +144,7 @@ def generate_phase_details(workflow: dict, agents: dict) -> str:
         section.append("\n**Agents:**")
         for agent_name in phase_agents:
             if agent_name in agents:
-                agent_data = agents[agent_name]
-                desc = extract_description(agent_data['content'])
-                section.append(f"- `@{agent_name}` - {desc}")
+                section.append(f"- `@{agent_name}` - See `context/agents/{agent_name}.md`")
             else:
                 section.append(f"- `@{agent_name}`")
 
@@ -190,23 +188,7 @@ def generate_agent_reference(agents: dict) -> str:
 
         for agent_name in agent_names:
             if agent_name in agents:
-                agent_data = agents[agent_name]
-                frontmatter = agent_data['frontmatter']
-                desc = extract_description(agent_data['content'])
-
-                standards = frontmatter.get('standards', [])
-                rules = frontmatter.get('rules', [])
-
-                section.append(f"\n**@{agent_name}**")
-                section.append(f"- {desc}")
-
-                if standards:
-                    standards_str = ', '.join(f"`{s}`" for s in standards)
-                    section.append(f"- **Standards**: {standards_str}")
-
-                if rules:
-                    rules_str = ', '.join(f"`{r}`" for r in rules)
-                    section.append(f"- **Rules**: {rules_str}")
+                section.append(f"\n**@{agent_name}** - See `context/agents/{agent_name}.md`")
 
         sections.append('\n'.join(section))
 
@@ -286,7 +268,7 @@ This guide describes the orchestration of specialised agents for software develo
 
 **Context Directory**: All standards, rules, and agent definitions are in `context/`. See [context/README.md](context/README.md) for complete index.
 
-**Orchestrator**: When spawning agents, pass project-specific paths (task location, output location, project root). Standards are inherited—don't repeat them. See [workflow-standards.md §8](context/standards/workflow-standards.md#8-orchestrator-agent-invocation).
+**Orchestrator**: When spawning agents, use the task prompt template at `context/templates/TASK-PROMPT-TEMPLATE.md`. The template ensures agents read their definition file and receive consistent task structure. Never inline agent definitions—agents will read them from `context/agents/{{agent-name}}.md`. See [workflow-standards.md §8](context/standards/workflow-standards.md#8-orchestrator-agent-invocation).
 
 ---
 

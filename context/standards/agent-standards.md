@@ -91,17 +91,50 @@ To operate autonomously but safely, agents shall adhere to the following behavio
 *   The agent shall not modify files outside the directory of the current project.
 *   The agent shall not proceed based on their own assumptions until the assumptions are validated with the user.
 
-### 3.3. Version Control
+### 3.3. Tool Usage
+
+Agents have access to multiple tools for different purposes. To minimise user interruption and maximise efficiency, agents shall follow these tool selection policies:
+
+#### 3.3.1. File Operations
+
+*   **Prefer Write/Edit tools** for creating and modifying files. These tools do not require user permission and provide immediate feedback.
+*   **Avoid Bash for file operations** such as `cat`, `echo >`, `sed`, `awk`, or heredoc redirection. These require user permission and slow down execution.
+*   **Exception**: Bash may be used for file operations when the operation is part of a larger script that includes non-file operations (e.g., git commit with file creation).
+
+#### 3.3.2. Command Execution
+
+*   **Use Bash** for running tests, validation commands, git operations, and other system commands.
+*   **Use Bash** when multiple dependent operations must run sequentially (e.g., `uv add package && uv run pytest`).
+*   **Preferred pattern**: Use Write/Edit to create files, then Bash to execute tests/validation on those files.
+
+#### 3.3.3. Code Search
+
+*   **Use Glob** for finding files by pattern (e.g., `**/*.py`).
+*   **Use Grep** for searching file contents by keyword or regex.
+*   **Avoid Bash alternatives** like `find`, `grep`, `rg` commands unless necessary for complex operations.
+
+#### 3.3.4. Tool Selection Summary
+
+| Operation | Preferred Tool | Avoid |
+|-----------|---------------|-------|
+| Create/modify files | Write, Edit | `echo >`, `cat <<EOF`, `sed` |
+| Run tests | Bash | N/A |
+| Git operations | Bash | N/A |
+| Find files | Glob | `find`, `ls` |
+| Search contents | Grep | `grep`, `rg`, `ack` |
+| Install dependencies | Bash (`uv add`, `yarn add`) | Manual edits to lock files |
+
+### 3.4. Version Control
 
 *   The agent shall commit its changes to the version control system after completing each task.
 *   The agent shall write a clear and concise commit message that summarises the purpose of the changes.
 *   The commit message shall include the task ID and follow the format specified in `/context/standards/coding-standards.md`.
 
-### 3.4. Agent Handoffs
+### 3.5. Agent Handoffs
 
 Agents shall communicate context and status through structured handoff documents to enable coordination.
 
-#### 3.4.1. Handoff Types
+#### 3.5.1. Handoff Types
 
 **Intra-domain handoffs** (within same service/package):
 - Location: `{service-directory}/HANDOFF.md`
@@ -113,7 +146,7 @@ Agents shall communicate context and status through structured handoff documents
 - Purpose: Coordinate between agents working on different context domains
 - Example: data-service → vis-service, vis-service → frontend
 
-#### 3.4.2. Handoff Format
+#### 3.5.2. Handoff Format
 
 Each handoff entry shall include:
 - **Timestamp**: ISO 8601 with timezone (e.g., `2026-01-27T18:45:32Z`)
@@ -126,7 +159,7 @@ Each handoff entry shall include:
 - **Blockers**: Any blockers preventing progress
 - **Commit**: Git commit hash linking handoff to code
 
-#### 3.4.3. Handoff Workflow
+#### 3.5.3. Handoff Workflow
 
 When completing a group of tasks:
 1. Update the HANDOFF.md file in service directory (intra-domain)
@@ -135,7 +168,7 @@ When completing a group of tasks:
 4. Commit changes with handoff updates included
 5. Mark tasks as complete in task list
 
-#### 3.4.4. Integration Readiness
+#### 3.5.4. Integration Readiness
 
 Before marking a service as "Ready for Integration", the agent shall ensure:
 - All Phase 2 (TDD GREEN) tasks complete
@@ -147,7 +180,7 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 - Example responses in `artefacts/shared/fixtures/`
 - Integration status updated in `artefacts/shared/handoffs/integration-status.md`
 
-#### 3.4.5. Templates
+#### 3.5.5. Templates
 
 - **Intra-domain**: Use `artefacts/shared/HANDOFF-TEMPLATE.md`
 - **Inter-domain**: Use `artefacts/shared/handoffs/TEMPLATE-service-api.md`
