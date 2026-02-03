@@ -1,6 +1,0 @@
----
-alwaysApply: false
-description: python runs in a virtual environment
----
-
-- **virtual environment** always run python code in a venv

@@ -31,6 +31,8 @@ This document describes preferred technology patterns and architectural decision
 
 ### Backend Services
 
+- **Python**: Always run Python in a virtual environment. Use `uv` and a `.python-version` file per project.
+
 ```yaml
 platform: Cloud Run Functions Gen 2 (Google Cloud)
 languages: Python
@@ -162,24 +164,24 @@ See `context/standards/testing-standards.md` for comprehensive testing guideline
 
 ## Performance Considerations
 
-### Frontend Optimization
+### Frontend Optimisation
 
 - **Static generation** where possible (`output: 'export'`)
 - **Lazy loading** for route components
-- **Image optimization** via Next.js Image component
+- **Image optimisation** via Next.js Image component
 - **Bundle analysis** with `@next/bundle-analyzer`
 
-### Backend Optimization
+### Backend Optimisation
 
 - **Async/await** for I/O operations
 - **Connection pooling** for databases
 - **Caching layers** (Redis/Memory) for expensive operations
 - **Background tasks** for heavy processing
 
-### Mobile Optimization
+### Mobile Optimisation
 
 - **Platform-specific builds** (single architecture)
-- **Asset optimization** (compressed images, WebP)
+- **Asset optimisation** (compressed images, WebP)
 - **Offline-first** design where applicable
 
 ## Monitoring & Observability
@@ -207,7 +209,7 @@ TODO
 - **Serverless-first**: Prefer managed services over self-hosted
 - **Mobile-first**: Desktop/web features are progressive enhancements
 - **Offline-capable**: Core functionality works without network
-- **Privacy-by-design**: Minimize data collection and retention
+- **Privacy-by-design**: Minimise data collection and retention
 
 ## Getting Help
 
@@ -215,7 +217,7 @@ TODO
 
 - `context/standards/` - All development standards (coding, testing, workflows)
 - `context/` - Shared context (agents, rules, standards, MCP)
-- `artifacts/` - Project-specific work output (specs, tasks, bugs, guides)
+- `artefacts/` - Project-specific work output (specs, tasks, bugs, guides)
 - Service-specific READMEs for setup instructions
 
 ### Development Support
@@ -229,3 +231,44 @@ TODO
 See `context/standards/build-standards.md` for complete build configuration, templates, and deployment patterns.
 
 Reference this document when making architectural decisions or introducing new patterns. These are preferred patterns; document deviations and rationale when choosing alternatives.
+## 12-Factor App Principles
+
+For building software-as-a-service applications with portability and resilience:
+
+1. **Codebase**: Exactly one codebase for a deployed service, used for many deployments
+2. **Dependencies**: All dependencies declared, no implicit reliance on system tools
+3. **Config**: Configuration that varies between deployments stored in environment
+4. **Backing services**: All backing services treated as attached resources
+5. **Build, release, run**: Strict delivery pipeline of build → release → run
+6. **Processes**: Deploy as stateless processes, persist data in backing services
+7. **Port binding**: Self-contained services available via specified ports
+8. **Concurrency**: Scale by individual processes
+9. **Disposability**: Fast startup and shutdown for robust systems
+10. **Dev/Prod parity**: All environments as similar as possible
+11. **Logs**: Produce logs as event streams, let execution environment aggregate
+12. **Admin Processes**: Admin tasks in source control, packaged with application
+
+## Context7 Integration
+
+Always use Context7 when needing:
+- Code generation
+- Setup or configuration steps
+- Library/API documentation
+
+Automatically use Context7 MCP tools to resolve library ID and get library docs without explicit request.
+
+## Package Installation
+
+Install packages at the project root folder, not at the monorepo root. This ensures proper dependency isolation and allows each project to manage its own dependencies independently.
+
+**Python projects:**
+```bash
+cd {project-root}
+uv add package-name
+```
+
+**Node.js projects:**
+```bash
+cd {project-root}
+yarn add package-name
+```

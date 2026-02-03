@@ -1,5 +1,0 @@
----
-description: location for installing packages for the project
-alwaysApply: false
----
-install packages at the project root folder, not at the monorepo root

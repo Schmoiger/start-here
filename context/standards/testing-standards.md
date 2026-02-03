@@ -12,7 +12,7 @@
 
 ## TDD Cycle
 
-**Red**: Write failing test first for each requirement/behavior.
+**Red**: Write failing test first for each requirement/behaviour.
 
 **Green**: Implement minimal code to pass test.
 
@@ -21,10 +21,25 @@
 ## Test Types
 
 **Unit Tests (pytest/Vitest)**: Isolated functions/methods, mock all dependencies.
+- Agent: @functional-tester writes these
+- Run via: pytest, vitest
+- Mock all external services
 
 **Integration Tests**: Component interactions, use real services where safe.
+- Agent: @functional-tester writes these
+- Test API endpoints with real backend
+- May use TestClient (FastAPI) or supertest (Express)
 
-**E2E Tests (Playwright)**: Complete user workflows with real browsers.
+**E2E Tests (Browser)**: Complete user workflows with real browsers.
+- Agent: @ui-tester performs these
+- **MUST use actual browser** (Chrome DevTools)
+- **MUST capture screenshots** as evidence
+- Tests user-facing behaviour, not APIs
+- Verify visual elements render correctly
+
+**Distinction:**
+- @functional-tester: Writes automated test code (pytest/vitest files)
+- @ui-tester: Executes manual browser testing with Chrome DevTools
 
 ## Phase Workflow
 
@@ -45,7 +60,7 @@ feat: implement user authentication
 - E2E: Login/logout flow
 ```
 
-## Test Organization
+## Test Organisation
 
 ```
 tests/
@@ -122,12 +137,12 @@ test('dashboard layout matches design', async ({ page }) => {
 | ----------------- | --------- | ------------------------------------------------------------- |
 | Minimum           | 90%       | Build fails below this                                        |
 | Target            | 100%      | Always aim for full coverage                                  |
-| Gap Documentation | Required  | If <100%, document gaps in `{service}/artifacts/test-gaps.md` |
+| Gap Documentation | Required  | If <100%, document gaps in `{service}/artefacts/test-gaps.md` |
 
 
 ### Gap Documentation Format
 
-When coverage is below 100%, document each gap in `{service}/artifacts/test-gaps.md`:
+When coverage is below 100%, document each gap in `{service}/artefacts/test-gaps.md`:
 
 ```markdown
 # Test Coverage Gaps
@@ -136,7 +151,7 @@ When coverage is below 100%, document each gap in `{service}/artifacts/test-gaps
 - **Current Coverage**: 94%
 - **Gap Location**: `src/auth/oauth.py:45-60`
 - **Reason**: External OAuth provider callback - requires live integration
-- **Mitigation**: Manual testing checklist in `{service}/artifacts/guides/oauth-testing.md`
+- **Mitigation**: Manual testing checklist in `{service}/artefacts/guides/oauth-testing.md`
 - **Ticket**: #123 (to address later)
 ```
 
@@ -211,3 +226,74 @@ def test_processes_api_response(mock_fetch):
     mock_fetch.assert_called_once()
 ```
 
+
+## Test-Driven Development (TDD)
+
+### London School TDD Cycle
+
+**Red → Green → Refactor**
+
+| Phase | Action | Constraint |
+|-------|--------|------------|
+| Red | Write one failing test | Must fail for right reason |
+| Green | Minimum code to pass | Hardcoded returns, no logic |
+| Refactor | Improve design | DRY, SOLID, proper names |
+
+### Core Rules
+
+1. **Start with acceptance test** (consumer perspective)
+2. **Isolate units**: interface per collaborator, mock for verification
+3. **Tell Don't Ask**: command collaborators, don't query state
+4. **One behaviour per test**: single assertion, descriptive name
+5. **Recurse to boundaries**: DB, APIs, filesystem, clock
+
+### Invariant Tests
+
+Complementary to TDD with different purpose.
+
+**TDD vs Invariants:**
+
+| Aspect | TDD | Invariants |
+|--------|-----|------------|
+| Question | "What should happen?" | "What should NEVER happen?" |
+| Inputs | Specific scenarios | Property-based (often random) |
+| Scope | One behaviour | One domain rule |
+| Timing | Before implementation | Before OR when rule discovered |
+
+**Test Pyramid:**
+```
+┌─────────────────────────┐
+│  Invariant tests        │  ← Domain rules (essential complexity)
+├─────────────────────────┤
+│  Unit tests (TDD)       │  ← Behaviour specs
+├─────────────────────────┤
+│  Integration tests      │  ← Boundaries
+└─────────────────────────┘
+```
+
+**Invariant Sources:**
+1. `domain-rules.yaml` - invariants section
+2. Discovered during development (add to domain-rules.yaml)
+3. Post-incident (encode "this must never happen again")
+
+**Invariant Test Pattern:**
+```typescript
+// tests/{domain}/invariants.test.ts
+describe('Domain Invariants', () => {
+  // From domain-rules.yaml#INV-001
+  it('balance is never negative', () => {
+    fc.assert(fc.property(
+      fc.array(transactionArb),
+      (transactions) => {
+        const account = applyTransactions(transactions);
+        return account.balance >= 0;
+      }
+    ));
+  });
+});
+```
+
+**Handoff Criteria:**
+- All TDD tests pass (behaviour correct)
+- All invariant tests pass (domain rules respected)
+- If invariant fails: agent hit essential complexity, must fix or escalate
