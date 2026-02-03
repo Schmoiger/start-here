@@ -16,6 +16,37 @@ This guide describes the orchestration of specialised agents for software develo
 
 ---
 
+## Session Initialisation Checklist
+
+**Use this checklist after context compaction or at session start:**
+
+Before beginning work, ensure you have current knowledge of project standards:
+
+1. **Core Standards** (Read if compacted or unfamiliar):
+   - `context/standards/agent-standards.md` - Agent behaviour, tool usage, handoffs
+   - `context/standards/workflow-standards.md` - Development workflow, TDD process
+   - `context/standards/doc-standards.md` - Documentation structure, artefact organisation
+
+2. **Technical Standards** (Read when working on implementation):
+   - `context/standards/tech-standards.md` - Tech stack (uv, yarn, FastAPI, React)
+   - `context/standards/coding-standards.md` - Code quality, patterns, error handling
+   - `context/standards/testing-standards.md` - TDD cycle, coverage requirements
+
+3. **Project Context** (Read when unfamiliar with current work):
+   - `artefacts/product/requirements.md` - System requirements
+   - `artefacts/architecture/architecture.md` - System architecture
+   - `artefacts/build/tasks.md` - Current task list
+
+4. **Verification**:
+   - ✅ I know which workflow phase we're in (discovery/design/tdd-red/tdd-green/review/etc.)
+   - ✅ I understand the TDD workflow (RED then GREEN, never combined)
+   - ✅ I know to use Write/Edit tools (not bash) for file operations
+   - ✅ I know agents read their definitions from `context/agents/{agent-name}.md`
+
+**After compaction:** The conversation summary provides what happened, but standards may have changed. Re-read core standards to ensure compliance.
+
+---
+
 ## Workflow: default
 
 Full TDD workflow with comprehensive reviews and testing
