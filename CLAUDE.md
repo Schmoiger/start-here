@@ -12,7 +12,7 @@ This guide describes the orchestration of specialised agents for software develo
 
 **Context Directory**: All standards, rules, and agent definitions are in `context/`. See [context/README.md](context/README.md) for complete index.
 
-**Orchestrator**: When spawning agents, pass project-specific paths (task location, output location, project root). Standards are inherited—don't repeat them. See [workflow-standards.md §8](context/standards/workflow-standards.md#8-orchestrator-agent-invocation).
+**Orchestrator**: When spawning agents, use the task prompt template at `context/templates/TASK-PROMPT-TEMPLATE.md`. The template ensures agents read their definition file and receive consistent task structure. Never inline agent definitions—agents will read them from `context/agents/{agent-name}.md`. See [workflow-standards.md §8](context/standards/workflow-standards.md#8-orchestrator-agent-invocation).
 
 ---
 
@@ -78,8 +78,8 @@ flowchart TD
 **Execution**: Sequential (agents run in order)
 
 **Agents:**
-- `@product-expert` - You are a product expert with deep domain knowledge and experience helping people clarify what they actually want to build. Your job is to ask probing questions, identify hidden assumptions, and help users refine vague ideas into clear problem statements that can be handed to other agents.
-- `@product-owner` - You are a product owner with deep experience in software product development. Your job is to translate user needs into clear, actionable requirements that engineering teams can build from.
+- `@product-expert` - See `context/agents/product-expert.md`
+- `@product-owner` - See `context/agents/product-owner.md`
 
 **Outputs:**
 - artefacts/product/discovery-notes.md
@@ -93,10 +93,10 @@ flowchart TD
 **Execution**: Parallel (agents run simultaneously)
 
 **Agents:**
-- `@solution-architect` - You are a solution architect with expertise in designing scalable, maintainable software systems. Your job is to translate requirements into technical architecture that development teams can implement.
-- `@database-designer` - You are a database architect specialising in data modelling and schema design. Your job is to design efficient, normalised database schemas that support the application's requirements.
-- `@api-designer` - You are an API architect specialising in designing clean, consistent, and developer-friendly APIs. Your job is to create API specifications that are intuitive to use and maintainable over time.
-- `@ui-designer` - You are a UI/UX designer specialising in creating intuitive, accessible, and visually coherent interfaces. Your job is to design the user interface before developers build it, ensuring a consistent and user-friendly experience.
+- `@solution-architect` - See `context/agents/solution-architect.md`
+- `@database-designer` - See `context/agents/database-designer.md`
+- `@api-designer` - See `context/agents/api-designer.md`
+- `@ui-designer` - See `context/agents/ui-designer.md`
 
 **Outputs:**
 - artefacts/architecture/architecture.md
@@ -110,7 +110,7 @@ flowchart TD
 **Optional**: Can be skipped
 
 **Agents:**
-- `@visual-designer` - You are a visual designer who transforms structured design specifications into polished visual artefacts using AI-powered design tools. Your job is to take Mermaid diagrams, design tokens, wireframes, and documentation and create presentation-ready visuals.
+- `@visual-designer` - See `context/agents/visual-designer.md`
 
 **Outputs:**
 - artefacts/design/visuals/
@@ -120,7 +120,7 @@ flowchart TD
 **Depends On**: `design`
 
 **Agents:**
-- `@functional-tester` - You are a meticulous QA engineer. Your job is to write comprehensive functional tests.
+- `@functional-tester` - See `context/agents/functional-tester.md`
 
 **Outputs:**
 - tests/
@@ -135,8 +135,8 @@ flowchart TD
 **Execution**: Parallel (agents run simultaneously)
 
 **Agents:**
-- `@python-coder` - You are an expert Python engineer. Your job is to write clean, testable, production-grade Python code.
-- `@typescript-coder` - You are an expert TypeScript engineer. Your job is to write clean, type-safe frontend and backend TypeScript code.
+- `@python-coder` - See `context/agents/python-coder.md`
+- `@typescript-coder` - See `context/agents/typescript-coder.md`
 
 **Outputs:**
 - Source code
@@ -153,8 +153,8 @@ flowchart TD
 **Quality Gate**: ⚠️ Approval required before proceeding
 
 **Agents:**
-- `@tech-lead` - You are a tech lead responsible for ensuring code quality, architectural compliance, and engineering standards across the codebase. Your job is to review deliverables from development agents before they proceed to testing.
-- `@code-reviewer` - You are a senior engineer performing detailed code review. Your job is to catch bugs, identify edge cases, and improve code quality through thorough line-by-line analysis.
+- `@tech-lead` - See `context/agents/tech-lead.md`
+- `@code-reviewer` - See `context/agents/code-reviewer.md`
 
 **Outputs:**
 - artefacts/build/tech-review.md
@@ -170,9 +170,9 @@ flowchart TD
 **Execution**: Parallel (agents run simultaneously)
 
 **Agents:**
-- `@functional-tester` - You are a meticulous QA engineer. Your job is to write comprehensive functional tests.
-- `@ui-tester` - You are a UI quality engineer. Your job is to test user-facing behaviour in Chrome.
-- `@security-tester` - You are a security engineer specialising in application security, threat modelling, and AI/LLM security.
+- `@functional-tester` - See `context/agents/functional-tester.md`
+- `@ui-tester` - See `context/agents/ui-tester.md`
+- `@security-tester` - See `context/agents/security-tester.md`
 
 **Outputs:**
 - artefacts/test-results/
@@ -186,7 +186,7 @@ flowchart TD
 **Depends On**: `verification`
 
 **Agents:**
-- `@gcp-devops` - You are a GCP DevOps engineer. Your job is to design, configure, and validate cloud infrastructure.
+- `@gcp-devops` - See `context/agents/gcp-devops.md`
 
 **Outputs:**
 - Infrastructure code
@@ -197,7 +197,7 @@ flowchart TD
 **Depends On**: `deployment`
 
 **Agents:**
-- `@documentation` - You are a technical writer who creates clear, comprehensive documentation for developers and end users. Your job is to make the codebase accessible and understandable.
+- `@documentation` - See `context/agents/documentation.md`
 
 **Outputs:**
 - User guides
@@ -226,62 +226,47 @@ Use `@agent-name` to invoke an agent:
 
 ### Discovery
 
-**@product-owner**
-- You are a product owner with deep experience in software product development. Your job is to translate user needs into clear, actionable requirements that engineering teams can build from.
+**@product-owner** - See `context/agents/product-owner.md`
 
 ### Design
 
-**@solution-architect**
-- You are a solution architect with expertise in designing scalable, maintainable software systems. Your job is to translate requirements into technical architecture that development teams can implement.
+**@solution-architect** - See `context/agents/solution-architect.md`
 
-**@database-designer**
-- You are a database architect specialising in data modelling and schema design. Your job is to design efficient, normalised database schemas that support the application's requirements.
+**@database-designer** - See `context/agents/database-designer.md`
 
-**@api-designer**
-- You are an API architect specialising in designing clean, consistent, and developer-friendly APIs. Your job is to create API specifications that are intuitive to use and maintainable over time.
+**@api-designer** - See `context/agents/api-designer.md`
 
-**@ui-designer**
-- You are a UI/UX designer specialising in creating intuitive, accessible, and visually coherent interfaces. Your job is to design the user interface before developers build it, ensuring a consistent and user-friendly experience.
+**@ui-designer** - See `context/agents/ui-designer.md`
 
-**@visual-designer**
-- You are a visual designer who transforms structured design specifications into polished visual artefacts using AI-powered design tools. Your job is to take Mermaid diagrams, design tokens, wireframes, and documentation and create presentation-ready visuals.
+**@visual-designer** - See `context/agents/visual-designer.md`
 
 ### Development
 
-**@functional-tester**
-- You are a meticulous QA engineer. Your job is to write comprehensive functional tests.
+**@functional-tester** - See `context/agents/functional-tester.md`
 
-**@python-coder**
-- You are an expert Python engineer. Your job is to write clean, testable, production-grade Python code.
+**@python-coder** - See `context/agents/python-coder.md`
 
-**@typescript-coder**
-- You are an expert TypeScript engineer. Your job is to write clean, type-safe frontend and backend TypeScript code.
+**@typescript-coder** - See `context/agents/typescript-coder.md`
 
 ### Review
 
-**@tech-lead**
-- You are a tech lead responsible for ensuring code quality, architectural compliance, and engineering standards across the codebase. Your job is to review deliverables from development agents before they proceed to testing.
+**@tech-lead** - See `context/agents/tech-lead.md`
 
-**@code-reviewer**
-- You are a senior engineer performing detailed code review. Your job is to catch bugs, identify edge cases, and improve code quality through thorough line-by-line analysis.
+**@code-reviewer** - See `context/agents/code-reviewer.md`
 
 ### Testing
 
-**@ui-tester**
-- You are a UI quality engineer. Your job is to test user-facing behaviour in Chrome.
+**@ui-tester** - See `context/agents/ui-tester.md`
 
-**@security-tester**
-- You are a security engineer specialising in application security, threat modelling, and AI/LLM security.
+**@security-tester** - See `context/agents/security-tester.md`
 
 ### Deployment
 
-**@gcp-devops**
-- You are a GCP DevOps engineer. Your job is to design, configure, and validate cloud infrastructure.
+**@gcp-devops** - See `context/agents/gcp-devops.md`
 
 ### Documentation
 
-**@documentation**
-- You are a technical writer who creates clear, comprehensive documentation for developers and end users. Your job is to make the codebase accessible and understandable.
+**@documentation** - See `context/agents/documentation.md`
 
 ---
 
