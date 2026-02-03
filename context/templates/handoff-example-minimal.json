@@ -22,10 +22,10 @@
   ],
   "status": "ready",
   "blockers": [],
-  "artifacts": {"tests": "services/visualisation-service/tests/"},
+  "artefacts": {"tests": "services/visualisation-service/tests/"},
   "stats": {"total_tests": 118, "tests_failing": 118},
   "context": {
-    "architecture_ref": "artifacts/architecture/architecture.md",
+    "architecture_ref": "artefacts/architecture/architecture.md",
     "key_decisions": ["Tests FAIL until implementation", "Use bollinger_types for shared models", "Implement: calculators -> storage -> endpoints"]
   }
 }

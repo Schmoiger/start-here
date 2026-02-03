@@ -24,7 +24,7 @@ phases:
     agents:
       - solution-architect
     outputs:
-      - artifacts/architecture/architecture.md
+      - artefacts/architecture/architecture.md
     notes:
       - High-level only
       - Document key decisions

@@ -236,7 +236,7 @@ Single source of truth: `domain-rules.yaml`. Handoff contains reference only.
 |-------|------------|
 | Know other domains' internals | Escalate to meta-orchestrator |
 | Spawn multiple coders for one task | Queue or reject |
-| Hold state across tasks | Pass via handoff artifacts |
+| Hold state across tasks | Pass via handoff artefacts |
 | Make cross-domain decisions | Escalate for decomposition |
 | Duplicate resolution in handoff | Reference domain-rules.yaml |
 | Escalate without checking resolved_blockers | Check if already answered |

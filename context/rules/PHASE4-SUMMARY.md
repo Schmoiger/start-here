@@ -38,7 +38,7 @@ All validators located in `/Users/avi/Repos/bollinger/scripts/validators/`:
   - Optional: IF {condition}, THE {system} SHALL {action}
   - Forbidden: THE {system} SHALL NOT {action}
   - Complex: WHEN {trigger}, IF {condition}, THE {system} SHALL {action}
-- **Target files**: `artifacts/product/requirements.md`, `artifacts/product/user-stories.md`
+- **Target files**: `artefacts/product/requirements.md`, `artefacts/product/user-stories.md`
 - **Skips**: Code blocks, headers, table separators
 - **Exit codes**: 0 (pass), 1 (fail)
 - **Executable**: ✅ `chmod +x`
@@ -195,7 +195,7 @@ echo "feat(test): add feature" > /tmp/test.txt
 uv run python scripts/validators/conventional_commits.py /tmp/test.txt
 
 # Validate requirements
-uv run python scripts/validators/ears_notation.py artifacts/product/requirements.md
+uv run python scripts/validators/ears_notation.py artefacts/product/requirements.md
 
 # Validate British English
 uv run python scripts/validators/british_english.py README.md

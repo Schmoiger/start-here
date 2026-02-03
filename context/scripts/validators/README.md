@@ -32,7 +32,7 @@ Run individual validators:
 uv run python scripts/validators/conventional_commits.py .git/COMMIT_EDITMSG
 
 # Validate requirements file
-uv run python scripts/validators/ears_notation.py artifacts/product/requirements.md
+uv run python scripts/validators/ears_notation.py artefacts/product/requirements.md
 
 # Validate British English in file
 uv run python scripts/validators/british_english.py README.md
@@ -123,8 +123,8 @@ Validates requirements files use EARS (Easy Approach to Requirements Syntax) not
 | Complex | WHEN {trigger}, IF {condition}, THE {system} SHALL {action} | WHEN user clicks Print, IF printer offline, THE system SHALL show error |
 
 **Target files:**
-- `artifacts/product/requirements.md`
-- `artifacts/product/user-stories.md`
+- `artefacts/product/requirements.md`
+- `artefacts/product/user-stories.md`
 
 **Examples:**
 

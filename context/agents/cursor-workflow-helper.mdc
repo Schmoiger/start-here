@@ -13,15 +13,15 @@ When using Cursor Composer, explicitly switch roles:
 ```
 Acting as the product-owner agent (see context/agents/product-owner.md):
 - Define requirements for [your feature]
-- Output to ./artifacts/requirements.md
+- Output to ./artefacts/requirements.md
 
 Then, acting as the solution-architect agent (see context/agents/solution-architect.md):
 - Design the system architecture
-- Output to ./artifacts/architecture.md
+- Output to ./artefacts/architecture.md
 
 Then, acting as the python-coder agent (see context/agents/python-coder.md):
 - Implement the backend service
-- Output to ./artifacts/python/
+- Output to ./artefacts/python/
 ```
 
 ### Pattern 2: Reference Agent Files Directly
@@ -90,7 +90,7 @@ Follow the TDD workflow from `context/agents/CLAUDE.md`:
 
 - **No `@agent-name` syntax**: Use explicit role instructions instead
 - **Manual orchestration**: You coordinate agents, not automatic
-- **Same artifacts**: All agents still read/write to `./artifacts/`
+- **Same artefacts**: All agents still read/write to `./artefacts/`
 - **Same standards**: Agents inherit from `context/standards/` and `context/rules/`
 
 ## Example Composer Session

@@ -26,10 +26,10 @@ This is a test agent for validation purposes.
 
 ## Workflow
 
-1. Read requirements from {project-root}/artifacts/requirements.md
+1. Read requirements from {project-root}/artefacts/requirements.md
 2. Execute task
-3. Write output to {project-root}/artifacts/test/
+3. Write output to {project-root}/artefacts/test/
 
 ## Deliverables
 
-- Output files to {project-root}/artifacts/test/
+- Output files to {project-root}/artefacts/test/

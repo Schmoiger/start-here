@@ -3,9 +3,11 @@
 All documentation in this project shall be in British English.
 
 This includes:
-- Spelling conventions (e.g., "colour" instead of "color", "organise" instead of "organize")
+- Spelling conventions (e.g., "colour" instead of "color", "organise" instead of "organize", "artefacts" instead of "artifacts")
 - Terminology (e.g., "behaviour" instead of "behavior", "recognise" instead of "recognize")
 - Date formats (DD/MM/YYYY preferred over MM/DD/YYYY where applicable)
 - Consistent use of British English throughout all project documentation, code comments, and communications
+
+**Directory naming**: Use `/artefacts/` (British spelling) not `/artifacts/` (American spelling)
 
 Agents shall apply British English standards when creating or modifying any textual content in the project.

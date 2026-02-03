@@ -10,14 +10,14 @@
   },
   "summary": "TDD RED complete: 118 failing tests across 6 files for vis-service (VS-001 to VS-008). Tests cover Bollinger calculator, signal detection, backtest engine, config storage, and export. Ready for TDD GREEN implementation.",
   "tasks_completed": [
-    {"id": "VS-001", "name": "Bollinger calculator tests", "status": "complete", "tests": 20, "artifacts": ["tests/test_bollinger_calculator.py"]},
-    {"id": "VS-002", "name": "Signal detector tests", "status": "complete", "tests": 15, "artifacts": ["tests/test_signal_detector.py"]},
-    {"id": "VS-003", "name": "Strategy registry tests", "status": "complete", "tests": 19, "artifacts": ["tests/test_strategy_registry.py"]},
-    {"id": "VS-004", "name": "Backtest engine tests", "status": "complete", "tests": 24, "artifacts": ["tests/test_backtest_engine.py"]},
+    {"id": "VS-001", "name": "Bollinger calculator tests", "status": "complete", "tests": 20, "artefacts": ["tests/test_bollinger_calculator.py"]},
+    {"id": "VS-002", "name": "Signal detector tests", "status": "complete", "tests": 15, "artefacts": ["tests/test_signal_detector.py"]},
+    {"id": "VS-003", "name": "Strategy registry tests", "status": "complete", "tests": 19, "artefacts": ["tests/test_strategy_registry.py"]},
+    {"id": "VS-004", "name": "Backtest engine tests", "status": "complete", "tests": 24, "artefacts": ["tests/test_backtest_engine.py"]},
     {"id": "VS-005", "name": "Metrics calculator tests", "status": "complete", "tests": 0, "notes": "Included in VS-004 file"},
-    {"id": "VS-006", "name": "Config storage tests", "status": "complete", "tests": 21, "artifacts": ["tests/test_config_storage.py"]},
+    {"id": "VS-006", "name": "Config storage tests", "status": "complete", "tests": 21, "artefacts": ["tests/test_config_storage.py"]},
     {"id": "VS-007", "name": "View config validator tests", "status": "complete", "tests": 0, "notes": "Included in VS-006 file"},
-    {"id": "VS-008", "name": "Export tests (CSV/Parquet)", "status": "complete", "tests": 19, "artifacts": ["tests/test_export.py"]}
+    {"id": "VS-008", "name": "Export tests (CSV/Parquet)", "status": "complete", "tests": 19, "artefacts": ["tests/test_export.py"]}
   ],
   "next_tasks": [
     {"id": "VS-101", "name": "Create project structure", "priority": "critical"},
@@ -33,7 +33,7 @@
   ],
   "status": "ready",
   "blockers": [],
-  "artifacts": {
+  "artefacts": {
     "tests": "services/visualisation-service/tests/",
     "config": "services/visualisation-service/pyproject.toml",
     "docs": "services/visualisation-service/README.md"
@@ -67,8 +67,8 @@
     {"message": "test(vis-service): VS-008 add failing tests for CSV and Parquet export", "tasks": ["VS-008"]}
   ],
   "context": {
-    "architecture_ref": "artifacts/architecture/architecture.md",
-    "api_ref": "artifacts/api/openapi.yaml",
+    "architecture_ref": "artefacts/architecture/architecture.md",
+    "api_ref": "artefacts/api/openapi.yaml",
     "key_decisions": [
       "All tests should FAIL until implementation (TDD RED)",
       "Use bollinger_types package for all shared Pydantic models",

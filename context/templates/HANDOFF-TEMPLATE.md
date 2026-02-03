@@ -24,7 +24,7 @@ Intra-domain handoffs within the {service-name} context domain.
 - {Files to review}
 - {Known issues or gotchas}
 
-**Artifacts**:
+**Artefacts**:
 - Code: `{path}`
 - Tests: `{path}`
 - Fixtures: `{path}`
@@ -56,10 +56,10 @@ Before marking service as "Ready for Integration":
 - [ ] Tech lead review approved
 - [ ] Test coverage >= 90%
 - [ ] API endpoints match OpenAPI spec
-- [ ] Mock client created in `artifacts/shared/mocks/`
-- [ ] Example responses in `artifacts/shared/fixtures/`
-- [ ] Cross-domain handoff file created in `artifacts/shared/handoffs/{service}-api.md`
-- [ ] Integration status updated in `artifacts/shared/handoffs/integration-status.md`
+- [ ] Mock client created in `artefacts/shared/mocks/`
+- [ ] Example responses in `artefacts/shared/fixtures/`
+- [ ] Cross-domain handoff file created in `artefacts/shared/handoffs/{service}-api.md`
+- [ ] Integration status updated in `artefacts/shared/handoffs/integration-status.md`
 
 ---
 

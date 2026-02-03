@@ -15,7 +15,7 @@ Our CI/CD system balances central control with developer autonomy:
 
 ### 2. Dynamic Dispatcher
 
-A single `cloudbuild.yaml` at the root of the repository acts as a dynamic dispatcher. On every push, it identifies changed applications and triggers the appropriate build template using the parameters from the application's manifest. The dispatcher includes conflict detection to prevent resource conflicts between parallel builds (see `workflows/gcp-build/artifacts/requirements.md` for details).
+A single `cloudbuild.yaml` at the root of the repository acts as a dynamic dispatcher. On every push, it identifies changed applications and triggers the appropriate build template using the parameters from the application's manifest. The dispatcher includes conflict detection to prevent resource conflicts between parallel builds (see `workflows/gcp-build/artefacts/requirements.md` for details).
 
 ### 3. Pre-flight Validation (Fail Fast)
 
