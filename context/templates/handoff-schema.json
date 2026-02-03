@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bollinger.app/schemas/handoff.json",
+  "title": "Multi-Agent Handoff Document",
+  "description": "Compressed handoff format for inter-agent state transfer. Designed to reduce token overhead while preserving all essential information for agent consumption and human audit.",
+  "type": "object",
+  "required": ["meta", "summary", "tasks_completed", "next_tasks", "status"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Handoff metadata for routing and audit",
+      "required": ["service", "date", "phase", "from_agent", "to_agent"],
+      "properties": {
+        "service": {
+          "type": "string",
+          "description": "Service domain (e.g., 'visualisation-service', 'data-service')",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date (YYYY-MM-DD)"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp for precise ordering"
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["DISCOVERY", "DESIGN", "TDD_RED", "TDD_GREEN", "REVIEW", "INTEGRATION", "DEPLOY"],
+          "description": "Current workflow phase"
+        },
+        "from_agent": {
+          "type": "string",
+          "pattern": "^@[a-z][a-z0-9-]*$",
+          "description": "Sending agent (e.g., '@functional-tester')"
+        },
+        "to_agent": {
+          "type": "string",
+          "pattern": "^@[a-z][a-z0-9-]*$",
+          "description": "Receiving agent (e.g., '@python-coder')"
+        },
+        "model": {
+          "type": "string",
+          "description": "LLM model used (for audit/debugging)"
+        },
+        "session_id": {
+          "type": "string",
+          "description": "Optional session identifier for tracing"
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Human-readable summary (1-3 sentences). Must be understandable without reading the full handoff."
+    },
+    "tasks_completed": {
+      "type": "array",
+      "description": "Tasks completed in this phase",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z]{2,4}-\\d{3}$",
+            "description": "Task ID (e.g., 'VS-001', 'DS-003')"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Brief task name"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["complete", "partial", "blocked", "skipped"],
+            "description": "Completion status"
+          },
+          "artifacts": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Relative paths to files created/modified"
+          },
+          "tests": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of tests written (for TDD phases)"
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Brief notes if status is not 'complete'"
+          }
+        }
+      }
+    },
+    "next_tasks": {
+      "type": "array",
+      "description": "Task IDs for the receiving agent to work on",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z]{2,4}-\\d{3}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Task IDs that must complete first"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["critical", "high", "normal", "low"]
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ready", "blocked", "needs_review", "failed"],
+      "description": "Overall handoff status"
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Decisions made with incomplete information",
+      "items": {
+        "type": "object",
+        "required": ["decision", "confidence", "impact_if_wrong"],
+        "properties": {
+          "decision": {
+            "type": "string",
+            "description": "What was assumed"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Agent's confidence in assumption"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Why this assumption was made"
+          },
+          "impact_if_wrong": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Consequence if assumption is incorrect"
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "description": "Issues blocking progress (empty if status is 'ready')",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "impact"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z]{2,4}-\\d{3}$",
+            "description": "Blocker identifier matching domain-rules.yaml"
+          },
+          "question": {
+            "type": "string",
+            "description": "What needs answering"
+          },
+          "impact": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Impact level of this blocker"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "resolved"],
+            "description": "Resolution status"
+          },
+          "resolution_ref": {
+            "type": "string",
+            "description": "Reference to domain-rules.yaml entry (e.g., 'domain-rules.yaml#PAY-042')"
+          }
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "description": "Token usage for this handoff (metrics)",
+      "properties": {
+        "in": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Input tokens consumed"
+        },
+        "out": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Output tokens generated"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["api_response", "estimated", "unavailable"],
+          "description": "How token count was determined"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "description": "Key artifact locations (relative paths)",
+      "properties": {
+        "tests": { "type": "string" },
+        "src": { "type": "string" },
+        "config": { "type": "string" },
+        "docs": { "type": "string" }
+      },
+      "additionalProperties": { "type": "string" }
+    },
+    "stats": {
+      "type": "object",
+      "description": "Quantitative metrics for audit",
+      "properties": {
+        "total_tests": { "type": "integer", "minimum": 0 },
+        "tests_passing": { "type": "integer", "minimum": 0 },
+        "tests_failing": { "type": "integer", "minimum": 0 },
+        "coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "files_created": { "type": "integer", "minimum": 0 },
+        "files_modified": { "type": "integer", "minimum": 0 },
+        "lines_added": { "type": "integer", "minimum": 0 },
+        "lines_removed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "validation_rules": {
+      "type": "object",
+      "description": "Domain-specific validation constraints (passed to next agent)",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["integer", "number", "string", "enum"] },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "default": {},
+          "values": { "type": "array" }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "Package dependencies (for environment setup)",
+      "properties": {
+        "runtime": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "dev": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "commits": {
+      "type": "array",
+      "description": "Git commits made in this phase",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hash": { "type": "string", "pattern": "^[a-f0-9]{7,40}$" },
+          "message": { "type": "string" },
+          "tasks": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Task IDs addressed by this commit"
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "description": "Essential context the next agent needs (avoid redundancy with shared docs)",
+      "properties": {
+        "architecture_ref": {
+          "type": "string",
+          "description": "Path to architecture doc (don't duplicate content)"
+        },
+        "api_ref": {
+          "type": "string",
+          "description": "Path to API spec (don't duplicate content)"
+        },
+        "key_decisions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 5,
+          "description": "Critical decisions made (max 5, one sentence each)"
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Gotchas or non-obvious issues"
+        }
+      }
+    },
+    "human_notes": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes for human reviewers (not for agent consumption)"
+    }
+  }
+}

@@ -114,7 +114,7 @@ Each service directory shall contain a `HANDOFF.md` file at its root for intra-d
 
 *   **Location**: `{service-directory}/HANDOFF.md`
 *   **Purpose**: Track handoffs between agents working on the same context domain
-*   **Format**: Use template from `/artifacts/shared/HANDOFF-TEMPLATE.md`
+*   **Format**: Use template from `/context/templates/HANDOFF-TEMPLATE.md`
 
 Required elements:
 *   **Timestamp**: ISO 8601 with timezone (e.g., `2026-01-27T18:45:32Z`)
