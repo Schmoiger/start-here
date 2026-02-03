@@ -65,7 +65,7 @@ chmod +x coordinate.sh
 ./coordinate.sh init
 
 # Option B: Create manually
-mkdir -p your-project/artifacts/{python/tests,typescript/tests,test-results,ui-test-results/screenshots,security-audit,gcp/terraform,database/migrations,api,design/visuals,docs}
+mkdir -p your-project/artefacts/{python/tests,typescript/tests,test-results,ui-test-results/screenshots,security-audit,gcp/terraform,database/migrations,api,design/visuals,docs}
 ```
 
 ### Step 4: Open your project in Claude Code
@@ -160,11 +160,11 @@ All agents follow standards in `./context/standards/` and rules in `./context/ru
 **TDD Workflow**
 Tests are written BEFORE implementation. Coders make tests pass, not the other way around.
 
-**All context is in `./artifacts/`**
+**All context is in `./artefacts/`**
 Agents read/write from a shared filesystem directory during development. This is ephemeral workspace.
 
 **Final docs go to `./context/`**
-After approval, outputs are promoted from `./artifacts/` to `./context/`.
+After approval, outputs are promoted from `./artefacts/` to `./context/`.
 
 **Agents don't spawn other agents**
 The main Claude Code session orchestrates everything. Agents are isolated specialists.
@@ -199,7 +199,7 @@ You're using Claude Code's native architecture instead of external orchestration
 
 - **Zero external dependencies** - Just Claude Code + your tools
 - **Clear agent boundaries** - Each agent has explicit tools and constraints
-- **Filesystem-based memory** - No database, just `./artifacts/`
+- **Filesystem-based memory** - No database, just `./artefacts/`
 - **Lean system prompts** - CLAUDE.md provides condensed knowledge, not massive prompts
 - **Native parallelisation** - Claude Code handles multiple agent invocations
 - **TDD enforced** - Tests define behaviour before implementation
@@ -224,14 +224,14 @@ allowed_tools:
 You are a [role]. Your job is to [responsibility].
 
 ## Context Paths
-- Read X from `./artifacts/...`
+- Read X from `./artefacts/...`
 
 ## Constraints
 - Rule 1
 - Rule 2
 
 ## Deliverables
-- Write output to `./artifacts/...`
+- Write output to `./artefacts/...`
 
 ## Task
 {$ARGUMENTS}

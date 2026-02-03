@@ -47,7 +47,7 @@ graph LR
 | Output | Path |
 |--------|------|
 | {Primary output} | `{path}` |
-| Handoff | `artifacts/handoffs/{task-id}.json` |
+| Handoff | `artefacts/handoffs/{task-id}.json` |
 | Metrics | `metrics/session-log.jsonl` (append) |
 
 ## Boundaries

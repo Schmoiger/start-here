@@ -99,10 +99,10 @@ flowchart TD
 - `@ui-designer` - You are a UI/UX designer specialising in creating intuitive, accessible, and visually coherent interfaces. Your job is to design the user interface before developers build it, ensuring a consistent and user-friendly experience.
 
 **Outputs:**
-- artifacts/architecture/architecture.md
-- artifacts/architecture/data-model.md
-- artifacts/api/openapi.yaml
-- artifacts/design/components.md
+- artefacts/architecture/architecture.md
+- artefacts/architecture/data-model.md
+- artefacts/api/openapi.yaml
+- artefacts/design/components.md
 
 #### Visual Assets
 **Phase ID**: `visual-design`
@@ -110,10 +110,10 @@ flowchart TD
 **Optional**: Can be skipped
 
 **Agents:**
-- `@visual-designer` - You are a visual designer who transforms structured design specifications into polished visual artifacts using AI-powered design tools. Your job is to take Mermaid diagrams, design tokens, wireframes, and documentation and create presentation-ready visuals.
+- `@visual-designer` - You are a visual designer who transforms structured design specifications into polished visual artefacts using AI-powered design tools. Your job is to take Mermaid diagrams, design tokens, wireframes, and documentation and create presentation-ready visuals.
 
 **Outputs:**
-- artifacts/design/visuals/
+- artefacts/design/visuals/
 
 #### TDD: Write Failing Tests
 **Phase ID**: `tdd-red`
@@ -157,8 +157,8 @@ flowchart TD
 - `@code-reviewer` - You are a senior engineer performing detailed code review. Your job is to catch bugs, identify edge cases, and improve code quality through thorough line-by-line analysis.
 
 **Outputs:**
-- artifacts/build/tech-review.md
-- artifacts/build/code-review.md
+- artefacts/build/tech-review.md
+- artefacts/build/code-review.md
 
 **Validation:**
 - tech-lead must APPROVE before code-reviewer runs
@@ -175,7 +175,7 @@ flowchart TD
 - `@security-tester` - You are a security engineer specialising in application security, threat modelling, and AI/LLM security.
 
 **Outputs:**
-- artifacts/test-results/
+- artefacts/test-results/
 
 **Validation:**
 - Coverage >= 90%
@@ -244,7 +244,7 @@ Use `@agent-name` to invoke an agent:
 - You are a UI/UX designer specialising in creating intuitive, accessible, and visually coherent interfaces. Your job is to design the user interface before developers build it, ensuring a consistent and user-friendly experience.
 
 **@visual-designer**
-- You are a visual designer who transforms structured design specifications into polished visual artifacts using AI-powered design tools. Your job is to take Mermaid diagrams, design tokens, wireframes, and documentation and create presentation-ready visuals.
+- You are a visual designer who transforms structured design specifications into polished visual artefacts using AI-powered design tools. Your job is to take Mermaid diagrams, design tokens, wireframes, and documentation and create presentation-ready visuals.
 
 ### Development
 

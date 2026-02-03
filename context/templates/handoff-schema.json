@@ -78,7 +78,7 @@
             "enum": ["complete", "partial", "blocked", "skipped"],
             "description": "Completion status"
           },
-          "artifacts": {
+          "artefacts": {
             "type": "array",
             "items": { "type": "string" },
             "description": "Relative paths to files created/modified"
@@ -210,7 +210,7 @@
         }
       }
     },
-    "artifacts": {
+    "artefacts": {
       "type": "object",
       "description": "Key artifact locations (relative paths)",
       "properties": {

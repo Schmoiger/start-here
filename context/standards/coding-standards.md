@@ -217,7 +217,7 @@ Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
 **Note**:
 - Agents must use their actual model name and ID (e.g., "Sonnet 4.5 (claude-sonnet-4-5-20250929)")
 - Agent-Session line tracks metrics for session analysis
-- Tasks line references task IDs from tasks.md or artifacts/build/tasks.md
+- Tasks line references task IDs from tasks.md or artefacts/build/tasks.md
 
 ### Commit Types by TDD Phase
 

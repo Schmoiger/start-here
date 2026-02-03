@@ -120,7 +120,7 @@ When task spans multiple domains:
 | Load full domain context | Use only domains.yaml registry |
 | Make implementation decisions | Delegate to domain orchestrators |
 | Route directly to agents | Always route to domain orchestrator |
-| Hold cross-domain state | Pass state via handoff artifacts |
+| Hold cross-domain state | Pass state via handoff artefacts |
 
 ## Metrics Logging
 

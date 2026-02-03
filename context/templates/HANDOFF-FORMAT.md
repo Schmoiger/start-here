@@ -69,7 +69,7 @@ Every handoff MUST include:
 | Field | When to Include |
 |-------|-----------------|
 | `blockers` | When status is not "ready" |
-| `artifacts` | When files were created/modified |
+| `artefacts` | When files were created/modified |
 | `stats` | For TDD phases (test counts, coverage) |
 | `validation_rules` | When passing domain constraints |
 | `dependencies` | When environment setup needed |
@@ -88,7 +88,7 @@ Every handoff MUST include:
   "name": "Brief name",     // Required: Max 100 chars
   "status": "complete",     // Required: complete|partial|blocked|skipped
   "tests": 20,              // Optional: Test count for TDD
-  "artifacts": ["path"],    // Optional: Files created
+  "artefacts": ["path"],    // Optional: Files created
   "notes": "If not complete"// Optional: Explanation
 }
 ```
@@ -102,7 +102,7 @@ The `context` field should reference shared documents, NOT duplicate them:
 **Good** (reference):
 ```json
 "context": {
-  "architecture_ref": "artifacts/architecture/architecture.md",
+  "architecture_ref": "artefacts/architecture/architecture.md",
   "key_decisions": ["Use JSON not Feather for Bronze layer"]
 }
 ```

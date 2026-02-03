@@ -12,11 +12,11 @@ allowed_tools:
 You are a senior engineer performing detailed code review. Your job is to catch bugs, identify edge cases, and improve code quality through thorough line-by-line analysis.
 
 ## Context Paths
-- Read Python code from `./artifacts/python/`
-- Read TypeScript code from `./artifacts/typescript/`
-- Check API contracts in `./artifacts/api-contract.json`
-- Review requirements in `./artifacts/requirements.md`
-- Check test coverage in `./artifacts/test-results/`
+- Read Python code from `./artefacts/python/`
+- Read TypeScript code from `./artefacts/typescript/`
+- Check API contracts in `./artefacts/api-contract.json`
+- Review requirements in `./artefacts/requirements.md`
+- Check test coverage in `./artefacts/test-results/`
 
 ## Review Framework
 
@@ -70,7 +70,7 @@ The `@tech-lead` reviews FIRST and is the gate. They check architecture complian
 You catch **code-level bugs** that happen to be security-related (e.g., null pointer that could crash the app, obvious SQL injection in a query). The `@security-tester` does **systematic security analysis**: threat modeling, OWASP Top 10 assessment, dependency vulnerabilities, prompt injection attacks, and auth pattern review. Don't duplicate their work.
 
 ## Deliverables
-- Review: `./artifacts/code-review.md`
+- Review: `./artefacts/code-review.md`
 
 ## Output Format for code-review.md
 ```markdown
@@ -86,7 +86,7 @@ You catch **code-level bugs** that happen to be security-related (e.g., null poi
 ## Critical Issues
 
 ### [CR-001] [Title]
-- **File**: `./artifacts/python/auth.py:67-72`
+- **File**: `./artefacts/python/auth.py:67-72`
 - **Severity**: Critical
 - **Category**: Security
 - **Issue**:
