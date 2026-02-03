@@ -6,12 +6,12 @@ This document outlines the standards for preparing projects for CI/CD deployment
 
 ## Core Concepts
 
-### 1. Centralized Templates & Decentralized Manifests
+### 1. Centralised Templates & Decentralised Manifests
 
 Our CI/CD system balances central control with developer autonomy:
 
-- **Centralized Build Templates**: All build, test, and deployment logic is defined in reusable templates located in `workflows/gcp-build/templates/`. This ensures consistency, security, and optimized resource usage.
-- **Decentralized Application Manifests**: Each application declares its deployment needs in a `scripts/build.yaml` file. This manifest points to a central template and provides the necessary parameters (substitutions).
+- **Centralised Build Templates**: All build, test, and deployment logic is defined in reusable templates located in `workflows/gcp-build/templates/`. This ensures consistency, security, and optimised resource usage.
+- **Decentralised Application Manifests**: Each application declares its deployment needs in a `scripts/build.yaml` file. This manifest points to a central template and provides the necessary parameters (substitutions).
 
 ### 2. Dynamic Dispatcher
 
@@ -205,7 +205,7 @@ For one service to call another (e.g., chat-api calling llm-orchestrator):
 
 ## Source-based Deployment
 
-Preferred for most deployments. This approach involves deploying the source code directly and letting the cloud provider (e.g., Google Cloud Run) handle the containerization using buildpacks. This method is equally applicable to Python and TypeScript backend services.
+Preferred for most deployments. This approach involves deploying the source code directly and letting the cloud provider (e.g., Google Cloud Run) handle the containerisation using buildpacks. This method is equally applicable to Python and TypeScript backend services.
 
 **Core Requirements**:
 
@@ -222,7 +222,7 @@ Preferred for most deployments. This approach involves deploying the source code
 **Rationale**:
 
 - Simplifies the development workflow by removing the need to write and maintain a `Dockerfile`.
-- Leverages Google Cloud's optimized buildpacks for both Python and TypeScript ecosystems.
+- Leverages Google Cloud's optimised buildpacks for both Python and TypeScript ecosystems.
 - Enables consistent deployment workflows across different backend technologies.
 
 ### Production Startup Configuration
