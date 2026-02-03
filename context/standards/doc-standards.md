@@ -19,8 +19,8 @@ The documentation shall be structured as follows:
     *   `/context/standards/`: Development standards (coding, testing, documentation, workflow)
     *   `/context/rules/`: Development guidelines (EARS notation, TDD practices)
 *   **`/artefacts/`**: Output files representing work completed
-    *   Monorepo root `/artefacts/`: System-wide artifacts (architecture, requirements, API contracts, design)
-    *   Project-level `{service}/artefacts/`: Service-specific artifacts (bugs, tasks, todo, test results)
+    *   Monorepo root `/artefacts/`: System-wide artefacts (architecture, requirements, API contracts, design)
+    *   Project-level `{service}/artefacts/`: Service-specific artefacts (bugs, tasks, todo, test results)
 
 For example:
 
@@ -96,9 +96,9 @@ For example:
 
 **Rule**: Context is organised by domain boundary.
 
-*   **Service-specific artifacts** → `{service}/artefacts/`
+*   **Service-specific artefacts** → `{service}/artefacts/`
     *   Example: Bugs only affecting data-service go in `services/data-service/artefacts/bugs.md`
-*   **System-wide artifacts** → `/artefacts/` (monorepo root)
+*   **System-wide artefacts** → `/artefacts/` (monorepo root)
     *   Example: System architecture affecting all services goes in `/artefacts/architecture.md`
 *   **Cross-service coordination** → `/artefacts/shared/`
     *   Example: Integration handoffs go in `/artefacts/shared/handoffs/`
@@ -203,7 +203,7 @@ The system shall maintain a `README.md` file in the root of each project. The `R
 -   Instructions for setting up the development environment and running common commands
 -   A summary of important architectural or technical decisions
 -   A list of other projects or services that this project depends on
--   Location of project artifacts (e.g., "See `artefacts/` for bugs, tasks, and test results")
+-   Location of project artefacts (e.g., "See `artefacts/` for bugs, tasks, and test results")
 
 ## 3. Common Context Resources
 
@@ -239,9 +239,9 @@ All project context files shall be reviewed from the perspective of an expert co
 *   **Non-Verbose**: Concise and focused, avoiding redundancy while not consuming unnecessary tokens in AI context windows
 *   **Actionable**: Provides clear, specific guidance that enables effective decision-making and implementation
 
-## 4. System-Wide Artifacts
+## 4. System-Wide Artefacts
 
-The monorepo root `/artefacts/` directory contains system-wide artifacts that affect multiple services, organised by category:
+The monorepo root `/artefacts/` directory contains system-wide artefacts that affect multiple services, organised by category:
 
 ### 4.1. Product (`/artefacts/product/`)
 
@@ -273,7 +273,7 @@ The monorepo root `/artefacts/` directory contains system-wide artifacts that af
 
 ### 4.5. Build & Project Management (`/artefacts/build/`)
 
-Project management artifacts and quality gate decisions:
+Project management artefacts and quality gate decisions:
 
 *   **`bugs.md`**: System-wide bugs affecting multiple services
 *   **`tasks.md`**: Current, past, and future tasks for system-level work
@@ -316,7 +316,7 @@ When creating a new artifact, apply these rules:
 
 **Q4**: Is this a standard/rule for developers to follow?
 - ✅ YES → Put in `/context/standards/` or `/context/rules/`
-- ❌ NO → It's an output, use artifacts per Q1-Q3
+- ❌ NO → It's an output, use artefacts per Q1-Q3
 ## 6. Diagram Standards
 
 ### 6.1. Prefer Mermaid

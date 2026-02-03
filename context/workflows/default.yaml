@@ -29,10 +29,10 @@ phases:
       - api-designer
       - ui-designer
     outputs:
-      - artifacts/architecture/architecture.md
-      - artifacts/architecture/data-model.md
-      - artifacts/api/openapi.yaml
-      - artifacts/design/components.md
+      - artefacts/architecture/architecture.md
+      - artefacts/architecture/data-model.md
+      - artefacts/api/openapi.yaml
+      - artefacts/design/components.md
 
   - id: visual-design
     name: Visual Assets
@@ -41,7 +41,7 @@ phases:
     agents:
       - visual-designer
     outputs:
-      - artifacts/design/visuals/
+      - artefacts/design/visuals/
 
   - id: tdd-red
     name: "TDD: Write Failing Tests"
@@ -77,8 +77,8 @@ phases:
       - tech-lead      # First: architecture compliance
       - code-reviewer  # After tech-lead approval
     outputs:
-      - artifacts/build/tech-review.md
-      - artifacts/build/code-review.md
+      - artefacts/build/tech-review.md
+      - artefacts/build/code-review.md
     validation:
       - tech-lead must APPROVE before code-reviewer runs
       - CHANGES REQUIRED → return to tdd-green
@@ -92,7 +92,7 @@ phases:
       - ui-tester          # E2E testing
       - security-tester    # Security audit
     outputs:
-      - artifacts/test-results/
+      - artefacts/test-results/
     validation:
       - Coverage >= 90%
       - No critical security issues

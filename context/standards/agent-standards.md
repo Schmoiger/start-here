@@ -8,17 +8,17 @@ This document outlines the standards for how AI agents shall interact with this 
 
 All agents shall follow the standards defined in `./context/standards/` and rules defined in `./context/rules/`. Agents are not required to explicitly reference individual standards; compliance is inherited by operating within this project.
 
-## 1.2. Input Standards vs Output Artifacts
+## 1.2. Input Standards vs Output Artefacts
 
-Agents read from input standards and write to output artifacts. For full directory layout see `doc-standards.md` §2.1.
+Agents read from input standards and write to output artefacts. For full directory layout see `doc-standards.md` §2.1.
 
 | Directory | Purpose | Lifecycle |
 |----------|---------|-----------|
 | `/context/` | Input standards and rules for agents to follow | Persistent; version controlled |
 | `{service}/artefacts/` | Service-specific working outputs (bugs, tasks, test results) | Persistent; version controlled |
-| `/artefacts/` | System-wide artifacts (architecture, requirements, API contracts) | Persistent; version controlled |
+| `/artefacts/` | System-wide artefacts (architecture, requirements, API contracts) | Persistent; version controlled |
 
-**Workflow**: Agents read standards from `/context/` and write outputs to `{service}/artefacts/` for service-specific work or `/artefacts/` for system-wide artifacts. All artifacts are version controlled and do not require promotion.
+**Workflow**: Agents read standards from `/context/` and write outputs to `{service}/artefacts/` for service-specific work or `/artefacts/` for system-wide artefacts. All artefacts are version controlled and do not require promotion.
 
 ## 2. Agent Context Setup Workflow
 
@@ -68,7 +68,7 @@ The agent shall create `scripts/build.yaml` following the standards in `/context
 
 * Upon completion of all build work, the agent shall review common documents as outlined in `/context/standards/doc-standards.md` and make very concise changes as required, in particular:
 - `README.md` (service root)
-- Project-specific artifacts in `{service}/artefacts/`
+- Project-specific artefacts in `{service}/artefacts/`
 
 * Upon completion of all documents, the agent shall summarise what was created and confirm with the user before beginning any implementation work.
 *   The agent shall not commence task execution until all context documents have been reviewed and approved by humans.
@@ -152,11 +152,11 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 - **Intra-domain**: Use `artefacts/shared/HANDOFF-TEMPLATE.md`
 - **Inter-domain**: Use `artefacts/shared/handoffs/TEMPLATE-service-api.md`
 
-## 4. Build, Test, and Automation Artifacts
+## 4. Build, Test, and Automation Artefacts
 
 *   The agent shall store all tests in a `tests/` directory within the project.
 *   The agent shall store all scripts used for automation in a `scripts/` directory.
-*   The agent shall store all test results and build artifacts in the `{service}/artefacts/` directory within the project.
+*   The agent shall store all test results and build artefacts in the `{service}/artefacts/` directory within the project.
 
 ## 5. Worktree Isolation
 
@@ -361,7 +361,7 @@ The `coordinate.sh` script manages worktrees:
 Agents shall be aware of their worktree context:
 
 - **Check current worktree**: Before writing files, verify you're in the correct domain worktree
-- **Don't cross boundaries**: Never write to paths outside your domain's artifacts
+- **Don't cross boundaries**: Never write to paths outside your domain's artefacts
 - **Signal completion**: When domain work is complete, notify the orchestrator to create PR
 - **Wait for sync**: If you need context from another domain, wait for their PR to merge and sync
 
