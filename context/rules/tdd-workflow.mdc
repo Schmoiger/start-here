@@ -1,0 +1,38 @@
+# TDD Workflow
+
+**Applies to**: All implementation tasks using Test-Driven Development
+
+## Phases
+
+### RED Phase (Write Tests)
+
+- Write tests BEFORE implementation
+- Tests MUST fail when run
+- Commit message: `test(scope): description`
+- Output: Test files only, no implementation
+
+**Verify**: Run tests, confirm they fail for the right reason (missing implementation, not syntax errors)
+
+### GREEN Phase (Implement)
+
+- Write minimal code to pass tests
+- Tests MUST pass when run
+- NEVER modify test files
+- Commit message: `feat(scope): description`
+- Output: Implementation files only
+
+**Verify**: Run tests, confirm they all pass without changing tests
+
+### REFACTOR Phase (Optional)
+
+- Improve code quality
+- Tests MUST still pass
+- May modify implementation, NOT tests
+- Commit message: `refactor(scope): description`
+
+## Forbidden
+
+- Implementing before tests exist (in TDD tasks)
+- Modifying tests to make them pass
+- Skipping tests to achieve green
+- Committing with failing tests in GREEN phase
