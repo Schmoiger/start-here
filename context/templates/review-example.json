@@ -1,0 +1,192 @@
+{
+  "meta": {
+    "service": "visualisation-service",
+    "date": "2026-01-28",
+    "reviewer": "@code-reviewer",
+    "type": "code",
+    "model": "claude-sonnet-4-5-20250929",
+    "files_reviewed": 9,
+    "iteration": 1
+  },
+  "summary": {
+    "status": "changes_required",
+    "counts": {"critical": 3, "high": 5, "medium": 7, "low": 0},
+    "verdict": "Good TDD coverage but 3 critical bugs (resource leak, wrong calculation, null crash) block deployment.",
+    "blockers": ["CR-001", "CR-002", "CR-003"]
+  },
+  "issues": [
+    {
+      "id": "CR-001",
+      "severity": "critical",
+      "category": "resource_leak",
+      "location": "clients/data_client.py:41-43",
+      "problem": "HTTPx client not closed on exception; leaks connections under load.",
+      "fix": "Use context manager: `with httpx.Client() as client:`",
+      "pattern": "client = httpx.Client",
+      "impact": "crash"
+    },
+    {
+      "id": "CR-002",
+      "severity": "critical",
+      "category": "correctness",
+      "location": "routers/backtest.py:147-151",
+      "problem": "Final value calculation wrong; returns last trade value, not portfolio total.",
+      "fix": "Use `result.metrics.final_capital` instead of manual calculation.",
+      "pattern": "last_trade.exit_price * last_trade.shares",
+      "impact": "data_corruption"
+    },
+    {
+      "id": "CR-003",
+      "severity": "critical",
+      "category": "null_safety",
+      "location": "backtest/backtest_engine.py:201",
+      "problem": "`band.lower` can be None for first N-1 points; comparison crashes.",
+      "fix": "Add null check: `if band.lower is None: return False`",
+      "pattern": "ohlcv.close <= band.lower",
+      "impact": "crash"
+    },
+    {
+      "id": "CR-004",
+      "severity": "high",
+      "category": "design",
+      "location": "routers/bollinger.py:75",
+      "problem": "DataServiceClient created per-request; no connection pooling, hard to test.",
+      "fix": "Use FastAPI `Depends()` for dependency injection.",
+      "pattern": "DataServiceClient()",
+      "impact": "performance_degradation"
+    },
+    {
+      "id": "CR-005",
+      "severity": "high",
+      "category": "security",
+      "location": "main.py:21-22",
+      "problem": "CORS allows all methods and headers; overly permissive.",
+      "fix": "Restrict to `[\"GET\", \"POST\", \"OPTIONS\"]` and `[\"Content-Type\"]`.",
+      "pattern": "allow_methods=[\"*\"]",
+      "impact": "security_hole"
+    },
+    {
+      "id": "CR-006",
+      "severity": "high",
+      "category": "error_handling",
+      "location": "routers/bollinger.py:85-92",
+      "problem": "Empty OHLCV data returns 404; should be 400 (bad request, not not-found).",
+      "fix": "Change to `HTTPException(status_code=400, ...)`",
+      "pattern": "status_code=404",
+      "impact": "poor_ux"
+    },
+    {
+      "id": "CR-007",
+      "severity": "high",
+      "category": "error_handling",
+      "location": "routers/bollinger.py:78",
+      "problem": "Broad `except Exception` catches everything including system errors.",
+      "fix": "Catch specific: `except httpx.HTTPError` or `except ValidationError`.",
+      "pattern": "except Exception",
+      "impact": "tech_debt"
+    },
+    {
+      "id": "CR-008",
+      "severity": "high",
+      "category": "validation",
+      "location": "routers/bollinger.py:65-70",
+      "problem": "No type validation before range checks; non-numeric input crashes.",
+      "fix": "Use Pydantic model validation or add explicit type checks.",
+      "pattern": "if request.period <",
+      "impact": "crash"
+    },
+    {
+      "id": "CR-009",
+      "severity": "medium",
+      "category": "design",
+      "location": "clients/data_client.py:13",
+      "problem": "Hardcoded 30s timeout; should be configurable.",
+      "fix": "Add `timeout` parameter with env var default.",
+      "impact": "tech_debt"
+    },
+    {
+      "id": "CR-010",
+      "severity": "medium",
+      "category": "design",
+      "location": "storage/config_storage.py:18",
+      "problem": "Hardcoded config path; doesn't respect XDG spec on Linux.",
+      "fix": "Use `platformdirs` library or check `XDG_CONFIG_HOME`.",
+      "impact": "poor_ux"
+    },
+    {
+      "id": "CR-011",
+      "severity": "medium",
+      "category": "performance",
+      "location": "routers/backtest.py:95",
+      "problem": "No pagination for large backtest results; response can be huge.",
+      "fix": "Add `limit` and `offset` parameters to endpoint.",
+      "impact": "performance_degradation"
+    },
+    {
+      "id": "CR-012",
+      "severity": "medium",
+      "category": "security",
+      "location": "routers/bollinger.py:1-200",
+      "problem": "No rate limiting; vulnerable to DoS.",
+      "fix": "Add `slowapi` rate limiter as per architecture spec.",
+      "impact": "security_hole"
+    },
+    {
+      "id": "CR-013",
+      "severity": "medium",
+      "category": "logging",
+      "location": "routers/*.py",
+      "problem": "No structured logging for requests or errors.",
+      "fix": "Add JSON logging with request_id, duration, status.",
+      "impact": "tech_debt"
+    },
+    {
+      "id": "CR-014",
+      "severity": "medium",
+      "category": "validation",
+      "location": "storage/config_storage.py:45",
+      "problem": "Watchlist allows duplicates; should enforce uniqueness.",
+      "fix": "Check `if ticker in watchlist` before adding.",
+      "impact": "poor_ux"
+    },
+    {
+      "id": "CR-015",
+      "severity": "medium",
+      "category": "error_handling",
+      "location": "export/csv_exporter.py:28",
+      "problem": "File write errors not caught; can crash on disk full.",
+      "fix": "Wrap in try/except with appropriate error response.",
+      "impact": "crash"
+    }
+  ],
+  "positives": [
+    "Comprehensive TDD test coverage (118 tests)",
+    "Good separation of concerns (calculators, storage, clients, routers)",
+    "Consistent use of Pydantic models for validation",
+    "Clean async/await patterns in endpoints",
+    "Follows OpenAPI spec structure"
+  ],
+  "test_status": {
+    "total": 160,
+    "passing": 152,
+    "failing": 8,
+    "coverage_percent": 87,
+    "failing_tests": [
+      "test_backtest_final_value_calculation",
+      "test_bollinger_with_null_bands",
+      "test_data_client_exception_handling",
+      "test_cors_restricted_methods",
+      "test_empty_data_returns_400",
+      "test_broad_exception_handling",
+      "test_type_validation_before_range",
+      "test_rate_limiting_enabled"
+    ]
+  },
+  "recommendations": [
+    {"priority": "now", "action": "Fix CR-001, CR-002, CR-003 (critical blockers)"},
+    {"priority": "now", "action": "Fix CR-004 through CR-008 (high severity)"},
+    {"priority": "soon", "action": "Add rate limiting (CR-012) and logging (CR-013)"},
+    {"priority": "later", "action": "Address remaining medium issues"},
+    {"priority": "later", "action": "Increase coverage to 90% target"}
+  ]
+}

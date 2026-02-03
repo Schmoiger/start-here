@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bollinger.app/schemas/review.json",
+  "title": "Compressed Code Review",
+  "description": "Compressed review format for audit trails. Reduces verbosity while preserving actionable information for both agents and humans.",
+  "type": "object",
+  "required": ["meta", "summary", "issues"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["service", "date", "reviewer", "type"],
+      "properties": {
+        "service": {
+          "type": "string",
+          "description": "Service reviewed"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "reviewer": {
+          "type": "string",
+          "description": "Agent or human reviewer"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["code", "tech", "security", "performance"],
+          "description": "Review type"
+        },
+        "model": {
+          "type": "string",
+          "description": "LLM model used (for audit)"
+        },
+        "files_reviewed": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "iteration": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Review iteration number"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["status", "counts"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["approved", "approved_with_notes", "changes_required", "rejected"],
+          "description": "Overall review status"
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "critical": { "type": "integer", "minimum": 0 },
+            "high": { "type": "integer", "minimum": 0 },
+            "medium": { "type": "integer", "minimum": 0 },
+            "low": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "verdict": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "One-sentence verdict for humans"
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Issue IDs that block approval"
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "location", "problem", "fix"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(CR|TR|SR|PR)-\\d{3}$",
+            "description": "Issue ID (CR=code, TR=tech, SR=security, PR=perf)"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "correctness",
+              "resource_leak",
+              "null_safety",
+              "security",
+              "performance",
+              "design",
+              "error_handling",
+              "validation",
+              "logging",
+              "testing",
+              "documentation",
+              "style"
+            ]
+          },
+          "location": {
+            "type": "string",
+            "description": "file:line or file:line-line (relative path)",
+            "pattern": "^[^:]+:\\d+(-\\d+)?$"
+          },
+          "problem": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "One sentence: what's wrong"
+          },
+          "fix": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "One sentence: how to fix"
+          },
+          "pattern": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Optional: code pattern to search for (grep-able)"
+          },
+          "impact": {
+            "type": "string",
+            "enum": ["crash", "data_corruption", "security_hole", "performance_degradation", "poor_ux", "tech_debt"],
+            "description": "Impact category"
+          },
+          "fixed": {
+            "type": "boolean",
+            "default": false,
+            "description": "Marked true when resolved"
+          },
+          "fixed_in": {
+            "type": "string",
+            "description": "Commit hash or task ID that fixed this"
+          }
+        }
+      }
+    },
+    "positives": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 5,
+      "description": "What's working well (max 5 bullet points)"
+    },
+    "test_status": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer" },
+        "passing": { "type": "integer" },
+        "failing": { "type": "integer" },
+        "coverage_percent": { "type": "number" },
+        "failing_tests": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of failing test names"
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "priority": { "type": "string", "enum": ["now", "soon", "later"] },
+          "action": { "type": "string", "maxLength": 100 }
+        }
+      },
+      "maxItems": 5,
+      "description": "Prioritised action list (max 5)"
+    }
+  }
+}

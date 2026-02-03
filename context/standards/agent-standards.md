@@ -149,7 +149,7 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 
 #### 3.4.5. Templates
 
-- **Intra-domain**: Use `artifacts/shared/HANDOFF-TEMPLATE.md`
+- **Intra-domain**: Use `context/templates/HANDOFF-TEMPLATE.md`
 - **Inter-domain**: Use `artifacts/shared/handoffs/TEMPLATE-service-api.md`
 
 ## 4. Build, Test, and Automation Artifacts
