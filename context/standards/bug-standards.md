@@ -4,7 +4,7 @@
 
 This document defines the standard for reporting bugs in a way that enables an AI agent to address them autonomously. The goal is to create a centralised, concise, and machine-readable list of bugs.
 
-All bugs shall be listed in a `bugs.md` file located in the project's artifacts directory (e.g., `/services/data-service/artefacts/bugs.md`).
+All bugs shall be listed in a `bugs.md` file located in the project's artefacts directory (e.g., `/services/data-service/artefacts/bugs.md`).
 
 ## 2. Format
 

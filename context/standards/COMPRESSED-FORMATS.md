@@ -71,7 +71,7 @@ maintainable code with comprehensive type hints.
 name: python-coder
 model: sonnet
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-reads: [artifacts/architecture/, artifacts/product/, services/*/tests/]
+reads: [artefacts/architecture/, artefacts/product/, services/*/tests/]
 writes: [services/*/src/]
 ---
 
@@ -566,7 +566,7 @@ context/
 2. [ ] Migrate agent definitions to new format
 3. [ ] Consolidate rules into reference cards
 4. [ ] Remove duplication between standards files
-5. [ ] Convert verbose artifacts to table format
+5. [ ] Convert verbose artefacts to table format
 6. [ ] Update CLAUDE.md to reference compressed formats
 7. [ ] Validate agents can still parse new formats
 

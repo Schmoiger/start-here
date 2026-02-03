@@ -94,7 +94,7 @@ Update both project and monorepo-level documentation to reflect completed work.
 **Monorepo Documentation:**
 
 - `README.md` - Update workspace description
-- `/artefacts/` - Update system-wide artifacts (architecture, API contracts, requirements)
+- `/artefacts/` - Update system-wide artefacts (architecture, API contracts, requirements)
 
 
 ## Assumption Handling Protocol
@@ -216,7 +216,7 @@ When spawning subagents, pass project-specific paths only. Standards are inherit
 @python-coder execute LOG-003
 
 Project: /Users/avi/Repos/bollinger
-Task: Read LOG-003 from artifacts/build/tasks.md
+Task: Read LOG-003 from artefacts/build/tasks.md
 Output: packages/shared-types/python/bollinger_types/
 ```
 
