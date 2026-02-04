@@ -44,48 +44,48 @@ log_phase() {
     echo -e "${CYAN}[PHASE]${NC} $1"
 }
 
-# Check if artifacts directory exists
-ensure_artifacts_dir() {
-    if [ ! -d "./artifacts" ]; then
-        log_warning "Creating ./artifacts directory"
-        mkdir -p ./artifacts
+# Check if artefacts directory exists
+ensure_artefacts_dir() {
+    if [ ! -d "./artefacts" ]; then
+        log_warning "Creating ./artefacts directory"
+        mkdir -p ./artefacts
     fi
 }
 
 # Create subdirectories for each agent's work
 init_agent_dirs() {
-    ensure_artifacts_dir
+    ensure_artefacts_dir
 
     log_info "Initialising agent directories..."
 
     # Phase 0: Discovery
-    # (files created directly in ./artifacts/)
+    # (files created directly in ./artefacts/)
 
     # Phase 1: Design
-    mkdir -p ./artifacts/database/migrations
-    mkdir -p ./artifacts/api
-    mkdir -p ./artifacts/design/visuals
+    mkdir -p ./artefacts/database/migrations
+    mkdir -p ./artefacts/api
+    mkdir -p ./artefacts/design/visuals
 
     # Phase 2-3: Development
-    mkdir -p ./artifacts/python/tests
-    mkdir -p ./artifacts/typescript/tests
+    mkdir -p ./artefacts/python/tests
+    mkdir -p ./artefacts/typescript/tests
 
     # Phase 4-5: Testing
-    mkdir -p ./artifacts/test-results
-    mkdir -p ./artifacts/ui-test-results/screenshots
-    mkdir -p ./artifacts/security-audit
+    mkdir -p ./artefacts/test-results
+    mkdir -p ./artefacts/ui-test-results/screenshots
+    mkdir -p ./artefacts/security-audit
 
     # Phase 6: Deploy
-    mkdir -p ./artifacts/gcp/terraform
+    mkdir -p ./artefacts/gcp/terraform
 
     # Phase 7: Documentation (per doc-standards.md)
-    mkdir -p ./artifacts/context/build
-    mkdir -p ./artifacts/context/specs
-    mkdir -p ./artifacts/context/guides
+    mkdir -p ./artefacts/context/build
+    mkdir -p ./artefacts/context/specs
+    mkdir -p ./artefacts/context/guides
 
     # Create requirements template if not present
-    if [ ! -f "./artifacts/requirements.md" ]; then
-        cat > ./artifacts/requirements.md << 'EOF'
+    if [ ! -f "./artefacts/requirements.md" ]; then
+        cat > ./artefacts/requirements.md << 'EOF'
 # Project Requirements
 
 ## Overview
@@ -102,7 +102,7 @@ Define your project requirements, acceptance criteria, and constraints here.
 - GCP Cloud Run for hosting
 
 ## API Contract
-See ./artifacts/api-contract.json for interface definitions.
+See ./artefacts/api-contract.json for interface definitions.
 EOF
         log_success "Created requirements.md template"
     fi
@@ -188,8 +188,8 @@ Phase 2: Tests First (TDD RED)
                 |
                 v
 Phase 3: Development (TDD GREEN)
-    @python-coder        -> ./artifacts/python/
-    @typescript-coder    -> ./artifacts/typescript/
+    @python-coder        -> ./artefacts/python/
+    @typescript-coder    -> ./artefacts/typescript/
     Goal: Make all tests pass
                 |
                 v
@@ -230,14 +230,14 @@ TDD CYCLE
 EOF
 }
 
-# Show artifacts directory structure
+# Show artefacts directory structure
 show_structure() {
     cat << 'EOF'
 
 ARTIFACTS DIRECTORY STRUCTURE
 =============================
 
-./artifacts/
+./artefacts/
 ├── requirements.md              # Product owner
 ├── user-stories.md              # Product owner
 ├── open-questions.md            # Product owner
@@ -338,8 +338,8 @@ worktree_create() {
         # Create worktree
         git worktree add "$worktree_path" "$branch_name"
 
-        # Initialise artifacts in the worktree
-        (cd "$worktree_path" && mkdir -p ./artifacts)
+        # Initialise artefacts in the worktree
+        (cd "$worktree_path" && mkdir -p ./artefacts)
 
         log_success "Created: $worktree_path -> $branch_name"
     done
@@ -500,7 +500,7 @@ This PR contains work from the $domain context domain.
 - [ ] Domain-specific review (see agent-standards.md section 5.5)
 
 ### Context
-See \`./artifacts/\` for domain outputs.
+See \`./artefacts/\` for domain outputs.
 "
         else
             log_warning "gh CLI not installed. Push complete, create PR manually."
@@ -639,7 +639,7 @@ Usage:
   ./coordinate.sh init              - Initialise agent directories
   ./coordinate.sh list              - List available agents by phase
   ./coordinate.sh workflow          - Show TDD workflow
-  ./coordinate.sh structure         - Show artifacts directory structure
+  ./coordinate.sh structure         - Show artefacts directory structure
   ./coordinate.sh worktree <cmd>    - Manage worktrees for domain isolation
 
 Worktree commands:

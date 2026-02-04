@@ -155,7 +155,7 @@ Each handoff entry shall include:
 - **Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked | 🔴 Failed
 - **Summary**: Brief description of work completed
 - **Notes**: Critical information for next agent
-- **Artifacts**: Paths to relevant files (code, tests, docs)
+- **Artefacts**: Paths to relevant files (code, tests, docs)
 - **Blockers**: Any blockers preventing progress
 - **Commit**: Git commit hash linking handoff to code
 

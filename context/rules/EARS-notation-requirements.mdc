@@ -1,72 +1,26 @@
-# EARS Notation for Requirements
+---
+description: Use EARS notation for requirements
+globs: ["**/requirements.md", "**/user-stories.md"]
+---
 
-## 1. Introduction
+# EARS Notation
 
-EARS (Easy Approach to Requirements Syntax) is a syntax for writing requirements that is designed to be easy to learn and use, while also being machine-readable and unambiguous. It was developed by Alistair Mavin and his colleagues at Rolls-Royce and is now widely used in industries where clear and testable requirements are critical.
+Structured requirement syntax. All requirements MUST use EARS patterns.
 
-The EARS notation provides a simple, structured template that guides the author to write well-formed requirements. It is particularly effective for autonomous agents, as it reduces ambiguity and provides a clear, testable statement of what the system must do.
+## Patterns
 
-## 2. The EARS Clauses
+| Type | Syntax | Example |
+|------|--------|---------|
+| Ubiquitous | THE {system} SHALL {action} | THE system SHALL encrypt all user data |
+| Event | WHEN {trigger}, THE {system} SHALL {action} | WHEN user clicks Save, THE system SHALL persist changes |
+| State | WHILE {state}, THE {system} SHALL {action} | WHILE in maintenance mode, THE system SHALL show notice |
+| Optional | IF {condition}, THE {system} SHALL {action} | IF user is admin, THE system SHALL show admin menu |
+| Forbidden | THE {system} SHALL NOT {action} | THE system SHALL NOT log passwords |
 
-An EARS requirement is made up of a series of clauses, each with a specific purpose. The main clauses are:
+## Combining
 
-*   **WHEN** (Pre-condition): Describes the event that triggers the requirement.
-*   **IF** (State): Describes a state that must be true for the requirement to be active.
-*   **THE** (System): The subject of the requirement (e.g., "The system", "The user interface").
-*   **SHALL** (Action): The action that the system must perform.
-*   **WHILE** (State): Describes a state that must be true while the action is being performed.
-*   **IN ORDER TO** (Purpose): Describes the reason for the requirement.
+Chain clauses for complex requirements:
 
-## 3. EARS Requirement Patterns
+`WHEN {trigger}, IF {condition}, THE {system} SHALL {action}`
 
-There are five basic patterns for EARS requirements, each designed for a specific type of requirement:
-
-### 3.1. Ubiquitous Requirements
-
-These requirements describe a feature that shall always be present. They do not have a **WHEN** or **IF** clause.
-
-**Syntax:** `THE <system> SHALL <action>`
-
-**Example:** `THE system SHALL encrypt all user data.`
-
-### 3.2. Event-Driven Requirements
-
-These requirements describe a system response to a specific event.
-
-**Syntax:** `WHEN <trigger>, THE <system> SHALL <action>`
-
-**Example:** `WHEN the user clicks the "Save" button, THE system SHALL save the user's changes.`
-
-### 3.3. State-Driven Requirements
-
-These requirements describe a system action that is performed while the system is in a specific state.
-
-**Syntax:** `WHILE <state>, THE <system> SHALL <action>`
-
-**Example:** `WHILE the system is in "maintenance mode", THE system SHALL display a "System Maintenance" message to all users.`
-
-### 3.4. Optional Features
-
-These requirements describe a feature that is only active when a specific condition is true.
-
-**Syntax:** `IF <condition>, THE <system> SHALL <action>`
-
-**Example:** `IF the user has "administrator" privileges, THE system SHALL display the "Admin" menu.`
-
-### 3.5. Unwanted Behaviour
-
-These requirements describe a behaviour that the system shall prevent.
-
-**Syntax:** `WHEN <trigger>, THE <system> SHALL NOT <action>`
-
-**Example:** `WHEN the user enters an invalid password, THE system SHALL NOT log the user in.`
-
-## 4. Combining Clauses
-
-The EARS clauses can be combined to create more complex requirements. For example:
-
-**Syntax:** `WHEN <trigger>, IF <condition>, THE <system> SHALL <action>`
-
-**Example:** `WHEN the user clicks the "Print" button, IF the printer is offline, THE system SHALL display an error message.`
-
-By using the EARS notation, we can create a set of requirements that are clear, concise, and testable, which is essential for effective communication between stakeholders and for the successful implementation of autonomous agents.
+Example: WHEN user clicks Print, IF printer offline, THE system SHALL show error.

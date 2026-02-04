@@ -155,7 +155,7 @@ flowchart TD
 ## Key Principles
 
 **Standards Compliance**
-All agents follow standards in `./context/standards/` and rules in `./context/rules/`. Compliance is inherited.
+All agents shall follow the standards defined in `./context/standards/` and rules defined in `./context/rules/`. Agents are not required to explicitly reference individual standards; compliance is inherited by operating within this project.
 
 **TDD Workflow**
 Tests are written BEFORE implementation. Coders make tests pass, not the other way around.

@@ -60,8 +60,8 @@ def validate_agent_definition(file_path: Path) -> list[str]:
         errors.append("Contains hardcoded absolute paths")
 
     # Check for {project-root} usage instead of relative paths
-    if './artifacts/' in body:
-        errors.append("Contains relative paths - use {project-root}/artifacts/ instead")
+    if './artefacts/' in body:
+        errors.append("Contains relative paths - use {project-root}/artefacts/ instead")
 
     # Check for Critical Reminders section and attribution
     if 'Critical Reminders' in body:

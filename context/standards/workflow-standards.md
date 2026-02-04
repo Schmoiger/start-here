@@ -253,3 +253,103 @@ When @ui-tester completes, orchestrator SHALL verify deliverables before accepti
 1. curl http://localhost:8001/data/search?q=AAPL → 200 OK
 2. All APIs responding correctly
 ```
+
+---
+
+## 10. Parallel Execution Analysis
+
+### When to Suggest Parallelisation
+
+The orchestrator should proactively analyse parallelisation opportunities when:
+- Spawning multiple agents (>1 agent)
+- Tasks expected to exceed 5 minutes
+- Multiple independent modules/services being worked on
+- Code reviews, testing, or builds across separate domains
+- Any situation where independent work streams exist
+
+### Presenting Options
+
+Use this template when suggesting parallel execution to users:
+
+**Current Approach: [Sequential/Single]**
+- Timeline: [Agent A → Agent B → Agent C]
+- Estimated time: X minutes
+- Estimated tokens: Y tokens (baseline)
+
+**Option A: [Partial Parallel]**
+- Execution: [Track 1: A+B parallel, Track 2: C]
+- Time saved: Z% faster (X min → W min)
+- Token increase: +N% (context duplication, coordination overhead)
+- Trade-offs: [Merge complexity, potential conflicts]
+
+**Option B: [Full Parallel]**
+- Execution: [A, B, C all parallel]
+- Time saved: Z% faster (X min → W min)
+- Token increase: +N% (context duplication, coordination overhead)
+- Trade-offs: [Higher coordination, merge conflicts, more complex error handling]
+
+### Decision Criteria
+
+Present options and let user choose based on priorities:
+- **Speed priority**: Full parallel execution
+- **Cost priority**: Sequential execution (minimal token usage)
+- **Quality priority**: Sequential with careful human review between stages
+- **Balanced**: Partial parallel (2-3 independent tracks)
+
+### Estimation Guidelines
+
+**Time Savings**:
+- 2 independent agents: ~40-50% faster (not 50% due to coordination)
+- 3+ independent agents: ~60-70% faster (diminishing returns)
+
+**Token Increase**:
+- 2 agents: +10-15% (shared context, some duplication)
+- 3 agents: +20-30% (more context duplication)
+- 4+ agents: +30-40% (significant overhead)
+
+### Examples
+
+**Example 1: Code Review**
+```
+Current: Single reviewer, 30 min, 150k tokens
+
+Option A (2 tracks):
+- Backend + Frontend parallel
+- 20 min (33% faster)
+- 165k tokens (+10%)
+- Trade-off: Need to merge findings
+
+Option B (3 tracks):
+- Backend, Frontend, Integration all parallel
+- 12 min (60% faster)
+- 180k tokens (+20%)
+- Trade-off: Higher coordination, merge conflicts
+```
+
+**Example 2: TDD Implementation**
+```
+Current: Frontend then Backend, 40 min, 200k tokens
+
+Option A (parallel):
+- Frontend + Backend simultaneously
+- 22 min (45% faster)
+- 220k tokens (+10%)
+- Trade-off: API contract must be agreed first
+```
+
+### When NOT to Parallelise
+
+- Tasks with sequential dependencies (B needs A's output)
+- Single-file modifications (conflicts guaranteed)
+- High coordination overhead (>30% of work is merging)
+- User explicitly requests sequential approach
+- Quality gate reviews (must run sequentially by design)
+
+### Best Practices
+
+1. **Identify dependencies first** - Map out what depends on what
+2. **Define clear boundaries** - Separate work by file, module, or service
+3. **Agree contracts upfront** - API contracts, interfaces, schemas
+4. **Plan merge strategy** - Who merges what, conflict resolution
+5. **Monitor progress** - Check agents aren't duplicating work
+6. **Learn and adapt** - Track actual vs estimated time/tokens

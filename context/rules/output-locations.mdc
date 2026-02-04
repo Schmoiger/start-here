@@ -6,7 +6,7 @@
 
 ```
 {project-root}/
-├── artefacts/                    # All build outputs (British spelling)
+├── artefacts/                    # All build outputs
 │   ├── architecture/             # Architecture docs, diagrams
 │   ├── build/                    # Tasks, reviews, implementation docs
 │   ├── product/                  # Requirements, user stories

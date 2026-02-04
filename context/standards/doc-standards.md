@@ -92,7 +92,7 @@ For example:
     └── README.md
 ```
 
-### 2.2. Artifact Organization Principle
+### 2.2. Artefact Organisation Principle
 
 **Rule**: Context is organised by domain boundary.
 
@@ -103,7 +103,7 @@ For example:
 *   **Cross-service coordination** → `/artefacts/shared/`
     *   Example: Integration handoffs go in `/artefacts/shared/handoffs/`
 
-### 2.3. Service/Package Artifact Files
+### 2.3. Service/Package Artefact Files
 
 Each service or package shall maintain the following files in its `artefacts/` directory:
 
@@ -300,17 +300,17 @@ Automated test execution outputs only (no human reviews):
 
 ## 5. Decision Criteria
 
-When creating a new artifact, apply these rules:
+When creating a new artefact, apply these rules:
 
-**Q1**: Is this artifact only relevant to one service/package?
+**Q1**: Is this artefact only relevant to one service/package?
 - ✅ YES → Put in `{service}/artefacts/`
 - ❌ NO → Continue to Q2
 
-**Q2**: Does this artifact describe system-wide architecture/contracts?
+**Q2**: Does this artefact describe system-wide architecture/contracts?
 - ✅ YES → Put in root `/artefacts/`
 - ❌ NO → Continue to Q3
 
-**Q3**: Is this artifact for coordination between services?
+**Q3**: Is this artefact for coordination between services?
 - ✅ YES → Put in `/artefacts/shared/`
 - ❌ NO → Re-evaluate Q1-Q3
 
