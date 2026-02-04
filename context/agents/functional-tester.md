@@ -32,7 +32,7 @@ Read these rules in `{project-root}/context/rules/`:
 | `python-environment.mdc` | `uv run pytest` - NEVER bare pytest |
 | `typescript-environment.mdc` | `yarn test` - NEVER npm test |
 | `tdd-workflow.mdc` | RED: tests must fail; GREEN: never modify tests |
-| `output-locations.mdc` | Results to `artefacts/test-results/` (British spelling) |
+| `output-locations.mdc` | Results to `artefacts/test-results/` |
 | `conventional-commits.mdc` | `test(scope): description` for RED phase |
 | `british-english.mdc` | colour, behaviour, organisation |
 
@@ -52,7 +52,7 @@ Use when implementation doesn't exist yet. Write tests based on requirements and
 - Read API contracts from `{project-root}/artefacts/api/openapi.yaml`
 - Read architecture from `{project-root}/artefacts/architecture/architecture.md`
 
-**Output**: Failing tests that define expected behaviour. All tests SHOULD fail initially.
+**Output**: Failing tests that define expected behaviour. All tests MUST fail initially.
 
 ### Verification Mode (Tests After)
 Use when implementation exists. Write tests based on actual code behaviour.
@@ -60,10 +60,10 @@ Use when implementation exists. Write tests based on actual code behaviour.
 **Context**:
 - Read Python code from service directory and its README
 - Read TypeScript code from service directory and its README
-- Check previous test runs in `{service}/artifacts/test-results/`
+- Check previous test runs in `{service}/artefacts/test-results/`
 - Read acceptance criteria in `{project-root}/artefacts/product/requirements.md`
 
-**Output**: Tests that verify implementation. Tests SHOULD pass.
+**Output**: Tests that verify implementation. Tests MUST pass.
 
 ## Context Paths
 
@@ -91,15 +91,15 @@ Use when implementation exists. Write tests based on actual code behaviour.
 - Target 100% coverage (document gaps if not achieved)
 - Include both happy path and edge case tests
 - Never modify production code, only test it
-- Run tests and capture output to `{service}/artifacts/test-results/`
+- Run tests and capture output to `{service}/artefacts/test-results/`
 - Follow anti-pattern rules in testing-standards.md (no excessive fallbacks, no skipping without reason)
 
 ## Deliverables
 
 - Test files in service `tests/` directories
-- Test results summary: `{service}/artifacts/test-results/functional-tests.json`
+- Test results summary: `{service}/artefacts/test-results/functional-tests.json`
 - Coverage metrics and pass/fail status
-- If coverage < 100%: Gap documentation in `{service}/artifacts/test-gaps.md`
+- If coverage < 100%: Gap documentation in `{service}/artefacts/test-gaps.md`
 - If tests fail in verification mode, output failures but do not fix code (coders handle that)
 
 ## Task

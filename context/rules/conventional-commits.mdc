@@ -1,78 +1,75 @@
+---
+description: Conventional commit message format with agent metrics
+globs: ["**/.git/**"]
+---
+
 # Conventional Commits
 
-## 1. Introduction
+## Subject Line
 
-Conventional Commits is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history, which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages.
+Format: `{type}({scope}): {description}`
 
-## 2. Specification
+| Type | Use For |
+|------|---------|
+| feat | New feature |
+| fix | Bug fix |
+| test | Adding/updating tests |
+| refactor | Code restructuring (no behaviour change) |
+| docs | Documentation only |
+| chore | Build, config, dependencies |
+| perf | Performance improvement |
 
-The commit message should be structured as follows:
-
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### 2.1. Type
-
-The type is a noun that describes the category of the change. The following types are allowed:
-
-*   **feat:** A new feature.
-*   **fix:** A bug fix.
-*   **docs:** Documentation only changes.
-*   **style:** Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc).
-*   **refactor:** A code change that neither fixes a bug nor adds a feature.
-*   **perf:** A code change that improves performance.
-*   **test:** Adding missing tests or correcting existing tests.
-*   **build:** Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm).
-*   **ci:** Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs).
-*   **chore:** Other changes that don't modify src or test files.
-*   **revert:** Reverts a previous commit.
-
-### 2.2. Scope
-
-The scope is an optional noun that describes the section of the codebase affected by the change. For example, `feat(api): ...` or `fix(ui): ...`.
-
-### 2.3. Description
-
-The description is a short, imperative-tense summary of the code change.
-
-### 2.4. Body
-
-The body is an optional, longer description of the code change. It should provide context and reasoning for the change.
-
-### 2.5. Footer
-
-The footer is optional and can be used for two purposes:
-
-*   **Breaking Changes:** A commit that introduces a breaking change must include a `BREAKING CHANGE:` footer, followed by a description of the change.
-*   **Issue Tracking:** A commit that references an issue should include a footer with the issue ID (e.g., `Closes #123`).
-
-## 3. Examples
-
-### Commit with a new feature
+## Full Format (Agent Commits)
 
 ```
-feat: allow users to upload a profile picture
+{type}({scope}): {description}
+
+{optional body}
+
+Tasks: {task-ids}
+Agent-Session: model={model} agents={list} tokens={in}K/{out}K duration={time}
+
+Co-Authored-By: Claude {Model} <{model}@anthropic.com>
 ```
 
-### Commit with a bug fix and issue reference
+## Agent-Session Line
+
+Machine-parseable metrics:
+
+| Field | Format | Example |
+|-------|--------|---------|
+| model | sonnet\|opus\|haiku | model=sonnet |
+| agents | comma-separated | agents=auth-coder,auth-reviewer |
+| tokens | in/out with K suffix | tokens=12.4K/8.2K |
+| duration | minutes or hours | duration=45m |
+
+## Examples
+
+### Agent Commit
 
 ```
-fix: correct handling of invalid user input
+feat(auth): add token refresh endpoint
 
-This fixes the issue where the application would crash if the user entered an invalid email address.
+Tasks: AUTH-001
+Agent-Session: model=sonnet agents=auth-coder tokens=8.2K/5.1K duration=32m
 
-Closes #456
+Co-Authored-By: Claude Sonnet <sonnet@anthropic.com>
 ```
 
-### Commit with a breaking change
+### Human Commit
 
 ```
-refactor(auth)!: remove deprecated login endpoint
+docs(api): update OpenAPI spec for backtest endpoint
 
-BREAKING CHANGE: The `/api/v1/login` endpoint has been removed. Use `/api/v2/login` instead.
+Tasks: DOC-001
 ```
+
+## Rules
+
+- Max 72 chars for subject line
+- Scope matches service/component name
+- Description is imperative ("add" not "added")
+- Tasks line references tasks.md
+- Agent commits require Agent-Session and Co-Authored-By
+
+Full template: `templates/commit-message.template.md`

@@ -1,70 +1,77 @@
-# {Service Name} Handoffs
-
-Intra-domain handoffs within the {service-name} context domain.
-
-**Last Updated**: {ISO 8601 timestamp with timezone}
-
----
-
-## Current Phase: {TDD RED | TDD GREEN | Review | Integration}
-
-### Latest Handoff
+# Handoff: {Service/Domain}
 
 **From**: @{agent-name}
 **To**: @{agent-name}
-**Timestamp**: {ISO 8601 timestamp with timezone}
-**Tasks**: {TASK-ID} through {TASK-ID}
-**Status**: ✅ Complete | 🚧 In Progress | ⚠️ Blocked
-
-**Summary**:
-{Brief description of what was completed}
-
-**Notes for Next Agent**:
-- {Important information}
-- {Files to review}
-- {Known issues or gotchas}
-
-**Artefacts**:
-- Code: `{path}`
-- Tests: `{path}`
-- Fixtures: `{path}`
-- Documentation: `{path}`
-
-**Blockers**: None | {List blockers}
-
-**Commit**: {commit-hash} - {commit message}
+**Date**: {YYYY-MM-DD}
+**Phase**: {DISCOVERY|DESIGN|TDD_RED|TDD_GREEN|REVIEW|INTEGRATION|DEPLOY}
+**Status**: {ready|blocked|needs_review|failed}
 
 ---
 
-## Handoff History
+## Summary
 
-### From: @{agent-name}
-**To**: @{agent-name}
-**Timestamp**: {timestamp}
-**Tasks**: {TASK-ID} through {TASK-ID}
-**Summary**: {summary}
-**Commit**: {hash}
+{1-3 sentences describing what was completed and overall status. Max 500 characters.}
 
 ---
 
-## Integration Checklist
+## Tasks Completed
 
-Before marking service as "Ready for Integration":
-
-- [ ] All TDD RED tasks complete (tests written and failing)
-- [ ] All TDD GREEN tasks complete (implementation done, tests passing)
-- [ ] Tech lead review approved
-- [ ] Test coverage >= 90%
-- [ ] API endpoints match OpenAPI spec
-- [ ] Mock client created in `artefacts/shared/mocks/`
-- [ ] Example responses in `artefacts/shared/fixtures/`
-- [ ] Cross-domain handoff file created in `artefacts/shared/handoffs/{service}-api.md`
-- [ ] Integration status updated in `artefacts/shared/handoffs/integration-status.md`
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| {TASK-ID} | {task name} | complete/partial/blocked/skipped | {if not complete} |
 
 ---
 
-## Revision History
+## Next Tasks
 
-| Timestamp | Agent | Phase | Tasks | Status |
-|-----------|-------|-------|-------|--------|
-| {timestamp} | @{agent} | {phase} | {tasks} | {status} |
+| ID | Task | Priority | Depends On |
+|----|------|----------|------------|
+| {TASK-ID} | {task name} | critical/high/normal/low | {other task IDs} |
+
+---
+
+## Artefacts
+
+- **Tests**: `{path}`
+- **Source**: `{path}`
+- **Config**: `{path}`
+- **Docs**: `{path}`
+
+---
+
+## Blockers
+
+{Only include if status ≠ "ready"}
+
+| ID | Question | Impact |
+|----|----------|--------|
+| {BLOCKER-ID} | {what needs answering} | low/medium/high |
+
+---
+
+## Context
+
+**Architecture Reference**: `{path to architecture.md}`
+**API Reference**: `{path to openapi.yaml}`
+
+**Key Decisions**:
+- {decision 1}
+- {decision 2}
+
+**Warnings**:
+- {gotcha or non-obvious issue}
+
+---
+
+## Statistics
+
+- **Tests**: {passing}/{total}
+- **Coverage**: {percent}%
+- **Files Created**: {count}
+- **Files Modified**: {count}
+
+---
+
+## Commits
+
+- `{hash}` - {commit message}

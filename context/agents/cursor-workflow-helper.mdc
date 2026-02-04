@@ -90,7 +90,7 @@ Follow the TDD workflow from `context/agents/CLAUDE.md`:
 
 - **No `@agent-name` syntax**: Use explicit role instructions instead
 - **Manual orchestration**: You coordinate agents, not automatic
-- **Same artefacts**: All agents still read/write to `./artefacts/`
+- **Same artifacts**: All agents still read/write to `./artefacts/`
 - **Same standards**: Agents inherit from `context/standards/` and `context/rules/`
 
 ## Example Composer Session
