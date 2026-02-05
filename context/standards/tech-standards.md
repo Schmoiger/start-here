@@ -215,9 +215,18 @@ TODO
 
 ### Architecture Principles
 
+Guided by **LESS Engineering Principles** (see `context/standards/LESS-Engineering-Principles.md`):
+
+- **Lean**: Maximise value with minimum effort; always MVP first; defer commitment until feedback
+- **Ethical**: Trustworthy, inclusive, of real benefit to users, does no harm
+- **Scalable**: Grow without do-over; loose coupling, modularity, statelessness
+- **Sustainable**: Carbon and energy efficient; minimise data transfer and resource usage
+
+Applied as:
+
 - **Serverless-first**: Prefer managed services over self-hosted
 - **Library-first**: Prefer established, well-maintained packages over custom implementations
-- **Token-efficient**: Design code and architecture to minimise LLM token consumption
+- **Lean and token-efficient**: Eliminate waste in code, documentation, and architecture (see coding-standards.md)
 - **Mobile-first**: Desktop/web features are progressive enhancements
 - **Offline-capable**: Core functionality works without network
 - **Privacy-by-design**: Minimise data collection and retention
