@@ -58,6 +58,25 @@
         "playwright_evaluate",
         "new_page"
       ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_69da37398430bf5f688b80a3e6b2d22de2f4c694"
+      ]
+    },
+    "tavily-remote-mcp": {
+      "command": "npx -y mcp-remote https://mcp.tavily.com/mcp/?tavilyApiKey=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,
+      "env": {}
+    },
+    "exa": {
+      "url": "https://mcp.exa.ai/mcp"
+    },
+    "hf-mcp-server": {
+      "url": "https://huggingface.co/mcp?login"
     }
   }
 }
