@@ -70,10 +70,14 @@ flowchart TD
         visual-design_visual_designer["@visual-designer"]
     end
     design --> visual-design
+    subgraph design-principles-review["Design Principles Review"]
+        design-principles-review_principles_reviewer["@principles-reviewer"]
+    end
+    design --> design-principles-review
     subgraph tdd-red["TDD: Write Failing Tests"]
         tdd-red_functional_tester["@functional-tester"]
     end
-    design --> tdd-red
+    design-principles-review --> tdd-red
     subgraph tdd-green["TDD: Implement to Pass Tests"]
         tdd-green_python_coder["@python-coder"]
         tdd-green_typescript_coder["@typescript-coder"]
@@ -82,6 +86,7 @@ flowchart TD
     subgraph review-gate["Quality Gate Reviews"]
         review-gate_tech_lead["@tech-lead"]
         review-gate_code_reviewer["@code-reviewer"]
+        review-gate_principles_reviewer["@principles-reviewer"]
     end
     tdd-green --> review-gate
     review-gate:::gateStyle
@@ -146,9 +151,22 @@ flowchart TD
 **Outputs:**
 - artefacts/design/visuals/
 
+#### Design Principles Review
+**Phase ID**: `design-principles-review`
+**Depends On**: `design`
+
+**Agents:**
+- `@principles-reviewer` - See `context/agents/principles-reviewer.md`
+
+**Outputs:**
+- artefacts/build/principles-review.md
+
+**Validation:**
+- No blockers raised against LESS principles
+
 #### TDD: Write Failing Tests
 **Phase ID**: `tdd-red`
-**Depends On**: `design`
+**Depends On**: `design-principles-review`
 
 **Agents:**
 - `@functional-tester` - See `context/agents/functional-tester.md`
@@ -186,10 +204,12 @@ flowchart TD
 **Agents:**
 - `@tech-lead` - See `context/agents/tech-lead.md`
 - `@code-reviewer` - See `context/agents/code-reviewer.md`
+- `@principles-reviewer` - See `context/agents/principles-reviewer.md`
 
 **Outputs:**
 - artefacts/build/tech-review.md
 - artefacts/build/code-review.md
+- artefacts/build/principles-review.md
 
 **Validation:**
 - tech-lead must APPROVE before code-reviewer runs
@@ -433,6 +453,6 @@ context/
 ---
 
 **Generated**: default workflow
-**Agents**: 16 specialised agents
+**Agents**: 17 specialised agents
 **Standards**: 5 guidance documents
 **Rules**: 4 enforceable rules

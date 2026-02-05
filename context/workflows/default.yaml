@@ -43,9 +43,19 @@ phases:
     outputs:
       - artefacts/design/visuals/
 
+  - id: design-principles-review
+    name: Design Principles Review
+    depends_on: [design]
+    agents:
+      - principles-reviewer  # LESS review of design before coding begins
+    outputs:
+      - artefacts/build/principles-review.md
+    validation:
+      - No blockers raised against LESS principles
+
   - id: tdd-red
     name: "TDD: Write Failing Tests"
-    depends_on: [design]
+    depends_on: [design-principles-review]
     agents:
       - functional-tester
     outputs:
@@ -74,11 +84,13 @@ phases:
     sequential: true
     gate: true
     agents:
-      - tech-lead      # First: architecture compliance
-      - code-reviewer  # After tech-lead approval
+      - tech-lead             # First: architecture compliance
+      - code-reviewer         # After tech-lead approval
+      - principles-reviewer   # LESS review of implementation
     outputs:
       - artefacts/build/tech-review.md
       - artefacts/build/code-review.md
+      - artefacts/build/principles-review.md
     validation:
       - tech-lead must APPROVE before code-reviewer runs
       - CHANGES REQUIRED → return to tdd-green

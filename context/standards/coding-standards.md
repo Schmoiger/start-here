@@ -144,6 +144,35 @@ export async function POST(request: Request) {
 }
 ```
 
+## Lean Code (Token-Efficient by Design)
+
+Lean code and token-efficient code are the same thing: eliminate waste so both humans and LLMs can read, understand, and modify code with minimum effort.
+
+**Every line must earn its place:**
+- No dead code, commented-out blocks, or unused imports
+- No speculative features (YAGNI); build for current requirements only
+- No premature abstraction; three similar lines beat a premature helper
+- No wrapper functions that just forward arguments
+
+**Keep modules small and focused:**
+- One responsibility per module; if you can't name it clearly, split it
+- Prefer flat structure over deep nesting
+- Small files are cheaper to read (for humans and LLMs)
+
+**Prefer established packages** (see Library-first in tech-standards.md):
+- Use well-maintained libraries over custom implementations
+- Fewer lines to maintain, test, and read
+
+**Minimise indirection:**
+- Reduce layers between intent and execution
+- Avoid patterns that exist only to satisfy a pattern (factories for one type, interfaces for one implementation)
+- Inline short functions used once
+
+**Apply to documentation too** (see Token-Efficient in doc-standards.md):
+- Comments explain *why*, never *what*
+- Self-documenting code over verbose comments
+- Docstrings on public APIs only; skip obvious ones
+
 ## Performance Patterns
 
 ```typescript
