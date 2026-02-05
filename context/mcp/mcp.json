@@ -42,23 +42,6 @@
         "list_network_requests"
       ]
     },
-    "playwright": {
-      "command": "uvx",
-      "args": [
-        "playwright-mcp@latest"
-      ],
-      "disabled": false,
-      "autoApprove": [
-        "playwright_goto",
-        "playwright_click",
-        "playwright_fill",
-        "playwright_screenshot",
-        "playwright_get_text",
-        "playwright_wait_for_selector",
-        "playwright_evaluate",
-        "new_page"
-      ]
-    },
     "supabase": {
       "command": "npx",
       "args": [

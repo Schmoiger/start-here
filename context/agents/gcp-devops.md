@@ -9,6 +9,8 @@ allowed_tools:
   - Bash
   - Glob
   - Grep
+mcp_tools:
+  - supabase # For Supabase deployment configuration on GCP
 standards:
   - tech-standards.md
   - build-standards.md

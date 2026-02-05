@@ -7,6 +7,8 @@ allowed_tools:
   - Write
   - Glob
   - Grep
+mcp_tools:
+  - context7 # For looking up library documentation and generating accurate API references
 standards:
   - doc-standards.md
 rules:
