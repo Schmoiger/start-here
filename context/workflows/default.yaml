@@ -78,9 +78,21 @@ phases:
       - All tests must pass
       - No test modifications allowed
 
+  - id: archive-cleanup
+    name: Archive Superseded Artefacts
+    depends_on: [tdd-green]
+    optional: true
+    agents:
+      - documentation  # Clean up old docs before reviews
+    outputs:
+      - artefacts/build/archive/
+      - artefacts/test-results/archive/
+    validation:
+      - Archive README.md created for moved artefacts
+
   - id: review-gate
     name: Quality Gate Reviews
-    depends_on: [tdd-green]
+    depends_on: [archive-cleanup]
     sequential: true
     gate: true
     agents:
