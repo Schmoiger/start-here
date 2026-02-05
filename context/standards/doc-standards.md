@@ -195,7 +195,90 @@ Required elements for API handoffs:
 *   **Known Issues**: Any bugs or limitations
 *   **Breaking Changes**: Upcoming changes with ETAs
 
-### 2.5. Project `README.md`
+### 2.5. Archive Management
+
+The system shall maintain archives of superseded artefacts to preserve project history whilst keeping active documentation focused and discoverable.
+
+#### Archive Organisation
+
+Archives shall be organised into separate directories by type:
+
+```
+/artefacts/
+├── archive/                    # Gitignored: Local working notes
+│   └── phase1/                # Individual contributor drafts
+├── build/
+│   └── archive/               # Tracked: Superseded build artefacts
+│       ├── README.md          # Index of archived items
+│       ├── old-reviews/       # Quality gate reviews
+│       └── planning/          # Design docs, strategies
+└── test-results/
+    └── archive/               # Tracked: Historical test results
+        ├── v2-tasks/          # Phase-specific test runs
+        └── ui-bugs/           # Bug fix verification
+```
+
+**Decision: Separate Archives**
+
+The project shall maintain two types of archives:
+- **Tracked archives** (`/artefacts/build/archive/`, `/artefacts/test-results/archive/`) - Historical artefacts committed to git for team reference
+- **Local archives** (`/artefacts/archive/`) - Gitignored working notes and drafts specific to individual contributors
+
+**Rationale**: This separation supports **Lean** principles (eliminate clutter from active docs whilst preserving institutional knowledge) and **Token-Efficient** documentation (LLMs read focused, current docs; humans reference archives when needed).
+
+#### When to Archive
+
+Archive artefacts when:
+- **Superseded by newer versions**: Architecture reviews replaced by current implementation
+- **Phase completion**: Test results from completed development phases
+- **Bug resolution**: Detailed bug investigation notes after fixes committed to `bugs.md`
+- **Strategy implementation**: Planning documents after features go live
+
+**Do NOT archive**:
+- Current `bugs.md`, `todo.md`, `tasks.md` (active tracking)
+- Integration test results (until next major version)
+- Security audit findings (until remediated)
+- Quality gate reviews (until next gate)
+
+#### Archive Process
+
+1. **Create archive subdirectory**: `mkdir -p artefacts/{area}/archive/{category}/`
+2. **Move completed artefacts**: `mv old-doc.md artefacts/{area}/archive/{category}/`
+3. **Create archive README.md**: Document what was archived, when, and why
+4. **Commit with clear message**: `refactor(docs): archive superseded {area} artefacts`
+
+#### Archive README Template
+
+Each archive directory shall contain a `README.md` describing its contents:
+
+```markdown
+# {Area} Archive
+
+**Archived**: {Date}
+**Reason**: {Why these were archived}
+
+## Contents
+
+### {Category}/
+{Description of archived items}
+
+**Status**: {What superseded them}
+
+## Current Replacements
+
+Active documents that replaced archived ones:
+- `architecture.md` (replaced architecture-v1-draft.md)
+- `tech-review.md` (replaced pre-implementation-review.md)
+```
+
+#### Automation
+
+Use `@documentation` agent to:
+- Identify superseded artefacts based on timestamps and git history
+- Generate archive README.md with references to current docs
+- Update cross-references in active documents
+
+### 2.6. Project `README.md`
 
 The system shall maintain a `README.md` file in the root of each project. The `README.md` file shall describe:
 
