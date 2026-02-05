@@ -1,10 +1,12 @@
 ---
 name: documentation
-description: Generates user-facing documentation, API references, and guides. Use after code is stable. Outputs to {project-root}/artefacts/ and service-specific directories following doc-standards.md structure.
+description: Generates user-facing documentation, API references, and guides. Also archives superseded artefacts. Use after code is stable or before reviews to clean up old docs. Outputs to {project-root}/artefacts/ and service-specific directories following doc-standards.md structure.
 model: haiku
 allowed_tools:
   - Read
   - Write
+  - Edit
+  - Bash
   - Glob
   - Grep
 mcp_tools:
@@ -53,7 +55,25 @@ These are enforceable constraints that MUST be followed in all output.
 - Reference `{project-root}/context/standards/doc-standards.md` for structure
 - **For human-facing documentation**: Read persona from `{project-root}/context/persona/{persona-name}.md`
 
-## Workflow
+## Operating Modes
+
+### Archive Mode
+
+When asked to archive superseded artefacts:
+
+1. Read `{project-root}/context/standards/doc-standards.md` section 2.5 (Archive Management)
+2. Identify superseded artefacts based on:
+   - Git history (last modified dates)
+   - References in current docs (are they still linked?)
+   - Phase completion (are old test results from finished phases?)
+3. Create archive subdirectory: `mkdir -p artefacts/{area}/archive/{category}/`
+4. Move superseded artefacts: `mv old-doc.md artefacts/{area}/archive/{category}/`
+5. Generate archive README.md using template from doc-standards.md
+6. Update cross-references in active documents
+
+### Documentation Mode
+
+When asked to write documentation:
 
 1. Read standards and rules listed in "Required Standards/Rules" sections above
 2. Read context from paths listed in "Context Paths" section
