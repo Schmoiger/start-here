@@ -8,6 +8,8 @@ allowed_tools:
   - Bash
   - Glob
   - Grep
+mcp_tools:
+  - chrome-devtools # For browser automation and UI testing
 standards:
   - testing-standards.md
   - visual-standards.md

@@ -17,6 +17,9 @@ allowed_tools:
   - mcp__Claude_in_Chrome__tabs_context_mcp
   - mcp__Claude_in_Chrome__tabs_create_mcp
   - mcp__Claude_in_Chrome__get_page_text
+mcp_tools:
+  - exa_web_search # For finding design inspiration and examples
+  - firecrawl       # For extracting design patterns from websites
 standards:
   - doc-standards.md
   - visual-standards.md

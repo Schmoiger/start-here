@@ -8,6 +8,9 @@ allowed_tools:
   - Grep
   - AskUserQuestion
   - WebSearch
+mcp_tools:
+  - tavily_search  # For researching domains, competition, and market analysis
+  - exa_web_search # For finding real-world examples and similar products
 standards:
   - doc-standards.md
 rules:

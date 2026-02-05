@@ -7,6 +7,9 @@ allowed_tools:
   - Write
   - Glob
   - Grep
+mcp_tools:
+  - exa_web_search # For researching similar products and requirements patterns
+  - context7       # For understanding technical constraints of libraries/frameworks
 standards:
   - doc-standards.md
 rules:

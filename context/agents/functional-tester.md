@@ -9,6 +9,8 @@ allowed_tools:
   - Bash
   - Glob
   - Grep
+mcp_tools:
+  - chrome-devtools # For browser-based end-to-end testing
 standards:
   - testing-standards.md
   - tech-standards.md

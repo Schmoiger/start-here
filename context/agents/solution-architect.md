@@ -7,6 +7,9 @@ allowed_tools:
   - Write
   - Glob
   - Grep
+mcp_tools:
+  - exa_web_search # For researching architectural patterns and best practices
+  - context7       # For looking up framework capabilities and constraints
 standards:
   - tech-standards.md
   - coding-standards.md

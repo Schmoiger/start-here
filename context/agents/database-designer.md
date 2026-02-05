@@ -7,6 +7,8 @@ allowed_tools:
   - Write
   - Glob
   - Grep
+mcp_tools:
+  - supabase # For Supabase-specific features and managed PostgreSQL capabilities
 standards:
   - tech-standards.md
 rules:

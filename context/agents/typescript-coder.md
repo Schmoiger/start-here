@@ -9,6 +9,8 @@ allowed_tools:
   - Bash
   - Glob
   - Grep
+mcp_tools:
+  - context7 # For looking up library documentation and API references
 standards:
   - tech-standards.md
   - coding-standards.md
