@@ -216,6 +216,8 @@ TODO
 ### Architecture Principles
 
 - **Serverless-first**: Prefer managed services over self-hosted
+- **Library-first**: Prefer established, well-maintained packages over custom implementations
+- **Token-efficient**: Design code and architecture to minimise LLM token consumption
 - **Mobile-first**: Desktop/web features are progressive enhancements
 - **Offline-capable**: Core functionality works without network
 - **Privacy-by-design**: Minimise data collection and retention

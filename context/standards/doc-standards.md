@@ -235,8 +235,9 @@ All project context files shall be reviewed from the perspective of an expert co
 
 *   **Necessary**: Each piece of information serves a clear purpose in understanding or developing the project
 *   **Sufficient**: Contains all essential information needed for autonomous agent understanding and execution
+*   **Token-Efficient**: Optimised for LLM consumption with minimal token usage while maintaining clarity
 *   **Human-Friendly**: Easily understandable by humans without requiring specialised knowledge, avoiding unnecessary technical jargon
-*   **Non-Verbose**: Concise and focused, avoiding redundancy while not consuming unnecessary tokens in AI context windows
+*   **Non-Verbose**: Concise and focused, avoiding redundancy
 *   **Actionable**: Provides clear, specific guidance that enables effective decision-making and implementation
 
 ## 4. System-Wide Artefacts
