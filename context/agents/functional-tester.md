@@ -14,6 +14,7 @@ mcp_tools:
 standards:
   - testing-standards.md
   - tech-standards.md
+  - context-framework.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc

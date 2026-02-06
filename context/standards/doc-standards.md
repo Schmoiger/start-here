@@ -107,9 +107,9 @@ For example:
 
 Each service or package shall maintain the following files in its `artefacts/` directory:
 
-*   **`bugs.md`**: Current and past bugs (per bug-standards.md format)
-    *   Format: One line per bug with status, description, file path, and link
-    *   Example: `[TODO] | Cache isolation bug INSTEAD shared cache | src/routers/cache.py:83 | #BUG-001`
+*   **`bugs.md`**: Current and past bugs (per context-framework.md format)
+    *   Format: One line per bug with severity, status, scope, description (INSTEAD pattern), and blocks
+    *   Example: `| BUG-001 | high | open | cache | Shared cache INSTEAD isolated per-user | TASK-005 |`
 *   **`tasks.md`**: Current, past, and future tasks
     *   The project root shall be defined and all file paths shall be relative to the project root
     *   For each task assigned to an agent, `tasks.md` shall specify whether the agent shall commit its changes automatically upon completion or shall wait for user approval before committing
@@ -297,9 +297,10 @@ The system maintains shared standards and rules in `/context/` for use across al
 ├── context/
 │   ├── standards/           # Development standards
 │   │   ├── agent-standards.md
-│   │   ├── bug-standards.md
 │   │   ├── coding-standards.md
+│   │   ├── context-framework.md
 │   │   ├── doc-standards.md
+│   │   ├── security-standards.md
 │   │   ├── testing-standards.md
 │   │   └── workflow-standards.md
 │   └── rules/              # Development rules

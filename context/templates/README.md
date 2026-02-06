@@ -2,6 +2,8 @@
 
 Reusable templates for project artefacts. Copy and customise for new files.
 
+See `context/standards/context-framework.md` for sharing formats, prioritisation, and terse format guidance.
+
 ## Document Templates
 
 | Template | Purpose | Output Location |
@@ -10,26 +12,22 @@ Reusable templates for project artefacts. Copy and customise for new files.
 | `user-stories-template.md` | Compressed user stories | `artefacts/product/` |
 | `tasks-template.md` | Task tracking matrix | `artefacts/build/` |
 | `bugs-template.md` | Bug tracker format | `artefacts/build/` |
-| `troubleshooting-template.md` | Issue resolution notes | `artefacts/build/` |
 
 ## Agent Templates
 
 | Template | Purpose |
 |----------|---------|
 | `agent-template.md` | Define a new specialist agent |
-| `domain-orchestrator-template.md` | Domain-level task routing |
-| `meta-orchestrator-template.md` | Repository-level orchestration |
 | `task-prompt-template.md` | Spawn agent with consistent structure |
-| `task-context-template.md` | Complex task context file |
 
 ## Handoff & Review
 
 | Template | Purpose |
 |----------|---------|
-| `handoff-template.md` | Inter-agent handoff document |
-| `handoff-schema.json` | JSON schema for validation |
-| `review-template.md` | Code/tech review template |
-| `review-schema.json` | JSON schema for validation |
+| `handoff-template.md` | Inter-agent handoff (markdown, for humans + agents) |
+| `handoff-schema.json` | Inter-agent handoff (JSON schema, for agent-to-agent) |
+| `review-template.md` | Code/tech review (markdown, for humans + agents) |
+| `review-schema.json` | Code/tech review (JSON schema, for agent-to-agent) |
 
 ## Git & PR
 
@@ -66,21 +64,14 @@ Use `review-template.md` or JSON format. See "Review Format" below for details.
 **Purpose**: Token-efficient inter-agent state transfer.
 
 **Format Options**:
-- **JSON** (recommended): Use `handoff-schema.json` for validation
-- **Markdown**: Use `handoff-template.md` for prose format
-
-**Token Efficiency**:
-| Format | Tokens | Reduction |
-|--------|--------|-----------|
-| Prose markdown | ~2,380 | Baseline |
-| Comprehensive JSON | ~1,316 | 45% |
-| Minimal JSON | ~443 | 81% |
+- **JSON** (recommended for agent-to-agent): Use `handoff-schema.json` for validation
+- **Markdown** (for agent-to-human): Use `handoff-template.md` for prose format
 
 **Key Principles**:
 - Keep summary under 500 characters
 - Reference shared docs, don't duplicate content
 - Use task objects with status tracking
-- Include blockers only when status ≠ "ready"
+- Include blockers only when status is not "ready"
 
 **Validation**:
 ```bash
@@ -94,18 +85,11 @@ npx ajv validate -s context/templates/handoff-schema.json -d path/to/HANDOFF.jso
 
 ## Review Format
 
-**Purpose**: Compressed code/tech reviews that reduce verbosity by 63-91%.
+**Purpose**: Compressed code/tech reviews.
 
 **Format Options**:
 - **JSON** (for agents): Use `review-schema.json` for validation and issue tracking
 - **Compressed prose** (for humans): Use `review-template.md` for audit trails
-
-**Token Efficiency**:
-| Format | Tokens | Reduction |
-|--------|--------|-----------|
-| Verbose prose | ~4,600 | Baseline |
-| Comprehensive JSON | ~1,700 | 63% |
-| Compressed prose | ~395 | 91% |
 
 **Issue Format** (JSON):
 ```json
@@ -121,14 +105,10 @@ npx ajv validate -s context/templates/handoff-schema.json -d path/to/HANDOFF.jso
 **Issue Format** (Prose):
 ```markdown
 **CR-001** `file.py:41` Problem description.
-→ Fix instruction.
+> Fix instruction.
 ```
 
-**Severity Categories**:
-- `critical`: Fix before deploy (crashes, data corruption, security)
-- `high`: Fix this sprint (significant bugs, poor patterns)
-- `medium`: Fix next sprint (tech debt, minor issues)
-- `low`: Fix when convenient (nitpicks, style)
+**Severity Categories**: See `context/standards/context-framework.md` for severity definitions.
 
 **File Location**:
 ```
@@ -153,23 +133,12 @@ npx ajv validate -s context/templates/review-schema.json -d artefacts/review/cod
 
 ## Naming Convention
 
-- Templates use `-template.md` or `-template.yaml` suffix
+- Templates use `-template.md` suffix
 - All templates use kebab-case (e.g., `task-prompt-template.md`)
 - Generated files remove `-template` suffix
-- Use kebab-case for all multi-word names
-
-## Template Standards
-
-All templates should:
-- ✅ Use British English spelling (artefacts, colour, etc.)
-- ✅ Follow EARS notation for requirements (when applicable)
-- ✅ Include file purpose in header comment
-- ✅ Mark all placeholders clearly with `{curly_braces}`
-- ✅ Be token-efficient (no verbose explanations in templates)
-- ✅ Reference relevant standards from `context/standards/`
 
 ## See Also
 
+- `context/standards/context-framework.md` - Sharing formats, prioritisation, terse formats
 - `context/standards/doc-standards.md` - Documentation structure and style
 - `context/standards/workflow-standards.md` - Development workflow processes
-- `context/rules/` - Non-negotiable formatting rules

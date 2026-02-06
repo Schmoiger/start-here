@@ -12,6 +12,7 @@ standards:
   - coding-standards.md
   - testing-standards.md
   - doc-standards.md
+  - context-framework.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc
