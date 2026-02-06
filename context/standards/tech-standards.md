@@ -214,19 +214,34 @@ yarn test                        # TypeScript tests
 
 ```
 {monorepo-root}/
+├── artefacts/                  # System-wide outputs (specs, contracts, shared)
+│   ├── product/                # Requirements, user stories
+│   ├── architecture/           # System architecture, design decisions
+│   ├── api/                    # OpenAPI specs, API contracts
+│   ├── design/                 # UI/UX designs, component specs
+│   ├── build/                  # Build artefacts, tasks, reviews
+│   ├── test-results/           # System-wide test results, dashboard
+│   └── shared/                 # Cross-service resources (handoffs, fixtures, mocks)
 ├── backend/                    # Backend services
 │   ├── {service-name}/         # Example: API service (Python, FastAPI)
+│   │   ├── artefacts/          # Service-specific outputs (tasks, bugs, test-results)
+│   │   ├── src/
+│   │   └── tests/
 │   └── {service-name}/         # Example: Background worker (TypeScript)
 ├── context/                    # Shared context (standards, rules, agents, MCP)
 │   ├── agents/                 # Agent definitions
 │   ├── mcp/                    # Model Context Protocol configs
 │   ├── rules/                  # Development rules
-│   └── standards/              # Development standards
+│   ├── standards/              # Development standards
+│   └── templates/              # Document templates
 ├── frontend/                   # Web applications
 │   ├── {app-name}/            # Example: Admin dashboard (Next.js)
+│   │   ├── artefacts/          # App-specific outputs
+│   │   └── src/
 │   └── {app-name}/             # Example: User interface (Vite + React)
 ├── mobile/                     # Mobile applications
 │   └── {app-name}/             # Example: iOS Swift application
+│       └── artefacts/          # App-specific outputs
 ├── packages/                   # Shared packages
 │   ├── {package-name}/        # Example: Authentication package
 │   ├── {package-name}/        # Example: Design system components
