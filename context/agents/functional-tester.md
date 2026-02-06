@@ -104,8 +104,10 @@ Use when implementation exists. Write tests based on actual code behaviour.
 
 ## Deliverables
 
-- Test files in service `tests/` directories
-- Test results summary: `{service}/artefacts/test-results/functional-tests.json`
+- Test files in service `tests/` directories (organized by tests/unit/, tests/integration/)
+- Test results:
+  - Unit tests: `{service}/artefacts/test-results/unit/pytest-results.json` or `vitest-results.json`
+  - Integration tests: `{service}/artefacts/test-results/integration/api-tests.json` or `component-tests.json`
 - Coverage metrics and pass/fail status
 - If coverage < 100%: Gap documentation in `{service}/artefacts/test-gaps.md`
 - If tests fail in verification mode, output failures but do not fix code (coders handle that)

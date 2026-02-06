@@ -229,7 +229,7 @@ Output: packages/shared-types/python/bollinger_types/
 When @ui-tester completes, orchestrator SHALL verify deliverables before accepting results:
 
 **Required Evidence (ALL must be present):**
-- [ ] Screenshots in `artefacts/test-results/ui-test-results/screenshots/` (minimum 1)
+- [ ] Screenshots in `artefacts/test-results/e2e/screenshots/` (minimum 1)
 - [ ] Test log documents browser interactions (not just API calls)
 - [ ] At least one complete user workflow tested
 

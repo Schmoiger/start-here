@@ -258,7 +258,7 @@ UI tests use **scenario coverage** rather than code coverage. The same phase-bas
 
 ### Test Scenario Structure
 
-Define test scenarios in `{service}/artefacts/test-results/ui-test-scenarios.md` with measurable checkpoints:
+Define test scenarios in `{service}/artefacts/test-results/e2e/test-scenarios.md` with measurable checkpoints:
 
 ```markdown
 # UI Test Scenarios
@@ -277,7 +277,7 @@ Define test scenarios in `{service}/artefacts/test-results/ui-test-scenarios.md`
 - **Expected Result**: User signed in and dashboard visible
 - **Evidence Required**: Screenshots of steps 1, 4, 5
 - **Status**: ✅ Passed (2026-02-06)
-- **Test Log**: `ui-test-results/test-log.md#sc-001`
+- **Test Log**: `e2e/test-log.md#sc-001`
 
 ### SC-002: View portfolio with holdings
 - **Priority**: Critical
@@ -291,7 +291,7 @@ Define test scenarios in `{service}/artefacts/test-results/ui-test-scenarios.md`
 - **Expected Result**: Portfolio data visible with interactive chart
 - **Evidence Required**: Screenshots of steps 3, 4, 5
 - **Status**: ✅ Passed (2026-02-06)
-- **Test Log**: `ui-test-results/test-log.md#sc-002`
+- **Test Log**: `e2e/test-log.md#sc-002`
 
 ### SC-003: Mobile responsive layout
 - **Priority**: High
@@ -310,8 +310,8 @@ Define test scenarios in `{service}/artefacts/test-results/ui-test-scenarios.md`
 ### Evidence Requirements
 
 Each executed scenario must have:
-1. **Screenshots**: Saved to `{service}/artefacts/test-results/ui-test-results/screenshots/{scenario-id}/`
-2. **Test log entry**: In `{service}/artefacts/test-results/ui-test-results/test-log.md` with timestamp, actions, and outcome
+1. **Screenshots**: Saved to `{service}/artefacts/test-results/e2e/screenshots/{scenario-id}/`
+2. **Test log entry**: In `{service}/artefacts/test-results/e2e/test-log.md` with timestamp, actions, and outcome
 3. **Status marker**: ✅ Passed | ❌ Failed | ⏸️ Concessioned
 
 **Example test log entry:**
@@ -334,7 +334,7 @@ Each executed scenario must have:
 ✅ **PASSED** - All steps completed successfully
 
 ### Evidence
-- Screenshots: `screenshots/SC-001/{01-homepage, 04-dashboard, 05-user-name}.png`
+- Screenshots: `e2e/screenshots/SC-001/{01-homepage, 04-dashboard, 05-user-name}.png`
 - Browser: Chrome 131.0.6778.109
 - Viewport: 1920×1080
 ```
@@ -376,7 +376,7 @@ Include concessioned UI scenarios in `{service}/artefacts/test-gaps.md`:
 ## Concessioned UI Scenarios
 
 ### SC-003: Mobile responsive layout
-- **Location**: `ui-test-scenarios.md#sc-003`
+- **Location**: `e2e/test-scenarios.md#sc-003`
 - **Reason**: Requires physical mobile device for accurate touch target testing
 - **Mitigation**: Runs in CI with BrowserStack device farm
 - **Ticket**: #234 (BrowserStack integration planned)
