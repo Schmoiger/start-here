@@ -31,9 +31,16 @@
 - Agent: @functional-tester writes these
 - Test service-to-service communication (backend ↔ backend)
 - Test API contracts (frontend → backend API)
-- Real database, mocked external services
+- Real database with isolation (per-test transactions or cleanup)
+- Mocked external services
 - Focus: Contract compliance, error handling, data flow
 - Tools: See [tech-standards.md §Monorepo Tools](tech-standards.md#monorepo-tools)
+
+**Database Isolation Requirements:**
+- Real database **per test** (no shared state between tests)
+- Use database transactions with rollback, or cleanup fixtures
+- Database fixtures/factories for test data (not hardcoded)
+- No test pollution - each test starts with clean state
 
 *Component Integration (Browser-based)*:
 - Agent: @functional-tester writes these
@@ -117,13 +124,20 @@ tests/
 test('dashboard layout matches design', async ({ page }) => {
   await page.goto('/dashboard');
 
-  // Take screenshot and compare
+  // Take screenshot and compare with context-appropriate threshold
   await expect(page).toHaveScreenshot('dashboard-layout.png', {
     fullPage: true,
-    threshold: 0.1  // Allow 10% difference for anti-aliasing
+    threshold: 0.001  // 0.1% for pixel-perfect (typography, layouts)
+    // threshold: 0.02   // 2% for anti-aliasing differences
+    // threshold: 0.05   // 5% for dynamic content (dates, usernames)
   });
 });
 ```
+
+**Visual Regression Thresholds:**
+- **0.1% (0.001)**: Pixel-perfect matching (typography, layout, spacing)
+- **1-2% (0.01-0.02)**: Anti-aliasing differences across browsers/devices
+- **5% (0.05)**: Dynamic content areas (timestamps, user-specific data)
 
 ### Visual Testing Workflow
 
@@ -163,9 +177,15 @@ Coverage requirements increase as code progresses toward deployment. Thresholds 
 
 | Phase          | Coverage | Pass Rate | Concessioned | Fail Rate | Enforcement                  |
 | -------------- | -------- | --------- | ------------ | --------- | ---------------------------- |
-| Prototype      | ≥90%     | ≥90%      | ≤10%         | 0%        | Warning (advisory)           |
-| Development    | ≥94%     | ≥94%      | ≤6%          | 0%        | Build fails below threshold  |
-| Pre-deployment | ≥97%     | ≥97%      | ≤3%          | 0%        | Merge blocked below threshold |
+| Prototype      | ≥90%     | ≥90%      | ≤10%         | 0%*       | Warning (advisory)           |
+| Development    | ≥94%     | ≥94%      | ≤6%          | 0%*       | Build fails below threshold  |
+| Pre-deployment | ≥97%     | ≥97%      | ≤3%          | 0%*       | Merge blocked below threshold |
+
+**TDD RED Phase Exception**: During TDD RED phase only, newly written tests may fail if:
+- Marked with `@pytest.mark.wip` or `@pytest.mark.xfail(reason="TDD RED - not implemented")`
+- Must pass in TDD GREEN phase before GREEN commit
+- Cannot remain in WIP state >24 hours
+- RED commit message must use `test:` type (e.g., `test(auth): add failing tests for OAuth flow`)
 
 **Definitions:**
 - **Coverage**: Percentage of code lines executed by tests
@@ -314,6 +334,25 @@ Each executed scenario must have:
 2. **Test log entry**: In `{service}/artefacts/test-results/e2e/test-log.md` with timestamp, actions, and outcome
 3. **Status marker**: ✅ Passed | ❌ Failed | ⏸️ Concessioned
 
+### Evidence Storage Management
+
+Screenshots accumulate quickly. Implement retention policy:
+
+**Retention:**
+- Keep latest 3 test runs in `e2e/screenshots/`
+- Archive older runs to `test-results/archive/{date}-e2e/`
+- Compress screenshots: lossless PNG → WebP (80-90% size reduction)
+- Max evidence directory size: 500MB per service
+
+**Cleanup:**
+```bash
+# Archive old screenshots (keep latest 3 runs)
+find test-results/e2e/screenshots -type d -mtime +3 | xargs -I{} mv {} test-results/archive/$(date +%Y-%m-%d)-e2e/
+
+# Compress archived screenshots
+find test-results/archive -name "*.png" -exec cwebp -lossless {} -o {}.webp \;
+```
+
 **Example test log entry:**
 
 ```markdown
@@ -341,7 +380,10 @@ Each executed scenario must have:
 
 ### Coverage Calculation
 
-**Formula**: `(Scenarios Passed + Scenarios Concessioned) / Total Scenarios × 100`
+Track both reported and effective coverage to prevent concessioned tests from masking untested areas:
+
+**Reported Coverage**: `(Scenarios Passed + Scenarios Concessioned) / Total Scenarios × 100`
+**Effective Coverage**: `Scenarios Passed / Total Scenarios × 100`
 
 **Example:**
 - Total scenarios: 50
@@ -349,9 +391,12 @@ Each executed scenario must have:
 - Concessioned: 3 (⏸️)
 - Failed: 2 (❌)
 
-**Scenario Coverage**: (45 + 3) / 50 = 96%
+**Reported Coverage**: (45 + 3) / 50 = 96% (meets threshold)
+**Effective Coverage**: 45 / 50 = 90% (actual tested scenarios)
 **Pass Rate**: 45 / (45 + 2) = 95.7%
 **Fail Rate**: 2 / 50 = 4% ❌ **BUILD FAILS** (must be 0%)
+
+**Gate enforcement**: Reported coverage must meet phase threshold, but track effective coverage to identify excessive concessioning.
 
 ### Concessioned Scenarios
 
