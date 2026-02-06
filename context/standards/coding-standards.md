@@ -177,20 +177,11 @@ user_data, health_data = await asyncio.gather(
 
 ## Logging Standards
 
-```python
-# Structured logging
-logger = logging.getLogger(__name__)
+**Format**: Use structured logging (JSON) with consistent fields: event type, timestamp, correlation ID, context (user_id, request_id, etc.).
 
-def log_api_call(method: str, endpoint: str, user_id: str, duration_ms: int):
-    logger.info(json.dumps({
-        "event": "api_call",
-        "method": method,
-        "endpoint": endpoint,
-        "user_id": user_id,
-        "duration_ms": duration_ms,
-        "timestamp": datetime.utcnow().isoformat()
-    }))
-```
+**What to log**: See [security-standards.md §Logging & Monitoring as Security](security-standards.md#logging--monitoring-as-security) for security events (auth attempts, permission denials, validation failures) and what never to log (passwords, tokens, PII).
+
+**Tools**: See [tech-standards.md §Monitoring & Observability](tech-standards.md#monitoring--observability) for platform choices.
 
 ## Code Quality Requirements
 
@@ -339,7 +330,7 @@ refactor: simplify data service logic
 **Styling:** Tailwind CSS, Mobile-first, Dark mode via CSS vars, WCAG contrast
 
 **Quality:**
-- Zod for validation
+- Zod for validation (see [security-standards.md §Input Validation](security-standards.md#input-validation) for principles)
 - Jest + React Testing Library
 - Error boundaries with Sentry
 - Semantic HTML, ARIA, keyboard nav
