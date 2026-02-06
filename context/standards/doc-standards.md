@@ -374,6 +374,7 @@ Project management artefacts and quality gate decisions:
 
 Automated test execution outputs organized by test type:
 
+*   **`DASHBOARD.md`**: Auto-generated at-a-glance test status (coverage, pass rates, trends)
 *   **`unit/`**: Unit test results (pytest/vitest execution, coverage reports)
 *   **`integration/`**: Integration test results (API tests, component tests with Testing Library)
 *   **`e2e/`**: End-to-end test results (UI tests, scenarios, logs, screenshots/)
