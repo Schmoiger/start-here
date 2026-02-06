@@ -28,8 +28,8 @@
         },
         "phase": {
           "type": "string",
-          "enum": ["DISCOVERY", "DESIGN", "TDD_RED", "TDD_GREEN", "REVIEW", "INTEGRATION", "DEPLOY"],
-          "description": "Current workflow phase"
+          "enum": ["discovery", "design", "visual-design", "design-principles-review", "tdd-red", "tdd-green", "archive-cleanup", "review-gate", "verification", "deployment", "documentation"],
+          "description": "Current workflow phase (matches workflow YAML phase IDs)"
         },
         "from_agent": {
           "type": "string",

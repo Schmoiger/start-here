@@ -1,3 +1,9 @@
+---
+description: Task delegation rules for orchestrator agents
+globs: []
+alwaysApply: false
+---
+
 # Orchestrator Delegation
 
 **Applies to**: Main Claude session or any coordinating agent

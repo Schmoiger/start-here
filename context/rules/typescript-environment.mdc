@@ -1,3 +1,9 @@
+---
+description: TypeScript/JavaScript environment setup and command execution
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/package.json"]
+alwaysApply: false
+---
+
 # TypeScript Environment
 
 **Applies to**: All TypeScript/JavaScript code execution

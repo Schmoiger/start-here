@@ -1,3 +1,9 @@
+---
+description: Output directory structure and file naming conventions
+globs: ["**/*.md", "**/*.py", "**/*.ts", "**/*.json"]
+alwaysApply: true
+---
+
 # Output Locations
 
 **Applies to**: All agent-generated files and artefacts
@@ -16,15 +22,6 @@
 └── services/{name}/              # Service implementation
     └── tests/                    # Service tests
 ```
-
-## Spelling
-
-| Correct | Wrong |
-|---------|-------|
-| `artefacts/` | `artifacts/` |
-| `behaviour` | `behavior` |
-| `colour` | `color` |
-| `organisation` | `organization` |
 
 ## File Naming
 
