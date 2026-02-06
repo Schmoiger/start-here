@@ -273,8 +273,21 @@ See [testing-standards.md](testing-standards.md) for comprehensive testing guide
 
 - **Frontend**: Google Analytics 4, custom events
 - **Backend**: Cloud Logging (structured JSON), Cloud Monitoring (custom metrics)
-- **Mobile**: Firebase Analytics, crash reporting
+- **Mobile**: Firebase Analytics
 - **Infrastructure**: Cloud Monitoring dashboards
+
+### Error Tracking
+
+Error tracking groups, deduplicates, and alerts on errors (distinct from raw logging):
+
+- **Frontend**: Sentry (React Error Boundaries + source maps for stack traces)
+- **Backend**: GCP Error Reporting (automatic from Cloud Logging structured errors)
+- **Mobile**: Firebase Crashlytics (crash dumps, stack traces, device context)
+- **Alerting**: PagerDuty or Opsgenie for critical errors (configurable thresholds)
+
+**Error vs Logging:**
+- **Logging**: Raw event stream (every request, every action)
+- **Error Tracking**: Aggregated failures (groups identical errors, tracks frequency, alerts on spikes)
 
 ## Key Decision Records
 
