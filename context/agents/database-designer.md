@@ -11,6 +11,7 @@ mcp_tools:
   - supabase # For Supabase-specific features and managed PostgreSQL capabilities
 standards:
   - tech-standards.md
+  - doc-standards.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc

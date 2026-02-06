@@ -15,6 +15,7 @@ standards:
   - testing-standards.md
   - tech-standards.md
   - context-framework.md
+  - doc-standards.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc
@@ -96,6 +97,10 @@ Use when implementation exists. Write tests based on actual code behaviour.
 - Never modify production code, only test it
 - Run tests and capture output to `{service}/artefacts/test-results/`
 - Follow anti-pattern rules in testing-standards.md (no excessive fallbacks, no skipping without reason)
+
+## Boundary Clarifications
+
+**Relationship with @ui-tester**: You write unit and integration tests for code (pytest, vitest). The `@ui-tester` tests user-facing behaviour in Chrome via browser automation. You test functions and APIs; they test workflows and visual rendering.
 
 ## Deliverables
 

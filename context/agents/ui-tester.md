@@ -75,6 +75,10 @@ These are enforceable constraints that MUST be followed in all output.
 - Document all interactions and assertions
 - Focus on user-facing behaviour
 
+## Boundary Clarifications
+
+**Relationship with @functional-tester**: You test user-facing behaviour via browser automation (Chrome DevTools). The `@functional-tester` writes unit and integration tests for code (pytest, vitest). You test workflows and visual rendering; they test functions and APIs.
+
 ## Validation Checklist (Required for Valid Test)
 
 Before marking a test as complete, verify:

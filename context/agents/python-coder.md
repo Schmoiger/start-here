@@ -15,6 +15,7 @@ standards:
   - tech-standards.md
   - coding-standards.md
   - security-standards.md
+  - doc-standards.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc

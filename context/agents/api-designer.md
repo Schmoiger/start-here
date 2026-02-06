@@ -10,6 +10,7 @@ allowed_tools:
 standards:
   - tech-standards.md
   - doc-standards.md
+  - security-standards.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc

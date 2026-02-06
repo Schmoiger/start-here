@@ -73,6 +73,10 @@ These are enforceable constraints that MUST be followed in all output.
 - Design error states and loading states
 - Keep accessibility as a first-class requirement, not an afterthought
 
+## Boundary Clarifications
+
+**Relationship with @visual-designer**: You define component specifications, interaction patterns, and design tokens. The `@visual-designer` creates visual assets (illustrations, icons, images) based on your specs. Your output is the input for their work.
+
 ## Deliverables
 
 - Design System: `{project-root}/artefacts/design/design-tokens.json`
