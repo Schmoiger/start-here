@@ -138,14 +138,27 @@ uv add --dev pytest pytest-cov
 
 ### Pre-commit Hooks
 
-- **Configuration Approach**: Project-specific `.pre-commit-config.yaml` files for Python backend services only (not used for frontend TypeScript projects)
-- **Scope**: Include code formatting, linting, type checking, and general file validation for Python codebases
-- **Enforcement**: `pre-commit run --all-files` before commits and in CI/CD for backend Python services
+**Python (backend services):**
+- **Config**: Project-specific `.pre-commit-config.yaml`
+- **Hooks**: Black (format), isort (imports), mypy (types), general file validation
+- **Enforcement**: `pre-commit run --all-files` before commits and in CI/CD
+
+**TypeScript/JavaScript (frontend):**
+- **Config**: `.husky/pre-commit` with `biome check --apply`
+- **Hooks**: Biome (format + lint), TypeScript compiler check
+- **Enforcement**: Husky triggers on git commit
+- **Installation**:
+  ```bash
+  yarn add -D @biomejs/biome husky
+  npx husky init
+  echo "npx biome check --apply src/" > .husky/pre-commit
+  echo "npx tsc --noEmit" >> .husky/pre-commit
+  ```
 
 ### Language-Specific Tools
 
-- **TypeScript/JavaScript**: Biome (linting + formatting), Vitest for testing
-- **Python**: Black (formatting) + isort (import sorting) + mypy (type checking) or Ruff + pyright
+- **TypeScript/JavaScript**: Biome (linting + formatting via pre-commit), Vitest for testing
+- **Python**: Black (formatting) + isort (import sorting) + mypy (type checking) via pre-commit, or Ruff + pyright
 - **Swift**: SwiftLint (linting), SwiftFormat (formatting)
 
 ### Quality Gates
