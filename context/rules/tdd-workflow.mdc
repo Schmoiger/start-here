@@ -1,3 +1,9 @@
+---
+description: Test-Driven Development RED-GREEN-REFACTOR cycle
+globs: ["**/tests/**", "**/*.test.py", "**/*.test.ts"]
+alwaysApply: false
+---
+
 # TDD Workflow
 
 **Applies to**: All implementation tasks using Test-Driven Development

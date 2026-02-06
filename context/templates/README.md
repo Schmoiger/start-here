@@ -12,6 +12,7 @@ See `context/standards/context-framework.md` for sharing formats, prioritisation
 | `user-stories-template.md` | Compressed user stories | `artefacts/product/` |
 | `tasks-template.md` | Task tracking matrix | `artefacts/build/` |
 | `bugs-template.md` | Bug tracker format | `artefacts/build/` |
+| `domain-rules-template.yaml` | Domain-specific rules, blockers, terminology | `services/{domain}/context/` |
 
 ## Agent Templates
 

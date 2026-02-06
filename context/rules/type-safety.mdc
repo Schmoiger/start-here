@@ -1,3 +1,9 @@
+---
+description: Type annotation and safety requirements
+globs: ["**/*.py", "**/*.ts", "**/*.tsx"]
+alwaysApply: false
+---
+
 # Type Safety
 
 **Applies to**: All Python and TypeScript code

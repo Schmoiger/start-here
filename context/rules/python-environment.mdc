@@ -1,3 +1,9 @@
+---
+description: Python environment setup and command execution
+globs: ["**/*.py", "**/pyproject.toml", "**/requirements.txt"]
+alwaysApply: false
+---
+
 # Python Environment
 
 **Applies to**: All Python code execution
