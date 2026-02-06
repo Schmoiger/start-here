@@ -256,7 +256,46 @@ When @ui-tester completes, orchestrator SHALL verify deliverables before accepti
 
 ---
 
-## 10. Parallel Execution Analysis
+## 10. Archive Cleanup (Pre-Deployment)
+
+Before deploying to production, purge temporary archives to keep repository lean.
+
+**Timing:** After all tests pass and before deployment commit.
+
+**What to purge:**
+- `test-results/archive/` - Historical test runs (CI/CD systems maintain build artifacts, not git)
+- Old screenshots beyond latest 3 runs - Already archived, safe to delete
+- Large generated files - Coverage reports, profiling data, memory dumps
+
+**What to keep:**
+- `test-results/DASHBOARD.md` - Latest test status
+- `test-results/test-gaps.md` - Coverage gap documentation
+- Latest test results - `unit/`, `integration/`, `e2e/`, `security/` current runs
+- Evidence for current release - Screenshots and logs for latest passing tests
+
+**Cleanup script:**
+```bash
+# Remove archived test results
+rm -rf artefacts/test-results/archive/
+
+# Remove old screenshots (keep latest 3 runs)
+find artefacts/test-results/e2e/screenshots -type d -mtime +3 -exec rm -rf {} +
+
+# Remove large generated files
+find . -name "*.coverage" -o -name "*.prof" -o -name "core.*" | xargs rm -f
+```
+
+**Rationale:** Archives are for development visibility during iteration. Production deployments reference specific commits; test results are preserved in CI/CD logs. Keeping archives in git bloats repository size without adding value post-deployment.
+
+**Commit archive cleanup:**
+```bash
+git add artefacts/test-results/
+git commit -m "chore: purge test archives before deployment"
+```
+
+---
+
+## 11. Parallel Execution Analysis
 
 ### When to Suggest Parallelisation
 
