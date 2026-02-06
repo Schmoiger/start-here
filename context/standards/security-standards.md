@@ -110,15 +110,15 @@ LLM APIs have a distinct threat profile — token cost and prompt injection matt
 
 ## Safe Failure
 
-Errors must not leak secrets, stack traces, or internal structure. Fail closed, loudly, and recoverably.
+**See [coding-standards.md §Error Handling & Safe Failure](coding-standards.md#error-handling--safe-failure) for implementation patterns.**
 
-**Principles**:
-- Log richly for developers, but return boring, vague messages to users
-- Catch broad exceptions at the boundary and map them to sanitised error responses — one error translator at the edge, not scattered try/catch everywhere
-- Default to denial: if auth fails, if validation fails, if anything unexpected happens — deny access, don't fall through to a permissive default
-- Make failure observable: log the real error with context (request ID, user ID) so you can diagnose without exposing internals to the caller
+Core principle: Errors must fail closed, loudly, and recoverably — without leaking secrets, stack traces, or internal structure.
 
-**Anti-pattern**: Returning stack traces, internal paths, or database error messages to API consumers.
+**Security-specific considerations**:
+- Never expose existence of resources to unauthorised users (404 vs 403 leaks information)
+- Rate limit error responses to prevent enumeration attacks
+- Sanitise all error messages at API boundaries — treat user-facing messages as untrusted output
+- Default to denial: if anything unexpected happens, deny access rather than falling through to a permissive state
 
 ## Logging & Monitoring as Security
 

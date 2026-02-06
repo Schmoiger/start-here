@@ -107,7 +107,11 @@ async def get_user_data(
     return ResponseModel(**data)
 ```
 
-## Error Handling
+## Error Handling & Safe Failure
+
+**Principle**: Errors must fail closed, loudly, and recoverably — without leaking secrets, stack traces, or internal structure.
+
+### Error Response Structure
 
 ```typescript
 // Frontend: Custom error types
@@ -123,10 +127,60 @@ class APIError(HTTPException):
     def __init__(self, status_code: int, error_code: str, message: str):
         super().__init__(status_code, {
             "error": error_code,
-            "message": message,
+            "message": message,  # User-facing, sanitised
             "timestamp": datetime.utcnow().isoformat()
         })
 ```
+
+### Safe Failure Principles
+
+| Principle | Implementation |
+|-----------|----------------|
+| **Log richly, return boring** | Log full context (stack trace, user ID, request ID) but return vague user-facing messages |
+| **Catch at boundaries** | One error translator at API edge, not scattered try/catch everywhere |
+| **Fail closed** | If auth fails, validation fails, or anything unexpected happens — deny access, don't fall through |
+| **Make failure observable** | Every error gets logged with correlation ID for diagnosis |
+
+### Error Translation Example
+
+```python
+# At API boundary (middleware or route decorator)
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    # Rich logging for developers
+    logger.error(
+        f"Unhandled error: {exc}",
+        extra={
+            "request_id": request.state.request_id,
+            "path": request.url.path,
+            "user_id": getattr(request.state, "user_id", None),
+            "stack_trace": traceback.format_exc()
+        }
+    )
+
+    # Boring response for users (no internals leaked)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "INTERNAL_ERROR",
+            "message": "An error occurred. Please contact support with reference ID.",
+            "request_id": request.state.request_id
+        }
+    )
+```
+
+### What NOT to Return
+
+**Anti-patterns** (security violations):
+- ❌ Stack traces in API responses
+- ❌ Database error messages (e.g., "Column 'ssn' does not exist")
+- ❌ Internal file paths (e.g., "/var/app/config/secrets.json not found")
+- ❌ Detailed validation errors exposing schema (e.g., "Expected field 'admin_override' to be boolean")
+
+**Instead**:
+- ✅ Generic error codes: `INVALID_INPUT`, `RESOURCE_NOT_FOUND`, `INTERNAL_ERROR`
+- ✅ User-actionable messages: "Invalid request format"
+- ✅ Request ID for support correlation
 
 ## Security
 
