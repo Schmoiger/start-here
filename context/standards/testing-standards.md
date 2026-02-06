@@ -4,6 +4,8 @@
 
 **Quality Gate**: All tests must pass before commits, reviews, or deployments.
 
+**Test Dashboard**: Maintain auto-generated `test-results/DASHBOARD.md` for at-a-glance status (coverage, pass rates, trends, concessioned tests). Update after each test run.
+
 **Testing Pyramid**:
 
 - **Unit Tests (70%)**: Isolated functions/methods with mocked dependencies
