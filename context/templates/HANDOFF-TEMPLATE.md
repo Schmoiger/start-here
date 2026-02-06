@@ -26,7 +26,7 @@
 
 | ID | Task | Priority | Depends On |
 |----|------|----------|------------|
-| {TASK-ID} | {task name} | critical/high/normal/low | {other task IDs} |
+| {TASK-ID} | {task name} | critical/high/medium/low | {other task IDs} |
 
 ---
 
@@ -45,7 +45,7 @@
 
 | ID | Question | Impact |
 |----|----------|--------|
-| {BLOCKER-ID} | {what needs answering} | low/medium/high |
+| {BLOCKER-ID} | {what needs answering} | critical/high/medium/low |
 
 ---
 
