@@ -125,7 +125,7 @@ Core principle: Errors must fail closed, loudly, and recoverably — without lea
 
 Logging is a security tool, not just an ops concern. Attackers are noisy; you just need ears.
 
-**Log these**:
+**Log these security events**:
 - Authentication attempts (success and failure)
 - Permission denials
 - Unusual spikes in traffic or error rates
@@ -137,6 +137,8 @@ Logging is a security tool, not just an ops concern. Attackers are noisy; you ju
 **Alert on patterns**, not single events. One failed login is noise; fifty in a minute is signal.
 
 **Never log**: passwords, tokens, PII, or request bodies containing sensitive data.
+
+See [coding-standards.md §Logging Standards](coding-standards.md#logging-standards) for structured format and [tech-standards.md §Monitoring & Observability](tech-standards.md#monitoring--observability) for platform tooling.
 
 ## Data Security
 

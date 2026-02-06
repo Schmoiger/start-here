@@ -221,12 +221,14 @@ See `context/standards/testing-standards.md` for comprehensive testing guideline
 
 ## Monitoring & Observability
 
-TODO
+**Stack**: GCP Cloud Logging and Cloud Monitoring for backend, Firebase Analytics for mobile, Google Analytics 4 for frontend.
+
+**Logging format**: Structured JSON logs with correlation IDs. See [coding-standards.md §Logging Standards](coding-standards.md#logging-standards) for format and [security-standards.md §Logging & Monitoring as Security](security-standards.md#logging--monitoring-as-security) for what to log from security perspective.
 
 ### Metrics Collection
 
 - **Frontend**: Google Analytics 4, custom events
-- **Backend**: Cloud Logging, custom metrics
+- **Backend**: Cloud Logging (structured JSON), Cloud Monitoring (custom metrics)
 - **Mobile**: Firebase Analytics, crash reporting
 - **Infrastructure**: Cloud Monitoring dashboards
 
@@ -241,12 +243,12 @@ TODO
 
 ### Architecture Principles
 
-Guided by **LESS Engineering Principles** (see `context/standards/LESS-Engineering-Principles.md`):
+Guided by **LESS Engineering Principles** (see `context/standards/LESS-Engineering-Principles.md` for full framework):
 
-- **Lean**: Maximise value with minimum effort; always MVP first; defer commitment until feedback
-- **Ethical**: Trustworthy, inclusive, of real benefit to users, does no harm
-- **Scalable**: Grow without do-over; loose coupling, modularity, statelessness
-- **Sustainable**: Carbon and energy efficient; minimise data transfer and resource usage
+- **Lean**: MVP first, defer commitment until feedback
+- **Ethical**: Trustworthy, inclusive, beneficial
+- **Scalable**: Loose coupling, modularity, statelessness
+- **Sustainable**: Minimise data transfer and resource usage
 
 Applied as:
 
