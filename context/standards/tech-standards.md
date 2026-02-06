@@ -164,7 +164,7 @@ uv add --dev pytest pytest-cov
 ### Quality Gates
 
 - **Type Checking**: Strict mode enabled (TypeScript `strict: true`, Python `--strict`)
-- **Test Coverage**: Minimum 90% code coverage (backend Python, frontend TypeScript)
+- **Test Coverage**: Phase-based thresholds (90% prototype, 94% development, 97% pre-deployment) - see [testing-standards.md §Coverage Requirements](testing-standards.md#coverage-requirements)
 - **Linting**: Zero tolerance - all auto-fixable issues resolved automatically
 
 ## Development Environment Setup
