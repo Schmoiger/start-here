@@ -145,7 +145,7 @@ Lean code and token-efficient code are the same thing: eliminate waste so both h
 - Prefer flat structure over deep nesting
 - Small files are cheaper to read (for humans and LLMs)
 
-**Prefer established packages** (see Library-first in tech-standards.md):
+**Prefer established packages** (see Library-first in [tech-standards.md](tech-standards.md)):
 - Use well-maintained libraries over custom implementations
 - Fewer lines to maintain, test, and read
 
@@ -154,7 +154,7 @@ Lean code and token-efficient code are the same thing: eliminate waste so both h
 - Avoid patterns that exist only to satisfy a pattern (factories for one type, interfaces for one implementation)
 - Inline short functions used once
 
-**Apply to documentation too** (see Token-Efficient in doc-standards.md):
+**Apply to documentation too** (see Token-Efficient in [doc-standards.md](doc-standards.md)):
 - Comments explain *why*, never *what*
 - Self-documenting code over verbose comments
 - Docstrings on public APIs only; skip obvious ones
