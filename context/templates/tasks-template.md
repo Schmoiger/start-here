@@ -4,7 +4,7 @@
 
 See `context/standards/context-framework.md` for prioritisation rules and agent behaviour.
 
-- **Pri**: critical, high, normal, low
+- **Pri**: critical, high, medium, low
 - **Status**: pending, in_progress, blocked, completed
 - **Blocked By**: task/bug IDs or `-` if none
 - **Tokens**: in/out with K suffix (e.g., 8.2K/5.1K) — populated on completion
@@ -16,7 +16,7 @@ See `context/standards/context-framework.md` for prioritisation rules and agent 
 |----|-----|--------|------------|------|--------|----------|
 | TASK-001 | critical | completed | - | {description} (REQ-xxx) | 4.1K/2.8K | 18m |
 | TASK-002 | high | in_progress | TASK-001 | {description} (REQ-xxx) | - | - |
-| TASK-003 | normal | pending | TASK-001 | {description} | - | - |
+| TASK-003 | medium | pending | TASK-001 | {description} | - | - |
 | TASK-004 | low | pending | - | {description} | - | - |
 
 ## Metrics Flow

@@ -118,7 +118,7 @@
           },
           "priority": {
             "type": "string",
-            "enum": ["critical", "high", "normal", "low"]
+            "enum": ["critical", "high", "medium", "low"]
           }
         }
       }

@@ -90,7 +90,7 @@ All actionable context needs prioritisation. The same four levels apply everywhe
 |-------|------------------|-------------------|
 | Critical | Must do before anything else; blocks phase exit | Needs your attention now; broken or blocked on you |
 | High | Do before quality gate; important dependency | Should review soon; significant decision or risk |
-| Normal | Planned work, do in order | FYI; will proceed unless you intervene |
+| Medium | Planned work, do in order | FYI; will proceed unless you intervene |
 | Low | Do if time permits; skip if time-boxed | No action needed; logged for awareness |
 
 ### Priority Assignment
@@ -99,7 +99,7 @@ Priority is assigned by the **producing agent** based on impact and dependencies
 
 - **Critical**: Without this, the current phase cannot complete
 - **High**: Without this, the next quality gate will fail
-- **Normal**: Planned work that contributes to phase completion
+- **Medium**: Planned work that contributes to phase completion
 - **Low**: Nice-to-have, deferrable without impact
 
 ### Priority Inheritance
