@@ -132,27 +132,87 @@ test('dashboard layout matches design', async ({ page }) => {
 
 ## Coverage Requirements
 
+Coverage requirements increase as code progresses toward deployment. Thresholds are enforced **per service** (not aggregate across all services).
 
-| Metric            | Threshold | Action                                                        |
-| ----------------- | --------- | ------------------------------------------------------------- |
-| Minimum           | 90%       | Build fails below this                                        |
-| Target            | 100%      | Always aim for full coverage                                  |
-| Gap Documentation | Required  | If <100%, document gaps in `{service}/artefacts/test-gaps.md` |
+### Phase-Based Thresholds
 
+| Phase          | Coverage | Pass Rate | Concessioned | Fail Rate | Enforcement                  |
+| -------------- | -------- | --------- | ------------ | --------- | ---------------------------- |
+| Prototype      | ≥90%     | ≥90%      | ≤10%         | 0%        | Warning (advisory)           |
+| Development    | ≥94%     | ≥94%      | ≤6%          | 0%        | Build fails below threshold  |
+| Pre-deployment | ≥97%     | ≥97%      | ≤3%          | 0%        | Merge blocked below threshold |
+
+**Definitions:**
+- **Coverage**: Percentage of code lines executed by tests
+- **Pass Rate**: Percentage of tests that pass (non-concessioned tests must have 100% pass rate)
+- **Concessioned**: Tests marked as `@pytest.mark.skip` or `@pytest.mark.xfail` with documented reason and ticket
+- **Fail Rate**: Percentage of tests that fail (always 0% - no failing tests allowed)
+- **Module**: Service level (e.g., `services/data-service/`, `frontend/`)
+
+### Concessioned Tests
+
+Tests may be concessioned (skipped or expected to fail) only for:
+
+1. **External dependencies unavailable locally**: Integration tests requiring live APIs, databases, or third-party services
+2. **Known bugs with tracking ticket**: `@pytest.mark.xfail(reason="Issue #123")`
+3. **TDD RED phase**: Tests written before implementation (temporary, must pass in GREEN phase)
+4. **Platform-specific tests**: Tests that only run in certain environments
+
+**All concessioned tests must**:
+- Include reason in marker: `@pytest.mark.skip(reason="External API unavailable")`
+- Be documented in `{service}/artefacts/test-gaps.md`
+- Have tracking ticket if representing technical debt
+
+**Not permitted as concessions**:
+- ❌ Broken tests without ticket
+- ❌ Tests skipped for convenience
+- ❌ Tests that "sometimes fail"
+- ❌ Tests skipped to hit coverage target
 
 ### Gap Documentation Format
 
-When coverage is below 100%, document each gap in `{service}/artefacts/test-gaps.md`:
+Document all coverage gaps and concessioned tests in `{service}/artefacts/test-gaps.md`:
 
 ```markdown
 # Test Coverage Gaps
 
-## [Module/Component Name]
+## Coverage Gaps
+
+### [Module/Component Name]
 - **Current Coverage**: 94%
 - **Gap Location**: `src/auth/oauth.py:45-60`
 - **Reason**: External OAuth provider callback - requires live integration
 - **Mitigation**: Manual testing checklist in `{service}/artefacts/guides/oauth-testing.md`
 - **Ticket**: #123 (to address later)
+
+## Concessioned Tests
+
+### [Test Name]
+- **Location**: `tests/integration/test_external_api.py::test_fetch_user_data`
+- **Marker**: `@pytest.mark.skip(reason="External API unavailable locally")`
+- **Reason**: Requires live connection to third-party API
+- **Mitigation**: Runs in CI with API credentials
+- **Ticket**: #456 (mock implementation planned)
+```
+
+### Enforcement
+
+**Prototype phase:**
+```bash
+# Advisory only - build succeeds with warning
+pytest --cov=src --cov-report=term-missing --cov-fail-under=90
+```
+
+**Development phase:**
+```bash
+# Build fails below threshold
+pytest --cov=src --cov-report=term-missing --cov-fail-under=94
+```
+
+**Pre-deployment phase:**
+```bash
+# Strict enforcement - blocks merge
+pytest --cov=src --cov-report=term-missing --cov-fail-under=97 --strict-markers
 ```
 
 ## Anti-Patterns (Forbidden)
