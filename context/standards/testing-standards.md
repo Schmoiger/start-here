@@ -25,21 +25,46 @@
 - Run via: pytest, vitest
 - Mock all external services
 
-**Integration Tests**: Component interactions, use real services where safe.
+**Integration Tests (20% of pyramid)**: Component interactions, use real services where safe. Two levels:
+
+*API Integration*:
 - Agent: @functional-tester writes these
-- Test API endpoints with real backend
-- May use TestClient (FastAPI) or supertest (Express)
+- Test service-to-service communication (backend ↔ backend)
+- Test API contracts (frontend → backend API)
+- Real database, mocked external services
+- Focus: Contract compliance, error handling, data flow
+- Tools: See [tech-standards.md §Monorepo Tools](tech-standards.md#monorepo-tools)
 
-**E2E Tests (Browser)**: Complete user workflows with real browsers.
+*Component Integration (Browser-based)*:
+- Agent: @functional-tester writes these
+- Test components with user interactions in simulated browser environment
+- Render components, simulate clicks/typing, verify DOM updates
+- Extends testing beyond API surface to include UI behaviour
+- Real component rendering, mocked backend API responses
+- Focus: Component behaviour with user interactions, not isolated unit logic
+- Example: "Click 'Add to Portfolio' button → verify modal opens and form renders"
+- Tools: See [tech-standards.md §Monorepo Tools](tech-standards.md#monorepo-tools)
+
+**E2E Tests (10% of pyramid)**: Complete user workflows with real browsers.
 - Agent: @ui-tester performs these
-- **MUST use actual browser** (Chrome DevTools)
+- **MUST use actual browser** (not simulated DOM)
 - **MUST capture screenshots** as evidence
-- Tests user-facing behaviour, not APIs
+- Tests user-facing behaviour and complete workflows
 - Verify visual elements render correctly
+- Real browser, real backend, real external services (or staging equivalents)
+- Focus: User journeys end-to-end
+- Example: "User signs in → views portfolio → adds holding → verifies chart updates"
+- Tools: See [tech-standards.md §Monorepo Tools](tech-standards.md#monorepo-tools)
 
-**Distinction:**
-- @functional-tester: Writes automated test code (pytest/vitest files)
-- @ui-tester: Executes manual browser testing with Chrome DevTools
+**Test Scope Distinction:**
+- **Unit**: Isolated function, all dependencies mocked
+- **API Integration**: Multiple components, real database, mocked external APIs
+- **Component Integration**: UI component + interactions, mocked backend
+- **E2E**: Full user workflow, real browser, real services
+
+**Agent Distinction:**
+- @functional-tester: Writes automated test code (unit, API integration, component integration)
+- @ui-tester: Executes browser-based E2E scenario testing with evidence capture
 
 ## Phase Workflow
 

@@ -100,7 +100,42 @@ build_tools:
   - Swift: Xcode, Swift Package Manager
 documentation: Mermaid
 linting: Biome (TypeScript), SwiftLint
-testing: Vitest (frontend), Pytest (backend), XCTest (iOS)
+testing:
+  unit: Vitest (frontend), Pytest (backend), XCTest (iOS)
+  integration_api: FastAPI TestClient (backend), Vitest + fetch (frontend)
+  integration_component: Testing Library (React/DOM interactions)
+  ui_e2e: Puppeteer (browser automation)
+```
+
+### Testing Tools
+
+**Unit Testing:**
+- **Vitest** (Frontend TypeScript): Fast, Vite-native, TypeScript-first
+- **Pytest** (Backend Python): Industry standard, fixture-based, plugin ecosystem
+- **XCTest** (iOS Swift): Native Apple framework, integrated with Xcode
+
+**API Integration Testing:**
+- **FastAPI TestClient** (Backend): Tests Python API endpoints with real backend logic, mocked database
+- **Vitest + fetch/axios** (Frontend): Tests API client code, mocked HTTP responses
+
+**Component Integration Testing:**
+- **Testing Library** (@testing-library/react, @testing-library/user-event): Tests React components with user interactions in simulated browser (jsdom). Extends testing beyond API surface to include UI behaviour without full browser overhead. Renders components, simulates clicks/typing, verifies DOM updates.
+
+**Rationale**: Lighter than full browser automation for component-level testing. Focuses on user-facing behaviour (what user sees/does) not implementation details (component state/props).
+
+**UI E2E Testing:**
+- **Puppeteer** (puppeteer-core): Automates Chrome via DevTools Protocol for full user workflow testing. Real browser, real rendering, captures screenshots as evidence. Chrome-only (matches current Chrome DevTools approach).
+
+**Rationale**: Lightweight (2MB with puppeteer-core using installed Chrome), matches existing Chrome DevTools workflow, sufficient for Chrome-focused web testing. Avoids Playwright's multi-browser overhead (~530MB).
+
+**Installation:**
+```bash
+# Frontend
+yarn add -D vitest @testing-library/react @testing-library/user-event puppeteer-core
+
+# Backend
+cd backend/{service-name}
+uv add --dev pytest pytest-cov
 ```
 
 ## Static Analysis & Code Quality
