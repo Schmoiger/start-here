@@ -52,6 +52,16 @@ ui: DaisyUI + custom components, TailwindCSS
 deployment: Firebase hosting with rewrite rules
 ```
 
+### Authentication
+
+```yaml
+provider: Firebase Authentication (upgrade to Identity Platform if needed)
+sign_in_methods: Google Sign-In (primary)
+frontend_sdk: Firebase Auth SDK
+backend_verification: Firebase Admin SDK (ID token verification)
+upgrade_trigger: Multi-tenancy, SAML/OIDC federation, or blocking functions
+```
+
 ### Mobile Applications
 
 ```yaml

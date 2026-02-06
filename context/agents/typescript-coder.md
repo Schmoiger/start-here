@@ -15,6 +15,7 @@ standards:
   - tech-standards.md
   - coding-standards.md
   - visual-standards.md
+  - security-standards.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc
@@ -47,6 +48,7 @@ For detailed guidance, see `{project-root}/context/standards/`:
 - `tech-standards.md` - Technology patterns, architecture
 - `coding-standards.md` - Code style, patterns
 - `visual-standards.md` - Accessibility, design patterns
+- `security-standards.md` - Input validation, auth, safe failure, data protection
 
 ## Context Paths
 

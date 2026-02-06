@@ -14,6 +14,7 @@ mcp_tools:
 standards:
   - tech-standards.md
   - coding-standards.md
+  - security-standards.md
 rules:
   - conventional-commits.mdc
   - british-english.mdc
@@ -45,6 +46,7 @@ Read these rules in `{project-root}/context/rules/`:
 For detailed guidance, see `{project-root}/context/standards/`:
 - `tech-standards.md` - Technology patterns, architecture
 - `coding-standards.md` - Code style, patterns, logging
+- `security-standards.md` - Input validation, auth, safe failure, data protection
 
 ## Context Paths
 
