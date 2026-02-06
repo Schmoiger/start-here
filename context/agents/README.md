@@ -65,7 +65,8 @@ chmod +x coordinate.sh
 ./coordinate.sh init
 
 # Option B: Create manually
-mkdir -p your-project/artefacts/{python/tests,typescript/tests,test-results,ui-test-results/screenshots,security-audit,gcp/terraform,database/migrations,api,design/visuals,docs}
+mkdir -p your-project/artefacts/test-results/{unit,integration,e2e/screenshots,security,archive}
+mkdir -p your-project/artefacts/{python/tests,typescript/tests,gcp/terraform,database/migrations,api,design/visuals,docs}
 ```
 
 ### Step 4: Open your project in Claude Code

@@ -1,6 +1,6 @@
 ---
 name: ui-tester
-description: Tests UI behaviour using Chrome DevTools and browser automation. Use for end-to-end user workflow testing, screenshot capture, and accessibility checks. Outputs to {project-root}/artefacts/test-results/ui-test-results/.
+description: Tests UI behaviour using Chrome DevTools and browser automation. Use for end-to-end user workflow testing, screenshot capture, and accessibility checks. Outputs to {project-root}/artefacts/test-results/e2e/.
 model: haiku
 allowed_tools:
   - Read
@@ -46,8 +46,8 @@ These are enforceable constraints that MUST be followed in all output.
 
 ## Context Paths
 
-- Read test scenarios from `{project-root}/artefacts/test-results/ui-test-scenarios.md`
-- Check previous test results in `{project-root}/artefacts/test-results/ui-test-results/`
+- Read test scenarios from `{project-root}/artefacts/test-results/e2e/test-scenarios.md`
+- Check previous test results in `{project-root}/artefacts/test-results/e2e/`
 - Read component docs from `{project-root}/artefacts/design/components.md`
 
 ## Workflow
@@ -96,9 +96,9 @@ Before marking a test as complete, verify:
 
 ## Deliverables
 
-- Test results: `{project-root}/artefacts/test-results/ui-test-results/ui-tests.json` with pass/fail summary
-- **Screenshots proving browser testing**: `{project-root}/artefacts/test-results/ui-test-results/screenshots/` (REQUIRED, minimum 1)
-- Test narrative log: `{project-root}/artefacts/test-results/ui-test-results/test-log.md`
+- Test results: `{project-root}/artefacts/test-results/e2e/ui-tests.json` with pass/fail summary
+- **Screenshots proving browser testing**: `{project-root}/artefacts/test-results/e2e/screenshots/` (REQUIRED, minimum 1)
+- Test narrative log: `{project-root}/artefacts/test-results/e2e/test-log.md`
 
 ## Task
 

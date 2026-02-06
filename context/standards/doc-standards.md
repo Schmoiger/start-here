@@ -60,10 +60,12 @@ For example:
 │   │   ├── tech-review.md
 │   │   └── architecture-review.md
 │   ├── test-results/                # Test execution outputs only
-│   │   ├── functional-tests.json
+│   │   ├── unit/
+│   │   ├── integration/
+│   │   ├── e2e/
+│   │   ├── security/
 │   │   ├── test-gaps.md
-│   │   ├── security-audit/
-│   │   └── ui-test-results/
+│   │   └── archive/
 │   └── shared/                      # Cross-service resources
 │       ├── handoffs/
 │       ├── fixtures/
@@ -120,7 +122,7 @@ Each service or package shall maintain the following files in its `artefacts/` d
     *   Future enhancements and optimisations
 *   **`code-review.md`**: Code review findings (quality gate, created by @code-reviewer)
 *   **`tech-review.md`**: Technical lead review findings (architecture compliance gate, created by @tech-lead)
-*   **`test-results/`**: Test execution outputs only (functional-tests.json, coverage reports)
+*   **`test-results/`**: Test execution outputs organized by type (unit/, integration/, e2e/, security/, archive/)
 *   **`fixtures/`**: Service-specific test data (optional)
 
 ### 2.4. Agent Handoff Files
@@ -370,12 +372,14 @@ Project management artefacts and quality gate decisions:
 
 ### 4.6. Test Results (`/artefacts/test-results/`)
 
-Automated test execution outputs only (no human reviews):
+Automated test execution outputs organized by test type:
 
-*   **`functional-tests.json`**: pytest/vitest execution output
-*   **`test-gaps.md`**: Test coverage gap analysis
-*   **`security-audit/`**: Security testing results (OWASP, vulnerabilities)
-*   **`ui-test-results/`**: UI/browser test outputs and screenshots
+*   **`unit/`**: Unit test results (pytest/vitest execution, coverage reports)
+*   **`integration/`**: Integration test results (API tests, component tests with Testing Library)
+*   **`e2e/`**: End-to-end test results (UI tests, scenarios, logs, screenshots/)
+*   **`security/`**: Security test results (findings, threat model, remediation guide)
+*   **`test-gaps.md`**: Cross-cutting test coverage gap analysis
+*   **`archive/`**: Historical test results organized by date and type
 
 ### 4.7. Shared Resources (`/artefacts/shared/`)
 

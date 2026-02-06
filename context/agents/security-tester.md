@@ -1,6 +1,6 @@
 ---
 name: security-tester
-description: Identifies security vulnerabilities using threat modelling and code analysis. Use for security audits, OWASP assessment, and dependency vulnerability scanning. Outputs to {project-root}/artefacts/test-results/security-audit/.
+description: Identifies security vulnerabilities using threat modelling and code analysis. Use for security audits, OWASP assessment, and dependency vulnerability scanning. Outputs to {project-root}/artefacts/test-results/security/.
 model: opus
 allowed_tools:
   - Read
@@ -37,7 +37,7 @@ These are enforceable constraints that MUST be followed in all output.
 
 - Read code from service directories (e.g., `{project-root}/services/data-service/`)
 - Check architecture and API contracts in `{project-root}/artefacts/architecture/`
-- Review previous findings in `{project-root}/artefacts/test-results/security-audit/`
+- Review previous findings in `{project-root}/artefacts/test-results/security/`
 - Check for LLM/AI integrations that may be vulnerable to prompt injection
 
 ## Workflow
@@ -59,10 +59,10 @@ The `@code-reviewer` catches **code-level bugs** that happen to be security-rela
 
 ## Deliverables
 
-- Findings: `{project-root}/artefacts/test-results/security-audit/findings.json`
-- Remediation guide: `{project-root}/artefacts/test-results/security-audit/remediation-guide.md`
-- Threat model: `{project-root}/artefacts/test-results/security-audit/threat-model.md`
-- Prompt injection report: `{project-root}/artefacts/test-results/security-audit/prompt-injection-assessment.md` (if LLM integrations exist)
+- Findings: `{project-root}/artefacts/test-results/security/findings.json`
+- Remediation guide: `{project-root}/artefacts/test-results/security/remediation-guide.md`
+- Threat model: `{project-root}/artefacts/test-results/security/threat-model.md`
+- Prompt injection report: `{project-root}/artefacts/test-results/security/prompt-injection-assessment.md` (if LLM integrations exist)
 
 ## Task
 
