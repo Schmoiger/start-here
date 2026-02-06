@@ -10,7 +10,7 @@ All agents shall follow the standards defined in `./context/standards/` and rule
 
 ## 1.2. Input Standards vs Output Artefacts
 
-Agents read from input standards and write to output artefacts. For full directory layout see `doc-standards.md` §2.1.
+Agents read from input standards and write to output artefacts. For full directory layout see [doc-standards.md §2.1](doc-standards.md#21-directory-structure).
 
 | Directory | Purpose | Lifecycle |
 |----------|---------|-----------|

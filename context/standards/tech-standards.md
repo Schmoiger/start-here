@@ -187,15 +187,15 @@ yarn test                        # TypeScript tests
 
 ## Development Workflows
 
-See `context/standards/workflow-standards.md` for complete development processes, quality gates, and deployment pipelines.
+See [workflow-standards.md](workflow-standards.md) for complete development processes, quality gates, and deployment pipelines.
 
 ## Coding Standards
 
-See `context/standards/coding-standards.md` for complete coding patterns, naming conventions, and implementation standards.
+See [coding-standards.md](coding-standards.md) for complete coding patterns, naming conventions, and implementation standards.
 
 ## Testing Standards
 
-See `context/standards/testing-standards.md` for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
+See [testing-standards.md](testing-standards.md) for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
 
 ## Performance Considerations
 
@@ -243,7 +243,7 @@ See `context/standards/testing-standards.md` for comprehensive testing guideline
 
 ### Architecture Principles
 
-Guided by **LESS Engineering Principles** (see `context/standards/LESS-Engineering-Principles.md` for full framework):
+Guided by **LESS Engineering Principles** (see [LESS-Engineering-Principles.md](LESS-Engineering-Principles.md) for full framework):
 
 - **Lean**: MVP first, defer commitment until feedback
 - **Ethical**: Trustworthy, inclusive, beneficial
@@ -254,7 +254,7 @@ Applied as:
 
 - **Serverless-first**: Prefer managed services over self-hosted
 - **Library-first**: Prefer established, well-maintained packages over custom implementations
-- **Lean and token-efficient**: Eliminate waste in code, documentation, and architecture (see coding-standards.md)
+- **Lean and token-efficient**: Eliminate waste in code, documentation, and architecture (see [coding-standards.md](coding-standards.md))
 - **Mobile-first**: Desktop/web features are progressive enhancements
 - **Offline-capable**: Core functionality works without network
 - **Privacy-by-design**: Minimise data collection and retention
@@ -276,7 +276,7 @@ Applied as:
 
 ## Deployment & Build Pipeline
 
-See `context/standards/build-standards.md` for complete build configuration, templates, and deployment patterns.
+See [build-standards.md](build-standards.md) for complete build configuration, templates, and deployment patterns.
 
 Reference this document when making architectural decisions or introducing new patterns. These are preferred patterns; document deviations and rationale when choosing alternatives.
 ## 12-Factor App Principles
