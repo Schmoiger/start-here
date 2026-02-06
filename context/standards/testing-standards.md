@@ -215,6 +215,166 @@ pytest --cov=src --cov-report=term-missing --cov-fail-under=94
 pytest --cov=src --cov-report=term-missing --cov-fail-under=97 --strict-markers
 ```
 
+## UI Test Coverage
+
+UI tests use **scenario coverage** rather than code coverage. The same phase-based thresholds apply to the percentage of test scenarios executed with evidence.
+
+### Scenario-Based Coverage
+
+**Coverage metric**: Percentage of defined test scenarios that have been executed with evidence (screenshots + test log entries).
+
+**Module**: Service or application (e.g., `frontend/`, `mobile/ios/`)
+
+| Phase          | Scenario Coverage | Pass Rate | Concessioned | Fail Rate |
+| -------------- | ----------------- | --------- | ------------ | --------- |
+| Prototype      | ≥90%              | ≥90%      | ≤10%         | 0%        |
+| Development    | ≥94%              | ≥94%      | ≤6%          | 0%        |
+| Pre-deployment | ≥97%              | ≥97%      | ≤3%          | 0%        |
+
+### Test Scenario Structure
+
+Define test scenarios in `{service}/artefacts/test-results/ui-test-scenarios.md` with measurable checkpoints:
+
+```markdown
+# UI Test Scenarios
+
+## User Authentication Journey
+
+### SC-001: Sign in with Google
+- **Priority**: Critical
+- **User Story**: As a user, I want to sign in with Google so I can access my account
+- **Steps**:
+  1. Navigate to homepage
+  2. Click "Sign in with Google" button
+  3. Complete Google OAuth flow
+  4. Verify redirect to dashboard
+  5. Verify user name displayed in header
+- **Expected Result**: User signed in and dashboard visible
+- **Evidence Required**: Screenshots of steps 1, 4, 5
+- **Status**: ✅ Passed (2026-02-06)
+- **Test Log**: `ui-test-results/test-log.md#sc-001`
+
+### SC-002: View portfolio with holdings
+- **Priority**: Critical
+- **User Story**: As a user, I want to view my portfolio holdings
+- **Steps**:
+  1. Sign in as authenticated user
+  2. Navigate to portfolio page
+  3. Verify holdings table renders
+  4. Verify Bollinger Band chart displays
+  5. Verify tooltips show on hover
+- **Expected Result**: Portfolio data visible with interactive chart
+- **Evidence Required**: Screenshots of steps 3, 4, 5
+- **Status**: ✅ Passed (2026-02-06)
+- **Test Log**: `ui-test-results/test-log.md#sc-002`
+
+### SC-003: Mobile responsive layout
+- **Priority**: High
+- **User Story**: As a mobile user, I want the app to work on my phone
+- **Steps**:
+  1. Open app in mobile viewport (375×667)
+  2. Verify navigation menu collapses to hamburger
+  3. Verify charts scale to mobile width
+  4. Verify touch targets ≥44×44px
+- **Expected Result**: All features accessible on mobile
+- **Evidence Required**: Screenshots showing mobile layout
+- **Status**: ⏸️ Concessioned - Requires mobile device (Ticket #234)
+- **Test Log**: N/A
+```
+
+### Evidence Requirements
+
+Each executed scenario must have:
+1. **Screenshots**: Saved to `{service}/artefacts/test-results/ui-test-results/screenshots/{scenario-id}/`
+2. **Test log entry**: In `{service}/artefacts/test-results/ui-test-results/test-log.md` with timestamp, actions, and outcome
+3. **Status marker**: ✅ Passed | ❌ Failed | ⏸️ Concessioned
+
+**Example test log entry:**
+
+```markdown
+## SC-001: Sign in with Google
+
+**Date**: 2026-02-06T14:32:00Z
+**Tester**: @ui-tester
+**Duration**: 45s
+
+### Actions
+1. Navigated to http://localhost:5173
+2. Clicked button[data-testid="google-signin"]
+3. Completed OAuth flow (mocked locally)
+4. Verified redirect to /dashboard
+5. Verified element[data-testid="user-name"] contains "Test User"
+
+### Result
+✅ **PASSED** - All steps completed successfully
+
+### Evidence
+- Screenshots: `screenshots/SC-001/{01-homepage, 04-dashboard, 05-user-name}.png`
+- Browser: Chrome 131.0.6778.109
+- Viewport: 1920×1080
+```
+
+### Coverage Calculation
+
+**Formula**: `(Scenarios Passed + Scenarios Concessioned) / Total Scenarios × 100`
+
+**Example:**
+- Total scenarios: 50
+- Passed: 45 (✅)
+- Concessioned: 3 (⏸️)
+- Failed: 2 (❌)
+
+**Scenario Coverage**: (45 + 3) / 50 = 96%
+**Pass Rate**: 45 / (45 + 2) = 95.7%
+**Fail Rate**: 2 / 50 = 4% ❌ **BUILD FAILS** (must be 0%)
+
+### Concessioned Scenarios
+
+UI scenarios may be concessioned only for:
+
+1. **Browser-specific features**: Tests requiring Safari/Firefox when only Chrome available
+2. **Platform-specific tests**: Mobile tests requiring physical device
+3. **External authentication**: OAuth flows requiring production credentials
+4. **Third-party integrations**: Features requiring external service (e.g., payment gateway)
+
+**All concessioned scenarios must**:
+- Have status `⏸️ Concessioned` with reason
+- Be documented in `{service}/artefacts/test-gaps.md`
+- Have tracking ticket
+- Include mitigation plan (e.g., "Runs in CI with device farm")
+
+### Gap Documentation
+
+Include concessioned UI scenarios in `{service}/artefacts/test-gaps.md`:
+
+```markdown
+## Concessioned UI Scenarios
+
+### SC-003: Mobile responsive layout
+- **Location**: `ui-test-scenarios.md#sc-003`
+- **Reason**: Requires physical mobile device for accurate touch target testing
+- **Mitigation**: Runs in CI with BrowserStack device farm
+- **Ticket**: #234 (BrowserStack integration planned)
+- **Estimated Resolution**: Sprint 4
+```
+
+### Automation Tools
+
+While markdown scripts are valid for scenario definition and evidence tracking, consider these tools for execution:
+
+**Chrome DevTools Protocol (current approach)**:
+- ✅ No external framework dependency
+- ✅ Direct browser control
+- ❌ Manual test log maintenance
+- ❌ Screenshot management overhead
+
+**Lightweight alternatives** (if automation needed):
+- **Playwright with Markdown Test Reporter**: Generates markdown logs from test code
+- **Puppeteer + custom script**: Reads markdown scenarios, executes, logs results
+- **Cypress with cy-spok**: Declarative test syntax similar to markdown
+
+**Recommendation**: Continue with markdown scripts in prototype/development phases. Consider automation only in pre-deployment phase if scenario count >100.
+
 ## Anti-Patterns (Forbidden)
 
 These practices undermine test quality and are explicitly prohibited:
