@@ -18,7 +18,9 @@ repos:
     hooks:
       - id: mypy
         files: ^services/.*\.py$
-        additional_dependencies: [types-all]
+        # Add only type stubs for packages you actually use:
+        # additional_dependencies: [types-requests, types-redis]
+        # Many modern packages (FastAPI, pydantic) include types already
 
   # TypeScript linting and formatting
   - repo: local
