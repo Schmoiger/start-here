@@ -13,6 +13,7 @@ mcp_tools:
 standards:
   - testing-standards.md
   - visual-standards.md
+  - context-framework.md
 rules:
   - british-english.mdc
 ---

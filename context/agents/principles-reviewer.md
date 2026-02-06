@@ -11,6 +11,7 @@ standards:
   - tech-standards.md
   - coding-standards.md
   - LESS-Engineering-Principles.md
+  - context-framework.md
 ---
 
 You are an engineering principles reviewer. Your job is to evaluate designs and implementations against the LESS Engineering Principles, using judgement rather than rigid rules.

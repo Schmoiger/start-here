@@ -9,6 +9,7 @@ allowed_tools:
   - Grep
 standards:
   - security-standards.md
+  - context-framework.md
 rules:
   - british-english.mdc
 ---

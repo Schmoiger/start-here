@@ -11,7 +11,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | Category | Files |
 |----------|-------|
 | **Rules** | [python-environment](rules/python-environment.mdc) &#124; [typescript-environment](rules/typescript-environment.mdc) &#124; [secrets](rules/secrets-management.mdc) &#124; [tdd](rules/tdd-workflow.mdc) &#124; [types](rules/type-safety.mdc) &#124; [outputs](rules/output-locations.mdc) &#124; [commits](rules/conventional-commits.mdc) &#124; [spelling](rules/british-english.mdc) &#124; [EARS](rules/EARS-notation-requirements.mdc) &#124; [metrics](rules/metrics-logging.mdc) |
-| **Standards** | [coding](standards/coding-standards.md) &#124; [testing](standards/testing-standards.md) &#124; [tech](standards/tech-standards.md) &#124; [doc](standards/doc-standards.md) &#124; [workflow](standards/workflow-standards.md) |
+| **Standards** | [coding](standards/coding-standards.md) &#124; [testing](standards/testing-standards.md) &#124; [tech](standards/tech-standards.md) &#124; [doc](standards/doc-standards.md) &#124; [workflow](standards/workflow-standards.md) &#124; [security](standards/security-standards.md) &#124; [context](standards/context-framework.md) |
 | **Agents** | [all agents](agents/) &#124; [template](agents/TEMPLATE.md) |
 | **Workflows** | [default (TDD)](workflows/default.yaml) &#124; [prototype (fast)](workflows/prototype.yaml) |
 | **Scripts** | [validators](scripts/validators/) &#124; [generators](scripts/generators/) |
@@ -134,6 +134,8 @@ context/                           # Portable, pre-loadable directory
 │   └── metrics-logging.mdc      # Agent metrics
 ├── standards/                    # Reference documentation
 │   ├── coding-standards.md      # Code patterns, style
+│   ├── context-framework.md     # Sharing formats, prioritisation, terse formats
+│   ├── security-standards.md    # Security principles, safe failure, data protection
 │   ├── testing-standards.md     # TDD, coverage, anti-patterns
 │   ├── tech-standards.md        # Architecture, tools
 │   ├── doc-standards.md         # Documentation structure
