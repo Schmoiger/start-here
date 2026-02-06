@@ -184,7 +184,9 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 ## Security
 
-See [security-standards.md](security-standards.md) for input validation, authentication, API security, data protection, and safe failure patterns.
+See standards for security implementation:
+- [tech-standards.md §Authentication Architecture](tech-standards.md#authentication-architecture) - Firebase Auth, workload identity, token flows
+- [security-standards.md](security-standards.md) - Input validation, API security, data protection, safe failure principles
 
 ## Lean Code (Token-Efficient by Design)
 

@@ -52,7 +52,9 @@ ui: DaisyUI + custom components, TailwindCSS
 deployment: Firebase hosting with rewrite rules
 ```
 
-### Authentication
+### Authentication Architecture
+
+**Stack Decision**: Firebase Authentication with Google Sign-In (managed auth provider).
 
 ```yaml
 provider: Firebase Authentication (upgrade to Identity Platform if needed)
@@ -61,6 +63,94 @@ frontend_sdk: Firebase Auth SDK
 backend_verification: Firebase Admin SDK (ID token verification)
 upgrade_trigger: Multi-tenancy, SAML/OIDC federation, or blocking functions
 ```
+
+#### User Authentication Flow
+
+```
+User → Frontend (Firebase Auth SDK) → Google Sign-In
+  ↓
+Frontend receives ID token
+  ↓
+Frontend → Backend API (ID token in Authorization header)
+  ↓
+Backend verifies token via Firebase Admin SDK
+  ↓
+Backend extracts user claims (UID, email, custom claims)
+  ↓
+Backend checks authorisation (roles, permissions)
+```
+
+#### Implementation Patterns
+
+**Frontend (TypeScript)**:
+```typescript
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+
+// Sign in
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
+const result = await signInWithPopup(auth, provider);
+const idToken = await result.user.getIdToken();
+
+// Attach token to API requests
+const response = await fetch('/api/resource', {
+  headers: { 'Authorization': `Bearer ${idToken}` }
+});
+```
+
+**Backend (Python)**:
+```python
+from firebase_admin import auth, credentials, initialize_app
+
+# Initialize once at startup
+cred = credentials.Certificate('/secrets/firebase-admin-key.json')
+initialize_app(cred)
+
+# Verify token in middleware/dependency
+async def get_current_user(authorization: str = Header(...)) -> dict:
+    token = authorization.removeprefix('Bearer ')
+    try:
+        decoded = auth.verify_id_token(token)
+        return {
+            'uid': decoded['uid'],
+            'email': decoded.get('email'),
+            'custom_claims': decoded.get('custom_claims', {})
+        }
+    except auth.InvalidIdTokenError:
+        raise HTTPException(401, 'Invalid token')
+```
+
+#### Service-to-Service Authentication
+
+For internal service communication (not user-facing):
+
+**GCP Backend Services**: Use Workload Identity (OIDC tokens from metadata server)
+
+```python
+import google.auth.transport.requests
+from google.auth import compute_engine
+
+# Get token for service account
+credentials = compute_engine.IDTokenCredentials(
+    request=google.auth.transport.requests.Request(),
+    target_audience='https://target-service-url'
+)
+credentials.refresh(google.auth.transport.requests.Request())
+token = credentials.token
+
+# Call internal service
+response = requests.get(
+    'https://internal-service/endpoint',
+    headers={'Authorization': f'Bearer {token}'}
+)
+```
+
+**Principles**:
+- Platform identity over shared secrets
+- Short-lived tokens (workload identity tokens auto-expire)
+- No credentials in code or environment variables
+
+See [security-standards.md §Authentication & Authorisation](security-standards.md#authentication--authorisation) for security principles (least privilege, phase-appropriate auth, library-first approach).
 
 ### Mobile Applications
 
