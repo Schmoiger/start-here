@@ -384,3 +384,98 @@ refactor: simplify data service logic
 5. **Focus on Developer Experience**
    - Fast refresh for all platforms
    - Shared dev tools and debugging
+
+## API Design Standards
+
+### RESTful Principles
+
+**Resource-based URLs:**
+- ✅ `/portfolios/{id}` - Resource noun, ID in path
+- ❌ `/getPortfolio` - Action verb in URL
+
+**HTTP verbs:**
+- `GET` - Read resource (idempotent, cacheable)
+- `POST` - Create resource (not idempotent)
+- `PUT` - Replace entire resource (idempotent)
+- `PATCH` - Update partial resource (not idempotent)
+- `DELETE` - Remove resource (idempotent)
+
+**Status codes:**
+- `200 OK` - Successful GET/PATCH/PUT
+- `201 Created` - Successful POST with new resource
+- `204 No Content` - Successful DELETE or PUT with no body
+- `400 Bad Request` - Client error (invalid input)
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Authenticated but not authorized
+- `404 Not Found` - Resource doesn't exist
+- `409 Conflict` - Resource conflict (duplicate, version mismatch)
+- `422 Unprocessable Entity` - Validation failed
+- `500 Internal Server Error` - Server error
+- `503 Service Unavailable` - Temporary unavailability
+
+### Pagination
+
+**Query parameters:**
+```
+GET /portfolios?page=2&limit=20          # Offset-based
+GET /portfolios?cursor=xyz123&limit=20   # Cursor-based (preferred for large datasets)
+```
+
+**Response envelope:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 2,
+    "limit": 20,
+    "total": 150,
+    "hasNext": true,
+    "nextCursor": "xyz123"
+  }
+}
+```
+
+### Versioning
+
+**URL versioning (preferred):**
+```
+GET /v1/portfolios/{id}
+```
+
+**Header versioning (alternative):**
+```
+Accept: application/vnd.api+json; version=1
+```
+
+**Deprecation:** Maintain previous version for 6 months after new version release.
+
+### Request/Response Format
+
+**Request bodies (POST/PUT/PATCH):**
+```json
+{
+  "name": "Tech Portfolio",
+  "description": "Technology stocks",
+  "holdings": [...]
+}
+```
+
+**Success responses:**
+```json
+{
+  "data": { "id": "123", "name": "Tech Portfolio", ... },
+  "meta": { "timestamp": "2026-02-06T14:00:00Z" }
+}
+```
+
+**Error responses (see [coding-standards.md §Error Handling](coding-standards.md#error-handling--safe-failure)):**
+```json
+{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "Invalid portfolio name",
+    "correlationId": "abc-123",
+    "timestamp": "2026-02-06T14:00:00Z"
+  }
+}
+```

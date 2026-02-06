@@ -39,7 +39,46 @@ languages: Python
 frameworks: FastAPI
 databases: Cloud SQL (PostgreSQL 18) with pgvector (future), BigQuery
 secrets: Google Cloud Secret Manager (env vars only)
+migrations: Alembic (pre-deployment)
 ```
+
+### Database Migrations
+
+**Phase-based approach:**
+
+| Phase | Strategy | Tool |
+|-------|----------|------|
+| Prototype | Manual SQL or rebuild schema | None (iterate quickly) |
+| Development | Start tracking migrations | Alembic setup |
+| Pre-deployment | Production-ready migrations | Alembic (required) |
+
+**Tool: Alembic** (SQLAlchemy-based migrations for Python + PostgreSQL)
+
+**Setup:**
+```bash
+cd backend/{service-name}
+uv add alembic
+alembic init alembic
+```
+
+**Naming convention:**
+```
+YYYYMMDD_HHMM_description.py
+Example: 20260206_1430_add_portfolio_table.py
+```
+
+**Migration workflow:**
+1. **Generate**: `alembic revision --autogenerate -m "add portfolio table"`
+2. **Review**: Check generated SQL for safety (destructive operations, data loss)
+3. **Test locally**: Run `alembic upgrade head` then `alembic downgrade -1`
+4. **Deploy**: Apply in staging before production
+5. **Rollback plan**: Always test downgrade path before deploying
+
+**Critical rules:**
+- Never edit applied migrations (create new migration instead)
+- Always test rollback (`downgrade`) before deploying forward (`upgrade`)
+- Use transactions where possible (PostgreSQL supports DDL transactions)
+- Avoid data migrations in schema migrations (separate data scripts)
 
 ### Frontend Applications
 
@@ -310,6 +349,73 @@ Error tracking groups, deduplicates, and alerts on errors (distinct from raw log
 **Error vs Logging:**
 - **Logging**: Raw event stream (every request, every action)
 - **Error Tracking**: Aggregated failures (groups identical errors, tracks frequency, alerts on spikes)
+
+### Feature Flags
+
+**Phase-based approach:**
+
+| Phase | Strategy | Tool |
+|-------|----------|------|
+| Prototype | Environment variables | Built-in (simple on/off) |
+| Development | Environment variables | Built-in (simple on/off) |
+| Pre-deployment | Remote config with targeting | Firebase Remote Config |
+
+**When to use feature flags:**
+- Gradual rollouts (10% → 50% → 100% of users)
+- A/B testing (compare feature variants)
+- Circuit breakers (disable unstable features)
+- Kill switches (emergency disablement)
+- Beta features (limit to specific users)
+
+**Implementation:**
+
+**Prototype/Development (Environment Variables):**
+```python
+# Backend (Python)
+ENABLE_NEW_PORTFOLIO_VIEW = os.getenv("ENABLE_NEW_PORTFOLIO_VIEW", "false") == "true"
+
+if ENABLE_NEW_PORTFOLIO_VIEW:
+    return new_portfolio_view()
+else:
+    return legacy_portfolio_view()
+```
+
+```typescript
+// Frontend (TypeScript)
+const ENABLE_NEW_PORTFOLIO_VIEW = process.env.ENABLE_NEW_PORTFOLIO_VIEW === "true"
+
+if (ENABLE_NEW_PORTFOLIO_VIEW) {
+  return <NewPortfolioView />
+} else {
+  return <LegacyPortfolioView />
+}
+```
+
+**Pre-deployment (Firebase Remote Config):**
+```python
+# Backend
+from firebase_admin import remote_config
+
+template = remote_config.get_template()
+enable_feature = template.parameters.get("enable_new_portfolio_view")
+```
+
+```typescript
+// Frontend
+import { getValue } from "firebase/remote-config"
+
+const enableFeature = getValue(remoteConfig, "enable_new_portfolio_view").asBoolean()
+```
+
+```swift
+// Mobile
+let enableFeature = RemoteConfig.remoteConfig()["enable_new_portfolio_view"].boolValue
+```
+
+**Cleanup policy:**
+- Remove flag code after 30 days of 100% rollout
+- Document flag lifecycle in ticket
+- Don't let flags rot in codebase
 
 ## Key Decision Records
 
