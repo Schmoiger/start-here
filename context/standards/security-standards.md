@@ -49,25 +49,26 @@ Validate at system boundaries. Trust internal code and framework guarantees. Typ
 
 ## Authentication & Authorisation
 
-### Phase-Appropriate Auth
+**See [tech-standards.md §Authentication Architecture](tech-standards.md#authentication-architecture) for implementation patterns (Firebase Auth, workload identity, token flows).**
 
-**Prototype/spike**: API keys or simple bearer tokens are sufficient. Focus on proving the feature, not hardening auth.
+### Security Principles
 
-**Production**: Use established auth libraries and services. Prefer managed auth (Firebase Auth, Auth0, Supabase Auth) over custom implementations.
+**Phase-Appropriate Auth**:
+- **Prototype/spike**: API keys or simple bearer tokens are sufficient. Focus on proving the feature, not hardening auth.
+- **Production**: Use established auth libraries and managed services. Never roll your own auth.
 
-**Principles**:
+**Core Principles**:
 - Use well-maintained auth libraries — never roll your own JWT verification, password hashing, or session management
-- Separate authentication (who are you?) from authorisation (what can you do?). These are different concerns; keep them in different boxes.
+- Separate authentication (who are you?) from authorisation (what can you do?). Different concerns, different boxes.
 - Make authorisation explicit and centralised. Check permissions at the boundary, not deep in business logic. Deny by default.
 - Apply least-privilege: default to no access, grant explicitly
 - Token expiry and refresh should be handled by the auth library, not custom code
 - For passwords: salted, slow hashes (bcrypt, scrypt, argon2). Never invent your own.
 
-### Architecture Considerations
-
-- **GCP backend + Firebase frontend**: Firebase Auth handles user identity; backend verifies Firebase ID tokens via SDK. No custom auth layer needed between them.
-- **Internal services**: Use platform identity (workload identity, OIDC, service accounts) for service-to-service auth. Prefer identity-based auth over shared secrets — machines should borrow credentials briefly, not store them.
-- **Third-party APIs**: Store credentials via secrets management (see below). Rotate on a schedule.
+**Architecture Security**:
+- Prefer platform identity (workload identity, service accounts) over shared secrets for service-to-service auth
+- Machines should borrow credentials briefly, not store them
+- Third-party API credentials: Use secrets management, rotate on schedule
 
 ## API Security
 
