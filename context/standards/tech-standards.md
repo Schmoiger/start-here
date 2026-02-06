@@ -203,6 +203,13 @@ yarn test                        # TypeScript tests
 - **Local Development**: `.env` files with development secrets
 - **Production**: Environment variables injected by Cloud Run/Firebase
 
+**TODO**: Expand this section with complete guidance from [rules/secrets-management.mdc](../rules/secrets-management.mdc) including:
+- `/secrets/` directory structure
+- Secret rotation policies
+- Workload Identity vs shared secrets
+- Secret Manager integration patterns
+- Never commit secrets to version control
+
 ## Preferred Repository Structure
 
 ```
