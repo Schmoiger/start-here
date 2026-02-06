@@ -128,21 +128,9 @@ class APIError(HTTPException):
         })
 ```
 
-## Security Patterns
+## Security
 
-```typescript
-// Input validation with Zod
-const Schema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2).max(100)
-});
-
-export async function POST(request: Request) {
-  const body = await request.json();
-  const validated = Schema.parse(body);
-  return NextResponse.json({ success: true });
-}
-```
+See [security-standards.md](security-standards.md) for input validation, authentication, API security, data protection, and safe failure patterns.
 
 ## Lean Code (Token-Efficient by Design)
 
