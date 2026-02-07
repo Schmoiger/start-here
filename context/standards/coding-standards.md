@@ -329,6 +329,19 @@ refactor: simplify data service logic
 
 **Styling:** Tailwind CSS, Mobile-first, Dark mode via CSS vars, WCAG contrast
 
+**UI Components (DaisyUI):**
+
+Use DaisyUI semantic classes for all standard components.
+
+| Do | Don't |
+|----|-------|
+| Use semantic classes (`btn`, `card`, `modal`) | Build custom components that duplicate DaisyUI functionality |
+| Customise via DaisyUI theming and CSS custom properties | Override with `!important` or specificity hacks |
+| Use semantic classes for components, utilities for layout | Mix semantic and utility classes inconsistently on the same element |
+| Extend through DaisyUI configuration and variants | Create wrapper components that break theme consistency |
+| Document which components nest inside which | Use ad-hoc nesting without established patterns |
+| Follow DaisyUI breakpoint conventions consistently | Create ad-hoc responsive workarounds per component |
+
 **Quality:**
 - Zod for validation (see [security-standards.md §Input Validation](security-standards.md#input-validation) for principles)
 - Jest + React Testing Library

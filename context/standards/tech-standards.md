@@ -89,6 +89,7 @@ frameworks: Next.js, Vite, React, TailwindCSS
 state: Redux Toolkit, React Query
 ui: DaisyUI + custom components, TailwindCSS
 deployment: Firebase hosting with rewrite rules
+docs: Context7 MCP is available for fetching up-to-date library documentation when needed
 ```
 
 ### Authentication Architecture

@@ -43,6 +43,9 @@ These are enforceable constraints that MUST be followed in all output.
 - Check interactive states: hover, focus, disabled (visual-standards.md)
 - Validate tooltip behaviour and positioning (visual-standards.md)
 - Ensure touch targets ≥44×44px on mobile (visual-standards.md)
+- Test at responsive breakpoints: 640px, 768px, 1024px, 1280px (visual-standards.md)
+- Check no viewport overflow or horizontal scrollbars (visual-standards.md)
+- Verify tooltips flip position near viewport edges (visual-standards.md)
 
 ## Context Paths
 
