@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Generate CLAUDE.md orchestration guide from context directory.
+"""Generate AGENTS.md orchestration guide from context directory.
+
+Creates two files:
+- AGENTS.md: Full agent orchestration guide
+- CLAUDE.md: Simple file that references @AGENTS.md
 
 Usage:
-    uv run python context/scripts/generators/generate-claude-md.py [--workflow default|prototype]
+    uv run python context/scripts/generators/generate_claude_md.py [--workflow default|prototype]
 """
 
 import argparse
@@ -247,8 +251,70 @@ def generate_workflow_rules(workflow: dict) -> str:
     return '\n'.join(sections) if sections else "No specific workflow rules defined."
 
 
-def generate_claude_md(workflow_name: str) -> str:
-    """Generate complete CLAUDE.md content."""
+def generate_state_recovery(workflow: dict) -> str:
+    """Generate state recovery section."""
+    state_recovery = workflow.get('state_recovery', {})
+
+    if not state_recovery:
+        return ""
+
+    sections = ["## State Recovery After Context Compaction\n"]
+    sections.append("**CRITICAL**: After context compaction or at session start, the orchestrating agent SHALL:\n")
+
+    after_compaction = state_recovery.get('after_compaction', [])
+    if after_compaction:
+        sections.append("\n### Recovery Checklist\n")
+        for step in after_compaction:
+            sections.append(f"- [ ] {step}")
+
+    critical_files = state_recovery.get('critical_files', [])
+    if critical_files:
+        sections.append("\n### Critical State Files\n")
+        sections.append("\nThese files maintain project state across sessions:\n")
+        for file in critical_files:
+            sections.append(f"- `{file}`")
+
+        sections.append("\n**Read these files immediately after compaction to understand current state.**")
+
+    return '\n'.join(sections)
+
+
+def generate_estimation_guidance(workflow: dict) -> str:
+    """Generate effort estimation guidance section."""
+    estimation = workflow.get('estimation_guidance', [])
+
+    if not estimation:
+        return ""
+
+    sections = ["## Effort Estimation Guidance\n"]
+    sections.append("**IMPORTANT**: Estimate effort in tokens, NOT time. Time estimates are unreliable.\n")
+
+    for guideline in estimation:
+        sections.append(f"- {guideline}")
+
+    return '\n'.join(sections)
+
+
+def generate_parallel_planning(workflow: dict) -> str:
+    """Generate parallel planning guidance section."""
+    parallel = workflow.get('parallel_planning', [])
+
+    if not parallel:
+        return ""
+
+    sections = ["## Parallel Execution Planning\n"]
+    sections.append("**When spawning multiple agents**, the orchestrator SHALL present parallel execution options:\n")
+
+    for guideline in parallel:
+        sections.append(f"- {guideline}")
+
+    sections.append("\nSee workflow-standards.md §11 for complete parallel execution template.")
+
+    return '\n'.join(sections)
+
+
+def generate_agents_md(workflow_name: str) -> str:
+    """Generate complete AGENTS.md content."""
     workflow = load_workflow(workflow_name)
     agents = load_agent_definitions()
 
@@ -258,7 +324,7 @@ def generate_claude_md(workflow_name: str) -> str:
 
 **Generated from**: `context/` directory
 **Workflow**: `{workflow_name}` - {workflow_desc}
-**Auto-generated**: Do not edit manually. Run `uv run python context/scripts/generators/generate-claude-md.py` to regenerate.
+**Auto-generated**: Do not edit manually. Run `uv run python context/scripts/generators/generate_claude_md.py` to regenerate.
 
 ---
 
@@ -303,9 +369,47 @@ Before beginning work, ensure you have current knowledge of project standards:
 
 ---
 
+{generate_state_recovery(workflow)}
+
+---
+
+{generate_estimation_guidance(workflow)}
+
+---
+
+{generate_parallel_planning(workflow)}
+
+---
+
 ## Workflow: {workflow.get('name', workflow_name)}
 
 {workflow_desc}
+
+### Understanding Parallelism
+
+This workflow uses two types of parallelism:
+
+**1. Phase-Level Parallelism (Inter-Phase)**
+- Multiple **phases** run simultaneously when they don't depend on each other
+- Example: If phase A and B both depend on phase C, then A and B can run in parallel after C completes
+- Determined by: `depends_on` field (implicit - no dependency = can be parallel)
+- Current workflow: **Linear chain** - no phase-level parallelism
+
+**2. Agent-Level Parallelism (Intra-Phase)**
+- Multiple **agents** within a single phase run simultaneously
+- Example: `@python-coder` and `@typescript-coder` in tdd-green phase
+- Determined by: `parallel: true` flag (explicit)
+- If `sequential: true`, agents run one after another in order
+
+**Phase Dependencies in This Workflow:**
+```
+discovery → design → design-review → tdd-red → tdd-green → tdd-blue →
+unit-test → integration-test → e2e-test → quality-review →
+docs-cleanup → deployment → deployment-review
+```
+Each phase waits for the previous phase to complete (strict sequence).
+
+**Quality Gates:** design-review, quality-review, deployment-review
 
 ### Workflow Diagram
 
@@ -335,6 +439,28 @@ Use `@agent-name` to invoke an agent:
 @python-coder Implement authentication service (TDD Green)
 @tech-lead Review authentication implementation
 ```
+
+### Tool Usage Reminders
+
+**CRITICAL**: Agents must use the correct tools for each operation:
+
+| Operation | ✅ Use | ❌ Don't Use |
+|-----------|--------|--------------|
+| Create/modify files | Write, Edit tools | bash with echo, cat, sed, awk, heredoc |
+| Run tests | bash with `uv run pytest` or `yarn test` | N/A |
+| Python package management | `uv add`, `uv remove`, `uv run` | pip, manual edits |
+| TypeScript package management | `yarn add`, `yarn remove` | npm, pnpm |
+| One-off TypeScript tools | `yarn dlx <tool>` | npx, global installs |
+| Find files | Glob tool | bash find, ls |
+| Search file contents | Grep tool | bash grep, rg |
+| Git operations | bash | N/A |
+
+**Why this matters:**
+- Write/Edit tools don't require user permission (faster execution)
+- Bash file operations require permission prompts (slower, interrupts flow)
+- Using correct package managers ensures consistent environments
+
+See agent-standards.md §3.3 for complete tool usage guidelines.
 
 {generate_agent_reference(agents)}
 
@@ -411,13 +537,13 @@ Located in `context/rules/` with automated validators:
 
 ### Updating This File
 
-Regenerate CLAUDE.md after changes to:
+Regenerate AGENTS.md after changes to:
 - `context/workflows/*.yaml`
 - `context/agents/*.md`
 - `context/README.md`
 
 ```bash
-uv run python context/scripts/generators/generate-claude-md.py --workflow default
+uv run python context/scripts/generators/generate_claude_md.py --workflow default
 ```
 
 ### Adding New Agents
@@ -425,7 +551,7 @@ uv run python context/scripts/generators/generate-claude-md.py --workflow defaul
 1. Copy `context/agents/TEMPLATE.md`
 2. Fill in standards/rules in frontmatter
 3. Add to appropriate workflow phase
-4. Regenerate CLAUDE.md
+4. Regenerate AGENTS.md
 
 ### Switching Workflows
 
@@ -464,7 +590,7 @@ context/
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description='Generate CLAUDE.md from context directory'
+        description='Generate AGENTS.md and CLAUDE.md from context directory'
     )
     parser.add_argument(
         '--workflow',
@@ -475,19 +601,28 @@ def main():
 
     args = parser.parse_args()
 
-    print(f"🔧 Generating CLAUDE.md from {args.workflow} workflow...")
+    print(f"🔧 Generating AGENTS.md from {args.workflow} workflow...")
 
     try:
-        content = generate_claude_md(args.workflow)
+        # Generate AGENTS.md with full content
+        agents_content = generate_agents_md(args.workflow)
+        agents_path = Path('AGENTS.md')
+        agents_path.write_text(agents_content)
 
-        output_path = Path('CLAUDE.md')
-        output_path.write_text(content)
-
-        print(f"✅ Generated CLAUDE.md ({len(content)} bytes)")
+        print(f"✅ Generated AGENTS.md ({len(agents_content)} bytes)")
         print(f"   Workflow: {args.workflow}")
-        print(f"   Location: {output_path.absolute()}")
+        print(f"   Location: {agents_path.absolute()}")
+
+        # Generate simple CLAUDE.md that references AGENTS.md
+        claude_content = "@AGENTS.md\n"
+        claude_path = Path('CLAUDE.md')
+        claude_path.write_text(claude_content)
+
+        print(f"✅ Generated CLAUDE.md (references @AGENTS.md)")
+        print(f"   Location: {claude_path.absolute()}")
+
     except Exception as e:
-        print(f"❌ Error generating CLAUDE.md: {e}")
+        print(f"❌ Error generating files: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
