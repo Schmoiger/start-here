@@ -18,10 +18,11 @@
 #
 # Current workflow is LINEAR: discovery → design → design-review → tdd-red →
 # tdd-green → tdd-blue → unit-test → integration-test → e2e-test →
-# quality-review → docs-cleanup → deployment → deployment-review
+# quality-review → docs-cleanup → deployment → deployment-review → retrospective
 #
 # No phase-level parallelism in this workflow (strict sequence enforced).
 # Three quality gates: design-review, quality-review, deployment-review
+# Optional retrospective: workflow efficiency analysis after deployment
 
 name: default
 description: Full TDD workflow with comprehensive reviews and testing
@@ -231,6 +232,27 @@ phases:
       - Deployment successful
       - Monitoring configured
       - Rollback tested
+
+  - id: retrospective
+    name: Workflow Efficiency Analysis
+    depends_on: [deployment-review]
+    optional: true
+    agents:
+      - workflow-analyst
+    outputs:
+      - artefacts/build/efficiency-report.md
+      - artefacts/build/efficiency-data/
+    validation:
+      - All data sources analyzed (tasks, handoffs, git, conversation)
+      - Metrics calculated for all phases
+      - Top 3-5 bottlenecks identified
+      - Actionable recommendations provided
+      - Workflow health score calculated
+    notes:
+      - Run after deployment for post-mortem analysis
+      - Can skip for urgent deployments (optional phase)
+      - Requires git history access for commit analysis
+      - Compare metrics to previous cycles for trend analysis
 
 quality_gates:
   - phase: design-review
