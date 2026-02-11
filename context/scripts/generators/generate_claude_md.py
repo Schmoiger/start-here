@@ -342,7 +342,7 @@ This guide describes the orchestration of specialised agents for software develo
 
 **Use this checklist after context compaction or at session start:**
 
-Before beginning work, ensure you have current knowledge of project standards:
+**For the orchestrator (you), before beginning work:**
 
 1. **Core Standards** (Read if compacted or unfamiliar):
    - `context/standards/agent-standards.md` - Agent behaviour, tool usage, handoffs
@@ -361,11 +361,14 @@ Before beginning work, ensure you have current knowledge of project standards:
 
 4. **Verification**:
    - ✅ I know which workflow phase we're in (discovery/design/tdd-red/tdd-green/review/etc.)
-   - ✅ I understand the TDD workflow (RED then GREEN, never combined)
-   - ✅ I know to use Write/Edit tools (not bash) for file operations
+   - ✅ I understand the TDD workflow (RED then GREEN then BLUE - three separate phases, never combined)
+   - ✅ I will include TOOL REQUIREMENTS in every agent prompt (Write/Edit not bash, uv not pip, yarn dlx not npx)
+   - ✅ I will present parallel options before spawning 2+ agents
    - ✅ I know agents read their definitions from `context/agents/{{agent-name}}.md`
 
 **After compaction:** The conversation summary provides what happened, but standards may have changed. Re-read core standards to ensure compliance.
+
+**When spawning agents:** Spawned agents do NOT inherit your context. You MUST explicitly tell them to read relevant standards. See "Agent Spawning Protocol" below.
 
 ---
 
@@ -428,17 +431,149 @@ All agents are defined in `context/agents/`. Each agent:
 - Enforces specific rules (validated automatically)
 - Uses `{{project-root}}` placeholders for portability
 
-### Invocation
+### Pre-Spawn Checklist
 
-Use `@agent-name` to invoke an agent:
+**BEFORE spawning any agent, verify ALL of these:**
+
+- [ ] Agent prompt includes "Read context/standards/tech-standards.md first"
+- [ ] Agent prompt includes TOOL REQUIREMENTS block (Write/Edit not bash, uv not pip, yarn dlx not npx)
+- [ ] If TDD phase: Specified which phase (RED/GREEN/BLUE) and requirements
+- [ ] If spawning 2+ agents: Presented parallel vs sequential options to user
+- [ ] Task is clear and unambiguous
+
+**If any checkbox is unchecked, do NOT spawn the agent yet.**
+
+### Agent Spawning Protocol
+
+**CRITICAL**: When spawning agents, the orchestrator MUST explicitly provide standards context. Spawned agents start with fresh context and do NOT automatically inherit standards.
+
+**Template for spawning agents:**
 
 ```
-@product-owner Define requirements for user authentication
-@solution-architect Design the authentication system architecture
-@functional-tester Write tests for authentication (TDD Red)
-@python-coder Implement authentication service (TDD Green)
-@tech-lead Review authentication implementation
+@agent-name [task description]
+
+BEFORE starting, read these standards:
+1. context/standards/tech-standards.md - Tech stack (uv, yarn, Puppeteer)
+2. context/standards/agent-standards.md - Tool usage (Write/Edit not bash)
+3. context/standards/[relevant-standard].md
+
+Key reminders:
+- Python: use `uv add`, `uv run` (NOT pip)
+- TypeScript: use `yarn add`, `yarn dlx` (NOT npm, npx)
+- Files: use Write/Edit tools (NOT bash echo/cat/sed)
+
+Then: [specific task instructions]
 ```
+
+**Why this is required:**
+- Spawned agents don't have access to CLAUDE.md/AGENTS.md
+- Standards are NOT inherited automatically
+- Explicit reading prevents common violations (npx vs yarn dlx, pip vs uv, bash vs Write/Edit)
+
+### Invocation Examples
+
+**Correct (with standards context):**
+```
+@python-coder Implement authentication service
+
+Read context/standards/tech-standards.md first.
+Use `uv add` for packages (NOT pip).
+Use Write/Edit tools for files (NOT bash).
+
+Implement: [task details]
+```
+
+**Incorrect (missing standards):**
+```
+@python-coder Implement authentication service
+```
+❌ Agent will likely use pip, bash for files, default behaviors
+
+### Critical Adherence Protocols
+
+**These protocols are MANDATORY. Violations indicate orchestrator failure.**
+
+#### Protocol 1: Tool Usage Enforcement
+
+**BEFORE spawning any agent, verify agent prompt includes:**
+
+```
+TOOL REQUIREMENTS (MANDATORY):
+- File operations: Use Write/Edit tools ONLY (NEVER bash echo/cat/sed/awk)
+- Python packages: Use `uv add` ONLY (NEVER pip)
+- TypeScript packages: Use `yarn add` ONLY (NEVER npm)
+- One-off TypeScript tools: Use `yarn dlx` ONLY (NEVER npx)
+- Find files: Use Glob tool (NEVER bash find/ls)
+- Search files: Use Grep tool (NEVER bash grep/rg)
+
+If you use bash for file operations, the task will be rejected.
+```
+
+**Validation**: After agent completes, check tool usage in transcript. Reject if violations found.
+
+#### Protocol 2: TDD Workflow Enforcement
+
+**TDD phases are SEPARATE. They CANNOT be combined.**
+
+**When starting TDD work:**
+
+```
+Phase 1: TDD RED (write failing tests)
+@functional-tester Write tests for [feature]
+
+Requirements:
+- Tests MUST fail when first run
+- Do NOT write implementation code
+- Report: "All tests failing as expected"
+
+Phase 2: TDD GREEN (implement to pass)
+@python-coder / @typescript-coder Implement [feature]
+
+Requirements:
+- Tests MUST pass when done
+- Do NOT modify tests
+- Do NOT refactor yet
+- Report: "All tests passing"
+
+Phase 3: TDD BLUE (refactor)
+@python-coder / @typescript-coder Refactor [feature]
+
+Requirements:
+- Tests MUST still pass
+- Improve code quality only
+- No new functionality
+- Report: "Refactored, all tests still passing"
+```
+
+**Validation**: Each phase must complete before next begins. No combining phases.
+
+#### Protocol 3: Parallel Execution Planning
+
+**BEFORE spawning 2+ agents, ALWAYS present parallel options to user.**
+
+**Mandatory template:**
+
+```
+I'm about to spawn [N] agents: [@agent1, @agent2, ...]
+
+EXECUTION OPTIONS:
+
+Option A: Sequential
+- Agents run one after another: @agent1 → @agent2 → @agent3
+- Time: ~X minutes total
+- Tokens: Y tokens (baseline)
+- Risk: Low (easier to debug, clear order)
+
+Option B: Parallel
+- Agents run simultaneously: @agent1 + @agent2 + @agent3
+- Time: ~Z minutes (~40-50% faster)
+- Tokens: Y + N tokens (~10-20% more due to context duplication)
+- Risk: Medium (merge conflicts possible, coordination overhead)
+
+Which option do you prefer?
+```
+
+**Validation**: If spawning 2+ agents without presenting options, this is a protocol violation.
 
 ### Tool Usage Reminders
 
