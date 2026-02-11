@@ -408,11 +408,12 @@ This workflow uses two types of parallelism:
 ```
 discovery → design → design-review → tdd-red → tdd-green → tdd-blue →
 unit-test → integration-test → e2e-test → quality-review →
-docs-cleanup → deployment → deployment-review
+docs-cleanup → deployment → deployment-review → retrospective (optional)
 ```
 Each phase waits for the previous phase to complete (strict sequence).
 
 **Quality Gates:** design-review, quality-review, deployment-review
+**Optional:** retrospective (workflow efficiency analysis)
 
 ### Workflow Diagram
 

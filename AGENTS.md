@@ -128,11 +128,12 @@ This workflow uses two types of parallelism:
 ```
 discovery → design → design-review → tdd-red → tdd-green → tdd-blue →
 unit-test → integration-test → e2e-test → quality-review →
-docs-cleanup → deployment → deployment-review
+docs-cleanup → deployment → deployment-review → retrospective (optional)
 ```
 Each phase waits for the previous phase to complete (strict sequence).
 
 **Quality Gates:** design-review, quality-review, deployment-review
+**Optional:** retrospective (workflow efficiency analysis)
 
 ### Workflow Diagram
 
@@ -207,6 +208,10 @@ flowchart TD
     end
     deployment --> deployment-review
     deployment-review:::gateStyle
+    subgraph retrospective["Workflow Efficiency Analysis"]
+        retrospective_workflow_analyst["@workflow-analyst"]
+    end
+    deployment-review --> retrospective
     classDef gateStyle fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
 ```
 
@@ -458,6 +463,31 @@ flowchart TD
 - Deployment successful
 - Monitoring configured
 - Rollback tested
+
+#### Workflow Efficiency Analysis
+**Phase ID**: `retrospective`
+**Depends On**: `deployment-review`
+**Optional**: Can be skipped
+
+**Agents:**
+- `@workflow-analyst` - See `context/agents/workflow-analyst.md`
+
+**Outputs:**
+- artefacts/build/efficiency-report.md
+- artefacts/build/efficiency-data/
+
+**Validation:**
+- All data sources analyzed (tasks, handoffs, git, conversation)
+- Metrics calculated for all phases
+- Top 3-5 bottlenecks identified
+- Actionable recommendations provided
+- Workflow health score calculated
+
+**Notes:**
+- Run after deployment for post-mortem analysis
+- Can skip for urgent deployments (optional phase)
+- Requires git history access for commit analysis
+- Compare metrics to previous cycles for trend analysis
 
 ---
 
@@ -831,6 +861,6 @@ context/
 ---
 
 **Generated**: default workflow
-**Agents**: 17 specialised agents
+**Agents**: 18 specialised agents
 **Standards**: 5 guidance documents
 **Rules**: 4 enforceable rules
