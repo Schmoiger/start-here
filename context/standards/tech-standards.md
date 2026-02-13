@@ -174,6 +174,27 @@ cd backend/{service-name}
 uv add --dev pytest pytest-cov
 ```
 
+**HTTP Response Recording (VCR):**
+- **pytest-recording** (wraps vcrpy): Records HTTP exchanges to YAML cassette files on first run, replays from file on subsequent runs
+- **When to use**: Integration tests that hit external APIs via services (e.g., LLM service → OpenRouter) and suffer from rate limiting or flakiness
+- **When NOT to use**: E2E tests (`@pytest.mark.e2e`), error-condition tests (rate limit, invalid request), or data-only tests that don't call external APIs
+- **Configuration**: `vcr_config` fixture in `tests/integration/conftest.py` sets cassette directory, record mode, and header filters
+- **Recording cassettes**: Run tests with services running: `uv run pytest tests/integration/ -v --record-mode=once`
+- **Refreshing cassettes**: Delete files in `tests/integration/cassettes/` and re-record with services running
+- **Cassettes are committed to git** as test fixtures alongside test code
+
+```bash
+# Record cassettes (requires services running)
+uv run pytest tests/integration/ -v --record-mode=once
+
+# Force re-record all cassettes
+rm -rf tests/integration/cassettes/*.yaml
+uv run pytest tests/integration/ -v --record-mode=once
+
+# Run tests offline using recorded cassettes
+uv run pytest tests/integration/ -v
+```
+
 ## Static Analysis & Code Quality
 
 ### Pre-commit Hooks
