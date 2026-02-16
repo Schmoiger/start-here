@@ -1,11 +1,3 @@
----
-purpose: CI/CD pipeline configuration, deployment patterns, and infrastructure standards
-audience: DevOps agents, deployment reviewers
-read-when: Configuring builds, deploying services, reviewing infrastructure
-not-for: Code patterns (see coding-standards.md), testing (see testing-standards.md)
-related: [tech-standards, security-standards]
----
-
 # Build & Deployment Standards
 
 ## Overview
@@ -72,9 +64,10 @@ Each backend service MUST have its own dedicated service account:
 
 | Service          | Service Account                                       |
 | ---------------- | ----------------------------------------------------- |
-| {service-name}   | `{service-name}@{PROJECT_ID}.iam.gserviceaccount.com` |
-
-Each backend service gets a dedicated service account following this naming pattern.
+| llm-orchestrator | `llm-orchestrator@PROJECT_ID.iam.gserviceaccount.com` |
+| chat-api         | `chat-api@PROJECT_ID.iam.gserviceaccount.com`         |
+| data-api         | `data-api@PROJECT_ID.iam.gserviceaccount.com`         |
+| pii-scrubber     | `pii-scrubber@PROJECT_ID.iam.gserviceaccount.com`     |
 
 
 **Rationale**:
@@ -112,7 +105,7 @@ Frontend applications deployed to Firebase Hosting access backend Cloud Run serv
 ```mermaid
 flowchart TB
     subgraph Firebase["Firebase Hosting"]
-        Static["Static Assets<br/>(React/Vite)"]
+        Static["Static Assets<br/>(React/Next.js)"]
         Rewrite["/api/** Rewrite"]
     end
 

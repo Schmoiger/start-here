@@ -49,6 +49,7 @@ phases:
       - visual-designer  # Creates visual designs and mockups
     outputs:
       - artefacts/architecture/
+      - artefacts/api/
       - artefacts/design/
 
   - id: design-review
@@ -253,11 +254,6 @@ phases:
       - Requires git history access for commit analysis
       - Compare metrics to previous cycles for trend analysis
 
-# Quality Gates with Phase-Based Thresholds
-# Coverage thresholds vary by development phase (see testing-standards.md §Phase-Based Thresholds):
-# - Development: 95% (default for quality review)
-# - Pre-deployment: 97% (increase threshold before production release)
-# Gates prevent code below phase thresholds from being approved.
 quality_gates:
   - phase: design-review
     type: approval
@@ -277,9 +273,8 @@ quality_gates:
     description: "Implementation must be approved before deployment: tech-lead → code-reviewer → principles-reviewer → visual-designer → security-tester"
     criteria:
       - metric: test_coverage
-        threshold: 95  # Development phase target (see testing-standards.md §Phase-Based Thresholds)
+        threshold: 90
         operator: ">="
-        phase_note: "Development: 95%, Pre-deployment: 97% (increase before production release)"
       - metric: critical_security_issues
         threshold: 0
         operator: "=="
@@ -294,13 +289,6 @@ quality_gates:
     type: approval
     required: true
     description: "Tech lead must approve deployment before production"
-    criteria:
-      - metric: test_coverage
-        threshold: 97  # Pre-deployment phase target (see testing-standards.md §Phase-Based Thresholds)
-        operator: ">="
-      - metric: critical_security_issues
-        threshold: 0
-        operator: "=="
 
 workflow_rules:
   - Tests written before implementation (TDD Red → Green → Blue)

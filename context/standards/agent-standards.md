@@ -1,11 +1,3 @@
----
-purpose: Agent behaviour, tool usage, and interaction standards
-audience: All AI agents and orchestrators
-read-when: Agent setup, tool usage, agent coordination
-not-for: Tech stack choices (see tech-standards.md), code patterns (see coding-standards.md)
-related: [tech-standards, workflow-standards, coding-standards]
----
-
 # Agent Interaction Standards
 
 ## 1. Introduction
@@ -41,9 +33,9 @@ When an agent is assigned to work on a new product or feature, it shall follow t
 
 After obtaining the product description, the agent shall create or amend the following documents in strict order:
 
-1. **`artefacts/product/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `/context/rules/EARS-notation-requirements.mdc`.
+1. **`/artefacts/requirements.md`**: Functional and non-functional requirements using EARS notation as specified in `/context/rules/EARS-notation-requirements.mdc`.
 
-2. **`artefacts/architecture/`** (and **`artefacts/architecture/architecture.md`** for the main doc): Architectural and design decisions that describe how the product will be implemented.
+2. **`/artefacts/architecture.md`**: Architectural and design decisions that describe how the product will be implemented.
 
 3. **`{service}/artefacts/tasks.md`**: Comprehensive task breakdown for implementation, verified against standards in `/context/standards/`.
 
@@ -60,7 +52,7 @@ Following the core specification documents, the agent shall create blank placeho
 
 All documentation created during this workflow shall conform to the standards outlined in `/context/standards/doc-standards.md`, including:
 
-*   Proper file location within the project structure (system-wide in `/artefacts/`, service-specific in `{service}/artefacts/`). Path conventions align with [context-framework.md](context-framework.md) (framework is draft; path conventions are adopted).
+*   Proper file location within the project structure (system-wide in `/artefacts/`, service-specific in `{service}/artefacts/`)
 *   Content formatting and structure requirements
 *   Required elements for requirements (EARS notation), design decisions, and task specifications
 
@@ -131,28 +123,6 @@ Agents have access to multiple tools for different purposes. To minimise user in
 | Find files | Glob | `find`, `ls` |
 | Search contents | Grep | `grep`, `rg`, `ack` |
 | Install dependencies | Bash (`uv add`, `yarn add`) | Manual edits to lock files |
-
-#### 3.3.5. Documentation Lookup
-
-Use Context7 MCP tools to look up library and API documentation rather than guessing or relying on training data alone. Automatically resolve library IDs and fetch current docs without explicit user request.
-
-**When to use Context7:**
-- Code generation requiring library-specific APIs
-- Setup or configuration steps
-- Verifying library behaviour or API signatures
-
-#### 3.3.6. Diagnostic Commands
-
-When troubleshooting environment issues or verifying setup, use these version-check commands:
-
-| Tool | Command |
-|------|---------|
-| Google Cloud SDK | `gcloud --version` |
-| Node.js | `node --version` |
-| Yarn | `yarn --version` |
-| Python | `python --version` |
-| uv | `uv --version` |
-| Xcode | `xcodebuild -version` |
 
 ### 3.4. Version Control
 
@@ -236,7 +206,7 @@ These domains apply during discovery, design, and review phases:
 | Domain | Agents | Shared Context |
 |--------|--------|----------------|
 | **discovery** | product-owner | requirements.md, user-stories.md |
-| **design** | solution-architect, database-designer, api-designer, ui-designer, visual-designer | architecture.md, data-model.md, schema.sql, openapi.yaml, design/ |
+| **design** | solution-architect, database-designer, api-designer, ui-designer, visual-designer | architecture.md, api-contract.json, data-model.md, schema.sql, openapi.yaml, design/ |
 | **review** | tech-lead, code-reviewer, security-tester | All code (read-only), review reports |
 | **infra** | gcp-devops | ./artefacts/gcp/, terraform/ |
 | **docs** | documentation | ./artefacts/docs/, all specs (read-only) |
@@ -260,7 +230,7 @@ For multi-service architectures, define project-specific domains based on servic
 - Services communicate via REST APIs, not shared code
 - Each domain provides mock implementations for testing during parallel development
 
-**See:** Project architecture documentation (`artefacts/architecture/`, e.g. `architecture.md`) for complete domain definitions, interface contracts, and mock implementation patterns.
+**See:** Project architecture documentation (`artefacts/architecture.md`) for complete domain definitions, interface contracts, and mock implementation patterns.
 
 ### 5.2. Worktree Structure
 

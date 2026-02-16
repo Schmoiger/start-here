@@ -1,11 +1,3 @@
----
-purpose: Development workflow phases, agent invocation, and parallel execution
-audience: Orchestrator and all agents
-read-when: Starting tasks, spawning agents, planning parallel work
-not-for: Code patterns (see coding-standards.md), testing methodology (see testing-standards.md)
-related: [agent-standards, coding-standards, testing-standards]
----
-
 # Technology Development Workflow
 
 ## Overview
@@ -34,8 +26,8 @@ Set up project folder with blank files according to documentation standards.
 
 **Files to create:**
 
-- `/artefacts/product/requirements.md` - Requirements specification (system-wide)
-- `/artefacts/architecture/` - Architecture and design specification (system-wide; main doc: `architecture.md`)
+- `/artefacts/requirements.md` - Requirements specification (system-wide)
+- `/artefacts/architecture.md` - Architecture and design specification (system-wide)
 - `{service}/artefacts/tasks.md` - Task breakdown (service-specific)
 - README.md and other project files as per standards
 
@@ -43,13 +35,13 @@ Set up project folder with blank files according to documentation standards.
 
 Write the specs documents in this order:
 
-1. **Requirements** (`/artefacts/product/requirements.md`)
+1. **Requirements** (`/artefacts/requirements.md`)
   - Detail functional and non-functional requirements using EARS notation
   - Specify acceptance criteria and constraints
-2. **User Stories** (`/artefacts/product/user-stories.md`)
+2. **User Stories** (`/artefacts/user-stories.md`)
   - Define end-to-end user stories spanning multiple services
   - Identify key stakeholders and success criteria
-3. **Architecture** (`/artefacts/architecture/`, main doc: `architecture.md`)
+3. **Architecture** (`/artefacts/architecture.md`)
   - Outline technical architecture and design decisions
   - Define data models, APIs, and service interactions
 
@@ -234,13 +226,33 @@ Output: packages/shared-types/python/bollinger_types/
 
 ## 9. UI Testing Quality Gate
 
-When @ui-tester completes, orchestrator SHALL verify:
+When @ui-tester completes, orchestrator SHALL verify deliverables before accepting results:
 
+**Required Evidence (ALL must be present):**
 - [ ] Screenshots in `artefacts/test-results/e2e/screenshots/` (minimum 1)
 - [ ] Test log documents browser interactions (not just API calls)
 - [ ] At least one complete user workflow tested
 
-**Rejection**: No screenshots, only API testing, or no browser interactions → reject and re-run with @ui-tester.
+**Rejection Criteria:**
+- ❌ No screenshots → Not valid UI test
+- ❌ Only API testing → Use @functional-tester instead
+- ❌ No browser interactions documented → Insufficient evidence
+
+**Example Valid Test Log:**
+```
+1. Opened browser to http://localhost:3000
+2. Clicked search input
+3. Typed "AAPL"
+4. Screenshot: search-results.png showing dropdown
+5. Clicked first result
+6. Screenshot: chart-loaded.png showing Bollinger Bands
+```
+
+**Example Invalid Test Log:**
+```
+1. curl http://localhost:8001/data/search?q=AAPL → 200 OK
+2. All APIs responding correctly
+```
 
 ---
 
@@ -351,6 +363,17 @@ Option B (3 tracks):
 - 12 min (60% faster)
 - 180k tokens (+20%)
 - Trade-off: Higher coordination, merge conflicts
+```
+
+**Example 2: TDD Implementation**
+```
+Current: Frontend then Backend, 40 min, 200k tokens
+
+Option A (parallel):
+- Frontend + Backend simultaneously
+- 22 min (45% faster)
+- 220k tokens (+10%)
+- Trade-off: API contract must be agreed first
 ```
 
 ### When NOT to Parallelise

@@ -1,14 +1,6 @@
----
-purpose: Defines context types, locations, and handoff patterns for multi-agent workflows
-audience: All agents and orchestrators
-read-when: Understanding context flow, handoff patterns, artefact locations
-not-for: Code patterns (see coding-standards.md), testing (see testing-standards.md)
-related: [agent-standards, doc-standards, workflow-standards]
----
-
 # Context Framework
 
-**Status**: Draft — under development, not yet enforced. Path and artefact locations in this document are **adopted as canonical** by agent-standards, doc-standards, and workflow-standards; when those standards refer to "context-framework" for paths, they mean the locations defined here.
+**Status**: Draft — under development, not yet enforced.
 
 **Principle**: Context is the primary output of agents. Code is a side effect. If an agent produces good code but poor context, the next agent (or human) wastes effort rediscovering what was already known.
 
@@ -24,7 +16,7 @@ Information that is consulted but not actioned. It doesn't change during a phase
 |---------|----------|---------|
 | Architecture decisions | `artefacts/architecture/` | How the system is designed |
 | Requirements | `artefacts/product/requirements.md` | What to build |
-| API contracts | `artefacts/architecture/openapi.yaml` | Interface agreements |
+| API contracts | `artefacts/api/openapi.yaml` | Interface agreements |
 | Standards and rules | `context/standards/`, `context/rules/` | How to work |
 | Existing code | Service directories | What already exists |
 
