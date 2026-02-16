@@ -189,6 +189,7 @@ context/                           # Portable, pre-loadable directory
 │   ├── prototype.yaml            # Fast iteration, skip gates
 │   └── agent-effectiveness.yaml  # Retrospective addon
 ├── docs/                          # Usage guides
+│   ├── workflow-diagrams.md      # Visual workflow comparison (mermaid)
 │   ├── orchestration-patterns.md # Multi-agent coordination patterns
 │   ├── workflow-default.md       # Default workflow usage guide
 │   ├── workflow-prototype.md     # Prototype workflow usage guide
@@ -210,6 +211,8 @@ context/                           # Portable, pre-loadable directory
 ---
 
 ## Workflows & Orchestration
+
+**Visual Overview**: See `docs/workflow-diagrams.md` for mermaid diagrams showing all workflows, comparison matrix, decision tree, and orchestration patterns.
 
 ### Available Workflows
 
