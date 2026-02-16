@@ -26,6 +26,50 @@
 
 **Purpose**: Analyze agent and workflow efficiency to identify bottlenecks and improve future cycles
 
+### Visual Diagram
+
+```mermaid
+flowchart TD
+    start([Trigger:<br/>After deployment<br/>OR on-demand]) --> collect
+
+    subgraph collect["📊 Data Collection"]
+        tasks["Read tasks.md<br/>(phase durations)"]
+        handoffs["Read handoffs/<br/>(handoff quality)"]
+        git["Read git log<br/>(commit patterns)"]
+        conv["Analyze conversation<br/>(tool usage, spawning)"]
+    end
+
+    collect --> analyze
+
+    subgraph analyze["🔍 Analysis"]
+        metrics["Calculate metrics:<br/>- Phase duration vs targets<br/>- Review rejection rate<br/>- Handoff completeness<br/>- Tool usage efficiency<br/>- Rework rate"]
+        bottlenecks["Identify top 3-5<br/>bottlenecks"]
+        trends["Compare to previous<br/>cycles (if available)"]
+        health["Calculate workflow<br/>health score (0-100)"]
+
+        metrics --> bottlenecks
+        bottlenecks --> trends
+        trends --> health
+    end
+
+    analyze --> output
+
+    subgraph output["📄 Outputs"]
+        report["efficiency-report.md<br/>(executive summary,<br/>recommendations)"]
+        data["efficiency-data/<br/>(raw JSON for<br/>trend tracking)"]
+    end
+
+    output --> finish([Complete])
+
+    classDef dataStyle fill:#d3f9d8,stroke:#37b24d
+    classDef analyzeStyle fill:#fff3bf,stroke:#fab005
+    classDef outputStyle fill:#d0ebff,stroke:#228be6
+
+    class collect dataStyle
+    class analyze analyzeStyle
+    class output outputStyle
+```
+
 **What it measures**:
 - Phase duration (which phases take longest?)
 - Agent effectiveness (token usage, task completion)
@@ -279,6 +323,6 @@ See `context/docs/orchestration-patterns.md` for pattern details.
 
 - `context/workflows/agent-effectiveness.yaml` - Workflow addon definition
 - `context/agents/workflow-analyst.md` - Agent definition
-- `context/docs/workflow-analyst-usage.md` - Detailed usage examples
+- `context/docs/how-to-measure-agent-effectiveness.md` - Detailed measurement examples
 - `context/docs/orchestration-patterns.md` - Orchestration pattern reference
 - `AGENTS.md` - Auto-generated agent reference

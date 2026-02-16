@@ -35,6 +35,112 @@ quality-review (GATE) → docs-cleanup →
 deployment → deployment-review (GATE) → retrospective (optional)
 ```
 
+### Visual Diagram
+
+```mermaid
+flowchart TD
+    start([Start]) --> discovery
+
+    subgraph discovery["🔍 Discovery (30min)"]
+        pe["@product-expert<br/>Clarify requirements"]
+        po["@product-owner<br/>Write formal requirements"]
+        pe --> po
+    end
+
+    discovery --> design
+
+    subgraph design["🎨 Design (1-2h)"]
+        sa["@solution-architect<br/>Architecture"]
+        dd["@database-designer<br/>Schema"]
+        ad["@api-designer<br/>API spec"]
+        ud["@ui-designer<br/>Components"]
+        vd["@visual-designer<br/>Visuals"]
+    end
+
+    design --> design_review
+
+    subgraph design_review["🚦 Design Review Gate (1h)"]
+        dr1["@tech-lead<br/>APPROVE"]
+        dr2["@code-reviewer<br/>Feasibility"]
+        dr3["@principles-reviewer<br/>LESS principles"]
+        dr4["@visual-designer<br/>Design consistency"]
+        dr5["@security-tester<br/>Security"]
+        dr1 --> dr2 --> dr3 --> dr4 --> dr5
+    end
+
+    design_review --> tdd_red
+
+    subgraph tdd_red["🔴 TDD RED (1h)"]
+        ft1["@functional-tester<br/>Write failing tests"]
+    end
+
+    tdd_red --> tdd_green
+
+    subgraph tdd_green["🟢 TDD GREEN (2-4h)"]
+        pc1["@python-coder<br/>Backend implementation"]
+        tc1["@typescript-coder<br/>Frontend implementation"]
+    end
+
+    tdd_green --> tdd_blue
+
+    subgraph tdd_blue["🔵 TDD BLUE (1h)"]
+        pc2["@python-coder<br/>Backend refactor"]
+        tc2["@typescript-coder<br/>Frontend refactor"]
+    end
+
+    tdd_blue --> testing
+
+    subgraph testing["🧪 Testing (1h)"]
+        ft2["@functional-tester<br/>Unit tests"]
+        ft3["@functional-tester<br/>Integration tests"]
+        ut["@ui-tester<br/>E2E tests + screenshots"]
+        ft2 --> ft3 --> ut
+    end
+
+    testing --> quality_review
+
+    subgraph quality_review["🚦 Quality Review Gate (1h+)"]
+        qr1["@tech-lead<br/>APPROVE"]
+        qr2["@code-reviewer<br/>Code quality"]
+        qr3["@principles-reviewer<br/>LESS principles"]
+        qr4["@visual-designer<br/>UI standards"]
+        qr5["@security-tester<br/>Security"]
+        qr1 --> qr2 --> qr3 --> qr4 --> qr5
+    end
+
+    quality_review --> docs
+
+    subgraph docs["📝 Docs (30min)"]
+        doc["@documentation<br/>Update docs, archive artefacts"]
+    end
+
+    docs --> deployment
+
+    subgraph deployment["🚀 Deployment (1h)"]
+        gcp["@gcp-devops<br/>Deploy to staging"]
+    end
+
+    deployment --> deployment_review
+
+    subgraph deployment_review["🚦 Deployment Review Gate"]
+        tl["@tech-lead<br/>Review deployment"]
+    end
+
+    deployment_review --> retro
+
+    subgraph retro["📊 Retrospective (30min, optional)"]
+        wa["@workflow-analyst<br/>Efficiency analysis"]
+    end
+
+    retro --> finish([Complete])
+
+    classDef gateStyle fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
+    classDef optionalStyle fill:#e9ecef,stroke:#868e96,stroke-dasharray: 5 5
+
+    class design_review,quality_review,deployment_review gateStyle
+    class retro optionalStyle
+```
+
 ---
 
 ## Phase-by-Phase Guide
