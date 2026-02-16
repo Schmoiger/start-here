@@ -12,6 +12,8 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Reference docs** | `standards/*.md` | Read when agent needs guidance |
 | **Agent definitions** | `agents/*.md` | Orchestrator spawns with Task tool |
 | **Workflows** | `workflows/*.yaml` | Defines phase dependencies |
+| **Workflow usage guides** | `docs/workflow-*.md` | How to use each workflow |
+| **Orchestration patterns** | `docs/orchestration-patterns.md` | Multi-agent coordination patterns |
 | **Validators** | `scripts/validators/` | Pre-commit hooks, CI/CD |
 
 ---
@@ -184,7 +186,15 @@ context/                           # Portable, pre-loadable directory
 │   └── workflow-analyst.md       # Workflow efficiency analysis
 ├── workflows/                     # Workflow patterns
 │   ├── default.yaml              # Full TDD with quality gates
-│   └── prototype.yaml            # Fast iteration, skip gates
+│   ├── prototype.yaml            # Fast iteration, skip gates
+│   └── agent-effectiveness.yaml  # Retrospective addon
+├── docs/                          # Usage guides
+│   ├── orchestration-patterns.md # Multi-agent coordination patterns
+│   ├── workflow-default.md       # Default workflow usage guide
+│   ├── workflow-prototype.md     # Prototype workflow usage guide
+│   ├── agent-effectiveness.md    # Effectiveness analysis guide
+│   ├── workflow-analyst-usage.md # Detailed analyst examples
+│   └── framework-adapters.md     # Cross-framework compatibility
 ├── templates/                     # Output templates
 │   ├── handoffs/                 # Handoff formats
 │   ├── reviews/                  # Review formats
@@ -196,6 +206,55 @@ context/                           # Portable, pre-loadable directory
     ├── generators/               # CLAUDE.md generator
     └── tests/                    # Validator tests
 ```
+
+---
+
+## Workflows & Orchestration
+
+### Available Workflows
+
+**Default** (`workflows/default.yaml` + `docs/workflow-default.md`):
+- Full TDD with comprehensive reviews and testing
+- 14 phases, 3 quality gates, 18 agents
+- Use for: Production code, critical features
+- Duration: 2-3 days typical feature
+- Coverage: 95% development, 97% pre-deployment
+
+**Prototype** (`workflows/prototype.yaml` + `docs/workflow-prototype.md`):
+- Fast iteration without quality gates
+- 4 phases, 0 quality gates, 5 agents
+- Use for: POCs, experiments, throwaway code
+- Duration: Hours to 1 day
+- Coverage: Optional (smoke tests only)
+
+**Agent Effectiveness** (`workflows/agent-effectiveness.yaml` + `docs/agent-effectiveness.md`):
+- Workflow addon for retrospective analysis
+- Analyzes agent/workflow efficiency, identifies bottlenecks
+- Can be added to any workflow or run standalone
+- Duration: ~30min
+
+### Orchestration Patterns
+
+See `docs/orchestration-patterns.md` for detailed guide on:
+
+1. **Single Agent** - Simple tasks, one agent handles everything
+2. **Sequential Chain** - Dependent tasks, agents run in order
+3. **Parallel Swarm** - Independent tasks, agents run simultaneously
+4. **Hive** - Coordinated parallel work with shared artifacts
+5. **Iterative Loop** - Refinement cycle with approval gates
+
+Each workflow combines these patterns. For example, default workflow uses:
+- Sequential Chain: discovery, testing phases, review gates
+- Parallel Swarm: design phase (5 independent designers)
+- Hive: tdd-green, tdd-blue (parallel coders, shared tests)
+- Iterative Loop: quality gates (may require fixes)
+
+### Framework Compatibility
+
+See `docs/framework-adapters.md` for using these workflows with:
+- Claude Code (native)
+- LangGraph, CrewAI, AutoGen (with adapter code)
+- Cursor, Aider, Continue, Windsurf (with manual orchestration)
 
 ---
 
