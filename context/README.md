@@ -188,14 +188,13 @@ context/                           # Portable, pre-loadable directory
 │   ├── default.yaml              # Full TDD with quality gates
 │   ├── prototype.yaml            # Fast iteration, skip gates
 │   └── agent-effectiveness.yaml  # Retrospective addon
-├── docs/                          # Usage guides
-│   ├── workflow-diagrams.md      # Visual workflow comparison (mermaid)
-│   ├── orchestration-patterns.md # Multi-agent coordination patterns
-│   ├── workflow-default.md       # Default workflow usage guide
-│   ├── workflow-prototype.md     # Prototype workflow usage guide
-│   ├── agent-effectiveness.md    # Effectiveness analysis guide
-│   ├── workflow-analyst-usage.md # Detailed analyst examples
-│   └── framework-adapters.md     # Cross-framework compatibility
+├── docs/                                # Usage guides
+│   ├── orchestration-patterns.md       # Multi-agent coordination patterns
+│   ├── workflow-default.md             # Default workflow usage guide (with diagram)
+│   ├── workflow-prototype.md           # Prototype workflow usage guide (with diagram)
+│   ├── workflow-agent-effectiveness.md # Effectiveness analysis guide (with diagram)
+│   ├── how-to-measure-agent-effectiveness.md # Detailed measurement examples
+│   └── framework-adapters.md           # Cross-framework compatibility
 ├── templates/                     # Output templates
 │   ├── handoffs/                 # Handoff formats
 │   ├── reviews/                  # Review formats
@@ -211,8 +210,6 @@ context/                           # Portable, pre-loadable directory
 ---
 
 ## Workflows & Orchestration
-
-**Visual Overview**: See `docs/workflow-diagrams.md` for mermaid diagrams showing all workflows, comparison matrix, decision tree, and orchestration patterns.
 
 ### Available Workflows
 

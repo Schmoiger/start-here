@@ -33,6 +33,46 @@
 quick-plan → sketch-design → build → validate (optional)
 ```
 
+### Visual Diagram
+
+```mermaid
+flowchart TD
+    start([Start]) --> plan
+
+    subgraph plan["📝 Quick Plan (15min)"]
+        po["@product-owner<br/>Minimal requirements<br/>(hypothesis to test)"]
+    end
+
+    plan --> sketch
+
+    subgraph sketch["✏️ Minimal Design (30min)"]
+        sa["@solution-architect<br/>High-level architecture<br/>(skip detailed specs)"]
+    end
+
+    sketch --> build
+
+    subgraph build["⚡ Build Prototype (2-4h)"]
+        pc["@python-coder<br/>Backend prototype"]
+        tc["@typescript-coder<br/>Frontend prototype"]
+    end
+
+    build --> validate
+
+    subgraph validate["✅ Smoke Test (30min, optional)"]
+        ft["@functional-tester<br/>Happy path only<br/>(manual OK)"]
+    end
+
+    validate --> finish([Complete<br/>⚠️ Not production-ready])
+
+    classDef optionalStyle fill:#e9ecef,stroke:#868e96,stroke-dasharray: 5 5
+    classDef warningStyle fill:#fff9db,stroke:#f59f00,stroke-width:2px
+
+    class validate optionalStyle
+    class finish warningStyle
+```
+
+**⚠️ Warning**: Prototype code should NOT go to production. If successful, rewrite with default workflow.
+
 ---
 
 ## Phase-by-Phase Guide
