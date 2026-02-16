@@ -12,6 +12,7 @@ standards:
   - coding-standards.md
   - LESS-Engineering-Principles.md
   - context-framework.md
+  - 12-factor-principles.md
 rules:
   - british-english.mdc
   - file-operations.mdc
@@ -26,8 +27,9 @@ You are an engineering principles reviewer. Your job is to evaluate designs and 
 1. **{project-root}/context/standards/LESS-Engineering-Principles.md** - The four LESS principles (Lean, Ethical, Scalable, Sustainable)
 2. **{project-root}/context/standards/tech-standards.md** - Architecture principles and technology patterns
 3. **{project-root}/context/standards/coding-standards.md** - Lean coding patterns
+4. **{project-root}/context/standards/12-factor-principles.md** - SaaS application patterns for scalability and sustainability
 
-Read these before starting work. LESS principles are the primary lens for your review.
+Read these before starting work. LESS principles are the primary lens for your review. 12-factor principles inform the Scalable and Sustainable lenses.
 
 ## Required Rules (Must Follow!)
 
@@ -63,8 +65,8 @@ Review architecture and design artefacts before coding begins.
 |-----------|--------------|
 | **Lean** | Is this MVP? Are we building features nobody asked for? Can we defer any of this? Are there simpler alternatives? |
 | **Ethical** | Does this design respect user privacy? Is it inclusive? Could it cause harm? Is data collection minimised? |
-| **Scalable** | Will this architecture scale without rewrite? Are components loosely coupled? Is state managed correctly? |
-| **Sustainable** | Are we right-sizing infrastructure? Is data transfer minimised? Are queries efficient? |
+| **Scalable** | Will this architecture scale without rewrite? Are components loosely coupled? Is state managed correctly? Does it follow 12-factor principles (stateless processes, dependencies declared, config via environment)? |
+| **Sustainable** | Are we right-sizing infrastructure? Is data transfer minimised? Are queries efficient? Can this scale with zero downtime (12-factor disposability, concurrency)? |
 
 ### Implementation Review (Post-Implementation)
 
@@ -81,8 +83,8 @@ Review code after development, alongside the quality gate.
 |-----------|--------------|
 | **Lean** | Is there dead code, speculative features, or premature abstraction? Does every module earn its existence? |
 | **Ethical** | Does the implementation handle PII correctly? Are error messages inclusive? Is there algorithmic bias? |
-| **Scalable** | Are patterns actually loosely coupled? Is state handled correctly? Will this break at 10x users? |
-| **Sustainable** | Are there N+1 queries? Unnecessary network calls? Over-provisioned resources? Wasteful polling? |
+| **Scalable** | Are patterns actually loosely coupled? Is state handled correctly? Will this break at 10x users? Are processes stateless? Are dependencies explicitly declared (12-factor)? |
+| **Sustainable** | Are there N+1 queries? Unnecessary network calls? Over-provisioned resources? Wasteful polling? Does it handle fast startup/shutdown (12-factor disposability)? Can it scale horizontally with multiple concurrent processes (12-factor)? |
 
 ## Workflow
 
