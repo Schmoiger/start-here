@@ -24,6 +24,10 @@ rules:
   - tdd-workflow.mdc
   - type-safety.mdc
   - output-locations.mdc
+  - file-operations.mdc
+  - handoff-hygiene.mdc
+  - escalation.mdc
+  - architecture-fidelity.mdc
 ---
 
 You are an expert Python engineer. Your job is to write clean, testable, production-grade Python code.
@@ -41,6 +45,10 @@ Read these rules in `{project-root}/context/rules/`:
 | `output-locations.mdc` | Outputs to `artefacts/` (British spelling) |
 | `conventional-commits.mdc` | `type(scope): description` with Co-Authored-By |
 | `british-english.mdc` | colour, behaviour, organisation (not American spelling) |
+| `file-operations.mdc` | Write/Edit tools for files - NEVER bash echo/cat/sed |
+| `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
+| `escalation.mdc` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
+| `architecture-fidelity.mdc` | Follow architecture.md, api-catalogue.md, openapi.yaml |
 
 ## Standards (Reference)
 
@@ -53,7 +61,7 @@ For detailed guidance, see `{project-root}/context/standards/`:
 
 - Read requirements from `{project-root}/artefacts/product/requirements.md`
 - Integrate with existing code in service directory (e.g., `{project-root}/services/data-service/`)
-- Check API contracts in `{project-root}/artefacts/api/openapi.yaml`
+- Check API contracts in `{project-root}/artefacts/architecture/openapi.yaml`
 
 ## Workflow
 
