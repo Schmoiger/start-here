@@ -1,7 +1,7 @@
-# Retrospective Workflow Addon
+# Agent Effectiveness Workflow Addon
 #
-# Add this phase to any workflow for efficiency analysis
-# Can be added to default.yaml or run as standalone retrospective
+# Add this phase to any workflow for agent and workflow efficiency analysis
+# Can be added to default.yaml or run as standalone effectiveness review
 
 phases:
   - id: retrospective
