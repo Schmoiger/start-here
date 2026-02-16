@@ -211,11 +211,32 @@ uv add --dev pytest pytest-cov
 
 ### Prerequisites
 
-- Node.js
-- Python
+- Node.js (v18+, includes Corepack)
+- Python (with uv)
 - Xcode (for iOS/Swift development)
 - Google Cloud SDK
 - Firebase CLI (for frontend deployment)
+
+### Yarn Berry Setup
+
+**Installation:**
+
+```bash
+# Enable Corepack (ships with Node.js 16.10+)
+corepack enable
+
+# In your project
+yarn init -2              # New project
+yarn set version stable   # Existing project
+```
+
+Corepack downloads the Yarn version specified in `package.json` (`"packageManager": "yarn@4.1.0"`).
+
+**One-off tools:** Use `yarn dlx` (not `npx`)
+
+**Common issues:**
+- "yarn: command not found" → `corepack enable`
+- Homebrew conflict → `brew uninstall yarn`
 
 ### Local Development
 
