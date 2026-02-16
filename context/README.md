@@ -16,18 +16,13 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 ---
 
-## For Agents (Token-Efficient Quick Links)
+## For Agents
 
 **Rules**: [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc)
 
 **Standards**: [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
 
-**Delegation Protocol**:
-- Python code → `@python-coder`
-- TypeScript code → `@typescript-coder`
-- Tests → `@functional-tester`
-- Architecture → `@solution-architect`
-- Reviews → `@tech-lead` or `@code-reviewer`
+**Delegation**: Python → `@python-coder` · TypeScript → `@typescript-coder` · Tests → `@functional-tester` · Architecture → `@solution-architect` · Reviews → `@tech-lead` / `@code-reviewer`
 
 ---
 
