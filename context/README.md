@@ -2,27 +2,42 @@
 
 Portable standards, rules, and agent definitions for multi-agent development workflows.
 
-**Purpose**: This directory contains reusable context that can be pre-loaded into any project. All paths use `{project-root}` placeholders for portability.
+---
+
+## Quick Reference
+
+| What | Where | When |
+|------|-------|------|
+| **Non-negotiable rules** | `rules/*.mdc` | Agent frontmatter lists applicable rules |
+| **Reference docs** | `standards/*.md` | Read when agent needs guidance |
+| **Agent definitions** | `agents/*.md` | Orchestrator spawns with Task tool |
+| **Workflows** | `workflows/*.yaml` | Defines phase dependencies |
+| **Validators** | `scripts/validators/` | Pre-commit hooks, CI/CD |
 
 ---
 
-## Quick Links
+## For Agents (Token-Efficient Quick Links)
 
-| Category | Files |
-|----------|-------|
-| **Rules** | [python-environment](rules/python-environment.mdc) &#124; [typescript-environment](rules/typescript-environment.mdc) &#124; [secrets](rules/secrets-management.mdc) &#124; [tdd](rules/tdd-workflow.mdc) &#124; [types](rules/type-safety.mdc) &#124; [outputs](rules/output-locations.mdc) &#124; [commits](rules/conventional-commits.mdc) &#124; [spelling](rules/british-english.mdc) &#124; [EARS](rules/EARS-notation-requirements.mdc) &#124; [metrics](rules/metrics-logging.mdc) |
-| **Standards** | [coding](standards/coding-standards.md) &#124; [testing](standards/testing-standards.md) &#124; [tech](standards/tech-standards.md) &#124; [doc](standards/doc-standards.md) &#124; [workflow](standards/workflow-standards.md) &#124; [security](standards/security-standards.md) &#124; [context](standards/context-framework.md) |
-| **Agents** | [all agents](agents/) &#124; [template](agents/TEMPLATE.md) |
-| **Workflows** | [default (TDD)](workflows/default.yaml) &#124; [prototype (fast)](workflows/prototype.yaml) |
-| **Scripts** | [validators](scripts/validators/) &#124; [generators](scripts/generators/) |
+**Rules**: [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc)
+
+**Standards**: [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
+
+**Delegation Protocol**:
+- Python code → `@python-coder`
+- TypeScript code → `@typescript-coder`
+- Tests → `@functional-tester`
+- Architecture → `@solution-architect`
+- Reviews → `@tech-lead` or `@code-reviewer`
 
 ---
 
-## Rules vs Standards
+## For Humans
 
-**Key insight**: Rules and standards serve different purposes and are consumed differently.
+### Rules vs Standards
 
-### Rules (Non-Negotiables)
+**Key insight**: Rules and standards serve different purposes.
+
+#### Rules (Non-Negotiables)
 
 **Location**: `context/rules/*.mdc`
 
@@ -40,7 +55,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - `secrets-management.mdc`: `/secrets/*.json` works, `.env` with creds leaks
 - `tdd-workflow.mdc`: GREEN phase modifying tests breaks TDD discipline
 
-### Standards (Reference Documentation)
+#### Standards (Reference Documentation)
 
 **Location**: `context/standards/*.md`
 
@@ -58,7 +73,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - `testing-standards.md`: TDD philosophy, coverage strategies, anti-patterns
 - `tech-standards.md`: Architecture decisions, deployment strategy
 
-### DRY Consideration
+#### DRY Consideration
 
 Some duplication between rules and standards is **intentional**:
 - Rules tell agents **what to do** (concise, actionable)
@@ -116,42 +131,75 @@ If there's no specialised agent for a task:
 
 ---
 
-## Architecture
+## Directory Structure
 
 ```
 context/                           # Portable, pre-loadable directory
 ├── README.md                      # This file (index + key concepts)
-├── rules/                        # Non-negotiables (break if ignored)
-│   ├── python-environment.mdc   # uv run, uv add
+├── standards/                     # Reference documentation
+│   ├── README.md                 # Standards index
+│   ├── coding-standards.md       # Code patterns, style
+│   ├── testing-standards.md      # TDD, coverage, anti-patterns
+│   ├── tech-standards.md         # Architecture, tools
+│   ├── doc-standards.md          # Documentation structure
+│   ├── workflow-standards.md     # Processes, retrospectives
+│   ├── security-standards.md     # Security principles
+│   ├── context-framework.md      # Sharing formats, terse formats
+│   ├── 12-factor-principles.md   # SaaS application patterns
+│   ├── LESS-Engineering-Principles.md # Design philosophy
+│   ├── visual-standards.md       # Visual design standards
+│   └── tech-mobile-standards.md  # Mobile standards (deferred)
+├── rules/                         # Non-negotiables (break if ignored)
+│   ├── python-environment.mdc    # uv run, uv add
 │   ├── typescript-environment.mdc # yarn, not npm
-│   ├── secrets-management.mdc   # /secrets only
-│   ├── tdd-workflow.mdc         # RED fails, GREEN no test mods
-│   ├── type-safety.mdc          # Type hints, strict mode
-│   ├── output-locations.mdc     # artefacts/ structure
-│   ├── conventional-commits.mdc # Commit format
-│   ├── british-english.mdc      # Spelling
+│   ├── secrets-management.mdc    # /secrets only
+│   ├── tdd-workflow.mdc          # RED fails, GREEN no test mods
+│   ├── type-safety.mdc           # Type hints, strict mode
+│   ├── output-locations.mdc      # artefacts/ structure
+│   ├── conventional-commits.mdc  # Commit format
+│   ├── british-english.mdc       # Spelling
 │   ├── EARS-notation-requirements.mdc # Requirements format
-│   └── metrics-logging.mdc      # Agent metrics
-├── standards/                    # Reference documentation
-│   ├── coding-standards.md      # Code patterns, style
-│   ├── context-framework.md     # Sharing formats, prioritisation, terse formats
-│   ├── security-standards.md    # Security principles, safe failure, data protection
-│   ├── testing-standards.md     # TDD, coverage, anti-patterns
-│   ├── tech-standards.md        # Architecture, tools
-│   ├── doc-standards.md         # Documentation structure
-│   └── workflow-standards.md    # Processes, retrospectives
-├── agents/                       # Agent definitions
-│   ├── TEMPLATE.md              # Template for new agents
-│   ├── python-coder.md          # Python implementation
-│   ├── typescript-coder.md      # TypeScript implementation
-│   ├── functional-tester.md     # Test writing
-│   └── ...                      # Other specialists
-├── workflows/                    # Workflow patterns
-│   ├── default.yaml             # Full TDD with quality gates
-│   └── prototype.yaml           # Fast iteration, skip gates
-└── scripts/                     # Portable tools
-    ├── validators/              # Rule validators
-    └── generators/              # CLAUDE.md generator, etc.
+│   ├── metrics-logging.mdc       # Agent metrics
+│   ├── file-operations.mdc       # Write/Edit not bash
+│   ├── handoff-hygiene.mdc       # Handoff completeness
+│   ├── escalation.mdc            # Issue escalation
+│   ├── architecture-fidelity.mdc # Architecture consistency
+│   ├── ui-component-reuse.mdc    # UI component reusability
+│   ├── visual-fidelity.mdc       # Visual design consistency
+│   └── quality-gates.mdc         # Quality gate enforcement
+├── agents/                        # Agent definitions
+│   ├── TEMPLATE.md               # Template for new agents
+│   ├── product-expert.md         # Requirements clarification
+│   ├── product-owner.md          # Requirements formalisation
+│   ├── solution-architect.md     # Architecture design
+│   ├── database-designer.md      # Database schema
+│   ├── api-designer.md           # API design
+│   ├── ui-designer.md            # UI design
+│   ├── visual-designer.md        # Visual design
+│   ├── python-coder.md           # Python implementation
+│   ├── typescript-coder.md       # TypeScript implementation
+│   ├── functional-tester.md      # Test writing
+│   ├── ui-tester.md              # E2E testing
+│   ├── tech-lead.md              # Architecture review
+│   ├── code-reviewer.md          # Code quality review
+│   ├── principles-reviewer.md    # LESS principles review
+│   ├── security-tester.md        # Security testing
+│   ├── gcp-devops.md             # GCP deployment
+│   ├── documentation.md          # Documentation
+│   └── workflow-analyst.md       # Workflow efficiency analysis
+├── workflows/                     # Workflow patterns
+│   ├── default.yaml              # Full TDD with quality gates
+│   └── prototype.yaml            # Fast iteration, skip gates
+├── templates/                     # Output templates
+│   ├── handoffs/                 # Handoff formats
+│   ├── reviews/                  # Review formats
+│   └── artefacts/                # Artefact templates
+├── mcp/                          # MCP server configuration
+│   └── mcp.json                  # Template config
+└── scripts/                      # Portable tools
+    ├── validators/               # Rule validators
+    ├── generators/               # CLAUDE.md generator
+    └── tests/                    # Validator tests
 ```
 
 ---
