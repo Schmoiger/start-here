@@ -1,11 +1,3 @@
----
-purpose: Documentation structure, artefact organisation, and writing quality
-audience: All agents producing documentation
-read-when: Creating artefacts, organising docs, writing content
-not-for: Code patterns (see coding-standards.md), testing (see testing-standards.md)
-related: [coding-standards, workflow-standards]
----
-
 # Documentation Standards
 
 ## 1. Introduction
@@ -27,7 +19,7 @@ The documentation shall be structured as follows:
     *   `/context/standards/`: Development standards (coding, testing, documentation, workflow)
     *   `/context/rules/`: Development guidelines (EARS notation, TDD practices)
 *   **`/artefacts/`**: Output files representing work completed
-    *   Monorepo root `/artefacts/`: System-wide artefacts (architecture, requirements, API contracts, design). Path conventions align with [context-framework.md](context-framework.md) (framework draft; paths adopted).
+    *   Monorepo root `/artefacts/`: System-wide artefacts (architecture, requirements, API contracts, design)
     *   Project-level `{service}/artefacts/`: Service-specific artefacts (bugs, tasks, todo, test results)
 
 For example:
@@ -47,11 +39,13 @@ For example:
 │   │   ├── requirements.md
 │   │   ├── user-stories.md
 │   │   └── open-questions.md
-│   ├── architecture/                # System architecture, API contracts
+│   ├── architecture/                # System architecture
 │   │   ├── architecture.md
 │   │   ├── data-model.md
-│   │   ├── api-catalogue.md
-│   │   └── openapi.yaml             # OpenAPI spec (source of truth)
+│   │   └── api-catalogue.md
+│   ├── api/                         # API specifications
+│   │   ├── openapi.yaml
+│   │   └── api-design-guide.md
 │   ├── design/                      # UI/UX design
 │   │   ├── design-tokens.json
 │   │   ├── components.md
@@ -107,7 +101,7 @@ For example:
 *   **Service-specific artefacts** → `{service}/artefacts/`
     *   Example: Bugs only affecting data-service go in `services/data-service/artefacts/bugs.md`
 *   **System-wide artefacts** → `/artefacts/` (monorepo root)
-    *   Example: System architecture affecting all services goes in `/artefacts/architecture/` (e.g. `architecture.md`)
+    *   Example: System architecture affecting all services goes in `/artefacts/architecture.md`
 *   **Cross-service coordination** → `/artefacts/shared/`
     *   Example: Integration handoffs go in `/artefacts/shared/handoffs/`
 
@@ -205,20 +199,86 @@ Required elements for API handoffs:
 
 ### 2.5. Archive Management
 
-The system shall maintain archives of superseded artefacts to preserve project history whilst keeping active documentation focused. Two archive types: **tracked** (`build/archive/`, `test-results/archive/`) committed to git, and **local** (`/artefacts/archive/`) gitignored for working notes.
+The system shall maintain archives of superseded artefacts to preserve project history whilst keeping active documentation focused and discoverable.
+
+#### Archive Organisation
+
+Archives shall be organised into separate directories by type:
 
 ```
 /artefacts/
 ├── archive/                    # Gitignored: Local working notes
-├── build/archive/              # Tracked: Superseded build artefacts
-└── test-results/archive/       # Tracked: Historical test results
+│   └── phase1/                # Individual contributor drafts
+├── build/
+│   └── archive/               # Tracked: Superseded build artefacts
+│       ├── README.md          # Index of archived items
+│       ├── old-reviews/       # Quality gate reviews
+│       └── planning/          # Design docs, strategies
+└── test-results/
+    └── archive/               # Tracked: Historical test results
+        ├── v2-tasks/          # Phase-specific test runs
+        └── ui-bugs/           # Bug fix verification
 ```
 
-**When to archive**: Superseded versions, completed phase results, resolved bug investigations, implemented planning docs.
+**Decision: Separate Archives**
 
-**Do NOT archive**: Active `bugs.md`/`todo.md`/`tasks.md`, current security findings, current quality gate reviews.
+The project shall maintain two types of archives:
+- **Tracked archives** (`/artefacts/build/archive/`, `/artefacts/test-results/archive/`) - Historical artefacts committed to git for team reference
+- **Local archives** (`/artefacts/archive/`) - Gitignored working notes and drafts specific to individual contributors
 
-**Process**: Create subdirectory in appropriate archive, move artefacts, commit with `refactor(docs): archive superseded {area} artefacts`. Use `@documentation` agent for bulk archiving.
+**Rationale**: This separation supports **Lean** principles (eliminate clutter from active docs whilst preserving institutional knowledge) and **Token-Efficient** documentation (LLMs read focused, current docs; humans reference archives when needed).
+
+#### When to Archive
+
+Archive artefacts when:
+- **Superseded by newer versions**: Architecture reviews replaced by current implementation
+- **Phase completion**: Test results from completed development phases
+- **Bug resolution**: Detailed bug investigation notes after fixes committed to `bugs.md`
+- **Strategy implementation**: Planning documents after features go live
+
+**Do NOT archive**:
+- Current `bugs.md`, `todo.md`, `tasks.md` (active tracking)
+- Integration test results (until next major version)
+- Security audit findings (until remediated)
+- Quality gate reviews (until next gate)
+
+#### Archive Process
+
+1. **Create archive subdirectory**: `mkdir -p artefacts/{area}/archive/{category}/`
+2. **Move completed artefacts**: `mv old-doc.md artefacts/{area}/archive/{category}/`
+3. **Create archive README.md**: Document what was archived, when, and why
+4. **Commit with clear message**: `refactor(docs): archive superseded {area} artefacts`
+
+#### Archive README Template
+
+Each archive directory shall contain a `README.md` describing its contents:
+
+```markdown
+# {Area} Archive
+
+**Archived**: {Date}
+**Reason**: {Why these were archived}
+
+## Contents
+
+### {Category}/
+{Description of archived items}
+
+**Status**: {What superseded them}
+
+## Current Replacements
+
+Active documents that replaced archived ones:
+- `architecture.md` (replaced architecture-v1-draft.md)
+- `tech-review.md` (replaced pre-implementation-review.md)
+```
+
+#### Automation
+
+Use `@documentation` agent to:
+- Identify superseded artefacts based on timestamps and git history
+- Generate archive README.md with references to current docs
+- Update cross-references in active documents
 
 ### 2.6. Project `README.md`
 
@@ -234,9 +294,28 @@ The system shall maintain a `README.md` file in the root of each project. The `R
 
 The system maintains shared standards and rules in `/context/` for use across all projects.
 
-For the full standards directory listing, see [context/README.md](../../context/README.md).
+```
+/ (monorepo root)
+├── context/
+│   ├── standards/           # Development standards
+│   │   ├── agent-standards.md
+│   │   ├── coding-standards.md
+│   │   ├── context-framework.md
+│   │   ├── doc-standards.md
+│   │   ├── security-standards.md
+│   │   ├── testing-standards.md
+│   │   └── workflow-standards.md
+│   └── rules/              # Development rules
+│       └── EARS-notation-requirements.mdc
+└── services/               # Projects reference context/
+```
 
-### 3.1. Context File Quality Standards
+### 3.1. Common Context Resources
+
+*   **`context/standards/`**: Development standards covering coding, testing, building, documentation, and workflow processes
+*   **`context/rules/`**: Development guidelines including EARS requirements notation and TDD practices
+
+### 3.2. Context File Quality Standards
 
 All project context files shall be reviewed from the perspective of an expert context engineer to ensure they are:
 
@@ -265,9 +344,10 @@ The monorepo root `/artefacts/` directory contains system-wide artefacts that af
 *   **`api-catalogue.md`**: Catalogue of all service APIs with their purposes and relationships
 *   Other architecture documents (e.g., reliability strategies, ADRs)
 
-### 4.3. API Specifications (in `/artefacts/architecture/`)
+### 4.3. API Specifications (`/artefacts/api/`)
 
-*   **`openapi.yaml`**: API specification (OpenAPI 4.1.0, source of truth for backend/frontend). Conventions and port assignments in `api-catalogue.md`.
+*   **`openapi.yaml`**: Complete API specification for all services
+*   **`api-design-guide.md`**: API design standards and conventions
 
 ### 4.4. Design System (`/artefacts/design/`)
 
