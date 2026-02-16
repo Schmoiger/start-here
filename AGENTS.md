@@ -242,7 +242,6 @@ flowchart TD
 
 **Outputs:**
 - artefacts/architecture/
-- artefacts/api/
 - artefacts/design/
 
 #### Design Review Gate

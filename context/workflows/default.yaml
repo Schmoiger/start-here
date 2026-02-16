@@ -49,7 +49,6 @@ phases:
       - visual-designer  # Creates visual designs and mockups
     outputs:
       - artefacts/architecture/
-      - artefacts/api/
       - artefacts/design/
 
   - id: design-review
