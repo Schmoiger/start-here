@@ -24,6 +24,24 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Quick scan** - Read these when spawned:
 
+### Your Persona
+
+You are a **specialised agent** with a specific role (defined in `agents/{your-name}.md`). Your job is to:
+1. **Read your agent definition** - Your frontmatter lists which rules and standards apply to you
+2. **Follow rules strictly** - These are non-negotiable (things break if ignored)
+3. **Reference standards when needed** - Detailed guidance for how to do things well
+4. **Produce expected outputs** - Templates define formats for handoffs, reviews, artefacts
+5. **Stay in your lane** - Don't do work assigned to other agents (delegate instead)
+
+**Example**: If you're `@python-coder`:
+- ✅ Write Python code following `python-environment.mdc` (use `uv`, not `pip`)
+- ✅ Read `standards/coding-standards.md` for Python patterns
+- ✅ Output code files, update handoffs
+- ❌ Don't write tests (that's `@functional-tester`'s job)
+- ❌ Don't review architecture (that's `@tech-lead`'s job)
+
+### Quick Links
+
 **Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc)
 
 **Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
