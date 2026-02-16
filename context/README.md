@@ -31,11 +31,9 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Workflows**: [default](workflows/default.yaml) · [prototype](workflows/prototype.yaml) · [agent-effectiveness](workflows/agent-effectiveness.yaml)
 
-**Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [patterns](docs/orchestration-patterns.md)
+**Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
 
 **Templates**: [handoffs](templates/handoffs/) · [reviews](templates/reviews/) · [artefacts](templates/artefacts/)
-
-**Personas**: [technical-writer](persona/technical-writer.md) · [editor](persona/editor.md) · [expert-reviewer](persona/expert-reviewer.md)
 
 ---
 
@@ -81,10 +79,9 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Agents use these for consistent outputs
 
 **Personas** (`persona/*.md`):
-- Writing voice/style for human-facing content
-- Documentation agents adopt these when writing blogs, technical papers, marketing materials
-- NOT for technical handoffs (README, build notes, architecture docs)
-- Examples: technical-writer.md (Dr. Sarah Chen persona), editor.md, expert-reviewer.md
+- Writing voice/style for human-facing content (blogs, papers, marketing)
+- NOT for technical handoffs (README, API docs, architecture)
+- See `docs/writing-personas.md` for complete guide
 
 **Scripts** (`scripts/`):
 - Validators: Pre-commit hooks for rule enforcement
@@ -180,6 +177,7 @@ context/
 │   ├── workflow-prototype.md           # Prototype workflow guide (with diagram)
 │   ├── workflow-agent-effectiveness.md # Effectiveness guide (with diagram)
 │   ├── how-to-measure-agent-effectiveness.md # Detailed measurement examples
+│   ├── writing-personas.md             # When/how to use writing personas
 │   └── framework-adapters.md           # Cross-framework compatibility
 ├── templates/                     # Output templates
 │   ├── handoffs/                 # Handoff formats
