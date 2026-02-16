@@ -78,10 +78,10 @@ See `context/docs/framework-adapters.md` for integration guides showing how to l
 
 ## What's Included
 
-- **16 specialized agents** - Discovery, design, development, review, testing, deployment
-- **9 standards** - Coding, testing, tech stack, documentation, workflows
-- **11 rules** - Enforceable constraints with validators
-- **2 workflows** - Default (full TDD) and prototype (fast iteration)
-- **23 templates** - Handoffs, reviews, artefacts
+- **18 specialized agents** - Discovery, design, development, review, testing, deployment
+- **14 standards** - Coding, testing, tech stack, documentation, workflows
+- **18 rules** - Enforceable constraints with validators
+- **4 workflows** - Default (full TDD), prototype (fast iteration), agent-effectiveness (retrospective), documentation-for-humans (blogs/papers)
+- **12 templates** - Handoffs, reviews, artefacts
 
-**Total**: ~75 context files for structured, high-quality multi-agent workflows.
+**Total**: ~66 context files for structured, high-quality multi-agent workflows.
