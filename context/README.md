@@ -181,53 +181,36 @@ context/                           # Portable, pre-loadable directory
 
 ## Syncing Context Across Projects
 
-**Note**: `start-here` is the golden source. This context folder should be copied into new projects, but can be kept in sync if actively developing across multiple repos.
+**Note**: `start-here` is the golden source. Copy the context folder into new projects and manually sync when needed.
 
-### Same Machine: Use Symlinks (Recommended)
+### Manual Sync (Recommended)
 
-If all your repos are on the same machine, use symbolic links for automatic synchronisation.
-
-**Setup** (one-time):
+Copy the context folder into each project:
 
 ```bash
-# Keep context in start-here (git tracks changes here)
-# Create symlinks FROM other repos TO start-here
+# From start-here to your project
+cp -r ~/Repos/start-here/context /path/to/your-project/context
+```
 
-cd /Users/your-username/repos/project-a
-rm -rf context  # Remove copied context folder
-ln -s /Users/your-username/Repos/start-here/context context
+When context evolves in start-here, sync changes manually:
 
-cd /Users/your-username/repos/project-b
-rm -rf context
-ln -s /Users/your-username/Repos/start-here/context context
+```bash
+# Update specific files that changed
+cp ~/Repos/start-here/context/agents/python-coder.md /path/to/your-project/context/agents/
+
+# Or sync entire directory
+rsync -av --delete ~/Repos/start-here/context/ /path/to/your-project/context/
 ```
 
 **Benefits**:
-- ✅ All edits instantly reflected across all repos
-- ✅ No manual sync required
-- ✅ Works transparently with IDEs (Cursor, VS Code) and AI agents
-- ✅ Git tracking intact (start-here tracks files, other repos track symlink)
+- ✅ Works reliably with all AI agents and IDEs
+- ✅ Each project has its own independent copy
+- ✅ No symlink confusion or path resolution issues
 
 **Workflow**:
-- Edit context files in any project (bollinger, new-devx, etc.)
-- Changes immediately available in all linked projects
-- Run `git status` in start-here to see changes
-- Commit changes in start-here repo:
-  ```bash
-  cd /Users/your-username/Repos/start-here
-  git add context/
-  git commit -m "feat(context): update agent definitions"
-  ```
-
-**Git Behavior**:
-- **start-here**: Tracks actual context files (commit here)
-- **Other repos**: Track the symlink `context -> /path/to/start-here/context`
-
-### Different Machines: Manual Sync
-
-If working across different machines or prefer not to use symlinks, copy the context folder into each project and manually sync changes as needed.
-
-Consider creating a sync script or using `rsync` to push/pull changes between repos when context evolves.
+1. Make changes in start-here (the golden source)
+2. Commit changes in start-here
+3. Manually copy/sync to other projects when needed
 
 ---
 
