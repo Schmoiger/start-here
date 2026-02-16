@@ -84,6 +84,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - See `docs/writing-personas.md` for complete guide
 
 **Scripts** (`scripts/`):
+- `coordinate.sh`: Agent coordination helper (init, list agents, show workflow)
 - Validators: Pre-commit hooks for rule enforcement
 - Generators: Auto-generate CLAUDE.md/AGENTS.md from workflows
 - Tests: Validator test suite
@@ -198,6 +199,7 @@ context/
 ├── mcp/                          # MCP server configuration
 │   └── mcp.json                  # Template config
 └── scripts/                      # Portable tools
+    ├── coordinate.sh             # Agent coordination helper
     ├── validators/               # Rule validators (pre-commit hooks)
     ├── generators/               # CLAUDE.md/AGENTS.md generators
     └── tests/                    # Validator tests
