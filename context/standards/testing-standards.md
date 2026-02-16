@@ -1,3 +1,11 @@
+---
+purpose: Testing methodology, TDD process, and coverage requirements
+audience: All developers and testing agents
+read-when: Writing tests, defining coverage, TDD process questions
+not-for: Tool installation (see tech-standards.md §Testing Tools)
+related: [tech-standards, coding-standards, workflow-standards]
+---
+
 # Testing Standards
 
 **TDD-First Development**: Write tests before implementation. No code without passing tests.
@@ -122,18 +130,8 @@ tests/
 ### Implementation
 
 ```typescript
-// Example visual test with Playwright
-test('dashboard layout matches design', async ({ page }) => {
-  await page.goto('/dashboard');
-
-  // Take screenshot and compare with context-appropriate threshold
-  await expect(page).toHaveScreenshot('dashboard-layout.png', {
-    fullPage: true,
-    threshold: 0.001  // 0.1% for pixel-perfect (typography, layouts)
-    // threshold: 0.02   // 2% for anti-aliasing differences
-    // threshold: 0.05   // 5% for dynamic content (dates, usernames)
-  });
-});
+// Example pattern: navigate, capture screenshot, assert. Use the E2E tool specified in tech-standards.
+// Pseudocode: launch browser → goto URL → screenshot → compare to baseline (threshold per context).
 ```
 
 **Visual Regression Thresholds:**
@@ -150,20 +148,7 @@ test('dashboard layout matches design', async ({ page }) => {
 
 ## Testing Tools & Frameworks
 
-### Backend (Python)
-
-- **pytest**: Core testing framework
-- **pytest-asyncio**: Async test support
-- **pytest-mock**: Mocking utilities
-- **pytest-cov**: Code coverage reporting
-- **hypothesis**: Property-based testing
-
-### Frontend (TypeScript/React)
-
-- **Vitest**: Fast unit testing for Vite/React projects
-- **Testing Library**: Component testing utilities
-- **Playwright**: E2E and visual testing
-- **MSW**: Mock Service Worker for API mocking
+For tool choices and installation commands, see [tech-standards.md §Testing Tools](tech-standards.md#testing-tools).
 
 ### CI/CD Integration
 
@@ -179,9 +164,11 @@ Coverage requirements increase as code progresses toward deployment. Thresholds 
 
 | Phase          | Coverage | Pass Rate | Concessioned | Fail Rate | Enforcement                  |
 | -------------- | -------- | --------- | ------------ | --------- | ---------------------------- |
-| Prototype      | ≥90%     | ≥90%      | ≤10%         | 0%*       | Warning (advisory)           |
-| Development    | ≥94%     | ≥94%      | ≤6%          | 0%*       | Build fails below threshold  |
-| Pre-deployment | ≥97%     | ≥97%      | ≤3%          | 0%*       | Merge blocked below threshold |
+| Prototype      | No threshold | No threshold | —        | —         | Advisory (just needs to work)|
+| Development    | ≥95%     | ≥95%      | ≤5%          | 0%        | Build fails below threshold  |
+| Pre-deployment | ≥97%     | ≥97%      | ≤3%          | 0%        | Merge blocked below threshold |
+
+Enforced by [quality-gates.mdc](../rules/quality-gates.mdc).
 
 **TDD RED Phase Exception**: During TDD RED phase only, newly written tests may fail if:
 - Marked with `@pytest.mark.wip` or `@pytest.mark.xfail(reason="TDD RED - not implemented")`
@@ -244,22 +231,11 @@ Document all coverage gaps and concessioned tests in `{service}/artefacts/test-g
 
 ### Enforcement
 
-**Prototype phase:**
 ```bash
-# Advisory only - build succeeds with warning
-pytest --cov=src --cov-report=term-missing --cov-fail-under=90
-```
-
-**Development phase:**
-```bash
-# Build fails below threshold
-pytest --cov=src --cov-report=term-missing --cov-fail-under=94
-```
-
-**Pre-deployment phase:**
-```bash
-# Strict enforcement - blocks merge
-pytest --cov=src --cov-report=term-missing --cov-fail-under=97 --strict-markers
+# Enforcement: adjust threshold per phase
+pytest --cov=src --cov-report=term-missing --cov-fail-under={THRESHOLD}
+# THRESHOLD: none (prototype), 95 (development), 97 (pre-deployment)
+# Enforced by quality-gates.mdc
 ```
 
 ## UI Test Coverage
@@ -289,45 +265,12 @@ Define test scenarios in `{service}/artefacts/test-results/e2e/test-scenarios.md
 
 ### SC-001: Sign in with Google
 - **Priority**: Critical
-- **User Story**: As a user, I want to sign in with Google so I can access my account
-- **Steps**:
-  1. Navigate to homepage
-  2. Click "Sign in with Google" button
-  3. Complete Google OAuth flow
-  4. Verify redirect to dashboard
-  5. Verify user name displayed in header
-- **Expected Result**: User signed in and dashboard visible
-- **Evidence Required**: Screenshots of steps 1, 4, 5
+- **Steps**: Navigate to homepage → Click "Sign in with Google" → Complete OAuth → Verify dashboard redirect → Verify user name in header
+- **Evidence Required**: Screenshots of homepage, dashboard, user name
 - **Status**: ✅ Passed (2026-02-06)
-- **Test Log**: `e2e/test-log.md#sc-001`
-
-### SC-002: View portfolio with holdings
-- **Priority**: Critical
-- **User Story**: As a user, I want to view my portfolio holdings
-- **Steps**:
-  1. Sign in as authenticated user
-  2. Navigate to portfolio page
-  3. Verify holdings table renders
-  4. Verify Bollinger Band chart displays
-  5. Verify tooltips show on hover
-- **Expected Result**: Portfolio data visible with interactive chart
-- **Evidence Required**: Screenshots of steps 3, 4, 5
-- **Status**: ✅ Passed (2026-02-06)
-- **Test Log**: `e2e/test-log.md#sc-002`
-
-### SC-003: Mobile responsive layout
-- **Priority**: High
-- **User Story**: As a mobile user, I want the app to work on my phone
-- **Steps**:
-  1. Open app in mobile viewport (375×667)
-  2. Verify navigation menu collapses to hamburger
-  3. Verify charts scale to mobile width
-  4. Verify touch targets ≥44×44px
-- **Expected Result**: All features accessible on mobile
-- **Evidence Required**: Screenshots showing mobile layout
-- **Status**: ⏸️ Concessioned - Requires mobile device (Ticket #234)
-- **Test Log**: N/A
 ```
+
+Follow this structure for all scenarios. Full format in `{service}/artefacts/test-results/e2e/test-scenarios.md`.
 
 ### Evidence Requirements
 
@@ -359,46 +302,19 @@ find test-results/archive -name "*.png" -exec cwebp -lossless {} -o {}.webp \;
 
 ```markdown
 ## SC-001: Sign in with Google
-
-**Date**: 2026-02-06T14:32:00Z
-**Tester**: @ui-tester
-**Duration**: 45s
-
-### Actions
-1. Navigated to http://localhost:5173
-2. Clicked button[data-testid="google-signin"]
-3. Completed OAuth flow (mocked locally)
-4. Verified redirect to /dashboard
-5. Verified element[data-testid="user-name"] contains "Test User"
-
-### Result
-✅ **PASSED** - All steps completed successfully
-
-### Evidence
-- Screenshots: `e2e/screenshots/SC-001/{01-homepage, 04-dashboard, 05-user-name}.png`
-- Browser: Chrome 131.0.6778.109
-- Viewport: 1920×1080
+**Date**: 2026-02-06T14:32:00Z | **Tester**: @ui-tester | **Duration**: 45s
+**Actions**: Navigated to localhost:5173 → Clicked google-signin → Completed OAuth → Verified /dashboard redirect → Verified user-name element
+**Result**: ✅ PASSED
+**Evidence**: `e2e/screenshots/SC-001/{01-homepage, 04-dashboard, 05-user-name}.png` | Chrome 131 | 1920×1080
 ```
 
 ### Coverage Calculation
 
-Track both reported and effective coverage to prevent concessioned tests from masking untested areas:
+**Reported Coverage**: `(Passed + Concessioned) / Total × 100` — must meet phase threshold
+**Effective Coverage**: `Passed / Total × 100` — tracks actual tested scenarios
+**Fail Rate**: Must be 0% (no failing tests allowed). Build fails if >0%.
 
-**Reported Coverage**: `(Scenarios Passed + Scenarios Concessioned) / Total Scenarios × 100`
-**Effective Coverage**: `Scenarios Passed / Total Scenarios × 100`
-
-**Example:**
-- Total scenarios: 50
-- Passed: 45 (✅)
-- Concessioned: 3 (⏸️)
-- Failed: 2 (❌)
-
-**Reported Coverage**: (45 + 3) / 50 = 96% (meets threshold)
-**Effective Coverage**: 45 / 50 = 90% (actual tested scenarios)
-**Pass Rate**: 45 / (45 + 2) = 95.7%
-**Fail Rate**: 2 / 50 = 4% ❌ **BUILD FAILS** (must be 0%)
-
-**Gate enforcement**: Reported coverage must meet phase threshold, but track effective coverage to identify excessive concessioning.
+Track effective coverage to prevent concessioned tests from masking untested areas.
 
 ### Concessioned Scenarios
 
@@ -441,9 +357,8 @@ While markdown scripts are valid for scenario definition and evidence tracking, 
 - ❌ Screenshot management overhead
 
 **Lightweight alternatives** (if automation needed):
-- **Playwright with Markdown Test Reporter**: Generates markdown logs from test code
-- **Puppeteer + custom script**: Reads markdown scenarios, executes, logs results
-- **Cypress with cy-spok**: Declarative test syntax similar to markdown
+- Use the browser automation tool specified in [tech-standards.md](tech-standards.md) (§Testing Tools).
+- Options: Markdown test reporter (generates logs from test code), or script that reads markdown scenarios and executes (see tech-standards for usage).
 
 **Recommendation**: Continue with markdown scripts in prototype/development phases. Consider automation only in pre-deployment phase if scenario count >100.
 
