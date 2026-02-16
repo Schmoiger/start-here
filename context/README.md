@@ -145,13 +145,36 @@ context/                           # Portable, pre-loadable directory
 │   ├── python-coder.md          # Python implementation
 │   ├── typescript-coder.md      # TypeScript implementation
 │   ├── functional-tester.md     # Test writing
-│   └── ...                      # Other specialists
+│   └── ...                      # Other specialists (18 total)
 ├── workflows/                    # Workflow patterns
 │   ├── default.yaml             # Full TDD with quality gates
-│   └── prototype.yaml           # Fast iteration, skip gates
-└── scripts/                     # Portable tools
-    ├── validators/              # Rule validators
-    └── generators/              # CLAUDE.md generator, etc.
+│   ├── prototype.yaml           # Fast iteration, skip gates
+│   ├── agent-effectiveness.yaml # Retrospective addon
+│   └── documentation-for-humans.yaml # Human-facing content with personas
+├── docs/                          # Usage guides
+│   ├── orchestration-patterns.md       # Multi-agent coordination
+│   ├── workflow-default.md             # Default workflow guide (with diagram)
+│   ├── workflow-prototype.md           # Prototype workflow guide (with diagram)
+│   ├── workflow-agent-effectiveness.md # Effectiveness guide (with diagram)
+│   ├── workflow-documentation-for-humans.md # Human-facing content guide (with diagram)
+│   ├── how-to-measure-agent-effectiveness.md # Detailed measurement examples
+│   ├── writing-personas.md             # When/how to use writing personas
+│   └── framework-adapters.md           # Cross-framework compatibility
+├── templates/                     # Output templates
+│   ├── handoffs/                 # Handoff formats
+│   ├── reviews/                  # Review formats
+│   └── artefacts/                # Artefact templates
+├── persona/                       # Writing voice for human-facing content
+│   ├── technical-writer.md       # Dr. Sarah Chen persona (blogs, papers)
+│   ├── editor.md                 # Editorial voice
+│   └── expert-reviewer.md        # Review voice
+├── mcp/                          # MCP server configuration
+│   └── mcp.json                  # Template config
+└── scripts/                      # Portable tools
+    ├── coordinate.sh             # Agent coordination helper
+    ├── validators/               # Rule validators (pre-commit hooks)
+    ├── generators/               # CLAUDE.md/AGENTS.md generators
+    └── tests/                    # Validator tests
 ```
 
 ---
