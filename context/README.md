@@ -15,6 +15,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Workflow usage guides** | `docs/workflow-*.md` | How to use each workflow (with diagrams) |
 | **Orchestration patterns** | `docs/orchestration-patterns.md` | Multi-agent coordination patterns |
 | **Output templates** | `templates/` | Handoff, review, artefact formats |
+| **Writing personas** | `persona/*.md` | Voice/style for human-facing content (blogs, papers) |
 | **Validators** | `scripts/validators/` | Pre-commit hooks, CI/CD |
 | **Generators** | `scripts/generators/` | CLAUDE.md/AGENTS.md generators |
 
@@ -23,24 +24,6 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 ## For Agents
 
 **Quick scan** - Read these when spawned:
-
-### Your Persona
-
-You are a **specialised agent** with a specific role (defined in `agents/{your-name}.md`). Your job is to:
-1. **Read your agent definition** - Your frontmatter lists which rules and standards apply to you
-2. **Follow rules strictly** - These are non-negotiable (things break if ignored)
-3. **Reference standards when needed** - Detailed guidance for how to do things well
-4. **Produce expected outputs** - Templates define formats for handoffs, reviews, artefacts
-5. **Stay in your lane** - Don't do work assigned to other agents (delegate instead)
-
-**Example**: If you're `@python-coder`:
-- ✅ Write Python code following `python-environment.mdc` (use `uv`, not `pip`)
-- ✅ Read `standards/coding-standards.md` for Python patterns
-- ✅ Output code files, update handoffs
-- ❌ Don't write tests (that's `@functional-tester`'s job)
-- ❌ Don't review architecture (that's `@tech-lead`'s job)
-
-### Quick Links
 
 **Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc)
 
@@ -51,6 +34,8 @@ You are a **specialised agent** with a specific role (defined in `agents/{your-n
 **Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [patterns](docs/orchestration-patterns.md)
 
 **Templates**: [handoffs](templates/handoffs/) · [reviews](templates/reviews/) · [artefacts](templates/artefacts/)
+
+**Personas**: [technical-writer](persona/technical-writer.md) · [editor](persona/editor.md) · [expert-reviewer](persona/expert-reviewer.md)
 
 ---
 
@@ -94,6 +79,12 @@ You are a **specialised agent** with a specific role (defined in `agents/{your-n
 **Templates** (`templates/`):
 - Output formats for handoffs, reviews, artefacts
 - Agents use these for consistent outputs
+
+**Personas** (`persona/*.md`):
+- Writing voice/style for human-facing content
+- Documentation agents adopt these when writing blogs, technical papers, marketing materials
+- NOT for technical handoffs (README, build notes, architecture docs)
+- Examples: technical-writer.md (Dr. Sarah Chen persona), editor.md, expert-reviewer.md
 
 **Scripts** (`scripts/`):
 - Validators: Pre-commit hooks for rule enforcement
@@ -194,6 +185,10 @@ context/
 │   ├── handoffs/                 # Handoff formats
 │   ├── reviews/                  # Review formats
 │   └── artefacts/                # Artefact templates
+├── persona/                       # Writing voice for human-facing content
+│   ├── technical-writer.md       # Dr. Sarah Chen persona (blogs, papers)
+│   ├── editor.md                 # Editorial voice
+│   └── expert-reviewer.md        # Review voice
 ├── mcp/                          # MCP server configuration
 │   └── mcp.json                  # Template config
 └── scripts/                      # Portable tools

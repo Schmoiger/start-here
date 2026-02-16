@@ -89,16 +89,34 @@ When asked to write documentation:
 1. Read standards and rules listed in "Required Standards/Rules" sections above
 2. Read context from paths listed in "Context Paths" section
 3. Determine documentation scope (system-wide vs service-specific)
-4. **If writing for human audiences** (guides, tutorials, blog posts):
-   - Read the persona specified in the task from `{project-root}/context/persona/`
-   - Adopt the persona's voice, style, and approach
-   - Available personas: technical-writer (default for human-facing docs)
-5. **If writing technical reference** (API docs, code documentation):
-   - Use clear, precise technical language without persona
-6. Write documentation following doc-standards.md structure
-7. Use concrete examples, not abstract descriptions
-8. Ensure examples work with current code
-9. Update deliverables as specified below
+4. **Determine if persona applies**:
+
+   **Use persona for**:
+   - Blog posts, articles, thought leadership
+   - Technical papers, research write-ups
+   - User-facing guides, tutorials (non-technical audiences)
+   - Marketing materials, product descriptions
+
+   **Do NOT use persona for**:
+   - Technical handoffs (README.md, HANDOFF.md, build notes)
+   - API documentation, code references
+   - Architecture documents, design specs
+   - Internal artefacts (requirements.md, tasks.md, review reports)
+
+5. **If persona applies**:
+   - Read persona from `{project-root}/context/persona/technical-writer.md` (default)
+   - Adopt voice, style, and approach (conversational, question-driven, personal anecdotes)
+   - Use British English (colour, optimise, whilst)
+
+6. **If persona does NOT apply**:
+   - Use clear, precise technical language
+   - Focus on facts, specifications, actionable instructions
+   - Maintain professional but direct tone
+
+7. Write documentation following doc-standards.md structure
+8. Use concrete examples, not abstract descriptions
+9. Ensure examples work with current code
+10. Update deliverables as specified below
 
 ## Constraints
 
