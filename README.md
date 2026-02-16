@@ -63,7 +63,7 @@ This context system works with multiple AI frameworks beyond Claude Code.
 **Native support**: Claude Code (CLI), Claude Desktop
 **Adaptable to**: LangGraph, CrewAI, AutoGen, Cursor, Aider, Continue, Windsurf
 
-See `context/agents/FRAMEWORK-ADAPTERS.md` for integration guides showing how to load agent definitions, map tools, and adapt workflows for each framework.
+See `context/docs/framework-adapters.md` for integration guides showing how to load agent definitions, map tools, and adapt workflows for each framework.
 
 ---
 
@@ -71,7 +71,7 @@ See `context/agents/FRAMEWORK-ADAPTERS.md` for integration guides showing how to
 
 - **Issues**: https://github.com/Schmoiger/start-here/issues
 - **Full documentation**: `context/README.md`
-- **Framework adapters**: `context/agents/FRAMEWORK-ADAPTERS.md`
+- **Framework adapters**: `context/docs/framework-adapters.md`
 - **Customization**: See `context/README.md` for adding agents, rules, validators
 
 ---
