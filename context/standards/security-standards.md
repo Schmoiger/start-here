@@ -1,3 +1,11 @@
+---
+purpose: Security principles, threat modelling, and data protection
+audience: All developers, security reviewers
+read-when: Designing auth, handling data, security reviews
+not-for: Implementation details for secrets (see tech-standards.md), code patterns (see coding-standards.md)
+related: [tech-standards, coding-standards]
+---
+
 # Security Standards
 
 **Principle**: Assume failure modes exist, then design so they're boring when they happen. Security effort should be proportionate to the workflow phase and architecture — prototype code needs basic hygiene; production code needs defence in depth.
@@ -184,16 +192,20 @@ Dependencies are a supply chain, not free candy. Treat them accordingly.
 
 ## Secrets Management
 
-See [rules/secrets-management.mdc](../rules/secrets-management.mdc) for loading patterns and file locations.
+**Rule:** No secrets are stored in plaintext, even in gitignored files.
 
-**Key points**:
-- Single source of truth in `/secrets/` (local) or Secret Manager (production)
-- Never commit secrets to version control
-- Never duplicate secrets across locations
+See [tech-standards.md §Secret Management & Security](tech-standards.md#secret-management--security) for the adopted pattern and [rules/secrets-management.mdc](../rules/secrets-management.mdc) for loading patterns and file locations.
+
+**Principles:**
+- Encrypt all secrets at rest (local and production)
+- Least privilege for secret access
+- Never commit plaintext secrets; encrypted files (e.g. `secrets.enc.json`) are allowed
 - Rotate credentials on a schedule
-- Use environment variables as transport, not storage — the real source is the secret manager
-- Prefer identity-based auth (workload identity, OIDC) over shared secrets where the platform supports it
-- Short-lived credentials over long-lived ones: machines should borrow credentials briefly and return them
+- Use environment variables as delivery, not storage — the source is the secret store
+- Prefer identity-based auth (workload identity, OIDC) over shared secrets
+- Short-lived credentials over long-lived: machines should borrow credentials briefly and return them
+
+For implementation details (SOPS, GSM, JSON blob rationale), see [tech-standards.md §Secret Management](tech-standards.md#secret-management--security).
 
 ## Testing Security
 

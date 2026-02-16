@@ -1,3 +1,11 @@
+---
+purpose: Code patterns, naming conventions, and implementation standards
+audience: All developers and coding agents
+read-when: Writing code, reviewing PRs, understanding patterns
+not-for: Tool choices (see tech-standards.md), testing methodology (see testing-standards.md)
+related: [tech-standards, testing-standards, security-standards]
+---
+
 # Coding Standards
 
 **Languages**: Python (backend), TypeScript (frontend)
@@ -5,7 +13,7 @@
 ## File Organisation
 
 ```
-backend/{service-name}/
+services/{service-name}/
 ├── main.py              # FastAPI app entry point
 ├── config.py            # Configuration classes
 ├── models.py            # Pydantic/SQLAlchemy models
@@ -15,7 +23,7 @@ backend/{service-name}/
 └── tests/               # Test directory
 
 frontend/
-├── app/                 # Next.js app router
+├── app/                 # Application routes
 ├── components/          # Reusable components
 ├── hooks/              # Custom React hooks
 ├── lib/                # Utilities, API clients
@@ -201,7 +209,7 @@ def process_data(user_id: str, data: Dict[str, Any]) -> Optional[Result]:
     pass
 ```
 
-**Linting**: Biome (TS), black + isort (Python) - auto-fix all issues before commits
+**Linting and formatting**: Python uses **Ruff** (format + lint) and **Pyright** (type checking); see [tech-standards.md §Static Analysis](tech-standards.md#static-analysis--code-quality). Auto-fix all issues before commits.
 
 ## Commit Protocol
 
@@ -215,18 +223,17 @@ def process_data(user_id: str, data: Dict[str, Any]) -> Optional[Result]:
 {optional body}
 
 Tasks: {task-ids}
-Agent-Session: model={model} agents={list} tokens={in}K/{out}K duration={time}
+Agent-Session: tool={tool} model={model} agents={agent-ids} tokens={in}K/{out}K duration={time}
 
-Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
+Co-Authored-By: {tool-or-model} <email>
 ```
 
 **Note**:
-- Agents must use their actual model name and ID (e.g., "Sonnet 4.5 (claude-sonnet-4-5-20250929)")
+- **Triplet**: Record the actual tool (e.g. cursor, claude-ide), model (e.g. sonnet, gpt-4), and agent(s) from context/agents (e.g. python-coder, functional-tester). Do not substitute a default.
 - Agent-Session line tracks metrics for session analysis
 - Tasks line references task IDs from tasks.md or artefacts/build/tasks.md
 
 ### Commit Types by TDD Phase
-
 
 | Phase            | Type       | Example                                                                   |
 | ---------------- | ---------- | ------------------------------------------------------------------------- |
@@ -236,63 +243,16 @@ Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
 | Bug fix          | `fix`      | `fix(llm-service): LLM-105 handle OpenRouter timeout`                     |
 | Refactor         | `refactor` | `refactor(shared-types): ST-107 simplify model exports`                   |
 
-
 ### Scopes
 
-Use the service/package name as scope:
+Use the service/package name as scope (e.g. `shared-types`, `data-service`, `vis-service`, `llm-service`, `frontend`).
 
-- `shared-types` - Shared type definitions
-- `data-service` - Data fetching service
-- `vis-service` - Visualisation service
-- `llm-service` - LLM service
-- `frontend` - React frontend
-
-### Workflow
-
-1. Complete task
-2. Run tests (verify expected state: failing for RED, passing for GREEN)
-3. Stage relevant files
-4. Commit with task ID in message
-5. Mark task as complete `[x]`
-
-### Examples
-
-```bash
-# TDD RED - failing tests
-test(data-service): DS-001 add failing tests for yfinance data fetching
-
-Tasks: DS-001
-Agent-Session: model=sonnet agents=functional-tester tokens=8.2K/5.1K duration=32m
-
-Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
-
-# TDD GREEN - implementation
-feat(data-service): DS-101 create project structure and dependencies
-
-Tasks: DS-101
-Agent-Session: model=sonnet agents=python-coder tokens=12.4K/8.2K duration=45m
-
-Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
-
-# Review approval
-docs(data-service): DS-301 add tech lead review - APPROVED
-
-Tasks: DS-301
-Agent-Session: model=opus agents=tech-lead tokens=15.6K/6.3K duration=28m
-
-Co-Authored-By: Claude Opus 4.5 (claude-opus-4-5-20251101) <noreply@anthropic.com>
-
-# Human commits (no Agent-Session or Co-Authored-By)
-feat: add user authentication
-fix: resolve token refresh bug
-docs: update API documentation
-refactor: simplify data service logic
-```
+For commit types, workflow, and full examples, see [conventional-commits.mdc](../rules/conventional-commits.mdc).
 
 
 ## Framework-Specific Best Practices
 
-### React/Next.js/TypeScript
+### React/TypeScript
 
 **Philosophy:** Functional/declarative, SOLID, Type safety, Component-driven
 
@@ -314,24 +274,21 @@ refactor: simplify data service logic
 - React.memo() strategically
 - Proper cleanup in useEffect
 
-**Next.js:**
-- App Router, Server Components by default
-- 'use client' only for: events, browser APIs, state, client libs
-- Image/Link/Script components for optimisation
-
 **State Management:**
 
 | Scope | Use |
 |-------|-----|
-| Local | useState, useReducer |
-| Shared | useContext |
-| Global | Redux Toolkit (createSlice) |
+| Component | useState, useReducer |
+| Shared (local) | useContext |
+| Global (client) | Zustand |
+| Server | TanStack Query |
 
 **Styling:** Tailwind CSS, Mobile-first, Dark mode via CSS vars, WCAG contrast
 
 **UI Components (DaisyUI):**
 
-Use DaisyUI semantic classes for all standard components.
+**Styling priority:** (1) DaisyUI semantic classes first, (2) Tailwind utilities second, (3) custom CSS only as a last resort when neither provides what's needed. Do not create component-specific `.css` files without exhausting DaisyUI and Tailwind options first.
+Enforced by [ui-component-reuse.mdc](../rules/ui-component-reuse.mdc).
 
 | Do | Don't |
 |----|-------|
@@ -344,59 +301,11 @@ Use DaisyUI semantic classes for all standard components.
 
 **Quality:**
 - Zod for validation (see [security-standards.md §Input Validation](security-standards.md#input-validation) for principles)
-- Jest + React Testing Library
+- Vitest + React Testing Library
 - Error boundaries with Sentry
 - Semantic HTML, ARIA, keyboard nav
 
-### SwiftUI/iOS
-
-**Architecture:** MVVM with SwiftUI, Prefer structs over classes
-
-**Structure:** Features/, Core/, UI/, Resources/
-
-**Naming:** camelCase vars/funcs, PascalCase types, Boolean: is/has/should prefix
-
-**Patterns:**
-
-| Area | Use |
-|------|-----|
-| Concurrency | async/await |
-| State | @Published, @StateObject |
-| Errors | Result type |
-| UI | SwiftUI first, UIKit when needed |
-| Icons | SF Symbols |
-
-**Quality:**
-- Profile with Instruments
-- XCTest + XCUITest
-- Support dark mode, dynamic type
-- Keychain for secrets, certificate pinning
-
-### React Native for Web
-
-**Goal:** Write Once, Run on Multiple Platforms
-
-**Principles:**
-
-1. **Organise Repository for Shared Code**
-   - Shared components in `packages/shared-ui/`
-   - Platform-specific overrides in `mobile/` and `web/`
-
-2. **Reuse Components Across Platforms**
-   - Use React Native primitives (View, Text, etc.)
-   - Platform-specific files: `.ios.tsx`, `.android.tsx`, `.web.tsx`
-
-3. **Consolidate State Management**
-   - Shared Redux store
-   - Platform-agnostic business logic
-
-4. **Optimize Build and Deployment**
-   - Separate build pipelines
-   - Shared TypeScript config base
-
-5. **Focus on Developer Experience**
-   - Fast refresh for all platforms
-   - Shared dev tools and debugging
+For mobile coding patterns (SwiftUI/iOS, React Native for Web), see [tech-mobile-standards.md](tech-mobile-standards.md).
 
 ## API Design Standards
 
