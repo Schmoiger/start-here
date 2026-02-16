@@ -29,9 +29,9 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
 
-**Workflows**: [default](workflows/default.yaml) · [prototype](workflows/prototype.yaml) · [agent-effectiveness](workflows/agent-effectiveness.yaml)
+**Workflows**: [default](workflows/default.yaml) · [prototype](workflows/prototype.yaml) · [agent-effectiveness](workflows/agent-effectiveness.yaml) · [documentation-for-humans](workflows/documentation-for-humans.yaml)
 
-**Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
+**Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [documentation-for-humans](docs/workflow-documentation-for-humans.md) · [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
 
 **Templates**: [handoffs](templates/handoffs/) · [reviews](templates/reviews/) · [artefacts](templates/artefacts/)
 
@@ -149,6 +149,12 @@ See `docs/workflow-*.md` for complete usage guides with diagrams.
 - Analyzes efficiency, identifies bottlenecks
 - Post-deployment retrospective or mid-cycle health check
 
+**Documentation for Humans** (`workflows/documentation-for-humans.yaml`):
+- Human-facing content: 5 phases, 1 agent (multiple personas)
+- Blogs, papers, user guides (NOT API docs/handoffs)
+- Uses writing personas (conversational, British English)
+- Duration: 2-4 hours
+
 **Orchestration patterns**: Single Agent, Sequential Chain, Parallel Swarm, Hive, Iterative Loop (see `docs/orchestration-patterns.md`)
 
 **Framework compatibility**: Claude Code (native), LangGraph, CrewAI, AutoGen, Cursor, Aider, Continue, Windsurf (see `docs/framework-adapters.md`)
@@ -170,12 +176,14 @@ context/
 ├── workflows/                     # Workflow patterns (phase dependencies)
 │   ├── default.yaml              # Full TDD with quality gates
 │   ├── prototype.yaml            # Fast iteration
-│   └── agent-effectiveness.yaml  # Retrospective addon
+│   ├── agent-effectiveness.yaml  # Retrospective addon
+│   └── documentation-for-humans.yaml # Human-facing content with personas
 ├── docs/                          # Usage guides
 │   ├── orchestration-patterns.md       # Multi-agent coordination
 │   ├── workflow-default.md             # Default workflow guide (with diagram)
 │   ├── workflow-prototype.md           # Prototype workflow guide (with diagram)
 │   ├── workflow-agent-effectiveness.md # Effectiveness guide (with diagram)
+│   ├── workflow-documentation-for-humans.md # Human-facing content guide (with diagram)
 │   ├── how-to-measure-agent-effectiveness.md # Detailed measurement examples
 │   ├── writing-personas.md             # When/how to use writing personas
 │   └── framework-adapters.md           # Cross-framework compatibility

@@ -1,0 +1,99 @@
+# Documentation for Humans Workflow
+#
+# Specialized workflow for creating human-facing content (blogs, papers, guides)
+# Uses writing personas for voice/style
+# NOT for technical handoffs or API documentation
+
+name: documentation-for-humans
+description: Create human-facing content (blogs, papers, guides) with writing personas
+
+phases:
+  - id: research
+    name: Research & Context Gathering
+    agents:
+      - product-expert  # Optional: gather domain context
+    outputs:
+      - Research notes
+      - Source materials
+    notes:
+      - Gather background information
+      - Understand audience and purpose
+      - Identify key messages
+
+  - id: draft
+    name: Write First Draft
+    depends_on: [research]
+    agents:
+      - documentation  # Uses technical-writer persona by default
+    outputs:
+      - artefacts/content/drafts/{title}-draft.md
+    notes:
+      - Agent reads context/persona/technical-writer.md
+      - Adopts Dr. Sarah Chen voice (conversational, question-driven)
+      - Uses British English throughout
+      - Target length based on content type (blog: 400-800 words, paper: longer)
+    validation:
+      - Persona voice applied (not dry technical tone)
+      - British English used consistently
+      - Opening hook present
+      - Concrete examples included
+
+  - id: review
+    name: Editorial Review
+    depends_on: [draft]
+    agents:
+      - documentation  # Uses editor persona
+    outputs:
+      - artefacts/content/drafts/{title}-reviewed.md
+    notes:
+      - Check voice consistency
+      - Verify British English
+      - Ensure no AI slop (em dashes, triads, vapid transitions)
+      - Verify examples are concrete, not abstract
+    validation:
+      - Voice consistent throughout
+      - No AI slop patterns
+      - Examples work and are relevant
+
+  - id: technical-review
+    name: Technical Accuracy Review
+    depends_on: [review]
+    optional: true  # Skip for non-technical content
+    agents:
+      - documentation  # Uses expert-reviewer persona
+    outputs:
+      - artefacts/content/drafts/{title}-tech-reviewed.md
+    notes:
+      - Verify technical claims are accurate
+      - Check code examples work
+      - Validate references to products/APIs
+      - Ensure no misleading statements
+
+  - id: finalize
+    name: Finalize & Publish
+    depends_on: [technical-review]
+    agents:
+      - documentation
+    outputs:
+      - artefacts/content/published/{title}.md
+    notes:
+      - Apply any final edits
+      - Format for publication platform
+      - Add metadata (date, author, tags)
+      - Move to published directory
+
+quality_gates: []  # No formal quality gates, but validation at each phase
+
+workflow_rules:
+  - Always use writing persona (technical-writer by default)
+  - British English throughout (colour, optimise, whilst)
+  - No AI slop (em dashes, triads, vapid transitions)
+  - Concrete examples, not abstract descriptions
+  - Opening hook required
+  - Target audience clarity (leaders vs practitioners)
+  - Persona voice consistency across phases
+
+warnings:
+  - "⚠️  This workflow is for HUMAN-FACING content only (blogs, papers, guides)"
+  - "⚠️  For technical handoffs/API docs, use default workflow without persona"
+  - "⚠️  Always specify which persona to use (default: technical-writer)"
