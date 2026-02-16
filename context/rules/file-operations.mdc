@@ -1,0 +1,27 @@
+---
+description: File creation and modification must use Write/Edit tools
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# File Operations
+
+**Applies to**: All file creation, modification, reading, and searching
+
+## Commands
+
+| Action | Correct | Wrong |
+|--------|---------|-------|
+| Create file | Write tool | `echo "..." > file`, `cat << EOF > file` |
+| Edit file | Edit tool | `sed -i`, `awk`, bash heredoc |
+| Read file | Read tool | `cat file`, `head`, `tail` |
+| Find files | Glob tool | `find . -name`, `ls -R` |
+| Search content | Grep tool | `grep`, `rg` via bash |
+
+## Why
+
+Write/Edit tools execute without user permission. Bash file operations require individual approval, blocking autonomous execution.
+
+## Exception
+
+Bash is correct for: git operations, running tests (`uv run pytest`, `yarn test`), installing packages (`uv add`, `yarn add`), starting servers.

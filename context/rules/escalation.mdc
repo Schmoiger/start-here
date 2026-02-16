@@ -1,0 +1,40 @@
+---
+description: Agents must escalate uncertainty to the orchestrator rather than guessing
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Escalation
+
+**Applies to**: All agents facing uncertainty or ambiguity
+
+## Decision Matrix
+
+| Impact if Wrong | Confidence | Action |
+|-----------------|------------|--------|
+| Low | Any | Assume, document in handoff, proceed |
+| Medium | High | Assume, document in handoff, proceed |
+| Medium | Low | Assume, document, flag for review |
+| High | Any | **STOP. Escalate to orchestrator.** |
+
+## Escalation Path
+
+Subagent → Orchestrator → Human. Escalate to the orchestrator (not directly to the human) because the orchestrator has broader project context and can often resolve without human intervention.
+
+## Escalate When
+
+- Requirements are ambiguous or contradictory
+- Architecture decision not covered by existing docs
+- Security implications unclear
+- Breaking change to existing API contract
+- Multiple valid approaches with significant trade-offs
+
+## How to Escalate
+
+Return to the orchestrator with: the question, impact assessment, options considered, and a recommendation. The orchestrator decides whether to resolve or escalate to the human.
+
+## Forbidden
+
+- Guessing on high-impact decisions without escalating
+- Silently assuming without documenting the assumption
+- Blocking on low-impact unknowns (just document and proceed)

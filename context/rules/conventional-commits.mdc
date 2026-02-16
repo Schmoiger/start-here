@@ -27,21 +27,24 @@ Format: `{type}({scope}): {description}`
 {optional body}
 
 Tasks: {task-ids}
-Agent-Session: model={model} agents={list} tokens={in}K/{out}K duration={time}
+Agent-Session: tool={tool} model={model} agents={agent-ids} tokens={in}K/{out}K duration={time}
 
-Co-Authored-By: Claude {Model} <{model}@anthropic.com>
+Co-Authored-By: {tool-or-model} <email>
 ```
 
-## Agent-Session Line
+## Agent-Session Line (triplet)
 
-Machine-parseable metrics:
+Machine-parseable. **Record the triplet accurately: tool, model, agent(s).**
 
 | Field | Format | Example |
 |-------|--------|---------|
-| model | sonnet\|opus\|haiku | model=sonnet |
-| agents | comma-separated | agents=auth-coder,auth-reviewer |
+| tool | IDE/platform that ran the model | tool=cursor, tool=claude-ide, tool=copilot |
+| model | Model/backend used | model=sonnet, model=opus, model=gpt-4 |
+| agents | Agent(s) from context/agents | agents=python-coder, agents=functional-tester,code-reviewer |
 | tokens | in/out with K suffix | tokens=12.4K/8.2K |
 | duration | minutes or hours | duration=45m |
+
+Agent names come from `context/agents/*.md`. Use the actual (tool, model, agent) for the commit; do not substitute a default.
 
 ## Examples
 
@@ -51,9 +54,9 @@ Machine-parseable metrics:
 feat(auth): add token refresh endpoint
 
 Tasks: AUTH-001
-Agent-Session: model=sonnet agents=auth-coder tokens=8.2K/5.1K duration=32m
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=8.2K/5.1K duration=32m
 
-Co-Authored-By: Claude Sonnet <sonnet@anthropic.com>
+Co-Authored-By: Cursor <cursor@cursor.com>
 ```
 
 ### Human Commit
