@@ -62,17 +62,21 @@ def validate_commit_message(msg: str) -> tuple[bool, str]:
             if not re.match(r'^Co-Authored-By: .+ <.+@.+\..+>$', line):
                 return False, f"Invalid Co-Authored-By format: {line}"
 
-    # If Agent-Session present, validate it's an agent commit
+    # If Agent-Session present, validate it's an agent commit (triplet: tool, model, agents)
     has_agent_session = False
     for line in lines:
         if line.startswith('Agent-Session:'):
             has_agent_session = True
-            # Validate format: Agent-Session: model={model} agents={list} tokens={in}K/{out}K duration={time}
-            pattern = r'^Agent-Session: model=(sonnet|opus|haiku) agents=[a-z0-9,-]+ tokens=\d+(\.\d+)?K/\d+(\.\d+)?K duration=\d+(m|h)$'
+            # Format: tool= tool model= model agents= list tokens= in/out duration= time
+            pattern = (
+                r'^Agent-Session: tool=[a-z0-9-]+ model=[a-z0-9.-]+ agents=[a-z0-9,-]+ '
+                r'tokens=\d+(\.\d+)?K/\d+(\.\d+)?K duration=\d+(m|h)$'
+            )
             if not re.match(pattern, line):
                 return False, (
                     f"Invalid Agent-Session format: {line}\n"
-                    "Expected: Agent-Session: model=sonnet agents=coder,reviewer tokens=8.2K/5.1K duration=45m"
+                    "Expected: Agent-Session: tool=<tool> model=<model> agents=<agents> tokens=8.2K/5.1K duration=45m\n"
+                    "Triplet: tool (e.g. cursor, claude-ide), model (e.g. sonnet, gpt-4), agents from context/agents (e.g. python-coder)"
                 )
 
     # If Agent-Session present, Co-Authored-By is required
