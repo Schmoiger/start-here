@@ -1,0 +1,31 @@
+---
+description: Agents and orchestrators must log interruptions to the interruptions file
+globs: []
+alwaysApply: true
+---
+
+# Interruption Logging
+
+**Applies to**: All agents and the orchestrator
+
+## When to Log
+
+Log to `artefacts/build/agent-interruptions.md` immediately when:
+
+| Type | Who logs | Trigger |
+|------|----------|---------|
+| Question | Agent | Blocked, needs external answer |
+| Tool approval | Agent | User prompted for permission |
+| Wrong approach | Orchestrator | Agent started wrong direction, required correction |
+| Missing context | Orchestrator | Agent failed because context bundle was insufficient |
+| Standards violation | Reviewer | Agent used wrong tool/command, caught in review |
+
+## When NOT to Log
+
+- Autonomous decisions (tool choice, code style, minor trade-offs)
+- Self-resolved issues (lint fixes, command syntax corrections)
+- Only log when external attention was required or given
+
+## Format
+
+See `context/standards/agent-standards.md` §3.6 for entry format.
