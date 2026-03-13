@@ -2,8 +2,6 @@
 
 Portable standards, rules, and agent definitions for multi-agent development workflows.
 
-**Purpose**: This directory contains reusable context that can be pre-loaded into any project. All paths use `{project-root}` placeholders for portability.
-
 ---
 
 ## Quick Reference
@@ -18,8 +16,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Orchestration patterns** | `docs/orchestration-patterns.md` | Multi-agent coordination patterns                    |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
-| **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD                              |
-| **Generators**             | `scripts/generators/`            | CLAUDE.md/AGENTS.md generators                       |
+| **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD, context integrity           |
 
 ---
 
@@ -27,11 +24,11 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Quick scan** - Read these when spawned:
 
-**Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc) · [orchestrator-delegation](rules/orchestrator-delegation.mdc) · [browser-automation](rules/browser-automation.mdc)
+**Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [git-commit-format](rules/git-commit-format.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [interruption-logging](rules/interruption-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc)
 
-**Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md) · [agent](standards/agent-standards.md) · [build](standards/build-standards.md) · [tech-mobile](standards/tech-mobile-standards.md)
+**Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
 
-**Workflows**: [default](workflows/default.yaml) · [prototype](workflows/prototype.yaml) · [agent-effectiveness](workflows/agent-effectiveness.yaml) · [documentation-for-humans](workflows/documentation-for-humans.yaml) · [retrospective-addon](workflows/retrospective-addon.yaml)
+**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [deploy](workflows/deploy.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [retrospective](workflows/retrospective.yaml) · [default](workflows/default.yaml) · [prototype](workflows/prototype.yaml)
 
 **Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [documentation-for-humans](docs/workflow-documentation-for-humans.md) · [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
 
@@ -39,49 +36,124 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 ---
 
-## Rules vs Standards
+## Two-Tier Architecture
 
-**Key insight**: Rules and standards serve different purposes and are consumed differently.
+```mermaid
+graph TD
+    subgraph tier1["Tier 1 — Framework-agnostic (context/)"]
+        R["rules/*.mdc<br/>binary constraints"]
+        S["standards/*.md<br/>reference docs"]
+        A["agents/*.md<br/>who does what"]
+        W["workflows/*.yaml<br/>phase definitions"]
+        T["templates/<br/>output formats"]
+    end
 
-### Rules (Non-Negotiables)
+    subgraph tier2["Tier 2 — Framework adapters (project root)"]
+        CC["CLAUDE.md + AGENTS.md<br/>Claude Code"]
+        CL[".clinerules/<br/>Cline"]
+        CU[".cursor/rules/<br/>Cursor"]
+    end
 
-**Location**: `context/rules/*.mdc`
+    subgraph hooks[".claude/ (hooks & permissions)"]
+        SJ["settings.json<br/>PostToolUse biome · SubagentStop metrics"]
+        SL["settings.local.json<br/>permissions (gitignored)"]
+    end
 
-**Purpose**: Things that **break** if not followed. Not style preferences—actual failures.
+    CC -->|reads| tier1
+    CL -->|points to| tier1
+    CU -->|reads| R
+    CC --- hooks
+```
 
-| Characteristic | Description |
-|----------------|-------------|
-| **Self-contained** | Agent can follow rule without cross-referencing other docs |
-| **Actionable** | Clear DO/DON'T commands, not explanations |
-| **Binary** | Either followed or not—no grey area |
-| **Loaded by agents** | Listed in agent frontmatter, key points in body |
+**Design principle**: `context/` is tool-agnostic. Framework adapters are thin pointers — they say "use `context/` for everything" without duplicating content.
 
-**Examples**:
-- `python-environment.mdc`: `uv run pytest` works, bare `pytest` fails
-- `secrets-management.mdc`: `/secrets/*.json` works, `.env` with creds leaks
-- `tdd-workflow.mdc`: GREEN phase modifying tests breaks TDD discipline
+---
 
-### Standards (Reference Documentation)
+## For Humans
 
-**Location**: `context/standards/*.md`
+### File Type Overview
 
-**Purpose**: **How** to do things well. Context, rationale, examples, edge cases.
+**Rules** (`rules/*.mdc`):
 
-| Characteristic | Description |
-|----------------|-------------|
-| **Comprehensive** | Full documentation with examples |
-| **Explanatory** | Includes rationale, trade-offs, alternatives |
-| **Reference** | Agents look up when they need guidance |
-| **Not loaded** | Too verbose for agent context; on-demand only |
+- Things that **break** if not followed (not style preferences)
+- Self-contained, actionable, binary (followed or not)
+- Agents load these via frontmatter
+- Examples: `uv run pytest` works, bare `pytest` fails; `/secrets/*.json` works, `.env` leaks
 
-**Examples**:
-- `coding-standards.md`: Python patterns, React patterns, logging conventions
-- `testing-standards.md`: TDD philosophy, coverage strategies, anti-patterns
-- `tech-standards.md`: Architecture decisions, deployment strategy
+**Standards** (`standards/*.md`):
 
-### DRY Consideration
+- **How** to do things well (context, rationale, examples)
+- Comprehensive reference documentation
+- Agents read on-demand (too verbose to preload)
+- Examples: Python patterns, TDD philosophy, architecture decisions
 
-Some duplication between rules and standards is **intentional**:
+**Agents** (`agents/*.md`):
+
+- Specialised agent definitions (who does what)
+- Frontmatter lists applicable rules + standards
+- Orchestrator spawns with Task tool
+- See `AGENTS.md` for the orchestrator protocol (~70 lines, hand-written)
+
+**Workflows** (`workflows/*.yaml`):
+
+- Phase definitions, dependencies, quality gates
+- Each phase lists agents, outputs, validation
+- Source of truth for phase ordering
+
+**Workflow Usage Guides** (`docs/workflow-*.md`):
+
+- How to use each workflow (when, how to invoke agents, phase-by-phase)
+- Each includes mermaid diagram showing phase flow
+- Best practices, common issues, tips
+
+**Orchestration Patterns** (`docs/orchestration-patterns.md`):
+
+- Multi-agent coordination patterns (single, chain, swarm, hive, loop)
+- Decision tree for choosing patterns
+- Token optimization strategies
+
+**Templates** (`templates/`):
+
+- Output formats for handoffs, reviews, artefacts
+- Agents use these for consistent outputs
+- Agent definitions include a `templates:` frontmatter field listing relevant templates for that agent
+
+**Personas** (`persona/*.md`):
+
+- Writing voice/style for human-facing content (blogs, papers, marketing)
+- NOT for technical handoffs (README, API docs, architecture)
+- See `docs/writing-personas.md` for complete guide
+
+**Scripts** (`scripts/`):
+
+- `log-agent-completion.sh`: SubagentStart/SubagentStop hook — writes per-agent metrics to `artefacts/build/agent-metrics.log`
+- `prepare-commit-msg.sh`: Git hook — reads agent-metrics.log and appends `Agent-Session` trailer to commit messages automatically. Install once per clone (see [Git Hooks](#git-hooks) below).
+- Validators: Pre-commit hooks for rule enforcement; `validate_context.py` checks context/ integrity
+- Tests: Validator test suite
+
+### Git Hooks
+
+Two git hooks live in `context/scripts/` and must be installed once per clone:
+
+| Hook | Script | Install |
+|------|--------|---------|
+| `prepare-commit-msg` | `context/scripts/prepare-commit-msg.sh` | `ln -sf ../../context/scripts/prepare-commit-msg.sh .git/hooks/prepare-commit-msg` |
+
+**What it does**: reads `artefacts/build/agent-metrics.log` for entries written since the last commit, calculates aggregate tokens and duration, then appends:
+
+```
+Agent-Session: tool=claude-code model=sonnet agents=python-coder tokens=~18K duration=12m
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+```
+
+The hook is a no-op if no agent work occurred since the last commit (no meaningful log entries). See `context/templates/commit-message-template.md` for the full footer format spec.
+
+---
+
+### DRY Between Rules & Standards
+
+Some duplication is **intentional**:
+
 - Rules tell agents **what to do** (concise, actionable)
 - Standards explain **why and how** (detailed, contextual)
 
@@ -91,93 +163,117 @@ An agent following a rule should succeed without reading standards. Standards ex
 
 ## Orchestrator Responsibilities
 
-The orchestrator (main Claude session or coordinating agent) has specific responsibilities.
+The orchestrator (main Claude session or coordinating agent) coordinates work but delegates implementation.
 
 ### Delegation Principle
 
-**Rule**: For implementation work, delegate to specialised agents when available.
+**Rule**: For implementation work, delegate to specialised agents.
 
-| Task Type | Action |
-|-----------|--------|
-| Python code | Spawn `@python-coder` |
-| TypeScript code | Spawn `@typescript-coder` |
-| Tests | Spawn `@functional-tester` |
-| Architecture | Spawn `@solution-architect` |
-| Code review | Spawn `@tech-lead` or `@code-reviewer` |
+**Why**: Specialised agents have rules loaded in their context. If the orchestrator writes code directly, it may not follow rules like `python-environment.mdc`.
 
-**Why**: Specialised agents have rules loaded in their context. If the orchestrator writes Python directly, it may not follow `python-environment.mdc` rules.
+### When No Agent Exists
 
-### No Agent Available?
+1. **Simple non-code tasks**: Orchestrator handles directly
 
-If there's no specialised agent for a task:
-
-1. **Simple non-code tasks**: Orchestrator can handle directly
    - File moves, git operations, task management
    - Reading/summarising files
    - Coordinating between agents
 
 2. **Code-adjacent tasks**: Follow relevant rules directly
-   - Read the applicable rules before starting
+
+   - Read applicable rules before starting
    - State which rules you're following
    - Example: "Following `python-environment.mdc`, using `uv run python`..."
 
-3. **New domain requiring repeated work**: Create a new agent
+3. **New domain requiring repeated work**: Create new agent
+
    - Copy `agents/TEMPLATE.md`
    - Define rules and standards in frontmatter
    - Add to workflow if ongoing
 
-### Orchestrator Anti-Patterns
+---
 
-| Anti-Pattern | Why It's Bad | Do Instead |
-|--------------|--------------|------------|
-| Writing Python without spawning agent | Rules not loaded, may use bare `python` | Spawn `@python-coder` |
-| Writing tests without spawning agent | May not follow TDD discipline | Spawn `@functional-tester` |
-| Doing reviews without spawning agent | Missing review checklist context | Spawn `@tech-lead` |
-| Waiting for all parallel tasks | Serial execution, not parallel | Let tracks progress independently |
+## Workflows
+
+See `docs/workflow-*.md` for complete usage guides with diagrams.
+
+**Build** (`workflows/build.yaml`):
+
+- Primary development loop: planning → TDD → sprint review → regression → holistic review → deployment
+- Replaces default.yaml as the recommended workflow for most work
+- Includes hive subtask execution model with context bundles per subtask
+- Optional retrospective phase for efficiency analysis
+
+**Design** (`workflows/design.yaml`):
+
+- Discovery through design review gate
+- Run before build workflow
+
+**Deploy** (`workflows/deploy.yaml`):
+
+- GCP cloud deployment and deployment review
+- Run after build workflow local-deployment
+
+**Full-Test** (`workflows/full-test.yaml`):
+
+- Full-suite testing across all modules
+- Run before merge to master or on demand
+
+**Content** (`workflows/content.yaml`):
+
+- Human-facing content: blogs, papers, guides with writing personas
+- NOT for API docs/handoffs (use docs-cleanup phase in build.yaml)
+
+**Retrospective** (`workflows/retrospective.yaml`):
+
+- Standalone efficiency analysis
+- Run after deployment or on demand mid-cycle
+
+**Default** (`workflows/default.yaml`) *(superseded by build.yaml for most work)*:
+
+- Full TDD: 14 phases, 3 quality gates, 18 agents
+- Production code, critical features
+
+**Prototype** (`workflows/prototype.yaml`):
+
+- Fast iteration: 4 phases, 0 quality gates, 5 agents
+- POCs, experiments, throwaway code
+- ⚠️ Must rewrite with build workflow before production
+
+**Orchestration patterns**: Single Agent, Sequential Chain, Parallel Swarm, Hive, Iterative Loop (see `docs/orchestration-patterns.md`)
+
+**Framework adapters**: Claude Code (`CLAUDE.md` → `AGENTS.md`), Cursor (reads `context/rules/` natively), Cline (`.clinerules/` pointer). See `docs/framework-adapters.md` for others.
 
 ---
 
-## Architecture
+## Directory Structure
 
 ```
-context/                           # Portable, pre-loadable directory
-├── README.md                      # This file (index + key concepts)
-├── rules/                        # Non-negotiables (break if ignored)
-│   ├── python-environment.mdc   # uv run, uv add
-│   ├── typescript-environment.mdc # yarn, not npm
-│   ├── secrets-management.mdc   # /secrets only
-│   ├── tdd-workflow.mdc         # RED fails, GREEN no test mods
-│   ├── type-safety.mdc          # Type hints, strict mode
-│   ├── output-locations.mdc     # artefacts/ structure
-│   ├── conventional-commits.mdc # Commit format
-│   ├── british-english.mdc      # Spelling
-│   ├── EARS-notation-requirements.mdc # Requirements format
-│   └── metrics-logging.mdc      # Agent metrics
-├── standards/                    # Reference documentation
-│   ├── coding-standards.md      # Code patterns, style
-│   ├── context-framework.md     # Sharing formats, prioritisation, terse formats
-│   ├── security-standards.md    # Security principles, safe failure, data protection
-│   ├── testing-standards.md     # TDD, coverage, anti-patterns
-│   ├── tech-standards.md        # Architecture, tools
-│   ├── doc-standards.md         # Documentation structure
-│   └── workflow-standards.md    # Processes, retrospectives
-├── agents/                       # Agent definitions
-│   ├── TEMPLATE.md              # Template for new agents
-│   ├── python-coder.md          # Python implementation
-│   ├── typescript-coder.md      # TypeScript implementation
-│   ├── functional-tester.md     # Test writing
-│   └── ...                      # Other specialists (18 total)
-├── workflows/                    # Workflow patterns
-│   ├── default.yaml             # Full TDD with quality gates
-│   ├── prototype.yaml           # Fast iteration, skip gates
-│   ├── agent-effectiveness.yaml # Retrospective addon
-│   └── documentation-for-humans.yaml # Human-facing content with personas
+context/
+├── README.md                      # This file
+├── standards/                     # Reference docs (how to do things well)
+│   └── *.md                      # coding, testing, tech, doc, workflow, security, 12-factor, LESS, visual
+├── rules/                         # Non-negotiables (break if ignored)
+│   └── *.mdc                     # python-env, ts-env, secrets, tdd, types, outputs, commits, etc.
+├── agents/                        # Agent definitions (who does what)
+│   ├── TEMPLATE.md               # Template for new agents
+│   └── *.md                      # 19 specialised agents (see AGENTS.md for complete list)
+├── workflows/                     # Workflow patterns (phase dependencies)
+│   ├── build.yaml                # Primary dev loop: planning → TDD → review → deployment
+│   ├── design.yaml               # Discovery through design review
+│   ├── deploy.yaml               # GCP cloud deployment
+│   ├── full-test.yaml            # Full-suite testing
+│   ├── content.yaml              # Human-facing content with personas
+│   ├── retrospective.yaml        # Standalone efficiency analysis
+│   ├── default.yaml              # Full TDD with quality gates (superseded by build.yaml)
+│   └── prototype.yaml            # Fast iteration
 ├── docs/                          # Usage guides
+│   ├── README.md                       # Guide index and maintenance notes
 │   ├── orchestration-patterns.md       # Multi-agent coordination
 │   ├── workflow-default.md             # Default workflow guide (with diagram)
 │   ├── workflow-prototype.md           # Prototype workflow guide (with diagram)
-│   ├── workflow-agent-effectiveness.md # Effectiveness guide (with diagram)
-│   ├── workflow-documentation-for-humans.md # Human-facing content guide (with diagram)
+│   ├── workflow-agent-effectiveness.md # Effectiveness guide (stale — renamed to retrospective)
+│   ├── workflow-documentation-for-humans.md # Content guide (stale — renamed to content)
 │   ├── how-to-measure-agent-effectiveness.md # Detailed measurement examples
 │   ├── writing-personas.md             # When/how to use writing personas
 │   └── framework-adapters.md           # Cross-framework compatibility
@@ -189,49 +285,39 @@ context/                           # Portable, pre-loadable directory
 │   ├── technical-writer.md       # Dr. Sarah Chen persona (blogs, papers)
 │   ├── editor.md                 # Editorial voice
 │   └── expert-reviewer.md        # Review voice
-├── mcp/                          # MCP server configuration
-│   └── mcp.json                  # Template config
+├── mcp/                          # MCP server configuration (gitignored — contains API keys)
+│   └── mcp.json                  # Local config — do NOT commit
 └── scripts/                      # Portable tools
-    ├── coordinate.sh             # Agent coordination helper
+    ├── log-agent-completion.sh   # SubagentStart/Stop hook → agent-metrics.log
+    ├── prepare-commit-msg.sh     # Git hook → Agent-Session commit trailer (install: see Git Hooks section)
     ├── validators/               # Rule validators (pre-commit hooks)
-    ├── generators/               # CLAUDE.md/AGENTS.md generators
-    └── tests/                    # Validator tests
+    └── tests/                    # Validator test suite
 ```
 
 ---
 
-## Syncing Context Across Projects
+## Seeding Context Across Projects
 
-**Note**: `start-here` is the golden source. Copy the context folder into new projects and manually sync when needed.
+The `context/` directory is seeded into each new project from a "golden source" repo (e.g. `start-here`). Each project owns its own copy — symlinks were tried but agents don't follow them reliably.
 
-### Manual Sync (Recommended)
-
-Copy the context folder into each project:
+### Adding context to a new project
 
 ```bash
-# From start-here to your project
-cp -r ~/Repos/start-here/context /path/to/your-project/context
+cp -r /path/to/start-here/context /path/to/new-project/context
 ```
 
-When context evolves in start-here, sync changes manually:
+### Keeping context in sync
 
-```bash
-# Update specific files that changed
-cp ~/Repos/start-here/context/agents/python-coder.md /path/to/your-project/context/agents/
+When you improve `context/` in one project:
+1. Copy the changed files to your golden source: `cp -r context/ /path/to/start-here/context/`
+2. From there, propagate to other projects as needed
 
-# Or sync entire directory
-rsync -av --delete ~/Repos/start-here/context/ /path/to/your-project/context/
-```
+### What changes per project
 
-**Benefits**:
-- ✅ Works reliably with all AI agents and IDEs
-- ✅ Each project has its own independent copy
-- ✅ No symlink confusion or path resolution issues
-
-**Workflow**:
-1. Make changes in start-here (the golden source)
-2. Commit changes in start-here
-3. Manually copy/sync to other projects when needed
+The `context/` directory is identical across projects. Project-specific configuration lives in:
+- `.claude/` — Claude Code adapter (hooks, permissions)
+- `CLAUDE.md` — Claude Code project preferences
+- `AGENTS.md` — orchestrator protocol (usually identical across projects)
 
 ---
 
@@ -243,25 +329,7 @@ When something keeps failing because agents don't follow it:
 2. **Does it break things?** Not just style—actual failures?
 3. **Is it actionable?** Can you give clear DO/DON'T commands?
 
-If yes to all three, create a rule:
-
-```markdown
-# Rule Name
-
-**Applies to**: [scope]
-
-## Commands
-
-| Action | Correct | Wrong |
-|--------|---------|-------|
-| ... | ... | ... |
-
-## Why
-
-[Brief explanation of what breaks]
-```
-
-Keep rules under 200 tokens. If you need more explanation, put it in standards.
+If yes to all three, create a rule in `rules/*.mdc` (keep under 200 tokens).
 
 ---
 
@@ -274,5 +342,14 @@ When a task domain needs repeated specialised work:
 3. List applicable `rules` and `standards` in frontmatter
 4. Write concise body with rules summary and workflow
 5. Add to workflow YAML if part of standard process
+6. Validate context integrity: `uv run python context/scripts/validators/validate_context.py`
 
-See existing agents for examples.
+---
+
+## See Also
+
+- **Orchestration reference**: `AGENTS.md` (hand-written orchestrator protocol)
+- **Root README**: `../README.md` (deployment instructions for context system)
+  - **Standards index**: `standards/README.md` (detailed standards catalogue)
+
+---
