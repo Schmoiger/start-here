@@ -1,0 +1,37 @@
+# Import boundary configuration for this project.
+#
+# Each boundary declares an import pattern that must ONLY appear in the listed
+# directories. Files outside those directories that match the pattern will fail
+# the pre-commit hook.
+#
+# Add entries here when your architecture requires a library to be isolated to
+# one service (e.g. database clients, payment SDKs, internal platform APIs).
+#
+# The hook is registered in .pre-commit-config.yaml as:
+#   - id: import-boundaries
+#     files: \.py$
+#
+# See context/scripts/validators/import_boundaries.py for the implementation.
+
+boundaries: []
+
+# Examples (uncomment and adapt):
+#
+# - name: "database client isolation"
+#   import_pattern: "^\\s*(import supabase|from supabase\\b)"
+#   allowed_in:
+#     - "services/database-service/"
+#   message: "supabase must only be imported in database-service"
+#
+# - name: "payment SDK isolation"
+#   import_pattern: "^\\s*(import stripe|from stripe\\b)"
+#   allowed_in:
+#     - "services/billing-service/"
+#   message: "stripe must only be imported in billing-service"
+#
+# - name: "internal admin API isolation"
+#   import_pattern: "from internal_admin"
+#   allowed_in:
+#     - "services/admin-service/"
+#     - "scripts/admin/"
+#   message: "internal_admin must only be used in admin-service or admin scripts"
