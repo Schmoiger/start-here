@@ -1,26 +1,19 @@
 repos:
-  # Python formatting and linting
-  - repo: https://github.com/psf/black
-    rev: 24.1.1
+  # Python: Ruff (format + lint) and Pyright (type checking)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.1
     hooks:
-      - id: black
-        files: ^services/.*\.py$
+      - id: ruff-check
+        name: Ruff (lint)
+        args: [--fix]
+      - id: ruff-format
+        name: Ruff (format)
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        files: ^services/.*\.py$
-        args: ["--profile", "black"]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
-    hooks:
-      - id: mypy
-        files: ^services/.*\.py$
-        # Add only type stubs for packages you actually use:
-        # additional_dependencies: [types-requests, types-redis]
-        # Many modern packages (FastAPI, pydantic) include types already
+  # Pyright: run per-service (cd services/<name> && uv run pyright)
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.408
+  #   hooks:
+  #     - id: pyright
 
   # TypeScript linting and formatting
   - repo: local
