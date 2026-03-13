@@ -64,6 +64,20 @@ docs(api): update OpenAPI spec for backtest endpoint
 Tasks: DOC-001
 ```
 
+## Shell Technique for Multi-line Commit Messages
+
+**NEVER use `$(cat <<'EOF' ... EOF)` command substitution** — Claude Code's sandbox blocks it.
+
+Write the message to a temp file instead:
+
+```bash
+printf 'feat(scope): subject\n\nbody line 1\nbody line 2\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n' > /tmp/commit_msg.txt
+git commit -F /tmp/commit_msg.txt
+rm -f /tmp/commit_msg.txt
+```
+
+For single-line messages `git commit -m "..."` is fine.
+
 ## Rules
 
 - Max 72 chars for subject line
