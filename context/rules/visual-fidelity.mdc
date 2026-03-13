@@ -12,10 +12,8 @@ alwaysApply: false
 
 Read these design artefacts:
 
-1. `{project-root}/artefacts/design/wireframes.md` (starting point, not rigid spec)
-2. `{project-root}/artefacts/design/design-tokens.json`
-3. `{project-root}/artefacts/design/components.md`
-4. `visual-standards.md` for hierarchy, spacing, responsive rules
+1. `{project-root}/artefacts/design/design-system.md` (foundations §1, components §3 and §8, wireframes §7)
+2. `visual-standards.md` for hierarchy, spacing, responsive rules
 
 ## Creative Latitude
 

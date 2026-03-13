@@ -18,6 +18,7 @@ alwaysApply: false
 | Install package | `uv add package` | `pip install package` |
 | Sync dependencies | `uv sync` | `pip install -r requirements.txt` |
 | Python REPL | `uv run python` | `python` or `python3` |
+| Run one-off tool | `uvx ruff check .` | `ruff check .` or `pipx run ruff` |
 
 ## Why
 
