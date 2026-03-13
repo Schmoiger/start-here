@@ -100,6 +100,7 @@ Agents have access to multiple tools for different purposes. To minimise user in
 *   **Prefer Write/Edit tools** for creating and modifying files. These tools do not require user permission and provide immediate feedback.
 *   **Avoid Bash for file operations** such as `cat`, `echo >`, `sed`, `awk`, or heredoc redirection. These require user permission and slow down execution.
 *   **Exception**: Bash may be used for file operations when the operation is part of a larger script that includes non-file operations (e.g., git commit with file creation).
+*   **Read immediately before each Edit**: The Edit tool validates its changes against a snapshot taken at the most recent Read. If another Edit has run since the last Read, the snapshot is stale and the Edit will fail. Always issue a Read immediately before each Edit — never batch a single Read with multiple subsequent Edits.
 
 #### 3.3.2. Command Execution
 
@@ -129,6 +130,23 @@ Agents have access to multiple tools for different purposes. To minimise user in
 *   The agent shall commit its changes to the version control system after completing each task.
 *   The agent shall write a clear and concise commit message that summarises the purpose of the changes.
 *   The commit message shall include the task ID and follow the format specified in `/context/standards/coding-standards.md`.
+*   The agent shall push to the remote after completing each sprint (or equivalent logical unit of work). Committing locally without pushing leaves work invisible to other agents and the orchestrator.
+
+**Push cadence**: commit per task, push per sprint.
+
+**Commit message pattern**: Never use `$()` heredoc substitution in `git commit -m`. Instead, write the commit message with the Write tool, then commit with `-F`:
+
+```bash
+# Write message first (no permission prompt)
+# Write tool → /tmp/commit_msg.txt
+
+# Then commit referencing the file
+git add <files>
+git commit -F /tmp/commit_msg.txt
+git push
+```
+
+Using `$()` substitution triggers a separate permission class and interrupts flow.
 
 ### 3.5. Agent Handoffs
 
@@ -184,6 +202,30 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 
 - **Intra-domain**: Use `artefacts/shared/HANDOFF-TEMPLATE.md`
 - **Inter-domain**: Use `artefacts/shared/handoffs/TEMPLATE-service-api.md`
+
+### 3.6. Interruptions Logging
+
+An interruption is any moment that required the user's or orchestrating agent's attention before work could continue. Agents shall log interruptions to `artefacts/build/agent-interruptions.md` under a heading matching the current sprint or phase.
+
+**Two types:**
+
+1. **Question** — agent raised a spec ambiguity or blocker it could not resolve autonomously
+2. **Tool approval** — user was prompted to approve a tool use before the agent could proceed
+
+**What to log**: only interruptions that required external attention. Do NOT log autonomous decisions, design trade-offs, self-resolved linter issues, or other choices the agent made without asking anyone.
+
+**Format:**
+
+```
+### [Sprint N — Phase] Short title
+**Agent**: @agent-name
+**Type**: Question | Tool approval
+**Question/Tool**: What did you need to know, or what tool needed approval?
+**Answered by/Approved by**: Orchestrating agent | User
+**Resolution**: What was decided?
+```
+
+**When to log**: append the entry immediately after the interruption is resolved — do not batch at end of sprint.
 
 ## 4. Build, Test, and Automation Artefacts
 

@@ -47,11 +47,8 @@ For example:
 │   │   ├── openapi.yaml
 │   │   └── api-design-guide.md
 │   ├── design/                      # UI/UX design
-│   │   ├── design-tokens.json
-│   │   ├── components.md
-│   │   ├── wireframes.md
-│   │   ├── user-flows.md
-│   │   └── accessibility.md
+│   │   ├── design-system.md         # tokens, components, accessibility, wireframes
+│   │   └── user-flows.md
 │   ├── build/                       # Project management & quality gates
 │   │   ├── bugs.md
 │   │   ├── tasks.md
@@ -340,6 +337,7 @@ The monorepo root `/artefacts/` directory contains system-wide artefacts that af
 ### 4.2. Architecture (`/artefacts/architecture/`)
 
 *   **`architecture.md`**: System architecture describing all services, their interactions, and data flow
+*   **`architecture-decision.md`**: Running log of significant technical decisions (the *why* behind choices). Add an entry here whenever a non-obvious technical decision is made — choice between alternatives, discovered gotcha, or convention established. Format: numbered ADR with Date, Status, Context, Decision, Consequences.
 *   **`data-model.md`**: Conceptual data model showing entities and relationships across the system
 *   **`api-catalogue.md`**: Catalogue of all service APIs with their purposes and relationships
 *   Other architecture documents (e.g., reliability strategies, ADRs)
@@ -351,11 +349,8 @@ The monorepo root `/artefacts/` directory contains system-wide artefacts that af
 
 ### 4.4. Design System (`/artefacts/design/`)
 
-*   **`design-tokens.json`**: Design system tokens (colours, typography, spacing)
-*   **`components.md`**: Reusable component specifications
-*   **`wireframes.md`**: UI wireframes and layouts
+*   **`design-system.md`**: Design system (tokens, components, accessibility, wireframes)
 *   **`user-flows.md`**: User journey and flow diagrams
-*   **`accessibility.md`**: Accessibility requirements and guidelines
 *   **`visuals/`**: Generated mockups and diagrams
 
 ### 4.5. Build & Project Management (`/artefacts/build/`)
@@ -484,7 +479,7 @@ CI validates cross-file references on PR to main.
 - Provide usage examples with code snippets
 
 **Design System Documentation:**
-- Maintain design tokens in `artefacts/design/design-tokens.json`
+- Maintain design tokens in `artefacts/design/design-system.md` (§1, §1.6)
 - Document component relationships and dependencies
 - Include visual examples (screenshots or Mermaid diagrams)
 - Specify when to use vs when not to use each component
