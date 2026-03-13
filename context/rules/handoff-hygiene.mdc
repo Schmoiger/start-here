@@ -16,6 +16,10 @@ alwaysApply: true
 | Cross-service | `/artefacts/shared/handoffs/` | Service directories |
 | Integration status | `/artefacts/shared/handoffs/integration-status.md` | Scattered files |
 
+## Handoff Template
+
+Use `context/templates/handoff-template.md` as the structure for new HANDOFF.md entries.
+
 ## After Every Task Completion
 
 Update these files (use Write/Edit tools per file-operations.mdc):

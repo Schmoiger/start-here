@@ -1,0 +1,29 @@
+---
+description: Git commit message format for Claude Code sandbox
+globs: []
+alwaysApply: true
+---
+
+# Git Commit Format
+
+**Applies to**: All git commits made by agents
+
+## Commands
+
+| Action | Correct | Wrong |
+|--------|---------|-------|
+| Multi-line commit | `printf 'msg\n\nbody\n' > /tmp/msg.txt && git commit -F /tmp/msg.txt && rm -f /tmp/msg.txt` | `git commit -m "$(cat <<'EOF' ... EOF)"` |
+| Single-line commit | `git commit -m "type(scope): description"` | N/A |
+
+## Pattern
+
+For multi-line commit messages:
+```bash
+printf 'type(scope): subject\n\nbody\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n' > /tmp/commit_msg.txt
+git commit -F /tmp/commit_msg.txt
+rm -f /tmp/commit_msg.txt
+```
+
+## Why
+
+Claude Code's sandbox blocks `$()` command substitution inside `git commit -m`. The `printf` + `-F` pattern bypasses this constraint. Heredoc substitution (`$(cat <<'EOF'...EOF)`) fails silently.
