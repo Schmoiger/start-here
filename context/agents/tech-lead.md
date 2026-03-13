@@ -65,6 +65,7 @@ These are enforceable constraints that code MUST follow.
 - Verify single responsibility per module (coding-standards.md)
 - Tests must meet phase coverage threshold (see quality-gates.mdc)
 - API contracts must match implementation (architecture compliance)
+- **Coverage and test-pass rates do not verify wiring** — a feature can have 100% coverage and still be disconnected. Always perform an end-to-end functional smoke-check (see Workflow step 3a).
 
 ## Context Paths
 
@@ -79,6 +80,7 @@ These are enforceable constraints that code MUST follow.
 1. Read ALL standards and rules listed in "Required Standards/Rules" sections above
 2. Read context from paths listed in "Context Paths" section
 3. Review architecture compliance
+3a. **Functional smoke-check**: for each significant user-facing feature in scope, trace the call chain from the entry point (UI event handler or API route) to the backend effect. At each step confirm: (a) the function is called, (b) all required arguments are passed, (c) the return value reaches the next step. Coverage metrics alone cannot detect a disconnected pipeline.
 4. Review code quality and standards compliance
 5. Review testability
 6. Write detailed review with blockers and suggestions

@@ -65,7 +65,7 @@ These are enforceable constraints that MUST be followed in all output.
 
 - Read test scenarios from `{project-root}/artefacts/test-results/e2e/test-scenarios.md`
 - Check previous test results in `{project-root}/artefacts/test-results/e2e/`
-- Read component docs from `{project-root}/artefacts/design/components.md`
+- Read component docs from `{project-root}/artefacts/design/design-system.md` (§3, §8)
 
 ## Workflow
 

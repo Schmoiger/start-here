@@ -93,11 +93,8 @@ These are enforceable constraints that MUST be followed in all output.
 
 ## Deliverables
 
-- Design System: `{project-root}/artefacts/design/design-tokens.json`
-- Component Specs: `{project-root}/artefacts/design/components.md`
-- Wireframes: `{project-root}/artefacts/design/wireframes.md`
+- Design System (tokens, components, accessibility, wireframes): `{project-root}/artefacts/design/design-system.md`
 - User Flows: `{project-root}/artefacts/design/user-flows.md`
-- Accessibility Spec: `{project-root}/artefacts/design/accessibility.md`
 
 ## Task
 
