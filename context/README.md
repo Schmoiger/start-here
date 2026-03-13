@@ -6,15 +6,36 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 ---
 
-## Quick Links
+## Quick Reference
 
-| Category | Files |
-|----------|-------|
-| **Rules** | [python-environment](rules/python-environment.mdc) &#124; [typescript-environment](rules/typescript-environment.mdc) &#124; [secrets](rules/secrets-management.mdc) &#124; [tdd](rules/tdd-workflow.mdc) &#124; [types](rules/type-safety.mdc) &#124; [outputs](rules/output-locations.mdc) &#124; [commits](rules/conventional-commits.mdc) &#124; [spelling](rules/british-english.mdc) &#124; [EARS](rules/EARS-notation-requirements.mdc) &#124; [metrics](rules/metrics-logging.mdc) |
-| **Standards** | [coding](standards/coding-standards.md) &#124; [testing](standards/testing-standards.md) &#124; [tech](standards/tech-standards.md) &#124; [doc](standards/doc-standards.md) &#124; [workflow](standards/workflow-standards.md) &#124; [security](standards/security-standards.md) &#124; [context](standards/context-framework.md) |
-| **Agents** | [all agents](agents/) &#124; [template](agents/TEMPLATE.md) |
-| **Workflows** | [default (TDD)](workflows/default.yaml) &#124; [prototype (fast)](workflows/prototype.yaml) |
-| **Scripts** | [validators](scripts/validators/) &#124; [generators](scripts/generators/) |
+| What                       | Where                            | When                                                 |
+| -------------------------- | -------------------------------- | ---------------------------------------------------- |
+| **Non-negotiable rules**   | `rules/*.mdc`                    | Agent frontmatter lists applicable rules             |
+| **Reference docs**         | `standards/*.md`                 | Read when agent needs guidance                       |
+| **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
+| **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies                           |
+| **Workflow usage guides**  | `docs/workflow-*.md`             | How to use each workflow (with diagrams)             |
+| **Orchestration patterns** | `docs/orchestration-patterns.md` | Multi-agent coordination patterns                    |
+| **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
+| **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
+| **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD                              |
+| **Generators**             | `scripts/generators/`            | CLAUDE.md/AGENTS.md generators                       |
+
+---
+
+## For Agents
+
+**Quick scan** - Read these when spawned:
+
+**Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/conventional-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [file-ops](rules/file-operations.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc) · [orchestrator-delegation](rules/orchestrator-delegation.mdc) · [browser-automation](rules/browser-automation.mdc)
+
+**Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md) · [agent](standards/agent-standards.md) · [build](standards/build-standards.md) · [tech-mobile](standards/tech-mobile-standards.md)
+
+**Workflows**: [default](workflows/default.yaml) · [prototype](workflows/prototype.yaml) · [agent-effectiveness](workflows/agent-effectiveness.yaml) · [documentation-for-humans](workflows/documentation-for-humans.yaml) · [retrospective-addon](workflows/retrospective-addon.yaml)
+
+**Usage guides**: [default](docs/workflow-default.md) · [prototype](docs/workflow-prototype.md) · [effectiveness](docs/workflow-agent-effectiveness.md) · [documentation-for-humans](docs/workflow-documentation-for-humans.md) · [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
+
+**Templates**: [handoffs](templates/handoffs/) · [reviews](templates/reviews/) · [artefacts](templates/artefacts/)
 
 ---
 
