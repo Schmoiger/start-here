@@ -208,3 +208,6 @@ __marimo__/
 
 # OSX specific files
 .DS_Store
+
+# MCP config (contains API keys)
+context/mcp/mcp.json
