@@ -392,3 +392,71 @@ Option A (parallel):
 4. **Plan merge strategy** - Who merges what, conflict resolution
 5. **Monitor progress** - Check agents aren't duplicating work
 6. **Learn and adapt** - Track actual vs estimated time/tokens
+
+---
+
+## 12. Claude Skills Alignment
+
+> **Context**: This section is specific to Claude Code as the orchestrator. The workflow is
+> framework-agnostic, but when Claude is running it the `skills` hints in `default.yaml` map
+> to named skills that sharpen agent behaviour at each phase. This section explains the intent
+> behind each mapping so the orchestrator knows when and why to invoke them.
+
+### What skills are and why they matter
+
+Skills are loaded prompt fragments that enforce a specific discipline. They are not tools — they
+are cognitive constraints. An agent without a skill hint will improvise; with the right skill it
+follows a proven pattern (TDD iron law, systematic debugging, parallel dispatch, etc.).
+
+The orchestrator MUST invoke relevant skills **before** generating any response or action at
+that phase. The `skills` field in `default.yaml` is a checklist, not a suggestion.
+
+### Phase-to-skill mapping
+
+| Workflow phase | Skill(s) | Why |
+|---|---|---|
+| `discovery` | `superpowers:brainstorming` | Explore problem space before formalising requirements; prevents premature lock-in |
+| `design` | `superpowers:brainstorming` | Evaluate design alternatives before committing; explore trade-offs |
+| `design` | `superpowers:using-git-worktrees` | Isolate feature branch from main; safe parallel work |
+| `design` (UI work) | `frontend-design` | Produces polished, non-generic UI designs; avoids AI-default aesthetics |
+| `design-review`, `quality-review`, `final-holistic-review` | `superpowers:requesting-code-review` | Structures what reviewers focus on; prevents unfocused review passes |
+| `design-review`, `quality-review`, `final-holistic-review` | `superpowers:receiving-code-review` | Validates CHANGES REQUIRED feedback before acting; prevents performative compliance |
+| `tasks-review` | `superpowers:writing-plans` | Enforces bite-sized tasks with exact file paths, TDD steps, and commit cadence |
+| `tasks-review`, `tdd-green`, `tdd-blue`, `sprint-review`, `final-holistic-review` | `superpowers:dispatching-parallel-agents` | Ensures parallel agents are spawned simultaneously, not sequentially |
+| `tdd-red`, `test-plan-review`, `tdd-green`, `tdd-blue` | `superpowers:test-driven-development` | The iron law: no production code before a failing test; watch-it-fail is mandatory |
+| `tdd-green` (UI) | `frontend-design` | When TypeScript agent builds new components; raises visual quality bar |
+| `tdd-green`, `tdd-blue`, `coverage-gate`, `unit-regression`, `e2e-regression`, `deployment-review` | `superpowers:verification-before-completion` | Requires running commands and showing real output before claiming any phase complete |
+| `coverage-gate`, `integration-regression` | `superpowers:systematic-debugging` | If threshold not met or contract breaks: root-cause analysis before writing tests or patches |
+| `deployment`, `deployment-review` | `superpowers:finishing-a-development-branch` | Guided merge/PR/cleanup decision; prevents branches being left dangling |
+| `deployment` | `commit-commands:commit-push-pr` | Structured commit + push + PR in one invocation |
+
+### How the orchestrator passes skill hints to subagents
+
+Spawned subagents do **not** inherit the orchestrator's context. The `skills` field in the
+workflow yaml is a reminder to the **orchestrator** to include skill invocation instructions
+in the agent prompt. The pattern is:
+
+```
+@python-coder implement Task 2.9 (Phase A circuit breaker)
+
+BEFORE starting, invoke these skills:
+- superpowers:test-driven-development  (TDD GREEN phase)
+- superpowers:verification-before-completion  (run tests, show output before claiming done)
+
+Read context/standards/tech-standards.md first.
+[task details...]
+```
+
+Without explicit inclusion in the prompt, subagents will not see the `skills` field and will
+not invoke them. The workflow yaml serves as the orchestrator's checklist; the agent prompt
+is where the instruction actually reaches the subagent.
+
+### Skills not tied to a specific phase
+
+| Skill | When to invoke |
+|---|---|
+| `superpowers:systematic-debugging` | Any time a test fails unexpectedly or behaviour is wrong — invoke before proposing any fix |
+| `claude-md-management:claude-md-improver` | After a sprint cycle when project conventions have evolved |
+| `superpowers:writing-skills` | When encoding a new reusable pattern as a skill |
+| `commit-commands:clean_gone` | Periodically to remove stale local branches |
+| `superpowers:subagent-driven-development` | Alternative to dispatching: single session, one fresh subagent per task, review between each |

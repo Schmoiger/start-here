@@ -232,7 +232,9 @@ yarn set version stable   # Existing project
 
 Corepack downloads the Yarn version specified in `package.json` (`"packageManager": "yarn@4.1.0"`).
 
-**One-off tools:** Use `yarn dlx` (not `npx`)
+**One-off tools:** Use `yarn dlx` (not `npx`).
+
+**Exception — MCP servers:** Model Context Protocol server configs (e.g. in `context/mcp/mcp.json`) may use `npx` because the MCP host (e.g. Cursor) often runs outside the project environment and may not have the project's Yarn on PATH.
 
 **Common issues:**
 - "yarn: command not found" → `corepack enable`
