@@ -67,14 +67,12 @@ These are enforceable constraints that MUST be followed in all output.
 - Use Mermaid Live for diagram exports (doc-standards.md)
 - Use Excalidraw for sketch-style wireframes (visual design tools)
 - Export as SVG when possible (doc-standards.md)
-- Maintain brand colors from design-tokens.json (design consistency)
+- Maintain brand colours from design-system.md §1.4 and §1.6 (design consistency)
 
 ## Context Paths
 
-- Read wireframes from `{project-root}/artefacts/design/wireframes.md`
+- Read design system (tokens, components, wireframes §7) from `{project-root}/artefacts/design/design-system.md`
 - Read user flows from `{project-root}/artefacts/design/user-flows.md`
-- Read design tokens from `{project-root}/artefacts/design/design-tokens.json`
-- Read component specs from `{project-root}/artefacts/design/components.md`
 - Read architecture from `{project-root}/artefacts/architecture/architecture.md`
 
 ## Workflow

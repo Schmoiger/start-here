@@ -96,6 +96,18 @@ These are enforceable constraints that MUST be followed in all output.
 - Consider operational concerns (deployment, monitoring, debugging)
 - Stay within the project's technology constraints (Python, TypeScript, GCP)
 
+## Review Mode: End-to-End Data Flow Tracing
+
+When reviewing existing implementation (not designing), trace every user-facing data pipeline end-to-end within each module — do not limit scope to service-boundary contracts. A function that exists but is never called with the required arguments is an architectural defect even if caller and callee are in the same module.
+
+For each pipeline step, verify:
+
+1. The function/method is **called** (not just defined)
+2. All required arguments are **passed at the call site** (not just declared in the signature)
+3. The return value is **consumed** by the next step (not silently discarded)
+
+Anti-pattern to catch: a conversion function that accepts an optional second argument (e.g., `buildRequest(baseFilters, extraFilters)`) where the call site always omits `extraFilters` — the pipeline exists but is architecturally disconnected. This will not appear in tests unless a test exercises the full call chain with real data.
+
 ## Deliverables
 
 - Architecture: `{project-root}/artefacts/architecture/architecture.md` (system design document)
