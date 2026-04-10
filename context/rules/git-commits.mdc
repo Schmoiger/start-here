@@ -1,0 +1,87 @@
+---
+description: Git commit message format, types, and Agent-Session metrics
+globs: []
+alwaysApply: true
+---
+
+# Git Commits
+
+**Applies to**: All git commits made by agents
+
+## Commit Commands
+
+| Action | Correct | Wrong |
+|--------|---------|-------|
+| Multi-line commit | Write tool → `/tmp/msg.txt`, then `git add <files> && git commit -F /tmp/msg.txt` | `git commit -m "$(...)"`, `printf ... \| git commit -F -` |
+| Single-line commit | `git commit -m "type(scope): description"` | N/A |
+| Directory-specific | `git -C /abs/path <subcommand>` | `cd /path && git`, subshells |
+
+## Message Format
+
+### Subject Line
+
+`{type}({scope}): {description}`
+
+| Type | Use For |
+|------|---------|
+| feat | New feature |
+| fix | Bug fix |
+| test | Adding/updating tests |
+| refactor | Code restructuring (no behaviour change) |
+| docs | Documentation only |
+| chore | Build, config, dependencies |
+| perf | Performance improvement |
+
+### Full Format (Agent Commits)
+
+```
+{type}({scope}): {description}
+
+{optional body}
+
+Tasks: {task-ids}
+Agent-Session: tool={tool} model={model} agents={list} tokens={in}K/{out}K duration={time}
+
+Co-Authored-By: Claude {Model} <{model}@anthropic.com>
+```
+
+### Agent-Session Fields
+
+| Field | Format | Example |
+|-------|--------|---------|
+| tool | IDE/platform that ran the model | tool=claude-code, tool=cursor |
+| model | sonnet\|opus\|haiku | model=sonnet |
+| agents | comma-separated | agents=auth-coder,auth-reviewer |
+| tokens | in/out with K suffix | tokens=12.4K/8.2K |
+| duration | minutes or hours | duration=45m |
+
+## Examples
+
+### Agent Commit
+
+```
+feat(auth): add token refresh endpoint
+
+Tasks: AUTH-001
+Agent-Session: tool=claude-code model=sonnet agents=auth-coder tokens=8.2K/5.1K duration=32m
+
+Co-Authored-By: Claude Sonnet <sonnet@anthropic.com>
+```
+
+### Human Commit
+
+```
+docs(api): update OpenAPI spec for backtest endpoint
+
+Tasks: DOC-001
+```
+
+## Rules
+
+- Max 72 chars for subject line
+- Scope matches service/component name
+- Description is imperative ("add" not "added")
+- Tasks line references tasks.md
+- Agent commits require Agent-Session and Co-Authored-By
+
+Full template: `templates/commit-message.template.md`
