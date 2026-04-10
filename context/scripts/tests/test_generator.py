@@ -1,4 +1,4 @@
-"""Tests for CLAUDE.md generator."""
+"""Tests for AGENTS.md generator."""
 
 import pytest
 from pathlib import Path
@@ -8,17 +8,20 @@ import yaml
 # Add generators directory to path so we can import generator
 sys.path.insert(0, str(Path(__file__).parent.parent / 'generators'))
 
-# Import with explicit sys.path modification since it's in generators/
-import generate_claude_md as gen
+import generate_agents_md as gen
 load_workflow = gen.load_workflow
 load_agent_definitions = gen.load_agent_definitions
 extract_description = gen.extract_description
 generate_workflow_diagram = gen.generate_workflow_diagram
 generate_phase_details = gen.generate_phase_details
+generate_phase_sequence = gen.generate_phase_sequence
+generate_phase_table = gen.generate_phase_table
+generate_agent_dispatch = gen.generate_agent_dispatch
 generate_agent_reference = gen.generate_agent_reference
 generate_quality_gates = gen.generate_quality_gates
 generate_workflow_rules = gen.generate_workflow_rules
-generate_claude_md = gen.generate_claude_md
+generate_state_recovery_files = gen.generate_state_recovery_files
+generate_agents_md = gen.generate_agents_md
 
 
 class TestWorkflowLoading:
@@ -26,13 +29,6 @@ class TestWorkflowLoading:
 
     def test_load_workflow(self, test_workflow, monkeypatch):
         """Test loading workflow from YAML file."""
-        # Monkeypatch the workflow path to use test fixture
-        def mock_workflow_path(workflow_name):
-            return test_workflow
-
-        monkeypatch.setattr('generate_claude_md.Path', lambda x: test_workflow.parent)
-
-        # Read test workflow directly
         workflow = yaml.safe_load(test_workflow.read_text())
         assert workflow['name'] == 'test-workflow'
         assert 'phases' in workflow
@@ -117,22 +113,68 @@ class TestDiagramGeneration:
         assert "gateStyle" in diagram
 
 
+class TestPhaseTable:
+    """Tests for compact phase table generation."""
+
+    def test_generate_phase_table(self, test_workflow):
+        """Test generating compact phase list."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        agents = {
+            'test-agent': {'frontmatter': {'name': 'test-agent'}, 'content': 'Test agent'},
+            'another-agent': {'frontmatter': {'name': 'another-agent'}, 'content': 'Another agent'},
+        }
+
+        table = generate_phase_table(workflow, agents)
+
+        assert "phase1" in table
+        assert "phase2" in table
+        assert "@test-agent" in table
+        assert "@another-agent" in table
+
+    def test_phase_table_marks_gates(self, test_workflow):
+        """Test that phase table marks quality gates."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        table = generate_phase_table(workflow, {})
+
+        assert "gate" in table
+
+    def test_phase_table_marks_parallel(self):
+        """Test that phase table marks parallel phases."""
+        workflow = {
+            'phases': [
+                {'id': 'p1', 'name': 'Phase One', 'agents': ['agent-a', 'agent-b'], 'parallel': True}
+            ]
+        }
+        table = generate_phase_table(workflow, {})
+
+        assert "parallel" in table
+
+    def test_phase_table_shows_skills(self):
+        """Test that phase table shows skills when present."""
+        workflow = {
+            'phases': [
+                {
+                    'id': 'p1',
+                    'name': 'Phase One',
+                    'agents': ['agent-a'],
+                    'skills': ['superpowers:test-driven-development']
+                }
+            ]
+        }
+        table = generate_phase_table(workflow, {})
+
+        assert "superpowers:test-driven-development" in table
+
+
 class TestPhaseDetails:
-    """Tests for phase details generation."""
+    """Tests for verbose phase details generation (backwards compatibility)."""
 
     def test_generate_phase_details(self, test_workflow):
         """Test generating detailed phase descriptions."""
         workflow = yaml.safe_load(test_workflow.read_text())
-        # Create minimal agent definitions
         agents = {
-            'test-agent': {
-                'frontmatter': {'name': 'test-agent'},
-                'content': 'Test agent for validation'
-            },
-            'another-agent': {
-                'frontmatter': {'name': 'another-agent'},
-                'content': 'Another test agent'
-            }
+            'test-agent': {'frontmatter': {'name': 'test-agent'}, 'content': 'Test agent'},
+            'another-agent': {'frontmatter': {'name': 'another-agent'}, 'content': 'Another test agent'},
         }
 
         details = generate_phase_details(workflow, agents)
@@ -147,9 +189,7 @@ class TestPhaseDetails:
     def test_phase_details_includes_dependencies(self, test_workflow):
         """Test that phase details show dependencies."""
         workflow = yaml.safe_load(test_workflow.read_text())
-        agents = {}
-
-        details = generate_phase_details(workflow, agents)
+        details = generate_phase_details(workflow, {})
 
         assert "Depends On" in details
         assert "`phase1`" in details
@@ -157,9 +197,7 @@ class TestPhaseDetails:
     def test_phase_details_marks_gates(self, test_workflow):
         """Test that phase details mark quality gates."""
         workflow = yaml.safe_load(test_workflow.read_text())
-        agents = {}
-
-        details = generate_phase_details(workflow, agents)
+        details = generate_phase_details(workflow, {})
 
         assert "Quality Gate" in details
 
@@ -171,19 +209,11 @@ class TestAgentReference:
         """Test generating agent reference section."""
         agents = {
             'product-owner': {
-                'frontmatter': {
-                    'name': 'product-owner',
-                    'standards': ['doc-standards.md'],
-                    'rules': ['conventional-commits.mdc']
-                },
+                'frontmatter': {'name': 'product-owner'},
                 'content': 'Defines requirements and user stories'
             },
             'python-coder': {
-                'frontmatter': {
-                    'name': 'python-coder',
-                    'standards': ['coding-standards.md'],
-                    'rules': []
-                },
+                'frontmatter': {'name': 'python-coder'},
                 'content': 'Writes production Python code'
             }
         }
@@ -194,8 +224,23 @@ class TestAgentReference:
         assert "Development" in reference
         assert "@product-owner" in reference
         assert "@python-coder" in reference
-        assert "doc-standards.md" in reference
-        assert "coding-standards.md" in reference
+        assert "context/agents/product-owner.md" in reference
+        assert "context/agents/python-coder.md" in reference
+
+    def test_generate_agent_reference_skips_missing(self):
+        """Test that only present agents are included."""
+        agents = {
+            'python-coder': {
+                'frontmatter': {'name': 'python-coder'},
+                'content': 'Writes production Python code'
+            }
+        }
+
+        reference = generate_agent_reference(agents)
+
+        assert "@python-coder" in reference
+        # product-owner not present, Discovery section should be absent
+        assert "@product-owner" not in reference
 
 
 class TestQualityGates:
@@ -206,10 +251,9 @@ class TestQualityGates:
         workflow = yaml.safe_load(test_workflow.read_text())
         gates_section = generate_quality_gates(workflow)
 
-        # Generator titlecases phase ID, so "phase2" becomes "Phase2"
         assert "Phase2" in gates_section or "phase2" in gates_section
         assert "approval" in gates_section
-        assert "Yes" in gates_section  # Required
+        assert "Yes" in gates_section
 
     def test_quality_gates_with_criteria(self):
         """Test quality gates with criteria."""
@@ -272,86 +316,198 @@ class TestWorkflowRules:
         assert "No specific workflow" in rules_section
 
 
-class TestFullGeneration:
-    """Tests for complete CLAUDE.md generation."""
+class TestPhaseSequence:
+    """Tests for single-line phase sequence generation."""
 
-    def test_generate_claude_md_structure(self, test_workflow, monkeypatch):
-        """Test that generated CLAUDE.md has correct structure."""
-        # Mock the load functions to use test fixtures
+    def test_generate_phase_sequence(self, test_workflow):
+        """Test that phase sequence is a single line with all phase IDs."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        seq = generate_phase_sequence(workflow)
+
+        assert "phase1" in seq
+        assert "phase2" in seq
+        assert "→" in seq
+
+    def test_phase_sequence_marks_gates(self, test_workflow):
+        """Test that gate phases are marked in the sequence."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        seq = generate_phase_sequence(workflow)
+
+        assert "gate" in seq
+
+    def test_phase_sequence_marks_parallel(self):
+        """Test that parallel phases are marked in the sequence."""
+        workflow = {
+            'phases': [
+                {'id': 'p1', 'name': 'Phase One', 'agents': [], 'parallel': True}
+            ]
+        }
+        seq = generate_phase_sequence(workflow)
+
+        assert "parallel" in seq
+
+    def test_phase_sequence_is_single_line(self, test_workflow):
+        """Test that the sequence contains no newlines."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        seq = generate_phase_sequence(workflow)
+
+        assert '\n' not in seq
+
+
+class TestAgentDispatch:
+    """Tests for agent dispatch table generation."""
+
+    def test_generate_agent_dispatch(self, test_workflow):
+        """Test that dispatch table includes agents from workflow phases."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        agents = {
+            'test-agent': {
+                'frontmatter': {'name': 'test-agent', 'description': 'Runs tests for the project.'},
+                'content': 'You are a tester.'
+            },
+            'another-agent': {
+                'frontmatter': {'name': 'another-agent', 'description': 'Reviews code quality.'},
+                'content': 'You are a reviewer.'
+            },
+        }
+
+        table = generate_agent_dispatch(workflow, agents)
+
+        assert "@test-agent" in table
+        assert "@another-agent" in table
+        assert "context/agents/" not in table
+
+    def test_agent_dispatch_uses_first_sentence(self, test_workflow):
+        """Test that long descriptions are truncated to first sentence."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        agents = {
+            'test-agent': {
+                'frontmatter': {
+                    'name': 'test-agent',
+                    'description': 'Runs tests. Also does other things after the first sentence.'
+                },
+                'content': ''
+            },
+        }
+
+        table = generate_agent_dispatch(workflow, agents)
+
+        assert "Runs tests" in table
+        assert "Also does other things" not in table
+
+    def test_agent_dispatch_falls_back_to_body(self, test_workflow):
+        """Test fallback to body content when no frontmatter description."""
+        workflow = yaml.safe_load(test_workflow.read_text())
+        agents = {
+            'test-agent': {
+                'frontmatter': {'name': 'test-agent'},
+                'content': 'Writes failing tests for all acceptance criteria.'
+            },
+        }
+
+        table = generate_agent_dispatch(workflow, agents)
+
+        assert "Writes failing tests" in table
+
+    def test_agent_dispatch_only_includes_workflow_agents(self):
+        """Test that only agents used in the workflow are included."""
+        workflow = {
+            'phases': [
+                {'id': 'p1', 'name': 'Phase One', 'agents': ['agent-a']}
+            ]
+        }
+        agents = {
+            'agent-a': {'frontmatter': {'name': 'agent-a', 'description': 'Does A.'}, 'content': ''},
+            'agent-b': {'frontmatter': {'name': 'agent-b', 'description': 'Does B.'}, 'content': ''},
+        }
+
+        table = generate_agent_dispatch(workflow, agents)
+
+        assert "@agent-a" in table
+        assert "@agent-b" not in table
+
+
+class TestStateRecoveryFiles:
+    """Tests for state recovery file list generation."""
+
+    def test_generate_state_recovery_files(self):
+        """Test that critical files are listed."""
+        workflow = {
+            'state_recovery': {
+                'critical_files': ['artefacts/tasks.md', '{service}/HANDOFF.md']
+            }
+        }
+        result = generate_state_recovery_files(workflow)
+
+        assert "artefacts/tasks.md" in result
+        assert "{service}/HANDOFF.md" in result
+
+    def test_state_recovery_files_empty(self):
+        """Test fallback when no critical files defined."""
+        result = generate_state_recovery_files({})
+
+        assert result  # non-empty fallback message
+
+
+class TestFullGeneration:
+    """Tests for complete AGENTS.md generation."""
+
+    def _mock(self, monkeypatch, test_workflow):
         def mock_load_workflow(workflow_name):
             return yaml.safe_load(test_workflow.read_text())
 
         def mock_load_agents():
             return {
                 'test-agent': {
-                    'frontmatter': {'name': 'test-agent'},
-                    'content': 'Test agent'
-                }
+                    'frontmatter': {'name': 'test-agent', 'description': 'Runs tests.'},
+                    'content': 'You are a tester.'
+                },
+                'another-agent': {
+                    'frontmatter': {'name': 'another-agent', 'description': 'Reviews code.'},
+                    'content': 'You are a reviewer.'
+                },
             }
 
-        monkeypatch.setattr('generate_claude_md.load_workflow', mock_load_workflow)
-        monkeypatch.setattr('generate_claude_md.load_agent_definitions', mock_load_agents)
+        monkeypatch.setattr('generate_agents_md.load_workflow', mock_load_workflow)
+        monkeypatch.setattr('generate_agents_md.load_agent_definitions', mock_load_agents)
 
-        content = generate_claude_md('test-workflow')
+    def test_generate_agents_md_structure(self, test_workflow, monkeypatch):
+        """Test that generated AGENTS.md has the minimal required sections."""
+        self._mock(monkeypatch, test_workflow)
+        content = generate_agents_md('test-workflow')
 
-        # Check major sections exist
         assert "# Multi-Agent Orchestration Guide" in content
-        assert "## Overview" in content
-        assert "## Workflow:" in content
-        assert "### Workflow Diagram" in content
-        assert "### Phases" in content
-        assert "## Agent Reference" in content
-        assert "## Standards & Rules" in content
-        assert "## Quality Gates" in content
-        assert "## Best Practices" in content
-        assert "## Maintenance" in content
-
-    def test_generated_md_has_mermaid_diagram(self, test_workflow, monkeypatch):
-        """Test that generated markdown includes Mermaid diagram."""
-        def mock_load_workflow(workflow_name):
-            return yaml.safe_load(test_workflow.read_text())
-
-        def mock_load_agents():
-            return {}
-
-        monkeypatch.setattr('generate_claude_md.load_workflow', mock_load_workflow)
-        monkeypatch.setattr('generate_claude_md.load_agent_definitions', mock_load_agents)
-
-        content = generate_claude_md('test-workflow')
-
-        assert "```mermaid" in content
-        assert "flowchart TD" in content
+        assert "## Agents" in content
+        assert "Spawning" in content
 
     def test_generated_md_includes_workflow_name(self, test_workflow, monkeypatch):
         """Test that workflow name is included in output."""
-        def mock_load_workflow(workflow_name):
-            return yaml.safe_load(test_workflow.read_text())
-
-        def mock_load_agents():
-            return {}
-
-        monkeypatch.setattr('generate_claude_md.load_workflow', mock_load_workflow)
-        monkeypatch.setattr('generate_claude_md.load_agent_definitions', mock_load_agents)
-
-        content = generate_claude_md('test-workflow')
+        self._mock(monkeypatch, test_workflow)
+        content = generate_agents_md('test-workflow')
 
         assert "test-workflow" in content
 
     def test_generated_md_portable_paths(self, test_workflow, monkeypatch):
         """Test that generated markdown uses portable paths."""
-        def mock_load_workflow(workflow_name):
-            return yaml.safe_load(test_workflow.read_text())
+        self._mock(monkeypatch, test_workflow)
+        content = generate_agents_md('test-workflow')
 
-        def mock_load_agents():
-            return {}
-
-        monkeypatch.setattr('generate_claude_md.load_workflow', mock_load_workflow)
-        monkeypatch.setattr('generate_claude_md.load_agent_definitions', mock_load_agents)
-
-        content = generate_claude_md('test-workflow')
-
-        # Should reference context/ directory
         assert "context/" in content
-        # Should not have hardcoded paths
         assert "/Users/" not in content
         assert "/home/" not in content
+
+    def test_generated_md_includes_phases(self, test_workflow, monkeypatch):
+        """Test that workflow agents appear (phases visible via dispatch table)."""
+        self._mock(monkeypatch, test_workflow)
+        content = generate_agents_md('test-workflow')
+
+        assert "@test-agent" in content
+        assert "@another-agent" in content
+
+    def test_generated_md_includes_agents(self, test_workflow, monkeypatch):
+        """Test that workflow agents appear in the dispatch table."""
+        self._mock(monkeypatch, test_workflow)
+        content = generate_agents_md('test-workflow')
+
+        assert "@test-agent" in content
+        assert "@another-agent" in content
