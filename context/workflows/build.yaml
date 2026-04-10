@@ -6,7 +6,7 @@ phases:
     name: Subtask Planning
     gate: true
     agents:
-      - tech-lead  # Decompose sprint tasks into a series of small subtasks with ACs, context bundles, and stream assignments
+      - tech-lead  # Decompose sprint tasks into subtasks with ACs, context bundles, and stream assignments
     outputs:
       - artefacts/build/subtask-plan.yaml
     validation:
@@ -43,7 +43,7 @@ phases:
       - Non-blocker findings documented in tasks document "Potential Further Work" section
       - Review artefacts archived to artefacts/build/archive/ after fixes are applied
     notes:
-      - Primary input is artefacts/build/subtask-plan.yaml; also read the current tasks file (artefacts/build/tasks-*.md), architecture.md, requirements.md
+      - Primary input is artefacts/build/subtask-plan.yaml; also read tasks.md, architecture.md, requirements.md
 
   - id: schema-migration
     name: Schema Migration
@@ -98,7 +98,7 @@ phases:
       - PROCEED only when all criteria are covered by failing tests
     notes:
       - Qualitative review only — no coverage tools at this stage
-      - Review tests against acceptance criteria in the current tasks file (artefacts/build/tasks-*.md)
+      - Review tests against acceptance criteria in artefacts/build/tasks.md
 
   - id: tdd-green
     name: "TDD Green: Implement to Pass Tests"
@@ -123,7 +123,6 @@ phases:
       - Use Write/Edit tools for code files, not bash
       - "Python: uv add / uv run"
       - "TypeScript: yarn add / yarn dlx"
-      - "Read-before-modify: Before editing any component or service, read the relevant files first and confirm current behaviour. Do NOT remove or modify existing functionality unless explicitly asked."
 
   - id: coverage-gate
     name: "Coverage Gate (Changed Files >= 95%)"
@@ -283,7 +282,7 @@ phases:
       - All documentation follows doc-standards.md
       - README.md updated with current information
       - API documentation complete and accurate
-      - The current tasks file (artefacts/build/tasks-*.md) reflects current status
+      - build/tasks.md reflects current status
       - HANDOFF.md includes final handoff entry
 
   - id: quality-review
@@ -327,25 +326,6 @@ phases:
       - Architecture coherent and maintainable
       - Visual design system consistent end-to-end
       - LESS principles met; no unnecessary abstractions
-
-  - id: retrospective
-    name: Workflow Retrospective
-    depends_on:
-      - final-holistic-review
-    optional: true
-    agents:
-      - workflow-analyst
-    outputs:
-      - artefacts/build/efficiency-report.md
-    validation:
-      - All data sources analysed (interruptions, agent-metrics.log, tasks, handoffs, git)
-      - Top 3-5 bottlenecks identified with evidence
-      - Actionable recommendations provided
-    notes:
-      - Optional — can skip for urgent deployments
-      - Read artefacts/build/agent-interruptions.md for friction patterns
-      - Read artefacts/build/agent-metrics.log for agent lifecycle data
-      - Compare to previous efficiency reports for trend analysis
 
 
 quality_gates:
@@ -429,24 +409,17 @@ workflow_rules:
   - "TypeScript: `yarn add` / `yarn dlx` — never npm / npx"
   - UI tests must include screenshots and browser interactions
   # Hygiene
-  - Update the current tasks file (artefacts/build/tasks-*.md) and HANDOFF.md after completing work
+  - Update artefacts/build/tasks.md and HANDOFF.md after completing work
   - Estimate effort in tokens, not time
   - After context compaction, read state recovery section and update status
   - All quality gates must pass
 
 state_recovery:
   after_compaction:
-    - Read the current tasks file (artefacts/build/tasks-*.md) for current task status
-    - Read HANDOFF.md in current service directory for latest handoff
-    - Read artefacts/shared/handoffs/integration-status.md for inter-service status
-    - Check git log for recent commits since last conversation
-    - Verify current phase by checking which tasks are complete
+    - Glob **/artefacts/README.md and read all matches for current state
+    - Run git log --oneline -5 to see recent changes
   critical_files:
-    - artefacts/build/tasks-*.md
-    - "{service}/HANDOFF.md"
-    - artefacts/shared/handoffs/integration-status.md
-    - artefacts/architecture/architecture.md
-    - artefacts/product/requirements.md
+    - "**/artefacts/README.md"
 
 estimation_guidance:
   - Estimate effort in tokens, not time
