@@ -22,10 +22,10 @@
 
 ## Test Types
 
-**Unit Tests (pytest/Vitest)**: Isolated functions/methods, mock all dependencies.
+**Unit Tests (pytest/Vitest)**: Isolated functions/methods. Mock only at I/O boundaries (network, database, filesystem, clock). Use real objects for business-logic collaborators.
 - Agent: @functional-tester writes these
 - Run via: pytest, vitest
-- Mock all external services
+- Mock only at I/O boundaries — never mock internal business-logic collaborators
 
 **Integration Tests (20% of pyramid)**: Component interactions, use real services where safe. Two levels:
 
@@ -66,7 +66,7 @@
 - Tools: See [tech-standards.md §Monorepo Tools](tech-standards.md#monorepo-tools)
 
 **Test Scope Distinction:**
-- **Unit**: Isolated function, all dependencies mocked
+- **Unit**: Isolated function, I/O boundaries mocked, real business-logic collaborators
 - **API Integration**: Multiple components, real database, mocked external APIs
 - **Component Integration**: UI component + interactions, mocked backend
 - **E2E**: Full user workflow, real browser, real services
@@ -194,7 +194,7 @@ Coverage requirements increase as code progresses toward deployment. Thresholds 
 - **Pass Rate**: Percentage of tests that pass (non-concessioned tests must have 100% pass rate)
 - **Concessioned**: Tests marked as `@pytest.mark.skip` or `@pytest.mark.xfail` with documented reason and ticket
 - **Fail Rate**: Percentage of tests that fail (always 0% - no failing tests allowed)
-- **Module**: Service level (e.g., `services/data-service/`, `frontend/`)
+- **Module**: Service level (e.g., `services/bronze-service/`, `frontend/`)
 
 ### Concessioned Tests
 
@@ -521,23 +521,41 @@ def test_processes_api_response(mock_fetch):
 
 ## Test-Driven Development (TDD)
 
-### London School TDD Cycle
+### Detroit School TDD Cycle
 
 **Red → Green → Refactor**
 
 | Phase | Action | Constraint |
 |-------|--------|------------|
-| Red | Write one failing test | Must fail for right reason |
-| Green | Minimum code to pass | Hardcoded returns, no logic |
-| Refactor | Improve design | DRY, SOLID, proper names |
+| Red | Write one failing test from spec only | Must fail for behavioural reason (not syntax/import) |
+| Green | Minimum code to pass | No test modifications |
+| Refactor | Improve design | No new tests; all existing tests still pass |
+
+### Naming Convention
+
+Test names MUST describe a behaviour, not a method or class. Use the `should` pattern:
+
+```
+test_<subject>_should_<behaviour>_when_<condition>
+```
+
+Every test body MUST follow Given-When-Then structure:
+
+```python
+def test_sync_should_abort_when_delist_rate_exceeds_threshold():
+    # Given a universe with 100 active tickers
+    # When the scraper returns 25 delisted tickers
+    # Then the sync is aborted
+```
 
 ### Core Rules
 
-1. **Start with acceptance test** (consumer perspective)
-2. **Isolate units**: interface per collaborator, mock for verification
-3. **Tell Don't Ask**: command collaborators, don't query state
-4. **One behaviour per test**: single assertion, descriptive name
-5. **Recurse to boundaries**: DB, APIs, filesystem, clock
+1. **Intent-first**: derive tests from acceptance criteria, never from implementation source
+2. **Assert on outcomes**: assert against state, return values, or observable side effects — not on calls made
+3. **Minimise mocks**: use real objects for business-logic collaborators; mock only at I/O boundaries (network, database, filesystem, clock)
+4. **Tell Don't Ask**: command collaborators, don't query state
+5. **Watch it fail**: a test that passes before GREEN begins was written against existing code — delete and rewrite
+6. **Pre-computed expectations**: expected values derived from the spec, never computed by the same logic being tested
 
 ### Invariant Tests
 
