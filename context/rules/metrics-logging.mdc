@@ -1,6 +1,6 @@
 ---
 description: Agent metrics self-reporting protocol
-alwaysApply: true
+alwaysApply: false
 globs: ["**/agents/**", "**/orchestrator*"]
 ---
 

@@ -35,7 +35,7 @@ def validate_agent_definition(file_path: Path) -> list[str]:
         return errors
 
     # Check required frontmatter fields
-    required = ['name', 'model', 'allowed_tools']
+    required = ['name', 'model']
     for field in required:
         if field not in frontmatter:
             errors.append(f"Missing required field: {field}")

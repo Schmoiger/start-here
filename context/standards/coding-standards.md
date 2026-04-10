@@ -230,7 +230,7 @@ Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
 
 | Phase            | Type       | Example                                                                   |
 | ---------------- | ---------- | ------------------------------------------------------------------------- |
-| TDD RED (tests)  | `test`     | `test(data-service): DS-001 add failing tests for yfinance data fetching` |
+| TDD RED (tests)  | `test`     | `test(bronze-service): DS-001 add failing tests for yfinance data fetching` |
 | TDD GREEN (impl) | `feat`     | `feat(vis-service): VS-102 implement Bollinger Band calculator`           |
 | Review           | `docs`     | `docs(frontend): FE-301 add tech lead review - APPROVED`                  |
 | Bug fix          | `fix`      | `fix(llm-service): LLM-105 handle OpenRouter timeout`                     |
@@ -242,7 +242,7 @@ Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
 Use the service/package name as scope:
 
 - `shared-types` - Shared type definitions
-- `data-service` - Data fetching service
+- `bronze-service` - Data fetching service
 - `vis-service` - Visualisation service
 - `llm-service` - LLM service
 - `frontend` - React frontend
@@ -259,7 +259,7 @@ Use the service/package name as scope:
 
 ```bash
 # TDD RED - failing tests
-test(data-service): DS-001 add failing tests for yfinance data fetching
+test(bronze-service): DS-001 add failing tests for yfinance data fetching
 
 Tasks: DS-001
 Agent-Session: model=sonnet agents=functional-tester tokens=8.2K/5.1K duration=32m
@@ -267,7 +267,7 @@ Agent-Session: model=sonnet agents=functional-tester tokens=8.2K/5.1K duration=3
 Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
 
 # TDD GREEN - implementation
-feat(data-service): DS-101 create project structure and dependencies
+feat(bronze-service): DS-101 create project structure and dependencies
 
 Tasks: DS-101
 Agent-Session: model=sonnet agents=python-coder tokens=12.4K/8.2K duration=45m
@@ -275,7 +275,7 @@ Agent-Session: model=sonnet agents=python-coder tokens=12.4K/8.2K duration=45m
 Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
 
 # Review approval
-docs(data-service): DS-301 add tech lead review - APPROVED
+docs(bronze-service): DS-301 add tech lead review - APPROVED
 
 Tasks: DS-301
 Agent-Session: model=opus agents=tech-lead tokens=15.6K/6.3K duration=28m

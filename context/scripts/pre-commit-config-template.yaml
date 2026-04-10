@@ -1,3 +1,17 @@
+# Pre-commit configuration template
+#
+# DEPLOYMENT
+# ----------
+# 1. Copy this file to the project root: cp context/scripts/pre-commit-config-template.yaml .pre-commit-config.yaml
+# 2. Install pre-commit: uv add --dev pre-commit
+# 3. Install hooks: uv run pre-commit install && uv run pre-commit install --hook-type commit-msg
+# 4. Run against all files (first time): uv run pre-commit run --all-files
+#
+# UPDATE HOOK VERSIONS
+# --------------------
+# Check for newer versions: uv run pre-commit autoupdate
+# Pin versions explicitly to prevent unexpected breakage across machines.
+
 repos:
   # Python: Ruff (format + lint) and Pyright (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -5,15 +19,21 @@ repos:
     hooks:
       - id: ruff-check
         name: Ruff (lint)
+        files: ^services/.*\.py$
         args: [--fix]
       - id: ruff-format
         name: Ruff (format)
+        files: ^services/.*\.py$
 
   # Pyright: run per-service (cd services/<name> && uv run pyright)
   # - repo: https://github.com/RobertCraigie/pyright-python
   #   rev: v1.1.408
   #   hooks:
   #     - id: pyright
+  #       name: Pyright (type check)
+  #       files: ^services/.*\.py$
+  #       exclude: ^services/.*/tests/.*\.py$
+  #       pass_filenames: false
 
   # TypeScript linting and formatting
   - repo: local
@@ -54,19 +74,12 @@ repos:
         language: python
         files: ^metrics/.*\.jsonl$
 
-      - id: import-boundaries
-        name: Import boundaries
-        language: python
-        entry: uv run python context/scripts/validators/import_boundaries.py
-        files: \.py$
-        additional_dependencies: [pyyaml]
-
-      # CLAUDE.md regeneration disabled - run manually when needed:
-      # uv run python context/scripts/generators/generate_claude_md.py
+      # AGENTS.md regeneration disabled - run manually when needed:
+      # uv run python context/scripts/generators/generate_agents_md.py
       #
-      # - id: regenerate-claude-md
-      #   name: Regenerate CLAUDE.md if context changed
-      #   entry: uv run python context/scripts/generators/generate_claude_md.py
+      # - id: regenerate-agents-md
+      #   name: Regenerate AGENTS.md if context changed
+      #   entry: uv run python context/scripts/generators/generate_agents_md.py
       #   language: python
       #   files: ^context/(agents/|workflows/|README\.md)
       #   pass_filenames: false

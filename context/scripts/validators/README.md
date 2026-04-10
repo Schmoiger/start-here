@@ -10,6 +10,7 @@ These validators enforce consistency across the codebase by checking:
 2. **ears_notation.py** - Requirements using EARS notation syntax
 3. **british_english.py** - British English spelling conventions
 4. **metrics_logging.py** - Agent metrics logging format
+5. **design_system.py** - Frontend compliance with `artefacts/design/design-system.md` (CSS only, colours, Heroicons barrel, spacing scale)
 
 ## Installation
 
@@ -62,6 +63,13 @@ uv run pre-commit run conventional-commits
 uv run pre-commit run ears-notation
 uv run pre-commit run british-english
 uv run pre-commit run metrics-logging
+uv run pre-commit run design-system
+```
+
+Design-system validator (run from repo root, no file args):
+
+```bash
+uv run python context/scripts/validators/design_system.py
 ```
 
 ## Validator Details
@@ -212,6 +220,17 @@ Invalid:
 {"ts":"2025-01-28","task":"AUTH-001"}                    # Missing required fields
 {"ts":"2025-01-28T09:00:00Z","task":"AUTH-001","event":"invalid"}  # Invalid event type
 ```
+
+### Design System (`design_system.py`)
+
+Validates frontend compliance with `artefacts/design/design-system.md`. Run from repo root (no file arguments); scans `frontend/src` for:
+
+- **CSS**: Only `frontend/src/index.css`; no component-scoped `.css` files (§1.1)
+- **Colours**: No Tailwind concrete colour classes (e.g. `text-green-600`); use DaisyUI semantic (§1.4)
+- **Icons**: No direct `from '@heroicons/react'` in components; use barrel `components/icons/HeroIcons.tsx` (§1.3)
+- **Spacing**: Only `gap-1`, `gap-2`, `gap-4`, `p-2`, `p-4`, `px-4`; `md:gap-6` / `md:px-6` only in PriceHeader (§1.2)
+
+**Target files:** Any change under `frontend/src` matching `*.tsx`, `*.ts`, `*.jsx`, `*.js`, `*.css` triggers the hook (full scan). Until design-system Phases 3–4 are complete, spacing violations are expected; use `SKIP=design-system git commit` to bypass.
 
 ## Exit Codes
 

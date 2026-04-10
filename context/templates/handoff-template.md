@@ -3,7 +3,8 @@
 **From**: @{agent-name}
 **To**: @{agent-name}
 **Date**: {YYYY-MM-DD}
-**Phase**: {DISCOVERY|DESIGN|TDD_RED|TDD_GREEN|REVIEW|INTEGRATION|DEPLOY}
+**Workflow**: {build|design|prototype|deploy|full-test|content|retrospective}
+**Phase**: {phase-id from workflow YAML}
 **Status**: {ready|blocked|needs_review|failed}
 
 ---

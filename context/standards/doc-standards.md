@@ -11,7 +11,7 @@ This document outlines the standards for documentation across the software proje
 This repository is a monorepo, containing multiple projects (services and packages).
 
 *   **Monorepo Root:** The top-level directory of the repository.
-*   **Project Root:** A directory within the monorepo that contains a specific project (e.g., `/services/data-service/`, `/packages/shared-types/python/`).
+*   **Project Root:** A directory within the monorepo that contains a specific project (e.g., `/services/bronze-service/`, `/packages/shared-types/python/`).
 
 The documentation shall be structured as follows:
 
@@ -68,7 +68,7 @@ For example:
 │       ├── fixtures/
 │       └── mocks/
 │
-├── services/data-service/           # Service example
+├── services/bronze-service/          # Service example
 │   ├── artefacts/                   # OUTPUT: Service-specific
 │   │   ├── bugs.md
 │   │   ├── tasks.md
@@ -96,13 +96,29 @@ For example:
 **Rule**: Context is organised by domain boundary.
 
 *   **Service-specific artefacts** → `{service}/artefacts/`
-    *   Example: Bugs only affecting data-service go in `services/data-service/artefacts/bugs.md`
+    *   Example: Bugs only affecting bronze-service go in `services/bronze-service/artefacts/bugs.md`
 *   **System-wide artefacts** → `/artefacts/` (monorepo root)
     *   Example: System architecture affecting all services goes in `/artefacts/architecture.md`
 *   **Cross-service coordination** → `/artefacts/shared/`
     *   Example: Integration handoffs go in `/artefacts/shared/handoffs/`
 
-### 2.3. Service/Package Artefact Files
+### 2.3. Artefacts README
+
+Every `artefacts/` directory — both the monorepo root and each service-level directory — shall contain a `README.md`. This file is the single-file orientation point used by agents after context compaction (see [agent-standards.md §2](agent-standards.md#2-state-recovery-after-compaction)).
+
+**Required content:**
+
+- **Current phase**: which workflow phase is active (e.g. `tdd-green`, `sprint-review`)
+- **Active tasks**: brief list of in-progress work with task IDs
+- **Recent decisions**: key choices made since the last major milestone (2–5 bullet points)
+- **Blockers**: anything preventing progress
+- **Key files**: pointers to the most important artefacts for the current phase
+
+**Maintenance**: any agent completing significant work shall update the `README.md` in the relevant `artefacts/` directory before handing off. The `@documentation` agent owns the format but not the cadence — all agents write to it.
+
+**Scope**: the root `artefacts/README.md` covers system-wide state; each `{service}/artefacts/README.md` covers that service only.
+
+### 2.4. Service/Package Artefact Files
 
 Each service or package shall maintain the following files in its `artefacts/` directory:
 
@@ -122,7 +138,7 @@ Each service or package shall maintain the following files in its `artefacts/` d
 *   **`test-results/`**: Test execution outputs organized by type (unit/, integration/, e2e/, security/, archive/)
 *   **`fixtures/`**: Service-specific test data (optional)
 
-### 2.4. Agent Handoff Files
+### 2.5. Agent Handoff Files
 
 The system shall maintain handoff documentation for agent coordination:
 
@@ -153,7 +169,7 @@ Example:
 **Tasks**: DS-001 through DS-008
 **Status**: ✅ Complete
 
-**Summary**: All data-service tests written and failing. Test coverage
+**Summary**: All bronze-service tests written and failing. Test coverage
 includes yfinance integration, Bronze/Silver stores, cache management,
 and API endpoints.
 
@@ -167,7 +183,7 @@ and API endpoints.
 - Fixtures: `tests/fixtures/`
 - Tasks: `artefacts/tasks.md`
 
-**Commit**: abc1234 - test(data-service): DS-001-008 add failing tests
+**Commit**: abc1234 - test(bronze-service): DS-001-008 add failing tests
 ```
 
 #### Cross-Domain Handoffs
@@ -194,7 +210,7 @@ Required elements for API handoffs:
 *   **Known Issues**: Any bugs or limitations
 *   **Breaking Changes**: Upcoming changes with ETAs
 
-### 2.5. Archive Management
+### 2.6. Archive Management
 
 The system shall maintain archives of superseded artefacts to preserve project history whilst keeping active documentation focused and discoverable.
 
@@ -277,7 +293,7 @@ Use `@documentation` agent to:
 - Generate archive README.md with references to current docs
 - Update cross-references in active documents
 
-### 2.6. Project `README.md`
+### 2.7. Project `README.md`
 
 The system shall maintain a `README.md` file in the root of each project. The `README.md` file shall describe:
 
