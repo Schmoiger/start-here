@@ -417,7 +417,7 @@ that phase. The `skills` field in `default.yaml` is a checklist, not a suggestio
 |---|---|---|
 | `discovery` | `superpowers:brainstorming` | Explore problem space before formalising requirements; prevents premature lock-in |
 | `design` | `superpowers:brainstorming` | Evaluate design alternatives before committing; explore trade-offs |
-| `design` | `superpowers:using-git-worktrees` | Isolate feature branch from main; safe parallel work |
+| `design` | `superpowers:brainstorming` | Explore design alternatives before committing to an approach |
 | `design` (UI work) | `frontend-design` | Produces polished, non-generic UI designs; avoids AI-default aesthetics |
 | `design-review`, `quality-review`, `final-holistic-review` | `superpowers:requesting-code-review` | Structures what reviewers focus on; prevents unfocused review passes |
 | `design-review`, `quality-review`, `final-holistic-review` | `superpowers:receiving-code-review` | Validates CHANGES REQUIRED feedback before acting; prevents performative compliance |

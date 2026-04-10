@@ -44,17 +44,35 @@ migrations: Alembic (pre-deployment)
 
 ### Database Migrations
 
+#### Supabase Projects (preferred for this monorepo)
+
+**Preferred tool: Supabase MCP** — apply migrations directly to the cloud-hosted Supabase project. Do **not** use Docker-based local Supabase (`supabase start`) — the project uses a cloud DB, not a local container.
+
+**Workflow:**
+1. Write migration SQL in `supabase/migrations/YYYYMMDDHHMMSS_description.sql`
+2. Apply via MCP: `mcp__supabase__apply_migration` (DDL) or `mcp__supabase__execute_sql` (queries)
+3. Verify with `mcp__supabase__execute_sql` (e.g. `SELECT COUNT(*) FROM table`)
+4. Credentials: `secrets/supabase.json` — project ID is the subdomain of `api_url`
+
+**Do not use:**
+- `supabase db push` (requires Docker)
+- `supabase start` / `supabase status` (requires Docker daemon)
+- `psql` direct connections (use MCP instead)
+
+#### Other PostgreSQL Projects (Alembic)
+
 **Phase-based approach:**
 
-| Phase | Strategy | Tool |
-|-------|----------|------|
-| Prototype | Manual SQL or rebuild schema | None (iterate quickly) |
-| Development | Start tracking migrations | Alembic setup |
-| Pre-deployment | Production-ready migrations | Alembic (required) |
+| Phase          | Strategy                     | Tool                   |
+| -------------- | ---------------------------- | ---------------------- |
+| Prototype      | Manual SQL or rebuild schema | None (iterate quickly) |
+| Development    | Start tracking migrations    | Alembic setup          |
+| Pre-deployment | Production-ready migrations  | Alembic (required)     |
 
 **Tool: Alembic** (SQLAlchemy-based migrations for Python + PostgreSQL)
 
 **Setup:**
+
 ```bash
 cd backend/{service-name}
 uv add alembic
@@ -62,12 +80,14 @@ alembic init alembic
 ```
 
 **Naming convention:**
+
 ```
 YYYYMMDD_HHMM_description.py
 Example: 20260206_1430_add_portfolio_table.py
 ```
 
 **Migration workflow:**
+
 1. **Generate**: `alembic revision --autogenerate -m "add portfolio table"`
 2. **Review**: Check generated SQL for safety (destructive operations, data loss)
 3. **Test locally**: Run `alembic upgrade head` then `alembic downgrade -1`
@@ -75,6 +95,7 @@ Example: 20260206_1430_add_portfolio_table.py
 5. **Rollback plan**: Always test downgrade path before deploying
 
 **Critical rules:**
+
 - Never edit applied migrations (create new migration instead)
 - Always test rollback (`downgrade`) before deploying forward (`upgrade`)
 - Use transactions where possible (PostgreSQL supports DDL transactions)
@@ -150,21 +171,26 @@ testing:
 ### Testing Tools
 
 **Unit Testing:**
+
 - **Vitest** (Frontend TypeScript)
 - **Pytest** (Backend Python)
 - **XCTest** (iOS Swift)
 
 **API Integration Testing:**
+
 - **FastAPI TestClient** (Backend)
 - **Vitest + fetch/axios** (Frontend)
 
 **Component Integration Testing:**
+
 - **Testing Library** (@testing-library/react, @testing-library/user-event): Tests React components with user interactions in simulated browser (jsdom)
 
 **UI E2E Testing:**
+
 - **Puppeteer** (puppeteer-core): Automates Chrome via DevTools Protocol, captures screenshots as evidence
 
 **Installation:**
+
 ```bash
 # Frontend
 yarn add -D vitest @testing-library/react @testing-library/user-event puppeteer-core
@@ -179,15 +205,18 @@ uv add --dev pytest pytest-cov
 ### Pre-commit Hooks
 
 **Python (backend services):**
+
 - **Config**: Project-specific `.pre-commit-config.yaml`
 - **Hooks**: Black (format), isort (imports), mypy (types), general file validation
 - **Enforcement**: `pre-commit run --all-files` before commits and in CI/CD
 
 **TypeScript/JavaScript (frontend):**
+
 - **Config**: `.husky/pre-commit` with `biome check --apply`
 - **Hooks**: Biome (format + lint), TypeScript compiler check
 - **Enforcement**: Husky triggers on git commit
 - **Installation**:
+  
   ```bash
   yarn add -D @biomejs/biome husky
   npx husky init
@@ -237,6 +266,7 @@ Corepack downloads the Yarn version specified in `package.json` (`"packageManage
 **Exception — MCP servers:** Model Context Protocol server configs (e.g. in `context/mcp/mcp.json`) may use `npx` because the MCP host (e.g. Cursor) often runs outside the project environment and may not have the project's Yarn on PATH.
 
 **Common issues:**
+
 - "yarn: command not found" → `corepack enable`
 - Homebrew conflict → `brew uninstall yarn`
 
@@ -257,6 +287,7 @@ yarn test                        # TypeScript tests
 ```
 
 **Test Commands:**
+
 - **Python**: `uv run pytest` (not `pytest` alone, not `pip` or `poetry`)
 - **TypeScript**: `yarn test` (not `npm test`)
 - **Coverage**: `uv run pytest --cov` or `yarn test --coverage`
@@ -267,6 +298,7 @@ yarn test                        # TypeScript tests
 - **Production**: Environment variables injected by Cloud Run/Firebase
 
 **TODO**: Expand this section with complete guidance from [rules/secrets-management.mdc](../rules/secrets-management.mdc) including:
+
 - `/secrets/` directory structure
 - Secret rotation policies
 - Workload Identity vs shared secrets
@@ -371,6 +403,7 @@ Error tracking groups, deduplicates, and alerts on errors (distinct from raw log
 - **Alerting**: PagerDuty or Opsgenie for critical errors (configurable thresholds)
 
 **Error vs Logging:**
+
 - **Logging**: Raw event stream (every request, every action)
 - **Error Tracking**: Aggregated failures (groups identical errors, tracks frequency, alerts on spikes)
 
@@ -378,13 +411,14 @@ Error tracking groups, deduplicates, and alerts on errors (distinct from raw log
 
 **Phase-based approach:**
 
-| Phase | Strategy | Tool |
-|-------|----------|------|
-| Prototype | Environment variables | Built-in (simple on/off) |
-| Development | Environment variables | Built-in (simple on/off) |
-| Pre-deployment | Remote config with targeting | Firebase Remote Config |
+| Phase          | Strategy                     | Tool                     |
+| -------------- | ---------------------------- | ------------------------ |
+| Prototype      | Environment variables        | Built-in (simple on/off) |
+| Development    | Environment variables        | Built-in (simple on/off) |
+| Pre-deployment | Remote config with targeting | Firebase Remote Config   |
 
 **When to use feature flags:**
+
 - Gradual rollouts (10% → 50% → 100% of users)
 - A/B testing (compare feature variants)
 - Circuit breakers (disable unstable features)
@@ -394,6 +428,7 @@ Error tracking groups, deduplicates, and alerts on errors (distinct from raw log
 **Implementation:**
 
 **Prototype/Development (Environment Variables):**
+
 ```python
 # Backend (Python)
 ENABLE_NEW_PORTFOLIO_VIEW = os.getenv("ENABLE_NEW_PORTFOLIO_VIEW", "false") == "true"
@@ -416,6 +451,7 @@ if (ENABLE_NEW_PORTFOLIO_VIEW) {
 ```
 
 **Pre-deployment (Firebase Remote Config):**
+
 ```python
 # Backend
 from firebase_admin import remote_config
@@ -437,6 +473,7 @@ let enableFeature = RemoteConfig.remoteConfig()["enable_new_portfolio_view"].boo
 ```
 
 **Cleanup policy:**
+
 - Remove flag code after 30 days of 100% rollout
 - Document flag lifecycle in ticket
 - Don't let flags rot in codebase
@@ -488,6 +525,7 @@ Applied as:
 See [build-standards.md](build-standards.md) for complete build configuration, templates, and deployment patterns.
 
 Reference this document when making architectural decisions or introducing new patterns. These are preferred patterns; document deviations and rationale when choosing alternatives.
+
 ## 12-Factor App Principles
 
 For building software-as-a-service applications with portability and resilience:
@@ -508,6 +546,7 @@ For building software-as-a-service applications with portability and resilience:
 ## Context7 Integration
 
 Always use Context7 when needing:
+
 - Code generation
 - Setup or configuration steps
 - Library/API documentation
@@ -519,12 +558,14 @@ Automatically use Context7 MCP tools to resolve library ID and get library docs 
 Install packages at the project root folder, not at the monorepo root. This ensures proper dependency isolation and allows each project to manage its own dependencies independently.
 
 **Python projects:**
+
 ```bash
 cd {project-root}
 uv add package-name
 ```
 
 **Node.js projects:**
+
 ```bash
 cd {project-root}
 yarn add package-name

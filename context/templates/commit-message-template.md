@@ -52,8 +52,8 @@ Agent-Session: tool=<tool> model=<model> agents=<agent-ids> tokens=<in>K/<out>K 
 
 | Field | Format | Example |
 |-------|--------|---------|
-| tool   | The IDE/platform that ran the model    | tool=cursor, tool=claude-ide, tool=copilot, tool=windsurf |
-| model  | The model/backend used                 | model=sonnet, model=opus, model=gpt-4, model=claude-3-5-sonnet |
+| tool | The IDE/platform that ran the model | tool=cursor, tool=claude-ide, tool=copilot, tool=windsurf |
+| model | The model/backend used | model=sonnet, model=opus, model=gpt-4, model=claude-3-5-sonnet |
 | agents | Agent role(s) from context/agents | agents=python-coder, agents=functional-tester,code-reviewer |
 | tokens | in/out with K suffix | tokens=12.4K/8.2K |
 | duration | minutes or hours | duration=45m |
@@ -67,8 +67,6 @@ GitHub-recognised trailer format. Use a line that identifies the tool (or tool +
 ```
 Co-Authored-By: Cursor <cursor@cursor.com>
 Co-Authored-By: Claude Sonnet <sonnet@anthropic.com>
-Co-Authored-By: Claude Opus <opus@anthropic.com>
-Co-Authored-By: Claude Haiku <haiku@anthropic.com>
 Co-Authored-By: GitHub Copilot <copilot@github.com>
 ```
 

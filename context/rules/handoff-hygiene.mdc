@@ -1,7 +1,7 @@
 ---
 description: Handoff documents and tracking files must be maintained and archived
 globs: ["**/HANDOFF.md", "**/bugs.md", "**/tasks.md", "**/todo.md"]
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Handoff Hygiene
@@ -18,7 +18,7 @@ alwaysApply: true
 
 ## After Every Task Completion
 
-Update these files (use Write/Edit tools per file-operations.mdc):
+Update these files (use Write/Edit tools):
 
 - `{service}/artefacts/tasks.md` — mark task done, update status
 - `{service}/artefacts/bugs.md` — log new bugs found, close resolved ones

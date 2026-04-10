@@ -112,8 +112,8 @@ Checklist of verification steps:
 ```markdown
 ## Test Plan
 
-- [ ] Unit tests pass (`npm test`)
-- [ ] Integration tests pass (`npm run test:integration`)
+- [ ] Unit tests pass (`uv run pytest` / `yarn test --run`)
+- [ ] Integration tests pass (`uv run pytest tests/integration`)
 - [ ] Manual verification of retry behaviour
 - [ ] Load test with simulated failures
 ```

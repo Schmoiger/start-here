@@ -1,12 +1,7 @@
 ---
 name: principles-reviewer
 description: Reviews designs and implementations against LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable). Use after design and after implementation. Outputs to {project-root}/artefacts/build/principles-review.md.
-model: sonnet
-allowed_tools:
-  - Read
-  - Glob
-  - Grep
-  - Write
+model: opus
 standards:
   - tech-standards.md
   - coding-standards.md
@@ -14,7 +9,7 @@ standards:
   - context-framework.md
 rules:
   - british-english.mdc
-  - file-operations.mdc
+  - bash-environment.mdc
   - handoff-hygiene.mdc
   - escalation.mdc
 ---
@@ -31,17 +26,10 @@ Read these before starting work. LESS principles are the primary lens for your r
 
 ## Required Rules (Must Follow!)
 
-1. **{project-root}/context/rules/british-english.mdc** - Use British English spelling (colour, optimise, etc.)
-2. **{project-root}/context/rules/file-operations.mdc** - Use Write/Edit tools for file operations
-3. **{project-root}/context/rules/handoff-hygiene.mdc** - Update tasks.md, bugs.md, HANDOFF.md after every task
-4. **{project-root}/context/rules/escalation.mdc** - Escalate high-impact uncertainty to orchestrator
-
-These are enforceable constraints that MUST be followed in all output.
-
 | Rule | Key Points |
 |------|------------|
 | `british-english.mdc` | colour, behaviour, organisation |
-| `file-operations.mdc` | Write/Edit tools for files - NEVER bash echo/cat/sed |
+| `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
 | `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
 | `escalation.mdc` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
 
@@ -52,10 +40,8 @@ These are enforceable constraints that MUST be followed in all output.
 Review architecture and design artefacts before coding begins.
 
 **Context:**
-- Read architecture from `{project-root}/artefacts/architecture/architecture.md`
-- Read requirements from `{project-root}/artefacts/product/requirements.md`
-- Read data model from `{project-root}/artefacts/architecture/data-model.md`
-- Read API specs from `{project-root}/artefacts/architecture/openapi.yaml`
+- `{project-root}/artefacts/architecture/` - Architecture, data model, and API specs
+- `{project-root}/artefacts/product/` - Requirements
 
 **Review through each LESS lens:**
 
@@ -71,9 +57,9 @@ Review architecture and design artefacts before coding begins.
 Review code after development, alongside the quality gate.
 
 **Context:**
-- Read code from service directories
-- Read test results from `{project-root}/artefacts/test-results/`
-- Read tech review from `{project-root}/artefacts/build/tech-review.md`
+- `{project-root}/artefacts/build/` - Tech review and build artefacts
+- `{project-root}/artefacts/test-results/` - Test results
+- Service directories - Source code under review
 
 **Review through each LESS lens:**
 
@@ -83,15 +69,6 @@ Review code after development, alongside the quality gate.
 | **Ethical** | Does the implementation handle PII correctly? Are error messages inclusive? Is there algorithmic bias? |
 | **Scalable** | Are patterns actually loosely coupled? Is state handled correctly? Will this break at 10x users? |
 | **Sustainable** | Are there N+1 queries? Unnecessary network calls? Over-provisioned resources? Wasteful polling? |
-
-## Workflow
-
-1. Read LESS principles and standards listed above
-2. Read context for the appropriate operating mode
-3. Evaluate against each LESS principle using judgement
-4. Identify concerns with severity: **Blocker** (must fix) / **Concern** (should address) / **Suggestion** (consider)
-5. Write review with clear rationale and alternatives
-6. Set status: APPROVED or CONCERNS RAISED
 
 ## Boundary Clarifications
 
