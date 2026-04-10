@@ -66,7 +66,7 @@ Test
         incomplete_agent = tmp_path / "incomplete_agent.md"
         incomplete_agent.write_text("""---
 name: test-agent
-# Missing 'model' and 'allowed_tools'
+# Missing 'model'
 ---
 
 ## Role
@@ -81,7 +81,6 @@ None
         errors = validate_agent_definition(incomplete_agent)
         assert len(errors) > 0
         assert any("model" in e for e in errors)
-        assert any("allowed_tools" in e for e in errors)
 
     def test_relative_paths_flagged(self, tmp_path):
         """Test that relative paths to artefacts are flagged."""
@@ -89,7 +88,6 @@ None
         bad_agent.write_text("""---
 name: test-agent
 model: sonnet
-allowed_tools: [Read]
 ---
 
 ## Role
@@ -116,7 +114,6 @@ None
         bad_agent.write_text("""---
 name: test-agent
 model: sonnet
-allowed_tools: [Read]
 ---
 
 ## Role
@@ -144,7 +141,6 @@ None
         good_agent.write_text("""---
 name: test-agent
 model: sonnet
-allowed_tools: [Read]
 ---
 
 ## Role
@@ -176,7 +172,6 @@ Use {project-root}/artefacts/
         good_agent.write_text("""---
 name: test-agent
 model: sonnet
-allowed_tools: [Read]
 ---
 
 ## Role
@@ -206,7 +201,6 @@ None
         bad_agent.write_text("""---
 name: test-agent
 model: sonnet
-allowed_tools: [Read]
 standards: [nonexistent-standard.md]
 ---
 
@@ -229,7 +223,6 @@ None
         bad_agent.write_text("""---
 name: test-agent
 model: sonnet
-allowed_tools: [Read]
 rules: [nonexistent-rule.mdc]
 ---
 
