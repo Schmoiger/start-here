@@ -186,7 +186,7 @@ Spawn in parallel:
 - `artefacts/architecture/architecture.md`
 - `artefacts/architecture/data-model.md`
 - `artefacts/architecture/openapi.yaml`
-- `artefacts/design/components.md`
+- `artefacts/design/design-system.md`
 - `artefacts/design/visuals/`
 
 **Duration**: ~1-2 hours
