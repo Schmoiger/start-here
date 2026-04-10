@@ -18,6 +18,7 @@ alwaysApply: false
 | Install all deps | `yarn install` | `npm install` |
 | Run script | `yarn scriptname` | `npm run scriptname` |
 | Execute binary | `yarn dlx package` | `npx package` |
+| Lint (from any directory) | `yarn --cwd {repo-root} run lint` | `yarn lint` (from subdirectory) |
 
 ## Why
 
@@ -25,18 +26,6 @@ This project uses Yarn workspaces for monorepo management. Using npm:
 - Breaks workspace dependency resolution
 - Creates conflicting lock files (`package-lock.json` vs `yarn.lock`)
 - May install wrong versions
-
-## Biome (Linter / Formatter)
-
-Biome is installed at the **repo root**, not in `frontend/`. Always invoke via yarn with `--cwd`:
-
-| Action | Correct | Wrong |
-|--------|---------|-------|
-| Lint check | `yarn --cwd {project-root} run lint` | `yarn lint` (fails — no biome in frontend/) |
-| Lint fix | `yarn --cwd {project-root} run lint:fix` | `./node_modules/.bin/biome check` |
-| Single file | `yarn --cwd {project-root} biome check --write path/to/file.ts` | `npx biome check` |
-
-**Why `--cwd`:** The `biome` binary is in the root `node_modules/.bin/`. Without `--cwd`, yarn looks in the current directory's `node_modules/` and fails.
 
 ## Project Setup
 
