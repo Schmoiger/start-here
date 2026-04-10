@@ -29,6 +29,5 @@
 
 ## Notes
 
-- Simple bugs: location is `file:line`
-- Complex bugs: location links to `troubleshooting-{service}.md#{id}`
+- Location is `file:line` for straightforward bugs; a link to a separate investigation file for complex ones
 - Learnings column: one-line insight from troubleshooting (prevents repeat attempts)
