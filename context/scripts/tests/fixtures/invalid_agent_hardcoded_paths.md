@@ -1,7 +1,6 @@
 ---
 name: bad-agent
 model: sonnet
-allowed_tools: [Read, Write]
 ---
 
 ## Role
