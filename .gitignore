@@ -211,3 +211,6 @@ __marimo__/
 
 # MCP config (contains API keys)
 context/mcp/mcp.json
+
+# Git worktrees
+.worktrees/
