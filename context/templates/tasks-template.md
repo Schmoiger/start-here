@@ -1,4 +1,4 @@
-# Tasks: {Sprint Name}
+# Tasks: {Feature Name}
 
 ## Header
 
@@ -6,13 +6,14 @@ Every task file begins with structured metadata:
 
 ```markdown
 **Branch**: `{branch-name}`
-**Scope**: {1–2 sentence summary of what the sprint delivers}
+**Status**: Planning | In Progress | Complete
+**Scope**: {1–2 sentence summary of what the feature delivers}
 **Design**: {path to design doc, or "N/A"}
 **Created**: {YYYY-MM-DD}
 **Amended**: {YYYY-MM-DD — brief summary of changes}
 ```
 
-Update **Amended** whenever the task file is revised after creation.
+Update **Status** as the feature progresses. Update **Amended** whenever the task file is revised after creation.
 
 ---
 
@@ -20,22 +21,23 @@ Update **Amended** whenever the task file is revised after creation.
 
 Two formats are used depending on the scope of the task file:
 
-### Table format — service-level task tracking
+### Task Index (required)
 
-See `context/standards/context-framework.md` for prioritisation rules and agent behaviour.
+The task index is the single source of truth for task status. **Update status immediately** when
+a task transitions — do not batch status updates.
 
 - **Pri**: critical, high, medium, low
 - **Status**: pending, in_progress, blocked, completed
 - **Blocked By**: task/bug IDs or `-` if none
-- **Tokens**: in/out with K suffix (e.g., 8.2K/5.1K) — populated on completion
-- **Duration**: minutes or hours (e.g., 32m) — populated on completion
 
-| ID | Pri | Status | Blocked By | Task | Tokens | Duration |
-|----|-----|--------|------------|------|--------|----------|
-| TASK-001 | critical | completed | - | {description} (REQ-xxx) | 4.1K/2.8K | 18m |
-| TASK-002 | high | in_progress | TASK-001 | {description} (REQ-xxx) | - | - |
-| TASK-003 | medium | pending | TASK-001 | {description} | - | - |
-| TASK-004 | low | pending | - | {description} | - | - |
+| ID | Pri | Status | Blocked By | Task |
+|----|-----|--------|------------|------|
+| TASK-001 | critical | completed | - | {description} |
+| TASK-002 | high | in_progress | TASK-001 | {description} |
+| TASK-003 | medium | pending | TASK-001 | {description} |
+
+**Every task in the index must have a matching `### TASK-ID:` specification section** with
+acceptance criteria. Tasks without specifications cannot be dispatched.
 
 ### Checklist format — sprint-based feature task tracking
 
@@ -72,26 +74,42 @@ dependency graph.
 
 ### Parallelism Strategy
 
-Identify independent tracks and the spawn sequence. Use a concrete dispatch plan:
+Identify independent sprints and the dispatch sequence. Use a concrete dispatch plan.
+
+**Terminology**: use "sprint" for parallel groupings (Sprint 1, Sprint 2). Do not mix in
+"wave", "track", "phase", or "batch" — keep to standard agile terminology.
+
+For tasks with both Python and TypeScript streams, specify the full dispatch chain including
+TypeScript RED/GREEN phases — do not omit TypeScript work from the dispatch plan.
+
+Include `file_scope` per parallel group so the orchestrator can verify disjoint scopes before
+dispatching (see `agent-standards.md` §6.4).
 
 ```markdown
 ### Parallelism Strategy
 
-**Track A** (critical path): T-1 → T-2 + T-3 (parallel) → T-4
-**Track B** (independent):  T-5 → T-6
+**Sprint 1** (critical path): T-1 → T-2 + T-3 (parallel) → T-4
+  file_scope: services/bronze-service/
+**Sprint 2** (independent):  T-5 → T-6
+  file_scope: services/mq-service/
 
-Spawn simultaneously in one message:
-  @agent-a → T-1
-  @agent-b → T-5
+Dispatch 1 — spawn simultaneously:
+  @functional-tester → T-1 RED
+  @functional-tester → T-5 RED
 
-After T-1 completes, spawn simultaneously:
-  @agent-c → T-2
-  @agent-d → T-3
+After T-1 RED, dispatch 2:
+  @python-coder → T-1 GREEN-py
+  @functional-tester → T-1 RED-ts (if TypeScript stream)
+  @typescript-coder → T-1 GREEN-ts (after RED-ts)
 ```
 
 ### Commit Strategy
 
 Define commit granularity and message format upfront. One commit per task is the default.
+Agents do not commit — they write a commit message to `/tmp/{task-id}_commit_msg.txt` and
+report the file list. The orchestrator commits on their behalf (see `agent-standards.md` §4.4).
+
+Push cadence: the orchestrator pushes after each completed sprint or logical group, not per commit.
 
 ```markdown
 ### Commit Strategy
@@ -102,6 +120,8 @@ One commit per task, on the `{branch}` branch. Commit messages follow convention
 |------|---------------|
 | T-1 | `type(scope): description` |
 | T-2 | `type(scope): description` |
+
+Push after: Sprint 1 complete, Sprint 2 complete.
 ```
 
 Additional guidance to include when relevant:

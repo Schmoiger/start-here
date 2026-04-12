@@ -8,7 +8,7 @@
 <body>
 
 Tasks: <task-ids>
-Agent-Session: tool=<tool> model=<model> agents=<agent-ids> tokens=<in>K/<out>K duration=<time>
+Agent-Session: tool=<tool> model=<model> agents=<agent-ids> duration=<time>
 
 Co-Authored-By: <tool-or-identifier> <<email>>
 ```
@@ -47,16 +47,22 @@ Tasks: AUTH-001, AUTH-002
 Single-line metrics block, machine-parseable. **Record the triplet accurately: tool, model, and agent(s).**
 
 ```
-Agent-Session: tool=<tool> model=<model> agents=<agent-ids> tokens=<in>K/<out>K duration=<time>
+Agent-Session: tool=<tool> model=<model> agents=<agent-ids>
 ```
 
-| Field | Format | Example |
-|-------|--------|---------|
-| tool | The IDE/platform that ran the model | tool=cursor, tool=claude-ide, tool=copilot, tool=windsurf |
-| model | The model/backend used | model=sonnet, model=opus, model=gpt-4, model=claude-3-5-sonnet |
-| agents | Agent role(s) from context/agents | agents=python-coder, agents=functional-tester,code-reviewer |
-| tokens | in/out with K suffix | tokens=12.4K/8.2K |
-| duration | minutes or hours | duration=45m |
+| Field | Authored by | Format | Example |
+|-------|------------|--------|---------|
+| tool | Agent or orchestrator | The IDE/platform that ran the model | tool=cursor, tool=claude-code |
+| model | Agent or orchestrator | The model/backend used | model=sonnet, model=opus |
+| agents | Agent or orchestrator | Agent role(s) from context/agents | agents=python-coder |
+| duration | Orchestrator | Minutes or hours | duration=45m |
+| dispatch | Orchestrator | Who initiated the task | dispatch=orchestrator, dispatch=human |
+| interactions | Orchestrator | Total human messages across orchestrator + subagent | interactions=0 |
+| approvals | Orchestrator | Total tool/action approvals across orchestrator + subagent | approvals=2 |
+
+`tokens=` is appended automatically by the `prepare-commit-msg` hook — do not include it manually.
+
+**Counting rule**: `interactions` and `approvals` measure the **total human cost** for the task. The orchestrator sums its own human touchpoints (e.g. asking the human about the task, getting tool approvals for the commit) plus the subagent's. `dispatch=orchestrator` with `interactions=0 approvals=0` means nobody needed a human for anything.
 
 **Triplet**: Always list the actual (tool, model, agent) for this commit. Agent names are from `context/agents/*.md` (e.g. python-coder, typescript-coder, functional-tester, code-reviewer, tech-lead). Do not substitute a default; use what was actually used.
 
@@ -80,11 +86,11 @@ Match the tool (and optionally model) to what is in Agent-Session. Do not use a 
 feat(auth): add token refresh endpoint
 
 Tasks: AUTH-001
-Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=8.2K/5.1K duration=32m
+Agent-Session: tool=cursor model=sonnet agents=python-coder duration=32m dispatch=orchestrator interactions=0 approvals=1
 
 Co-Authored-By: Cursor <cursor@cursor.com>
 ```
-(Triplet: cursor + sonnet + python-coder; list what was actually used.)
+The hook appends `tokens=8.2K/5.1K` to the Agent-Session line at commit time.
 
 ### Multi-Task with Review
 
@@ -95,11 +101,10 @@ Exponential backoff with max 5 attempts.
 Addresses reliability issues from incident INC-042.
 
 Tasks: DATA-003, DATA-004
-Agent-Session: tool=cursor model=sonnet agents=python-coder,code-reviewer tokens=15.6K/9.8K duration=58m
+Agent-Session: tool=cursor model=sonnet agents=python-coder,code-reviewer duration=58m dispatch=orchestrator interactions=2 approvals=1
 
 Co-Authored-By: Cursor <cursor@cursor.com>
 ```
-(Triplet: tool, model, agents from context/agents.)
 
 ### Bug Fix with Blocker Resolution
 
@@ -107,12 +112,11 @@ Co-Authored-By: Cursor <cursor@cursor.com>
 fix(payments): correct decimal precision on refunds
 
 Tasks: PAY-012
-Agent-Session: tool=claude-ide model=opus agents=python-coder tokens=6.1K/3.2K duration=18m
+Agent-Session: tool=claude-code model=opus agents=python-coder duration=18m dispatch=human interactions=3 approvals=0
 Blocker-Resolved: PAY-042 (see domain-rules.yaml#PAY-042)
 
 Co-Authored-By: Claude Opus <opus@anthropic.com>
 ```
-(Triplet reflects actual tool, model, and agent.)
 
 ### Human-Only Commit
 
@@ -136,15 +140,17 @@ git log --format='%b' | grep '^Agent-Session:' | \
 ```
 
 ```python
-# Parse metrics line (triplet: tool, model, agents)
+# Parse metrics line
 import re
-pattern = r'tool=([a-z0-9-]+) model=([a-z0-9.-]+) agents=([\w,-]+) tokens=([\d.]+K)/([\d.]+K) duration=(\d+[mh])'
+pattern = (
+    r'tool=([a-z0-9-]+) model=([a-z0-9.-]+) agents=([\w,-]+)'
+    r'(?: duration=(\d+[mh]))?'
+    r'(?: dispatch=(human|orchestrator))?'
+    r'(?: interactions=(\d+))?'
+    r'(?: approvals=(\d+))?'
+    r'(?: tokens=([\d.]+K?)/([\d.]+K?))?'
+)
 match = re.search(pattern, line)
-# match.group(1)=tool, (2)=model, (3)=agents, (4)=tokens_in, (5)=tokens_out, (6)=duration
+# match.group(1)=tool, (2)=model, (3)=agents, (4)=duration,
+# (5)=dispatch, (6)=interactions, (7)=approvals, (8)=tokens_in, (9)=tokens_out
 ```
-
-## Link to Detailed Metrics
-
-For per-task breakdown, see:
-- `tasks.md` - task status and summary
-- `metrics/session-log.jsonl` - full token log per agent turn

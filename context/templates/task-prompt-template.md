@@ -50,12 +50,12 @@ Key files for this task:
 
 ## FILE SCOPE
 
-You may only `git add` and commit files within this scope:
+You may only write or edit files within this scope:
 - `{path}` — {what you are writing here}
 - `{path}` — {what you are writing here}
 
-Do NOT use `git add -A`, `git add .`, or `git add --all`.
 Do NOT write to HANDOFF.md, tasks.md, or bugs.md — report changes back to the orchestrator.
+Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf (see COMMIT section).
 
 ---
 
@@ -79,12 +79,21 @@ Do NOT write to HANDOFF.md, tasks.md, or bugs.md — report changes back to the 
 
 ## COMMIT
 
-Follow `context/templates/commit-message-template.md`.
+Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf.
+Before reporting back, **lint your own code** — the orchestrator only auto-formats, it will not fix lint errors:
+- Python: `uv run --project /abs/path/to/service ruff check {files}` (fix any errors yourself)
+- TypeScript: `yarn --cwd /abs/path/to/project-root biome check {files}` (fix any errors yourself)
+
+Write your commit message to `/tmp/{task-id}_commit_msg.txt` following `context/templates/commit-message-template.md`.
 {any task-specific commit notes, e.g. conventional commit type and scope}
 
 ---
 
 ## REPORT BACK
+
+Include in your report:
+- **Files changed**: exact paths you wrote or edited (these become the `git add` list)
+- **Commit message**: path to your `/tmp/{task-id}_commit_msg.txt`
 
 {what the orchestrator needs to know when the agent finishes}
 ```
@@ -101,7 +110,7 @@ Follow `context/templates/commit-message-template.md`.
    - Include rules whose `globs` match the task's target files
    - Omit rules whose `globs` don't match
    - Add domain standards (coding, testing, doc, tech) as appropriate for the task type
-4. **Assign file scope** — list the exact paths the agent may `git add` (see `agent-standards.md` §6.2). For parallel dispatches, verify scopes are disjoint. For read-only agents, state `(read-only — no commits)`.
+4. **Assign file scope** — list the exact paths the agent may write or edit (see `agent-standards.md` §6.2). For parallel dispatches, verify scopes are disjoint. For read-only agents, state `(read-only)`.
 5. Always include IMMEDIATE CONTEXT — agents have no inherited context
 6. Always include ESCALATION block — agents must know where to log blockers
 7. If the task produces an artefact, consult `context/templates/README.md` and reference the appropriate template in IMPLEMENTATION

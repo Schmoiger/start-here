@@ -127,7 +127,7 @@ Each service or package shall maintain the following files in its `artefacts/` d
     *   Example: `| BUG-001 | high | open | cache | Shared cache INSTEAD isolated per-user | TASK-005 |`
 *   **`tasks.md`**: Current, past, and future tasks
     *   The project root shall be defined and all file paths shall be relative to the project root
-    *   For each task assigned to an agent, `tasks.md` shall specify whether the agent shall commit its changes automatically upon completion or shall wait for user approval before committing
+    *   Agents do not commit — the orchestrator commits on their behalf after validating the report
     *   Each task description shall provide the necessary and sufficient context for an agent to execute the task, assuming it operates in a standalone context
 *   **`todo.md`**: Technical debt and future improvements
     *   Smaller items not urgent enough for tasks.md

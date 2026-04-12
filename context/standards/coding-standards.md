@@ -215,15 +215,16 @@ def process_data(user_id: str, data: Dict[str, Any]) -> Optional[Result]:
 {optional body}
 
 Tasks: {task-ids}
-Agent-Session: model={model} agents={list} tokens={in}K/{out}K duration={time}
+Agent-Session: tool={tool} model={model} agents={list} duration={time} dispatch={dispatch} interactions={N} approvals={N}
 
-Co-Authored-By: Claude {MODEL_NAME} ({MODEL_ID}) <noreply@anthropic.com>
+Co-Authored-By: Claude {Model} <{model}@anthropic.com>
 ```
 
 **Note**:
-- Agents must use their actual model name and ID (e.g., "Sonnet 4.5 (claude-sonnet-4-5-20250929)")
-- Agent-Session line tracks metrics for session analysis
-- Tasks line references task IDs from tasks.md or artefacts/build/tasks.md
+- Agent-Session line tracks metrics for session analysis — see `context/rules/git-commits.mdc` for full field reference
+- `tokens=` is appended automatically by the `prepare-commit-msg` hook — never include it manually
+- `duration`, `dispatch`, `interactions`, `approvals` are added by the orchestrator at commit time
+- Tasks line references task IDs from tasks.md
 
 ### Commit Types by TDD Phase
 
@@ -251,9 +252,9 @@ Use the service/package name as scope:
 
 1. Complete task
 2. Run tests (verify expected state: failing for RED, passing for GREEN)
-3. Stage relevant files
-4. Commit with task ID in message
-5. Mark task as complete `[x]`
+3. Lint your code (`ruff check` for Python, `biome check` for TypeScript) — fix any errors
+4. Write commit message to `/tmp/{task-id}_commit_msg.txt`
+5. Report back to orchestrator with file list + message path — the orchestrator commits on your behalf
 
 ### Examples
 
@@ -262,25 +263,25 @@ Use the service/package name as scope:
 test(bronze-service): DS-001 add failing tests for yfinance data fetching
 
 Tasks: DS-001
-Agent-Session: model=sonnet agents=functional-tester tokens=8.2K/5.1K duration=32m
+Agent-Session: tool=claude-code model=sonnet agents=functional-tester duration=32m dispatch=orchestrator interactions=0 approvals=0
 
-Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
+Co-Authored-By: Claude Sonnet <sonnet@anthropic.com>
 
 # TDD GREEN - implementation
 feat(bronze-service): DS-101 create project structure and dependencies
 
 Tasks: DS-101
-Agent-Session: model=sonnet agents=python-coder tokens=12.4K/8.2K duration=45m
+Agent-Session: tool=claude-code model=sonnet agents=python-coder duration=45m dispatch=orchestrator interactions=0 approvals=2
 
-Co-Authored-By: Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) <noreply@anthropic.com>
+Co-Authored-By: Claude Sonnet <sonnet@anthropic.com>
 
 # Review approval
 docs(bronze-service): DS-301 add tech lead review - APPROVED
 
 Tasks: DS-301
-Agent-Session: model=opus agents=tech-lead tokens=15.6K/6.3K duration=28m
+Agent-Session: tool=claude-code model=opus agents=tech-lead duration=28m dispatch=orchestrator interactions=0 approvals=0
 
-Co-Authored-By: Claude Opus 4.5 (claude-opus-4-5-20251101) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus <opus@anthropic.com>
 
 # Human commits (no Agent-Session or Co-Authored-By)
 feat: add user authentication

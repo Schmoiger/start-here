@@ -22,22 +22,26 @@ This guide describes the orchestration of specialised agents for software develo
 
 **For the orchestrator (you), before beginning work:**
 
-1. **Core Standards** (Read if compacted or unfamiliar):
+1. **Orchestrator Definition** (Read first, always):
+   - `context/agents/orchestrator.md` - Orchestrator role, delegation rules, commit procedure
+   - Read each file listed in its `rules:` and `standards:` frontmatter before spawning any agent
+
+2. **Core Standards** (Read if compacted or unfamiliar):
    - `context/standards/agent-standards.md` - Agent behaviour, tool usage, handoffs
    - `context/standards/workflow-standards.md` - Development workflow, TDD process
    - `context/standards/doc-standards.md` - Documentation structure, artefact organisation
 
-2. **Technical Standards** (Read when working on implementation):
+3. **Technical Standards** (Read when working on implementation):
    - `context/standards/tech-standards.md` - Tech stack (uv, yarn, FastAPI, React)
    - `context/standards/coding-standards.md` - Code quality, patterns, error handling
    - `context/standards/testing-standards.md` - TDD cycle, coverage requirements
 
-3. **Project Context** (Read when unfamiliar with current work):
+4. **Project Context** (Read when unfamiliar with current work):
    - `artefacts/product/requirements.md` - System requirements
    - `artefacts/architecture/architecture.md` - System architecture
    - `artefacts/build/tasks.md` - Current task list
 
-4. **Verification**:
+5. **Verification**:
    - ✅ I know which workflow phase we're in (discovery/design/tdd-red/tdd-green/review/etc.)
    - ✅ I understand the TDD workflow (RED then GREEN then BLUE - three separate phases, never combined)
    - ✅ I will include TOOL REQUIREMENTS in every agent prompt (Write/Edit not bash, uv not pip, yarn dlx not npx)
@@ -128,12 +132,12 @@ This workflow uses two types of parallelism:
 ```
 discovery → design → design-review → tdd-red → tdd-green → tdd-blue →
 unit-test → integration-test → e2e-test → quality-review →
-docs-cleanup → deployment → deployment-review → retrospective (optional)
+docs-cleanup → deployment → deployment-review → continuous-improvement (optional)
 ```
 Each phase waits for the previous phase to complete (strict sequence).
 
 **Quality Gates:** design-review, quality-review, deployment-review
-**Optional:** retrospective (workflow efficiency analysis)
+**Optional:** continuous-improvement (incident or retrospective mode)
 
 ### Workflow Diagram
 
@@ -208,10 +212,11 @@ flowchart TD
     end
     deployment --> deployment-review
     deployment-review:::gateStyle
-    subgraph retrospective["Workflow Efficiency Analysis"]
-        retrospective_workflow_analyst["@workflow-analyst"]
+    subgraph continuous-improvement["Continuous Improvement"]
+        ci_workflow_analyst["@workflow-analyst"]
+        ci_orchestrator["@orchestrator"]
     end
-    deployment-review --> retrospective
+    deployment-review --> continuous-improvement
     classDef gateStyle fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
 ```
 
@@ -464,30 +469,31 @@ flowchart TD
 - Monitoring configured
 - Rollback tested
 
-#### Workflow Efficiency Analysis
-**Phase ID**: `retrospective`
-**Depends On**: `deployment-review`
-**Optional**: Can be skipped
+#### Continuous Improvement
+**Workflow**: `continuous-improvement`
+**Modes**: `incident` (reactive) | `retrospective` (proactive)
+**Optional**: Can be skipped for urgent deployments
+
+**Incident mode** — triggered by a reported framework failure:
+- Phases: report → diagnose → fix → record
+- No quality gate; human who reported approves the fix
+
+**Retrospective mode** — triggered periodically or after deployment:
+- Phases: review → discuss → fix → record
+- Quality gate on `discuss`: human approves findings before fixing
 
 **Agents:**
-- `@workflow-analyst` - See `context/agents/workflow-analyst.md`
+- `@workflow-analyst` - See `context/agents/workflow-analyst.md` (retrospective review)
+- `@orchestrator` - See `context/agents/orchestrator.md` (incident diagnose, fix coordination, record)
 
 **Outputs:**
-- artefacts/build/efficiency-report.md
-- artefacts/build/efficiency-data/
-
-**Validation:**
-- All data sources analyzed (tasks, handoffs, git, conversation)
-- Metrics calculated for all phases
-- Top 3-5 bottlenecks identified
-- Actionable recommendations provided
-- Workflow health score calculated
+- artefacts/build/agent-incidents.md
+- artefacts/build/efficiency-report.md (retrospective mode)
 
 **Notes:**
-- Run after deployment for post-mortem analysis
-- Can skip for urgent deployments (optional phase)
-- Requires git history access for commit analysis
-- Compare metrics to previous cycles for trend analysis
+- See `context/workflows/continuous-improvement.yaml` for full phase definitions
+- Every finding must identify a fixable gap in context/ — no vanity metrics
+- Human decides which gaps to fix in retrospective mode
 
 ---
 
@@ -727,7 +733,6 @@ Located in `context/rules/` with automated validators:
 - **conventional-commits.mdc** - Commit message format
 - **EARS-notation-requirements.mdc** - Requirements notation
 - **british-english.mdc** - Spelling conventions
-- **metrics-logging.mdc** - Agent metrics format
 
 **Pre-commit hooks** validate all rules automatically.
 

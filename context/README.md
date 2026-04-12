@@ -25,11 +25,11 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Quick scan** - Read these when spawned:
 
-**Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/git-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [metrics](rules/metrics-logging.mdc) · [bash](rules/bash-environment.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc) · [browser](rules/browser-automation.mdc)
+**Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/git-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [bash](rules/bash-environment.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc) · [browser](rules/browser-automation.mdc)
 
 **Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
 
-**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [retrospective](workflows/retrospective.yaml)
+**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml)
 
 **Usage guides**: [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
 
@@ -94,10 +94,10 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Scripts** (`scripts/`):
 
-- `log-agent-completion.sh`: Agent lifecycle event logger
-- Validators: Pre-commit hooks for rule enforcement
-- Generators: Auto-generate CLAUDE.md/AGENTS.md from workflows
-- Tests: Validator test suite
+- `prepare-commit-msg.py` / `.sh`: Git hook — injects token usage from Claude Code session telemetry into Agent-Session commit trailer
+- Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary)
+- Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
+- Tests (`tests/`): Validator test suite
 
 ### DRY Between Rules & Standards
 
@@ -136,7 +136,9 @@ See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.y
 
 **content** — Human-facing content (blogs, papers, guides) using writing personas.
 
-**retrospective** — Workflow efficiency analysis. Run after deployment or mid-cycle.
+**bugfix** — Empirical bug reproduction, fix, and verification.
+
+**continuous-improvement** — Framework improvement: reactive (human reports incident) or proactive (review interruptions, incidents, and git log metrics).
 
 **Orchestration patterns**: Single Agent, Sequential Chain, Parallel Swarm, Hive, Iterative Loop (see `docs/orchestration-patterns.md`)
 
@@ -160,9 +162,10 @@ context/
 │   ├── design.yaml               # Discovery through design review
 │   ├── prototype.yaml            # Fast iteration / POC
 │   ├── deploy.yaml               # GCP cloud deployment
+│   ├── bugfix.yaml               # Bug reproduction, fix, verification
 │   ├── full-test.yaml            # Full regression suite
 │   ├── content.yaml              # Human-facing content with personas
-│   └── retrospective.yaml        # Workflow efficiency analysis
+│   └── continuous-improvement.yaml # Incident response + retrospective
 ├── docs/                          # Usage guides
 │   ├── orchestration-patterns.md       # Multi-agent coordination
 │   ├── workflow-default.md             # Default workflow guide (with diagram)
@@ -180,7 +183,8 @@ context/
 ├── mcp/                          # MCP server configuration
 │   └── mcp.json                  # Template config
 └── scripts/                      # Portable tools
-    ├── log-agent-completion.sh   # Agent lifecycle event logger
+    ├── prepare-commit-msg.py    # Hook: inject token metrics into commits
+    ├── prepare-commit-msg.sh    # Shell wrapper (symlinked from .git/hooks/)
     ├── validators/               # Rule validators (pre-commit hooks)
     ├── generators/               # CLAUDE.md/AGENTS.md generators
     └── tests/                    # Validator tests

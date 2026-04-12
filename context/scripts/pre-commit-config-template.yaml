@@ -68,11 +68,7 @@ repos:
         files: ^(artefacts/|frontend/|services/|packages/).*\.md$
         exclude: ^(node_modules|\.git|venv|\.venv)/
 
-      - id: metrics-logging
-        name: Validate agent metrics format
-        entry: uv run python context/scripts/validators/metrics_logging.py
-        language: python
-        files: ^metrics/.*\.jsonl$
+
 
       # AGENTS.md regeneration disabled - run manually when needed:
       # uv run python context/scripts/generators/generate_agents_md.py
