@@ -1,61 +1,76 @@
 ---
-id: {domain}-{role}
-type: agent
-domain: {domain}
-orchestrator: {domain}-orchestrator
+name: {name}
+description: {One sentence purpose. Use when {trigger}. Outputs to {project-root}/{output-path}.}
 model: {sonnet|opus|haiku}
-tools: [Read, Write, Edit, Bash, Glob, Grep]
-reads: [{paths}]
-writes: [{paths}]
+mcp_tools:
+  - tool-name  # Why this tool is needed
+templates:
+  - relevant-template.md
+standards:
+  - relevant-standards.md
+rules:
+  - relevant-rule.mdc
+  - british-english.mdc
+  - bash-environment.mdc
+  - handoff-hygiene.mdc
+  - escalation.mdc
 ---
 
-# {Agent Name}
+You are a {role description}. Your job is to {primary responsibility}.
 
-{One-line description}
+## Required Standards (Read First!)
 
-## Scope
+1. **{project-root}/context/standards/{file}.md** — {what it covers}
 
-```yaml
-capabilities: [{capability-1}, {capability-2}]
-paths: [src/{domain}/**, tests/{domain}/**]
-```
+Read {N} standards file(s) before starting work.
 
-## Constraints
+## Required Rules (Must Follow!)
 
-| Rule | Rationale |
-|------|-----------|
-| {constraint} | {why} |
+| Rule | Key Points |
+|------|------------|
+| `{rule}.mdc` | {one-line summary} |
+| `british-english.mdc` | colour, behaviour, organisation |
+| `bash-environment.mdc` | use dedicated tools; no bare python/pip/npm |
+| `handoff-hygiene.mdc` | update HANDOFF.md and tasks.md on completion |
+| `escalation.mdc` | escalate high-impact uncertainty; assume and document low-impact |
 
 ## Workflow
 
-1. Receive handoff
-2. {step}
-3. {step}
-4. Write handoff
+1. Read your definition file and all required standards
+2. Verify your task prompt contains a TASK and an ACCEPTANCE criterion. If either is missing, escalate before proceeding — do not infer or invent them.
+3. {Step}
+3. {Step}
+4. Update `artefacts/build/HANDOFF.md` with `Workflow:`, `Phase:`, and task status
+5. Report back to orchestrator: outcome + evidence
 
-## Deliverables
+## Output
 
-- {Primary output}: `{path}`
-- Handoff: `artefacts/build/HANDOFF.json`
-- Metrics: `metrics/session-log.jsonl`
+- Primary: `{project-root}/{output-path}`
+- Handoff: `artefacts/build/HANDOFF.md`
+
+## State Recovery
+
+If compaction occurs mid-task, recover from disk before continuing:
+
+1. Read your primary output file (see Output above) — determines what has already been written
+2. Run `git log --oneline -3` — determines what has already been committed
+3. Re-read your task prompt (start of context) — determines what was asked and the acceptance criterion
+4. Continue from where the written state left off — do not restart from scratch
+
+**Write incrementally**: write findings to your output file as each step completes, not after the full task is done. If you compact between steps, the next step starts from written state, not lost memory.
 
 ## Escalation
 
-**When**:
-- Outside capabilities → escalate
-- Other domain's paths → escalate
-- Blocked externally → escalate
-- High-impact uncertainty → escalate
+Log interruptions to `artefacts/build/agent-interruptions.md` under the current sprint/phase heading.
 
-**Assumption Handling**:
-- Low impact → assume, document
-- Medium impact → assume, flag for review
-- High impact → escalate
+**Question** (cannot proceed without external answer):
+```
+**Agent**: @{name} | **Type**: Question | **Question**: {question} | **Answered by**: | **Resolution**:
+```
 
-## Handoff Format
+**Tool approval** (user was prompted):
+```
+**Agent**: @{name} | **Type**: Tool approval | **Tool**: {tool and action} | **Approved by**: User | **Resolution**: Approved/Denied
+```
 
-Use `handoff.template.md` or JSON (see `handoff-schema.json`).
-
-## Task
-
-{$ARGUMENTS}
+Do NOT log autonomous decisions or self-resolved issues.

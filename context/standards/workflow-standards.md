@@ -99,98 +99,25 @@ Update both project and monorepo-level documentation to reflect completed work.
 
 ## Assumption Handling Protocol
 
-### Escalation Thresholds
+### Escalation and Assumptions
 
-Domain sensitivity shifts the decision matrix. Set in `domain-rules.yaml`.
+See `context/rules/escalation.mdc` for the authoritative escalation model:
 
-| Threshold | Domains | Effect |
-|-----------|---------|--------|
-| low | Payments, security, auth | Escalate earlier |
-| medium | Default | Standard matrix |
-| high | UI, docs, tooling | More autonomy |
+- **Decision matrix**: impact × confidence → assume / flag / escalate
+- **Impact classification**: distinguishes scope deferrals (low) from operational deferrals (high)
+- **Two-tier triage**: subagent → orchestrator (resolve or forward) → human
+- **Logging**: escalations are logged to `artefacts/build/agent-interruptions.md`
 
-### Decision Matrix (threshold: medium)
+Document assumptions in handoff with decision, confidence, rationale, and impact if wrong.
 
-| Impact if Wrong | Confidence | Action |
-|-----------------|------------|--------|
-| Low | Any | Assume, document, proceed |
-| Medium | High | Assume, document, proceed |
-| Medium | Low | Assume, document, flag for review |
-| High | Any | Escalate as blocker |
+## Continuous Improvement
 
-### Document in Handoff
+Framework improvement uses the `continuous-improvement` workflow with two modes:
 
-```json
-{
-  "assumptions": [
-    {
-      "decision": "What was assumed",
-      "confidence": "low|medium|high",
-      "rationale": "Why this assumption",
-      "impact_if_wrong": "low|medium|high"
-    }
-  ],
-  "blockers": [
-    {
-      "id": "DOMAIN-001",
-      "question": "What needs answering",
-      "impact": "high|medium|low",
-      "status": "open|resolved",
-      "resolution_ref": "domain-rules.yaml#DOMAIN-001"
-    }
-  ]
-}
-```
+- **Incident mode**: human reports a specific failure → diagnose root cause → fix → record in `agent-incidents.md` and `tasks-context-framework.md`
+- **Retrospective mode**: review `agent-interruptions.md`, `agent-incidents.md`, and git log `Agent-Session` metrics → identify patterns → discuss with human → fix → record
 
-### Resolution Flow
-
-1. Agent hits blocker → logs in handoff (question, status: open)
-2. Human resolves → adds to domain-rules.yaml#resolved_blockers
-3. Orchestrator updates handoff → status: resolved, resolution_ref
-4. Knowledge persists for future tasks
-
-**Single source of truth**: `domain-rules.yaml`. Handoff contains reference only.
-
-### Impact Assessment
-
-| Impact | Characteristics |
-|--------|-----------------|
-| Low | Easily reversible, localised, no external dependencies |
-| Medium | Requires rework but contained, single domain |
-| High | Cascading, external APIs, security, data migration |
-
-### Escalation Path
-
-```
-Agent → Domain Orchestrator → Meta-Orchestrator → Human
-```
-
-### Anti-Patterns
-
-| Don't | Do Instead |
-|-------|------------|
-| Silently assume | Document every assumption |
-| Block on low-impact unknowns | Proceed with documented assumption |
-| Guess on high-impact decisions | Escalate as blocker |
-| Ask humans for every question | Reserve for blockers |
-| Duplicate resolution in handoff | Reference domain-rules.yaml |
-| Escalate without checking resolved_blockers | Check first |
-
-## Retrospective Guidelines
-
-### Structure
-
-Check-in → What Went Well → What Didn't → Action Items → Check-out
-
-### Prime Directive
-
-"Everyone did the best they could given what they knew at the time."
-
-### Rules
-
-- Focus on improvement, not blame
-- Be honest; listen to others
-- Create SMART action items (Specific, Measurable, Achievable, Relevant, Time-bound)
+See `context/workflows/continuous-improvement.yaml` for the full phase definitions.
 
 ## Communication Style
 
@@ -204,23 +131,43 @@ When working with users, adopt an expert engineer teaching a novice:
 
 ## 8. Orchestrator Agent Invocation
 
-When spawning subagents, pass project-specific paths only. Standards are inherited (agent-standards.md §1.1).
+Use `context/templates/task-prompt-template.md` when spawning subagents. The template ensures Rule Resolution and File Scope Assignment are included.
 
-**Required context:**
-- Project root: `{absolute-path}`
-- Task reference: `Read {TASK-ID} from {path}/tasks.md`
-- Output location: `Create at {path}/{file}` (reference doc-standards.md section)
+**Key points:**
+- Agents do not commit — they lint, write a commit message to `/tmp/{task-id}_commit_msg.txt`, and report back with file list + message path
+- The orchestrator commits on their behalf (format → stage → commit, one at a time)
+- The orchestrator adds `duration=`, `dispatch=`, `interactions=`, `approvals=` to the Agent-Session line; `tokens=` is injected by the `prepare-commit-msg` hook
+- The orchestrator verifies the Agent-Session line is present before committing — see `context/rules/git-commits.mdc` Orchestrator Commit Procedure
+- See `context/agents/orchestrator.md` for Rule Resolution, File Scope, and Context Budget Test
 
-**Example:**
+### Token Metrics
+
+Token usage is captured automatically — agents do not self-report.
+
+**Data source**: Claude Code writes session JSONL files to `~/.claude/projects/` with exact token counts per API call (`input_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens`, `output_tokens`).
+
+**Collection**: A `prepare-commit-msg` git hook (`context/scripts/prepare-commit-msg.py`) runs at commit time:
+
+1. Derives the Claude Code project directory from `git rev-parse --show-toplevel` (portable across repos)
+2. Finds the active session (most recently modified session directory)
+3. Sums tokens across all JSONL files (orchestrator + subagents)
+4. Reads a watermark file (`.tokens-watermark` in the session directory) to compute the delta since the last commit
+5. Appends `tokens=<in>K/<out>K` to the `Agent-Session:` line in the commit message
+6. Updates the watermark for the next commit
+
+**What the numbers mean**: input tokens are everything sent to the model (prompt, context, tool results); output tokens are everything generated (responses, tool calls, code). Input is typically much larger because agents read heavily to produce concise output.
+
+**Commit message format**: agents author the triplet, the orchestrator adds remaining fields, the hook injects tokens:
+
 ```
-@python-coder execute LOG-003
-
-Project: /Users/avi/Repos/bollinger
-Task: Read LOG-003 from artefacts/build/tasks.md
-Output: packages/shared-types/python/bollinger_types/
+Agent-Session: tool=claude-code model=opus agents=python-coder duration=32m dispatch=orchestrator interactions=0 approvals=2 tokens=245.3K/18.7K
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^
+               agent-authored (or orchestrator-appended)        orchestrator at commit time                                    injected by hook
 ```
 
-**Anti-pattern:** Don't repeat standards (coding, testing, doc) - agents inherit these.
+**Interaction tracking**: `interactions` and `approvals` measure the total human cost for the task — the orchestrator sums its own human touchpoints plus the subagent's. See `context/rules/git-commits.mdc` for the full counting rule and `context/templates/pr-description-template.md` for PR-level autonomy metrics.
+
+**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`. No separate metrics file is maintained.
 
 ---
 
@@ -316,7 +263,7 @@ Use this template when suggesting parallel execution to users:
 - Estimated tokens: Y tokens (baseline)
 
 **Option A: [Partial Parallel]**
-- Execution: [Track 1: A+B parallel, Track 2: C]
+- Execution: [Sprint 1: A+B parallel, Sprint 2: C]
 - Time saved: Z% faster (X min → W min)
 - Token increase: +N% (context duplication, coordination overhead)
 - Trade-offs: [Merge complexity, potential conflicts]
@@ -384,14 +331,25 @@ Option A (parallel):
 - User explicitly requests sequential approach
 - Quality gate reviews (must run sequentially by design)
 
+### File Scope and Collision Safety
+
+All parallel agents must have **disjoint file scopes** — see `agent-standards.md` §6 for the full model. Before spawning parallel agents:
+
+1. List each agent's `file_scope` from the task plan
+2. Reject if any path appears in more than one agent's scope
+3. Shared paths (migrations/, shared-types/) → sequence those tasks or assign one owner
+4. Log the verified scope matrix in HANDOFF.md before spawning
+
+Agents do not commit — the orchestrator commits sequentially on their behalf to avoid ref-lock collisions.
+
 ### Best Practices
 
 1. **Identify dependencies first** - Map out what depends on what
-2. **Define clear boundaries** - Separate work by file, module, or service
+2. **Assign disjoint file scopes** - No two parallel agents share a writable path
 3. **Agree contracts upfront** - API contracts, interfaces, schemas
-4. **Plan merge strategy** - Who merges what, conflict resolution
+4. **Commit sequentially** - Orchestrator formats and commits one agent at a time
 5. **Monitor progress** - Check agents aren't duplicating work
-6. **Learn and adapt** - Track actual vs estimated time/tokens
+6. **Learn and adapt** - Review token usage from git log Agent-Session lines
 
 ---
 
@@ -417,7 +375,7 @@ that phase. The `skills` field in `default.yaml` is a checklist, not a suggestio
 |---|---|---|
 | `discovery` | `superpowers:brainstorming` | Explore problem space before formalising requirements; prevents premature lock-in |
 | `design` | `superpowers:brainstorming` | Evaluate design alternatives before committing; explore trade-offs |
-| `design` | `superpowers:using-git-worktrees` | Isolate feature branch from main; safe parallel work |
+| `design` | `superpowers:brainstorming` | Explore design alternatives before committing to an approach |
 | `design` (UI work) | `frontend-design` | Produces polished, non-generic UI designs; avoids AI-default aesthetics |
 | `design-review`, `quality-review`, `final-holistic-review` | `superpowers:requesting-code-review` | Structures what reviewers focus on; prevents unfocused review passes |
 | `design-review`, `quality-review`, `final-holistic-review` | `superpowers:receiving-code-review` | Validates CHANGES REQUIRED feedback before acting; prevents performative compliance |

@@ -1,7 +1,6 @@
 ---
 name: incomplete-agent
 model: sonnet
-allowed_tools: [Read]
 ---
 
 ## Role

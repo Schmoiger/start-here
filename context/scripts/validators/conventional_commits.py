@@ -63,20 +63,27 @@ def validate_commit_message(msg: str) -> tuple[bool, str]:
                 return False, f"Invalid Co-Authored-By format: {line}"
 
     # If Agent-Session present, validate it's an agent commit (triplet: tool, model, agents)
+    # Required: tool, model, agents. Optional: duration (orchestrator), tokens (hook-injected)
     has_agent_session = False
     for line in lines:
         if line.startswith('Agent-Session:'):
             has_agent_session = True
-            # Format: tool= tool model= model agents= list tokens= in/out duration= time
             pattern = (
-                r'^Agent-Session: tool=[a-z0-9-]+ model=[a-z0-9.-]+ agents=[a-z0-9,-]+ '
-                r'tokens=\d+(\.\d+)?K/\d+(\.\d+)?K duration=\d+(m|h)$'
+                r'^Agent-Session: tool=[a-z0-9-]+ model=[a-z0-9.-]+ agents=[a-z0-9,-]+'
+                r'( duration=\d+[mh])?'
+                r'( dispatch=(human|orchestrator))?'
+                r'( interactions=\d+)?'
+                r'( approvals=\d+)?'
+                r'( tokens=\d+(\.\d+)?K?/\d+(\.\d+)?K?)?$'
             )
             if not re.match(pattern, line):
                 return False, (
                     f"Invalid Agent-Session format: {line}\n"
-                    "Expected: Agent-Session: tool=<tool> model=<model> agents=<agents> tokens=8.2K/5.1K duration=45m\n"
-                    "Triplet: tool (e.g. cursor, claude-ide), model (e.g. sonnet, gpt-4), agents from context/agents (e.g. python-coder)"
+                    "Expected: Agent-Session: tool=<tool> model=<model> agents=<agents>"
+                    " [duration=45m] [dispatch=orchestrator] [interactions=0] [approvals=2]"
+                    " [tokens=8.2K/5.1K]\n"
+                    "Triplet: tool (e.g. cursor, claude-code), model (e.g. sonnet, opus),"
+                    " agents from context/agents (e.g. python-coder)"
                 )
 
     # If Agent-Session present, Co-Authored-By is required

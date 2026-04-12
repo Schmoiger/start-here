@@ -1,6 +1,6 @@
 ---
 description: Which browser automation tool to use depending on environment (Cursor vs terminal)
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Browser Automation

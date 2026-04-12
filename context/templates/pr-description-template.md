@@ -15,22 +15,22 @@
 
 ## Agent Metrics
 
-| Metric | Value |
-|--------|-------|
-| Model | <primary-model> |
-| Agents | <list> |
-| Total Tokens | <in>/<out> |
-| Duration | <time> |
-| Commits | <count> |
+### Efficiency
 
-<details>
-<summary>Per-task breakdown</summary>
+| Metric | Total | Mean | SD |
+|--------|-------|------|----|
+| Commits | <count> | — | — |
+| Duration | <total> | <mean> | <sd> |
+| Tokens (in) | <total> | <mean> | <sd> |
+| Tokens (out) | <total> | <mean> | <sd> |
 
-| Task | Agents | Tokens | Duration |
-|------|--------|--------|----------|
-| #ID | agents | in/out | time |
+### Autonomy
 
-</details>
+| Mode | Count | % |
+|------|-------|----|
+| Fully autonomous | <n> | <pct> |
+| With human input | <n> | <pct> |
+| Human-directed | <n> | <pct> |
 
 ## Test Plan
 
@@ -39,7 +39,6 @@
 ## Links
 
 - [Task details](tasks.md)
-- [Session metrics](metrics/session-log.jsonl)
 
 ---
 Generated with [Claude Code](https://claude.ai/code)
@@ -74,36 +73,35 @@ Table linking to task IDs with brief descriptions:
 
 ### Agent Metrics (required for agent PRs)
 
-Aggregated metrics across all commits in the PR:
+Aggregated from `git log --format='%b' | grep Agent-Session` on the branch. All stats derived from Agent-Session fields across commits.
 
 ```markdown
 ## Agent Metrics
 
-| Metric | Value |
-|--------|-------|
-| Model | claude-sonnet-4 |
-| Agents | data-orchestrator, data-coder, data-reviewer |
-| Total Tokens | 45.2K / 28.1K |
-| Duration | 2h 15m |
-| Commits | 4 |
+### Efficiency
+
+| Metric | Total | Mean | SD |
+|--------|-------|------|----|
+| Commits | 12 | — | — |
+| Duration | 3h 45m | 18.8m | 12.1m |
+| Tokens (in) | 245.3K | 20.4K | 8.2K |
+| Tokens (out) | 18.7K | 1.6K | 0.9K |
+
+### Autonomy
+
+| Mode | Count | % |
+|------|-------|----|
+| Fully autonomous | 8 | 67% |
+| With human input | 3 | 25% |
+| Human-directed | 1 | 8% |
 ```
 
-### Per-Task Breakdown (optional, in collapsible)
+**Autonomy classification** (derived per commit):
+- **Fully autonomous**: `dispatch=orchestrator` and `interactions=0`
+- **With human input**: `dispatch=orchestrator` and `interactions>0` — delegated but human guided
+- **Human-directed**: `dispatch=human`
 
-For larger PRs, include per-task metrics in a collapsed section:
-
-```markdown
-<details>
-<summary>Per-task breakdown</summary>
-
-| Task | Agents | Tokens (in/out) | Duration |
-|------|--------|-----------------|----------|
-| DATA-003 | data-coder | 12.4K / 8.2K | 32m |
-| DATA-004 | data-coder, data-reviewer | 18.6K / 11.4K | 58m |
-| DATA-005 | data-coder | 14.2K / 8.5K | 45m |
-
-</details>
-```
+Counts are the **total human cost** per task — orchestrator + subagent touchpoints summed. Commits without these fields (pre-change) default to human-directed.
 
 ### Test Plan (required)
 
@@ -112,21 +110,20 @@ Checklist of verification steps:
 ```markdown
 ## Test Plan
 
-- [ ] Unit tests pass (`npm test`)
-- [ ] Integration tests pass (`npm run test:integration`)
+- [ ] Unit tests pass (`uv run pytest` / `yarn test --run`)
+- [ ] Integration tests pass (`uv run pytest tests/integration`)
 - [ ] Manual verification of retry behaviour
 - [ ] Load test with simulated failures
 ```
 
 ### Links (required)
 
-Always link to task details and metrics:
+Always link to task details:
 
 ```markdown
 ## Links
 
 - [Task details](tasks.md)
-- [Session metrics](metrics/session-log.jsonl)
 - [Relevant ADR](docs/adr/003-webhook-retry-strategy.md)
 ```
 
@@ -155,24 +152,22 @@ when downstream services are temporarily unavailable.
 
 ## Agent Metrics
 
-| Metric | Value |
-|--------|-------|
-| Model | claude-sonnet-4 |
-| Agents | data-orchestrator, data-coder, data-reviewer |
-| Total Tokens | 45.2K / 28.1K |
-| Duration | 2h 15m |
-| Commits | 4 |
+### Efficiency
 
-<details>
-<summary>Per-task breakdown</summary>
+| Metric | Total | Mean | SD |
+|--------|-------|------|----|
+| Commits | 4 | — | — |
+| Duration | 2h 15m | 33.8m | 10.7m |
+| Tokens (in) | 45.2K | 11.3K | 2.6K |
+| Tokens (out) | 28.1K | 7.0K | 1.4K |
 
-| Task | Agents | Tokens (in/out) | Duration |
-|------|--------|-----------------|----------|
-| DATA-003 | data-coder | 12.4K / 8.2K | 32m |
-| DATA-004 | data-coder, data-reviewer | 18.6K / 11.4K | 58m |
-| DATA-005 | data-coder | 14.2K / 8.5K | 45m |
+### Autonomy
 
-</details>
+| Mode | Count | % |
+|------|-------|----|
+| Fully autonomous | 2 | 50% |
+| With human input | 1 | 25% |
+| Human-directed | 1 | 25% |
 
 ## Test Plan
 
@@ -181,17 +176,9 @@ when downstream services are temporarily unavailable.
 - [ ] Manual verification in staging
 - [ ] Load test with 10% simulated failures
 
-## Assumptions Made
-
-| Decision | Confidence | Impact |
-|----------|------------|--------|
-| Max 5 retry attempts sufficient | High | Low |
-| 1 hour max delay acceptable | Medium | Medium |
-
 ## Links
 
 - [Task details](tasks.md#data-003)
-- [Session metrics](metrics/session-log.jsonl)
 - [Blocker resolution](services/data-service/context/domain-rules.yaml#DATA-042)
 
 ---

@@ -177,7 +177,7 @@ Phase 1: Design (parallel)
     @solution-architect  -> architecture.md, api-contract.json
     @database-designer   -> schema.sql, migrations/
     @api-designer        -> openapi.yaml
-    @ui-designer         -> design-tokens.json, wireframes.md
+    @ui-designer         -> design-system.md
     @visual-designer     -> design/visuals/
                 |
                 v
@@ -252,9 +252,7 @@ ARTIFACTS DIRECTORY STRUCTURE
 │   ├── openapi.yaml             # API designer
 │   └── api-design-guide.md      # API designer
 ├── design/
-│   ├── design-tokens.json       # UI designer
-│   ├── components.md            # UI designer
-│   ├── wireframes.md            # UI designer
+│   ├── design-system.md        # UI designer (tokens, components, accessibility, wireframes)
 │   └── visuals/                 # Visual designer
 ├── python/
 │   ├── *.py                     # Python coder

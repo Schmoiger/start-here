@@ -18,6 +18,7 @@ alwaysApply: false
 | Install all deps | `yarn install` | `npm install` |
 | Run script | `yarn scriptname` | `npm run scriptname` |
 | Execute binary | `yarn dlx package` | `npx package` |
+| Lint (from any directory) | `yarn --cwd {repo-root} run lint` | `yarn lint` (from subdirectory) |
 
 ## Why
 

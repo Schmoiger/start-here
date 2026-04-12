@@ -1,7 +1,6 @@
 ---
 name: test-agent
 model: sonnet
-allowed_tools: [Read, Write, Bash]
 standards: [coding-standards.md, testing-standards.md]
 rules: [conventional-commits.mdc]
 ---
