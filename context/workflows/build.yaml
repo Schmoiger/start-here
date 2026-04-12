@@ -14,6 +14,7 @@ phases:
       - Context bundles are minimal — only files the subtask agent must read
       - Subtasks assigned to streams (python / typescript) for parallel execution
       - No subtask spans more than one module or component
+      - Every subtask declares file_scope; parallel subtasks have disjoint scopes
       - max_retries set per subtask (default 2)
     notes:
       - Output schema defined in subtask_execution.schema below
@@ -413,13 +414,27 @@ workflow_rules:
   - Estimate effort in tokens, not time
   - After context compaction, read state recovery section and update status
   - All quality gates must pass
+  # Compaction safety
+  - Subagents write findings incrementally to their output file — never accumulate in memory and flush at end
+  - Commit after each completed subtask — git log is the recovery point if compaction occurs between steps
+  - Update HANDOFF.md Phase: field BEFORE spawning agents — not after their response — so the active phase survives compaction
+  - For parallel dispatches, write artefacts/build/dispatch.md before spawning, recording each agent's subtask ID, file_scope, and acceptance criterion
+  - After compaction, recover by reading HANDOFF.md (phase) and the workflow validation: block (criteria) — do not rely on recalled instructions
 
 state_recovery:
   after_compaction:
+    - Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter
     - Glob **/artefacts/README.md and read all matches for current state
     - Run git log --oneline -5 to see recent changes
+    - Read HANDOFF.md Phase: field to identify which phase was in flight
+    - Read the validation: block for that phase in this file — that is what any pending subagent report must satisfy
+    - Read artefacts/build/dispatch.md if it exists — lists what each in-flight agent was asked to do
+    - Read artefacts/build/subtask-plan.yaml — check status: fields to see which subtasks completed vs pending
   critical_files:
     - "**/artefacts/README.md"
+    - artefacts/build/HANDOFF.md
+    - artefacts/build/dispatch.md
+    - artefacts/build/subtask-plan.yaml
 
 estimation_guidance:
   - Estimate effort in tokens, not time
@@ -431,6 +446,11 @@ parallel_planning:
   - Always spawn parallel agents simultaneously — do NOT present options or ask for preference
   - All phases marked parallel: true spawn their agents in the same message
   - Identify dependencies before spawning; only sequential when one output feeds another's input
+  - "Scope-collision check (before every parallel dispatch):"
+  - "  1. List each agent's file_scope from subtask-plan.yaml"
+  - "  2. Reject if any path appears in more than one agent's scope"
+  - "  3. Shared paths (migrations/, shared-types/) → sequence those subtasks or assign one owner"
+  - "  4. Log the verified scope matrix in HANDOFF.md before spawning"
 
 subtask_execution:
   # Applies to tdd-red, tdd-green, tdd-blue. Each task in subtask-plan.yaml is one agent invocation.
@@ -488,6 +508,8 @@ subtask_execution:
     #       acceptance_criteria: <exact command> → <expected output pattern>
     #       context_files:
     #         - <path>:<line-range>   # use ranges for large files
+    #       file_scope:              # paths this subtask may write/commit — must be disjoint across parallel subtasks
+    #         - <path>
     #       max_retries: 2
     #       depends_on: []           # other subtask ids within this stream
     #   typescript:

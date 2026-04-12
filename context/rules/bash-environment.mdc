@@ -35,7 +35,7 @@ Write/Edit/Glob/Grep tools execute without user permission. Bash equivalents req
 | `(cd /path && ...)` subshell | `(` prefix matches no allow rule | Use `git -C /path` or `--project /abs/path` |
 | `python -c "..."` multiline with `#` lines | `#`-prefixed lines inside quoted blocks flagged as hidden arguments | Write script to `/tmp/script.py`; run as file |
 | Consecutive `''` at word start | Flagged as potential shell obfuscation | Write script to temp file |
-| Batch Edit then commit without verifying | Edits can silently fail if snapshot is stale (another Edit ran since last Read) | After batch edits, run `git diff --stat` to confirm changes are on disk before committing; re-read and re-apply any missing edits |
+| Batch Edit then report without verifying | Edits can silently fail if snapshot is stale (another Edit ran since last Read) | After batch edits, run `git diff --stat` to confirm changes are on disk before reporting back; re-read and re-apply any missing edits |
 
 ## Why
 

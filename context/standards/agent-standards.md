@@ -8,6 +8,15 @@ This document outlines the standards for how AI agents shall interact with this 
 
 All agents shall follow the standards defined in `./context/standards/` and rules defined in `./context/rules/`. Agents are not required to explicitly reference individual standards; compliance is inherited by operating within this project.
 
+### Rule Injection
+
+Subagents do not auto-load rules. The orchestrator injects rules into each spawn prompt via Rule Resolution (see `context/agents/orchestrator.md`):
+
+1. **Always-apply rules** are hardcoded in the orchestrator definition and included for every agent. When adding a new rule with `alwaysApply: true`, you must also add it to the orchestrator's always-apply list.
+2. **Agent-specific rules** come from the agent's `rules:` frontmatter, filtered by glob match against the task's files.
+
+This means a rule with `alwaysApply: true` in its `.mdc` frontmatter will NOT be injected unless it is also listed in the orchestrator's always-apply list.
+
 ## 1.2. Input Standards vs Output Artefacts
 
 Agents read from input standards and write to output artefacts. For full directory layout see [doc-standards.md §2.1](doc-standards.md#21-directory-structure).
@@ -137,26 +146,15 @@ Agents have access to multiple tools for different purposes. To minimise user in
 
 ### 4.4. Version Control
 
-*   The agent shall commit its changes to the version control system after completing each task.
-*   The agent shall write a clear and concise commit message that summarises the purpose of the changes.
-*   The commit message shall include the task ID and follow the format specified in `/context/standards/coding-standards.md`.
-*   The agent shall push to the remote after completing each sprint (or equivalent logical unit of work). Committing locally without pushing leaves work invisible to other agents and the orchestrator.
+**Agents do not commit.** The orchestrator commits on their behalf, one at a time. This prevents ref-lock collisions when parallel agents finish around the same time.
 
-**Push cadence**: commit per task, push per sprint.
+*   The agent shall lint its own code before reporting back (see COMMIT section in task-prompt-template.md).
+*   The agent shall write a commit message to `/tmp/{task-id}_commit_msg.txt` following `context/templates/commit-message-template.md`.
+*   The agent shall report back with the exact file paths it changed and the commit message file path.
+*   The orchestrator formats, stages, and commits per agent report: `uv run --project /abs/path ruff format {files}` → `git add {files}` → `git commit -F {message}`.
+*   The orchestrator shall push to the remote after completing each sprint (or equivalent logical unit of work).
 
-**Commit message pattern**: Never use `$()` heredoc substitution in `git commit -m`. Instead, write the commit message with the Write tool, then commit with `-F`:
-
-```bash
-# Write message first (no permission prompt)
-# Write tool → /tmp/commit_msg.txt
-
-# Then commit referencing the file
-git add <files>
-git commit -F /tmp/commit_msg.txt
-git push
-```
-
-Using `$()` substitution triggers a separate permission class and interrupts flow.
+**Push cadence**: commit per task (orchestrator), push per sprint (orchestrator).
 
 ### 4.5. Agent Handoffs
 
@@ -217,14 +215,15 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 
 An interruption is any moment that required the user's or orchestrating agent's attention before work could continue. Agents shall log interruptions to `artefacts/build/agent-interruptions.md` under a heading matching the current sprint or phase.
 
-**Two types:**
+**Three types:**
 
 1. **Question** — agent raised a spec ambiguity or blocker it could not resolve autonomously
 2. **Tool approval** — user was prompted to approve a tool use before the agent could proceed
+3. **Escalation** — subagent flagged a high-impact issue per `escalation.mdc`; orchestrator triaged and either resolved autonomously or forwarded to the human
 
 **What to log**: only interruptions that required external attention. Do NOT log autonomous decisions, design trade-offs, self-resolved linter issues, or other choices the agent made without asking anyone.
 
-**Format:**
+**Format (question / tool approval):**
 
 ```
 ### [Sprint N — Phase] Short title
@@ -233,6 +232,18 @@ An interruption is any moment that required the user's or orchestrating agent's 
 **Question/Tool**: What did you need to know, or what tool needed approval?
 **Answered by/Approved by**: Orchestrating agent | User
 **Resolution**: What was decided?
+```
+
+**Format (escalation):**
+
+```
+### [Sprint N — Phase] Short title
+**Agent**: @agent-name
+**Type**: Escalation
+**Impact**: High — brief reason (e.g. unbounded data growth, schema change)
+**Escalated to**: Orchestrator | Human
+**Options considered**: What approaches were identified?
+**Resolution**: What was decided, and by whom?
 ```
 
 **When to log**: append the entry immediately after the interruption is resolved — do not batch at end of sprint.
@@ -262,7 +273,7 @@ The orchestrator assigns each agent a file scope at dispatch time. The scope goe
 
 **Rules:**
 1. Scopes must be **disjoint** — no two parallel agents may share a writable path
-2. Agents shall only `git add` files within their scope — never `git add -A` or `git add .`
+2. Agents shall only write or edit files within their scope — the orchestrator stages and commits on their behalf
 3. **Shared state files** (HANDOFF.md, tasks.md, bugs.md) are **orchestrator-owned** — agents report back; the orchestrator updates these files
 4. Read access is unrestricted — any agent may read any file
 
@@ -285,7 +296,7 @@ Agent C (@code-reviewer):   FILE SCOPE: (read-only — no commits)
 
 ### 6.3. Commit Cadence
 
-Agents shall commit at **natural checkpoints**, not only at task completion:
+Agents shall request commits at **natural checkpoints**, not only at task completion:
 
 | Checkpoint | Example |
 |------------|---------|
@@ -294,17 +305,9 @@ Agents shall commit at **natural checkpoints**, not only at task completion:
 | Refactor complete (BLUE) | `refactor(bronze): extract validation helpers` |
 | File group complete | `feat(bronze): add all ohlcv router endpoints` |
 
-**Commit command pattern** (from §4.4):
-```bash
-# Write message first (no permission prompt)
-# Write tool → /tmp/commit_msg.txt
+At each checkpoint, the agent writes a commit message to `/tmp/{task-id}_commit_msg.txt` and reports the file list + message path. The orchestrator commits on their behalf.
 
-# Then commit ONLY scoped files
-git add services/bronze-service/src/routers/ohlcv.py services/bronze-service/tests/test_ohlcv.py
-git commit -F /tmp/commit_msg.txt
-```
-
-**Never** use `git add -A`, `git add .`, or `git add --all`. These will capture files outside the agent's scope and create collisions with parallel agents.
+**Never** use `git add`, `git commit`, `git add -A`, `git add .`, or `git add --all`. Agents do not touch git. Report changed files; the orchestrator handles the rest.
 
 ### 6.4. Parallel Agent Safety
 
@@ -313,6 +316,7 @@ When spawning parallel agents, the orchestrator shall:
 1. **Define disjoint scopes** — verify no path overlap before dispatching
 2. **Reserve shared files** — HANDOFF.md, tasks.md, bugs.md are not in any agent's scope
 3. **Sequence shared-type work** — if multiple agents need to modify `packages/shared-types/`, run them sequentially, not in parallel
+4. **Commit sequentially** — when parallel agents report back, the orchestrator formats and commits one at a time (format → stage → commit) to avoid ref-lock collisions
 
 ```mermaid
 flowchart TD
@@ -320,9 +324,10 @@ flowchart TD
     ORCH -->|"scope: services/bronze-service/"| PY1["@python-coder"]
     ORCH -->|"scope: frontend/src/"| TS["@typescript-coder"]
     ORCH -->|"scope: (read-only)"| CR["@code-reviewer"]
-    PY1 -->|"reports back"| ORCH
-    TS -->|"reports back"| ORCH
-    CR -->|"reports back"| ORCH
+    PY1 -->|"files + msg"| ORCH
+    TS -->|"files + msg"| ORCH
+    CR -->|"report"| ORCH
+    ORCH -->|"format + commit"| GIT["git (one at a time)"]
     ORCH -->|"updates"| SHARED["HANDOFF.md, tasks.md"]
 ```
 

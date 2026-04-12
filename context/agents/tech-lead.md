@@ -14,7 +14,6 @@ standards:
 rules:
   - git-commits.mdc
   - british-english.mdc
-  - metrics-logging.mdc
   - EARS-notation-requirements.mdc
   - supabase.mdc
   - bash-environment.mdc
@@ -41,7 +40,6 @@ Read 4 standards files before starting work.
 |------|------------|
 | `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
 | `british-english.mdc` | colour, behaviour, organisation |
-| `metrics-logging.mdc` | Structured logging patterns |
 | `EARS-notation-requirements.mdc` | Requirements notation format |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
 | `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |

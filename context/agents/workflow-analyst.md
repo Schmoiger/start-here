@@ -10,7 +10,6 @@ standards:
   - testing-standards.md
   - tech-standards.md
 rules:
-  - metrics-logging.mdc
   - bash-environment.mdc
   - handoff-hygiene.mdc
   - escalation.mdc
@@ -33,7 +32,6 @@ Read ALL standards files to understand what "good" looks like for comparison.
 
 | Rule | Key Points |
 |------|------------|
-| `metrics-logging.mdc` | Agent metrics format |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
 | `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
 | `escalation.mdc` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
