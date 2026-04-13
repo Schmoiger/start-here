@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.6
+**Version**: 0.7
 **Last Updated**: 13 April 2026
-**Word Count**: ~8,500 words
-**Reading Time**: ~35 minutes
+**Word Count**: ~8,800 words
+**Reading Time**: ~36 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -50,6 +50,8 @@ Each section covers one structural area of the framework: what it contains, how 
 
 The companion paper develops the *why* and the trade-offs behind those choices. As you read the catalogue below, the same posture shows up repeatedly: **explicitness** (written phases, gates, paths, recovery—not tacit convention); **durability** (artefacts and handoffs—not chat memory); **reuse** (templates, shared agents, generated registries—not one-off prose); **portability** (Markdown and YAML at the core—not a single vendor runtime); and **verification** (validators, tests, reviews, gates, telemetry—not unevidenced claims). For the full argument, see `context/docs/agentic-framework.md`.
 
+This reference summarises the tree on disk. If anything here disagrees with an authoritative file (a workflow YAML, an agent definition, a rule, or a generator script), **trust the file** and treat the mismatch as documentation drift to fix.
+
 ---
 
 ## Framework Topology
@@ -68,6 +70,8 @@ The framework is organised as a layered directory structure inside `context/`. T
 | Personas | `context/persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only |
 
 The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. Nothing bleeds across boundaries unless explicitly designed to.
+
+**As-built snapshot (counts change when you add files):** under `context/` today you will find on the order of **nine** workflow YAML files, **nineteen** agent markdown definitions (including the orchestrator), **one** agent inventory (`agents/README.md`), **twenty-one** rule files (`rules/*.mdc`), **thirteen** behavioural standards (Markdown in `standards/`, excluding `standards/README.md`), **fourteen** template artefacts (files in `templates/` excluding `templates/README.md`), and **six** Python validators wired for pre-commit in `scripts/validators/`. The tables later in this document catalogue each area; use the directories as ground truth when in doubt.
 
 The design pattern is consistent throughout:
 
@@ -131,6 +135,8 @@ An agent executing a straightforward Python task needs the 15-token rule that sa
 
 ### Standards Catalogue
 
+`context/standards/README.md` is the lightweight index for humans navigating the folder. The tables below describe **what each standard is for** when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
+
 #### Foundational
 
 | Standard | Purpose |
@@ -185,6 +191,8 @@ alwaysApply: false
 
 The body of the rule is concise instruction text, typically structured as a table of correct vs incorrect usage, followed by a brief rationale. The entire rule stays under 200 tokens.
 
+Every enforceable idea in `context/rules/*.mdc` should be represented in the catalogue below when it is stable; if you add a rule file, extend the catalogue in the same section so readers can discover it without spelunking.
+
 ### Example: Python Environment Rule
 
 ```
@@ -198,6 +206,8 @@ The body of the rule is concise instruction text, typically structured as a tabl
 The rationale section explains that bare `python` or `pytest` commands fail because no virtual environment is activated and dependencies are not available. `uv run` automatically uses the project's virtual environment, ensures dependencies are installed, and respects `.python-version`.
 
 ### Rules Catalogue
+
+Only a subset of rules currently have matching Python validators under `context/scripts/validators/` (see [Scripts and Automation](#scripts-and-automation)). A rule without a validator is still binding for agents via prompt injection; a rule *with* a validator is also mechanically checkable at commit time.
 
 #### Environment and Tooling
 
@@ -255,6 +265,8 @@ If all three are true, create a rule in `rules/*.mdc` and keep it under 200 toke
 ## Agents
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
+
+The repository ships **one orchestrator** plus **eighteen** delegatable specialists (nineteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with **recommended model tiers** for operators who tune cost versus capability. Which agent runs in which phase is **never** implied by the roster alone—it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -321,7 +333,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines 18 specialised agents, organised by kind of judgement.
+The framework defines eighteen delegatable specialists plus the orchestrator, organised by kind of judgement.
 
 #### Core Coordinator
 
@@ -374,7 +386,7 @@ The framework defines 18 specialised agents, organised by kind of judgement.
 
 ### Creating a New Agent
 
-1. Copy `context/agents/TEMPLATE.md`
+1. Copy `context/templates/agent-template.md` to `context/agents/{name}.md` (some deployments also keep a `context/agents/TEMPLATE.md` copy; the templates directory is the canonical scaffold in this tree)
 2. Set `name`, `description`, `model` in frontmatter
 3. List applicable `rules` and `standards` in frontmatter
 4. Write a concise body with role definition, workflow steps, and output expectations
@@ -439,6 +451,8 @@ All personas use British English throughout (colour, optimise, behaviour, whilst
 ## Workflows
 
 Workflows are YAML files in `context/workflows/` that encode phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. Storing orchestration logic in versionable YAML rather than ad hoc conversation makes it inspectable, diffable, reviewable, and recoverable after context compaction.
+
+The **as-built workflow set** in this repository is nine files: `design.yaml`, `build.yaml`, `prototype.yaml`, `bugfix.yaml`, `deploy.yaml`, `full-test.yaml`, `content.yaml`, `continuous-improvement.yaml`, and `retrospective.yaml`. **Production delivery** is normally `design.yaml` then `build.yaml`, with `deploy.yaml` for cloud promotion after local verification. The other files are alternate pipelines (spike, defect, regression sweep, human-facing content, process improvement). Each file's `phases`, `quality_gates`, `workflow_rules`, and `state_recovery` blocks are authoritative; this section is a human-oriented digest.
 
 ### The Default Workflow
 
@@ -987,6 +1001,8 @@ These are examples of **fixable gaps**, not a separate scoring methodology:
 
 The framework documents five coordination patterns, from simple to complex. Production workflows combine them.
 
+In YAML, those combinations show up as **phase lists** (`agents:` ordering), **`parallel: true`** on a phase when multiple agents may run without depending on each other's fresh output, and **gates** where a phase or human approval must succeed before later phases unlock. Reading a workflow file alongside this section connects the abstract pattern names to concrete phase IDs.
+
 ### Single Agent
 
 One specialist, one task, no dependencies. Use for isolated tasks with clear requirements: fix a specific bug, add a simple feature, write documentation.
@@ -1057,6 +1073,8 @@ Prefer parallel execution when time is critical, tasks are large (overhead is a 
 
 Templates are stored in `context/templates/` and define standard output shapes for recurring artefacts. The orchestrator selects the appropriate template when constructing a task prompt; the producing agent uses it to structure its output.
 
+`context/templates/README.md` indexes every template file, when to use it, and how it relates to workflows—use it when you are adding a new artefact shape rather than guessing from filenames alone.
+
 ### Why Templates Exist
 
 Standardised shapes reduce ambiguity for both writers and readers. When every review follows the same structure, or every handoff includes the same fields, downstream agents and humans can consume the output predictably. Automation becomes reliable when the shape is known in advance.
@@ -1087,6 +1105,8 @@ The task prompt template deserves particular attention. It carries rule resoluti
 ## Scripts and Automation
 
 Scripts are stored in `context/scripts/` and form the automation layer that turns the framework from a collection of ideas into an operating system with enforcement.
+
+Layout on disk: **`generators/`** holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); **`validators/`** holds pre-commit Python checks; **`tests/`** exercises validators and generators against fixtures; **`prepare-commit-msg.*`** lives alongside those directories and backs the Agent-Session commit trailers described under [Measuring Effectiveness](#measuring-effectiveness). Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
 
 ### Generators
 
@@ -1130,6 +1150,8 @@ The scripts directory includes its own test suite in `context/scripts/tests/`. T
 ## Portability and Framework Adapters
 
 The framework is designed to survive changes in agent runtime or orchestration platform. Agent definitions are markdown files. Workflows are YAML. The core logic lives in the system prompt body, which is framework-agnostic. The frontmatter carries runtime-specific metadata (tool names, model tiers) that adapts to each platform.
+
+The code samples in this section are **illustrative**: they show how to load markdown prompts and map tool names, not a supported SDK matrix. Your runtime may use different client libraries, different tool primitives, or different sandbox rules—keep the portable assets (markdown, YAML, rules, standards) and replace the adapter glue per platform.
 
 ### Agent Definition Portability
 
@@ -1251,6 +1273,8 @@ def load_with_metadata(name: str):
 ---
 
 ## How the Parts Connect
+
+End to end: **workflows** pick which **agent** runs in each phase and which **outputs** must exist; the orchestrator loads that agent's **rules** (injected) and **standards** (referenced), wraps the task in the **task prompt template**, and dispatches execution; agents write artefacts that match **templates**; **validators** and **hooks** ensure the committed tree still matches the declared rules; **state recovery** blocks in YAML plus `HANDOFF.md` let a new session resume after compaction. The subsections below spell out each pairwise relationship.
 
 ### Agents Read Rules and Standards
 
