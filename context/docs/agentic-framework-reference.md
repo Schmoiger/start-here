@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.7
+**Version**: 0.8
 **Last Updated**: 13 April 2026
-**Word Count**: ~8,800 words
-**Reading Time**: ~36 minutes
+**Word Count**: ~8,950 words
+**Reading Time**: ~37 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -18,6 +18,7 @@
 5. [Standards](#standards)
 6. [Rules](#rules)
 7. [Agents](#agents)
+   - [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter)
    - [Writing Personas](#writing-personas)
 8. [Workflows](#workflows)
    - [The Default Workflow](#the-default-workflow)
@@ -288,6 +289,9 @@ rules:
   - type-safety.mdc
   - git-commits.mdc
   # ... additional rules
+# Optional — see "Tool and MCP surfaces" below
+# mcp_tools:
+#   - context7
 ---
 
 You are an expert Python engineer. Your job is to write clean,
@@ -316,7 +320,17 @@ testable, production-grade Python code.
 
 **`rules`**: List of rule files that apply to this agent's work. The orchestrator injects these into the spawn prompt.
 
+**`mcp_tools`** (optional, common on specialists here): MCP server identifiers the author expects the runtime to attach for that role (for example library docs or database inspection). Other products use **`allowed_tools`** or an equivalent allow-list instead. Neither field executes by itself—it documents **intent** for whoever configures the runtime.
+
 The body below the frontmatter is the agent's system prompt: role definition, workflow steps, output expectations, and any role-specific constraints.
+
+### Tool and MCP surfaces (runtime vs frontmatter)
+
+Agent YAML declares what a role *should* be able to reach; the **orchestrator runtime** (Cursor, Claude Code, a headless worker, and so on) still decides which tools and MCP servers actually exist, which paths are writable, and which invocations require human approval. Those layers live outside `context/agents/`—often in **workspace or user settings** that are **not** committed. In Cursor, permissions and MCP wiring frequently sit in **`.cursor/settings.local.json`** (typically git-ignored), so two machines with the same checkout can behave differently.
+
+When frontmatter and local configuration **diverge**, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a **deployment alignment** problem: update the local settings (or your organisation’s standard Cursor profile) when you add `mcp_tools:` entries, add a new agent, or enable a new server—**and** keep frontmatter honest about what is truly required versus optional.
+
+Rule injection and file scope (see `context/agents/orchestrator.md`) remain mandatory regardless of tool lists; missing rules cause as much pain as missing MCP entries.
 
 ### How the Orchestrator Resolves an Agent
 
@@ -1155,7 +1169,7 @@ The code samples in this section are **illustrative**: they show how to load mar
 
 ### Agent Definition Portability
 
-The frontmatter lists Claude Code-specific tool names in `allowed_tools`, but the body of the agent definition (role, workflow, constraints) works across any system that can inject a system prompt. Porting an agent to a new platform requires mapping the tools; the prompt itself travels unchanged.
+Frontmatter may list **`mcp_tools:`** (this tree) or **`allowed_tools:`** (other runtimes)—both are platform-specific hints. The markdown **body** (role, workflow, constraints) is what ports cleanly. Moving to a new platform means mapping those hints onto that platform’s tool and MCP configuration (often a settings file or admin console, not something validators in this repo can see); the prompt itself travels unchanged.
 
 ### Adapter Examples
 
@@ -1314,6 +1328,7 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 2. `context/templates/agent-template.md`
 3. `context/agents/orchestrator.md`
 4. The workflow where the new agent should appear
+5. [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter) (this document) — align local runtime settings (for example Cursor `.cursor/settings.local.json`) with any `mcp_tools:` you add
 
 ### Porting the Framework to Another Runtime
 
