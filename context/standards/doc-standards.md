@@ -436,7 +436,7 @@ Use Mermaid notation for all diagrams. Renders natively in GitHub, GitLab, Notio
 
 **Example:**
 ```mermaid
-flowchart LR
+flowchart TD
     A[Input] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[Other]
