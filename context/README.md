@@ -197,31 +197,7 @@ context/
 
 **Golden source**: `start-here` repo
 
-### Same Machine: Symlinks (Recommended)
-
-```bash
-# Keep context in start-here (git tracks changes here)
-# Create symlinks FROM other repos TO start-here
-
-cd /Users/your-username/repos/project-a
-rm -rf context
-ln -s /Users/your-username/Repos/start-here/context context
-
-cd /Users/your-username/repos/project-b
-rm -rf context
-ln -s /Users/your-username/Repos/start-here/context context
-```
-
-**Benefits**: Instant sync, no manual copying, git tracking intact
-
-**Git behaviour**:
-
-- **start-here**: Tracks actual context files (commit here)
-- **Other repos**: Track the symlink `context -> /path/to/start-here/context`
-
-### Different Machines: Manual Sync
-
-Copy context folder into each project. Use `rsync` or custom sync script for updates.
+Copy the `context/` folder into each project. Use `rsync` or a custom sync script to keep copies current.
 
 ---
 
