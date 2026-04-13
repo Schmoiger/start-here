@@ -187,7 +187,7 @@ The framework documents five coordination patterns, from simple to complex:
 4. **Hive**: parallel agents sharing artefacts (tests, API specs) with coordination points before and after
 5. **Iterative Loop**: review-fix cycles until approval
 
-Production workflows combine these. The build workflow uses a sequential chain for planning, a hive for parallel Python/TypeScript implementation against shared tests, and iterative loops at quality gates. The hive pattern (coordinated parallelism against shared contracts) is the most complex to manage correctly and the area where explicit orchestration adds the most value. The framework's title reflects this emphasis.
+Production workflows combine these. **Design** adds one parallel phase (database and API designers on the same architecture handoff). **Build** uses a sequential chain for planning, a **hive** for parallel Python and TypeScript implementation against the **same** test contract (with disjoint file scopes), parallel **review** passes that still share one plan or codebase, and iterative loops at quality gates. Most `parallel: true` phases in the shipped YAML are hive-style coordination, not independent “swarms.” The hive pattern is the hardest to manage well and where explicit orchestration adds the most value. The framework's title reflects this emphasis.
 
 ---
 
