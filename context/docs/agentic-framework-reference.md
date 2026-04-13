@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.8
+**Version**: 0.9
 **Last Updated**: 13 April 2026
-**Word Count**: ~8,950 words
-**Reading Time**: ~37 minutes
+**Word Count**: ~8,400 words
+**Reading Time**: ~35 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -71,8 +71,6 @@ The framework is organised as a layered directory structure inside `context/`. T
 | Personas | `context/persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only |
 
 The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. Nothing bleeds across boundaries unless explicitly designed to.
-
-**As-built snapshot (counts change when you add files):** under `context/` today you will find on the order of **nine** workflow YAML files, **nineteen** agent markdown definitions (including the orchestrator), **one** agent inventory (`agents/README.md`), **twenty-one** rule files (`rules/*.mdc`), **thirteen** behavioural standards (Markdown in `standards/`, excluding `standards/README.md`), **fourteen** template artefacts (files in `templates/` excluding `templates/README.md`), and **six** Python validators wired for pre-commit in `scripts/validators/`. The tables later in this document catalogue each area; use the directories as ground truth when in doubt.
 
 The design pattern is consistent throughout:
 
@@ -192,8 +190,6 @@ alwaysApply: false
 
 The body of the rule is concise instruction text, typically structured as a table of correct vs incorrect usage, followed by a brief rationale. The entire rule stays under 200 tokens.
 
-Every enforceable idea in `context/rules/*.mdc` should be represented in the catalogue below when it is stable; if you add a rule file, extend the catalogue in the same section so readers can discover it without spelunking.
-
 ### Example: Python Environment Rule
 
 ```
@@ -267,7 +263,7 @@ If all three are true, create a rule in `rules/*.mdc` and keep it under 200 toke
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships **one orchestrator** plus **eighteen** delegatable specialists (nineteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with **recommended model tiers** for operators who tune cost versus capability. Which agent runs in which phase is **never** implied by the roster alone—it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships **one orchestrator** plus **eighteen** delegatable specialists (nineteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with **recommended model tiers** for operators who tune cost versus capability. Which agent runs in which phase is **never** implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -347,7 +343,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines eighteen delegatable specialists plus the orchestrator, organised by kind of judgement.
+The framework defines 18 specialised agents, organised by kind of judgement.
 
 #### Core Coordinator
 
@@ -465,8 +461,6 @@ All personas use British English throughout (colour, optimise, behaviour, whilst
 ## Workflows
 
 Workflows are YAML files in `context/workflows/` that encode phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. Storing orchestration logic in versionable YAML rather than ad hoc conversation makes it inspectable, diffable, reviewable, and recoverable after context compaction.
-
-The **as-built workflow set** in this repository is nine files: `design.yaml`, `build.yaml`, `prototype.yaml`, `bugfix.yaml`, `deploy.yaml`, `full-test.yaml`, `content.yaml`, `continuous-improvement.yaml`, and `retrospective.yaml`. **Production delivery** is normally `design.yaml` then `build.yaml`, with `deploy.yaml` for cloud promotion after local verification. The other files are alternate pipelines (spike, defect, regression sweep, human-facing content, process improvement). Each file's `phases`, `quality_gates`, `workflow_rules`, and `state_recovery` blocks are authoritative; this section is a human-oriented digest.
 
 ### The Default Workflow
 
@@ -614,16 +608,11 @@ Cleaning up a prototype takes longer than rewriting it properly. The technical d
 ### Human-Facing Content Workflow
 
 **File**: `context/workflows/content.yaml`
-**Pattern**: Sequential chain; one agent (`documentation`) with different personas per phase
-**Use for**: Blog posts, articles, thought leadership, technical papers, user-facing guides for non-technical audiences, marketing copy, conference talks, announcements
+**Pattern**: Sequential chain — `product-expert` for research, then `documentation` with a **different persona per phase** (draft → editor → optional expert reviewer → finalize).
+**Use for**: External-facing prose: blogs, papers, guides, talks, marketing where voice matters.
+**Do not use for**: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use the default path and `doc-standards.md` without personas.
 
-**Do not use for**: technical handoffs (README, HANDOFF.md), API or reference documentation, architecture or design specifications, internal artefacts (requirements, tasks, review reports), code comments, error messages, log output.
-
-For technical documentation and repository docs, use the default workflow (`build.yaml` / design path) without personas.
-
-#### Summary
-
-Five phases, zero quality gates, typical duration 2-4 hours. The `documentation` agent reads a different persona file each phase (see [Writing Personas](#writing-personas) for persona definitions and selection).
+Five phases, **no** quality gates (YAML `quality_gates: []`); typical wall time about **2–4 hours**. Shape, validation strings, and `workflow_rules` live in **`content.yaml`**; this subsection is a digest only.
 
 ```
 research → draft → review → technical-review (optional) → finalize
@@ -667,239 +656,17 @@ flowchart TD
     class tech_review optionalStyle
 ```
 
-#### Phase 1: Research and context gathering
-
-**Agent**: `product-expert`
-
-**Purpose**: Gather background context, clarify audience and purpose, surface key messages.
-
-**You invoke**:
-
-```
-@product-expert Gather context for [blog post / paper / guide] about [topic]
-
-Audience: [engineering leaders / practitioners / general public]
-Purpose: [educate / persuade / inform]
-Key messages: [list 3-5 key points]
-```
-
-**Outputs**: Research notes, source materials, audience analysis.
-
-**Duration**: about 30 minutes (can be short if you already have material; the phase still anchors the pipeline in `content.yaml`).
-
----
-
-#### Phase 2: Draft
-
-**Agent**: `documentation` with **technical-writer** or **opinionated-blogger** persona (files under `context/persona/`).
-
-**Purpose**: First draft in the correct voice. The agent must read the chosen persona file before writing.
-
-**You invoke**:
-
-```
-@documentation Write [blog post / guide / paper] about [topic]
-
-Use [technical-writer / opinionated-blogger] persona
-(context/persona/technical-writer.md or context/persona/opinionated-blogger.md).
-
-Audience: [engineering leaders / practitioners]
-Length: [400-800 words for blog; longer for guide or paper]
-Key messages:
-- [message 1]
-- [message 2]
-- [message 3]
-
-Context: [background, project details, research notes]
-```
-
-**Outputs**: `artefacts/content/drafts/{title}-draft.md`
-
-**Checks before handoff**: persona voice sustained; concrete examples; British English; no patterns forbidden in `context/rules/no-ai-slop.mdc` (see also [AI slop and editorial constraints](#ai-slop-and-editorial-constraints) below).
-
-**Duration**: about 1-2 hours.
-
----
-
-#### Phase 3: Editorial review
-
-**Agent**: `documentation` with **editor** persona (`context/persona/editor.md`).
-
-**Purpose**: Voice consistency, tighten structure, strip AI slop.
-
-**You invoke**:
-
-```
-@documentation Review draft for editorial quality
-
-Use editor persona (context/persona/editor.md).
-
-Check for:
-- Voice consistency (chosen persona maintained throughout)
-- British English throughout
-- No AI slop (em dashes as connectors, triads, empty transitions)
-- Concrete examples (not abstract descriptions)
-- Scannable structure (short paragraphs, clear headings)
-```
-
-**Outputs**: `artefacts/content/drafts/{title}-reviewed.md`
-
-**Duration**: about 30 minutes.
-
----
-
-#### Phase 4: Technical review (optional)
-
-**Agent**: `documentation` with **expert-reviewer** persona (`context/persona/expert-reviewer.md`).
-
-**Purpose**: Verify technical accuracy of claims, code samples, and product references.
-
-**Skip when**: purely non-technical content, a domain expert already signed off, or low technical depth.
-
-**You invoke**:
-
-```
-@documentation Technical review for accuracy
-
-Use expert-reviewer persona (context/persona/expert-reviewer.md).
-
-Verify:
-- Technical claims are accurate
-- Code examples work
-- Product and API references are correct
-- No misleading statements
-```
-
-**Outputs**: `artefacts/content/drafts/{title}-tech-reviewed.md`
-
-**Duration**: about 30 minutes.
-
----
-
-#### Phase 5: Finalize
-
-**Agent**: `documentation` (no persona switch required; follows `doc-standards.md` and publication format).
-
-**Purpose**: Final edits, platform formatting, metadata, move to published location.
-
-**You invoke**:
-
-```
-@documentation Finalize content for publication
-
-Format for: [Medium / blog / conference paper]
-Add metadata: date, author, tags
-Move to: artefacts/content/published/{title}.md
-```
-
-**Outputs**: `artefacts/content/published/{title}.md`
-
-**Duration**: about 30 minutes.
-
----
-
-#### Content type guidelines
-
-**Blog posts (about 400-800 words)**
-
-1. Opening hook (question, observation, or tension)
-2. Three to five sections with clear headings
-3. Concrete examples with numbers where possible
-4. Closing that states why it matters
-
-Target read time about 2-4 minutes.
-
-**Technical papers (2000+ words)**
-
-1. Abstract (about 150 words)
-2. Introduction with hook
-3. Background and related work
-4. Main body (three to seven sections)
-5. Discussion ("So what?")
-6. Conclusion with actionable takeaways
-
-Include data, figures, references, and working code where relevant.
-
-**User guides (variable length)**
-
-1. Problem the guide solves
-2. Quick start (three to five steps)
-3. Common use cases (question-led)
-4. Troubleshooting
-
-Keep tone conversational but task-focused.
-
----
-
-#### British English reminders
-
-| American | British |
-|----------|---------|
-| optimize | optimise |
-| organization | organisation |
-| behavior | behaviour |
-| while (stylistic) | whilst (where appropriate) |
-| program (TV, schedule) | programme |
-| color | colour |
-| analyze | analyse |
-| -ize endings | -ise where British usage requires |
-
----
-
-#### AI slop and editorial constraints
-
-The rule file `context/rules/no-ai-slop.mdc` applies to persona-driven content. In brief:
-
-**Avoid**: em dashes (—) as connectors; three-beat lists ("fast, reliable, secure"); empty transitions ("Furthermore", "In today's fast-paced world"); marketing superlatives without evidence; filler sentences.
-
-**Prefer**: short sentences; varied list lengths; hooks that introduce a real idea; specific numbers and examples; honest limits.
-
----
-
-#### Example: technical handoff versus persona blog
-
-**Without persona** (correct for README or API docs):
-
-```markdown
-# JWT Authentication
-
-## Overview
-
-Access tokens expire after 15 minutes; refresh tokens after 7 days.
-
-## Endpoints
-
-- POST /auth/login
-- POST /auth/refresh
-```
-
-Tone: direct, neutral, no narrative voice.
-
-**With persona** (blog or opinion piece): conversational hook, question-led sections, disclosure where claims are generalisations, still no banned punctuation patterns from `no-ai-slop.mdc`. (When illustrating voice, keep examples compliant; avoid em dashes even inside quoted blog prose.)
-
----
-
-#### Tips
-
-**Before starting**: fix audience (leaders vs practitioners), three to five key messages, content shape (blog vs paper vs guide), and gather sources.
-
-**While drafting**: read the persona file first; open with tension or a real question; after each factual block, ask what changes for the reader.
-
-**After drafting**: read aloud; search for American spellings; remove triads and connector em dashes; cut paragraphs that add no new information.
-
----
-
-#### Common issues
-
-| Symptom | Remedy |
-|---------|--------|
-| Reads like an essay rubric, not a person | Add contractions, specifics, one honest limitation |
-| Abstract claims ("many users") | Replace with measurable detail ("51% in a sample of 10,000") |
-| American spellings | Systematic replace; run British English checks |
-| Weak opening | Start from observation, disagreement, or question |
-| AI slop patterns | Rewrite sentences; break lists of three into two plus a separate sentence |
-
----
+#### Phases (see YAML for full validation)
+
+| Phase | Agent | Persona / role | Primary output |
+|-------|--------|----------------|------------------|
+| `research` | `product-expert` | Audience, purpose, key messages, sources | Research notes (see YAML `outputs`) |
+| `draft` | `documentation` | `technical-writer` or `opinionated-blogger` | `artefacts/content/drafts/{title}-draft.md` |
+| `review` | `documentation` | `editor` | `artefacts/content/drafts/{title}-reviewed.md` |
+| `technical-review` | `documentation` | `expert-reviewer` (**optional** — skip for non-technical pieces) | `artefacts/content/drafts/{title}-tech-reviewed.md` |
+| `finalize` | `documentation` | Publication formatting per task | `artefacts/content/published/{title}.md` |
+
+Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in **`context/rules/no-ai-slop.mdc`**). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
 
 #### Comparison with the default workflow
 
@@ -912,13 +679,11 @@ Tone: direct, neutral, no narrative voice.
 | Typical output | Blogs, papers, guides | Production code, tests, technical docs |
 | Voice | Persona-led | Direct, evidence-led |
 
----
-
 #### See also
 
-- `context/workflows/content.yaml` (source of truth for phase IDs and validation)
-- [Writing Personas](#writing-personas) (persona files and when to use each)
-- `context/standards/doc-standards.md` (technical documentation structure; complements this workflow for non-persona docs)
+- `context/workflows/content.yaml` — phase IDs, `validation`, `workflow_rules`, `state_recovery`
+- [Writing Personas](#writing-personas) — persona files and selection
+- `context/standards/doc-standards.md` — structure for technical docs (non-persona path)
 
 ### Other Workflows
 
