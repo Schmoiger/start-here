@@ -1,7 +1,7 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 1.0
+**Version**: 1.1
 **Last Updated**: 13 April 2026
 **Word Count**: ~8,400 words
 **Reading Time**: ~35 minutes
@@ -467,8 +467,6 @@ All personas use British English throughout (colour, optimise, behaviour, whilst
 
 Workflows are YAML files in `context/workflows/` that encode phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. Storing orchestration logic in versionable YAML rather than ad hoc conversation makes it inspectable, diffable, reviewable, and recoverable after context compaction.
 
-The **as-built workflow set** in this repository is nine files under `context/workflows/`. The table below matches the companion essay (`context/docs/agentic-framework.md`); each row has a matching subsection (default product delivery is **design → build → deploy**, three files in sequence—not a single combined YAML).
-
 | Workflow | File | Purpose |
 |----------|------|---------|
 | **design** | `design.yaml` | Discovery through design review; run before build |
@@ -715,7 +713,7 @@ flowchart TD
     class tech_review optionalStyle
 ```
 
-#### Phases (see YAML for full validation)
+#### Phases
 
 | Phase | Agent | Persona / role | Primary output |
 |-------|--------|----------------|------------------|
@@ -726,25 +724,6 @@ flowchart TD
 | `finalize` | `documentation` | Publication formatting per task | `artefacts/content/published/{title}.md` |
 
 Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in **`context/rules/no-ai-slop.mdc`**). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
-
-#### Comparison with the default workflow
-
-| Aspect | Content (`content.yaml`) | Design + build |
-|--------|--------------------------------------|--------------------------------------|
-| Phases | 5 | 6 design + 16 build (sprint loop repeats in build) |
-| Personas | Required | No (technical tone) |
-| Duration | 2-4 hours | Multi-day; scales with sprints and scope |
-| Quality gates | 0 (per-phase checks only) | 1 design + 4 build (see build `quality_gates`) |
-| Typical output | Blogs, papers, guides | Production code, tests, technical docs |
-| Voice | Persona-led | Direct, evidence-led |
-
-#### See also
-
-- `context/workflows/content.yaml` — phase IDs, `validation`, `workflow_rules`, `state_recovery`
-- [Writing Personas](#writing-personas) — persona files and selection
-- `context/standards/doc-standards.md` — structure for technical docs (non-persona path)
-
-<a id="continuous-improvement-continuous-improvementyaml"></a>
 
 ### Continuous improvement (`continuous-improvement.yaml`)
 
@@ -841,17 +820,13 @@ These are examples of **fixable gaps**, not a separate scoring methodology:
 
 See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recovery`.
 
-### Other workflows
-
-There is **no tenth** workflow file. What operators call “default delivery” is a **sequence** of three YAML files: [Design](#design-designyaml) → [Build](#build-buildyaml) → optional [Deploy](#deploy-deployyaml). **Human-facing editorial** content is **only** [Content](#content-contentyaml); technical docs from implementation use design/build and `doc-standards.md` without personas.
-
 ---
 
 ## Orchestration Patterns
 
-The framework documents five coordination patterns, from simple to complex. Production workflows combine them.
+The framework documents five coordination patterns, from simple to complex. They are **vocabulary** for describing orchestration—not separate runtime features. On disk, behaviour is whatever each workflow YAML says: **phase order**, **`parallel: true`** (spawn agents in one dispatch; see `parallel_planning` in `build.yaml`), **disjoint `file_scope`** for coders, and **gates**.
 
-In YAML, those combinations show up as **phase lists** (`agents:` ordering), **`parallel: true`** on a phase when multiple agents may run without depending on each other's fresh output, and **gates** where a phase or human approval must succeed before later phases unlock. Reading a workflow file alongside this section connects the abstract pattern names to concrete phase IDs.
+In **`design.yaml`** and **`build.yaml`**, almost every `parallel: true` phase is **not** “independent agents with no shared state.” Multiple agents read the **same upstream artefacts** (architecture, `subtask-plan.yaml`, failing tests, the running app, design exports) and must stay consistent with each other. That is **coordination-heavy parallelism**—closest to the **hive** idea (shared contract) in the taxonomy below. The textbook **parallel swarm** (truly disjoint work merged only at the end) is rare in these files; do not read “parallel” in YAML as automatically meaning swarm.
 
 ### Single Agent
 
@@ -859,15 +834,15 @@ One specialist, one task, no dependencies. Use for isolated tasks with clear req
 
 ### Sequential Chain
 
-Agents in strict order, each depending on the previous output. Use for tasks with clear dependencies and quality gates: design then implement then review.
+Agents in strict order, each depending on the previous output. Use for tasks with clear dependencies and quality gates: most of **design** and **build** is sequential between phases.
 
 ### Parallel Swarm
 
-Independent agents running simultaneously with no shared state. Use when tasks are truly independent and can be merged later: for example `design-contracts` runs `database-designer` and `api-designer` in parallel, and `tasks-review` runs three reviewers in parallel. Token cost is higher (context duplicated across agents) but execution is often materially faster than strict sequencing.
+Independent agents running simultaneously with **little or no shared mutable contract**—each owns a disjoint slice until merge. Rare in the shipped default path YAML; use the term carefully when reading `parallel: true` phases that still share a plan, a test suite, or design artefacts.
 
 ### Hive
 
-Parallel agents sharing artefacts (tests, API specs, schemas) with coordination points before and after the parallel execution. Use when agents work simultaneously but need shared contracts: the TDD GREEN phase runs `python-coder` and `typescript-coder` in parallel against the same test suite. The hive pattern is the most complex to manage and where explicit orchestration adds the most value.
+Parallel agents working against a **shared contract** (same tests, same subtask plan, same architecture outputs) with orchestrator-enforced **scope** and merge discipline. The canonical case in **`build.yaml`** is **TDD GREEN** and **TDD BLUE**: `python-coder` and `typescript-coder` run together with **disjoint `file_scope`** but the **same** failing-then-passing test suite (`parallel_planning` and `subtask_execution` in the YAML spell this out). **`design-contracts`** is hive-like too: both designers extend the same architecture handoff. **Tasks review**, **sprint-review**, **e2e-regression**, and **final-holistic-review** are parallel **reviewers** on the same body of work—again shared-artefact coordination, not swarm isolation.
 
 ### Iterative Loop
 
@@ -875,41 +850,40 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 
 ### Pattern Comparison
 
-| Pattern | Speed | Token Cost | Coordination | Example Use |
-|---------|-------|------------|--------------|-------------|
-| Single | Fast | Low | None | Bug fix, documentation |
-| Sequential | Slow | Low | Linear | TDD phases, review gates |
-| Parallel Swarm | Fastest | High | None | Contract design, tasks-review, sprint-review, e2e-regression |
-| Hive | Fast | High | Shared artefacts | Parallel coders with shared tests |
-| Iterative | Varies | Medium | Approval loops | Quality gates |
+| Pattern | Speed | Token Cost | Coordination | Example in shipped YAML |
+|---------|-------|------------|--------------|-------------------------|
+| Single | Fast | Low | None | `tdd-red`, `coverage-gate`, many single-agent phases |
+| Sequential | Slow | Low | Linear | Discovery, architecture → contracts → UI chain |
+| Parallel swarm | Fastest | High | Disjoint ownership until merge | Uncommon in default path; do not assume every `parallel: true` is this |
+| Hive | Fast | High | Shared contract + scopes | `tdd-green` / `tdd-blue`; `design-contracts`; parallel review phases on one plan or codebase |
+| Iterative | Varies | Medium | Approval loops | `design-review`, quality gates |
 
-### How the Default Path Uses Patterns
+### How the default path uses patterns
 
 **`design.yaml`**
 
-- **Discovery**: Sequential chain (`product-expert` then `product-owner`).
+- **Discovery**: Sequential (`product-expert` then `product-owner`).
 - **Architecture**: Single agent (`solution-architect`).
-- **Contracts**: Parallel swarm (`database-designer` and `api-designer`).
-- **UI then visuals**: Sequential chain (`ui-designer` then `visual-designer`).
-- **Design review**: Sequential chain with iterative loop (five reviewers in order; may return to earlier design phases).
+- **Contracts**: Parallel **hive-like** pair (`database-designer` and `api-designer` on the same architecture outputs).
+- **UI then visuals**: Sequential (`ui-designer` then `visual-designer`).
+- **Design review**: Sequential reviewers with **iterative** return to earlier phases when required.
 
 **`build.yaml`**
 
-- **Planning and test planning**: Sequential chain (`tech-lead` planning; `code-reviewer` on test plan).
-- **Tasks review** and **sprint-review** and **e2e-regression**: Parallel swarm where phases list multiple agents with `parallel: true`.
-- **TDD RED**: Single agent (`functional-tester`).
-- **TDD GREEN / BLUE**: Hive (parallel coders, shared test contract).
-- **Coverage gate**: Single agent with automated threshold (loop back to RED if failing).
-- **Regression after local deployment**: Sequential chain (unit then integration, then e2e with parallel agents in the e2e phase).
-- **Quality review** then **final holistic review**: Approval gates (`tech-lead` alone, then four parallel approvers).
+- **Planning and test planning**: Sequential (`tech-lead` then `code-reviewer` on the test plan).
+- **Tasks review**, **sprint-review**, **e2e-regression**, **final-holistic-review**: `parallel: true`, but agents share the **same** plan, sprint surface, workflows under test, or release candidate—treat as **hive-style** coordination, not swarm.
+- **TDD GREEN / BLUE**: Hive (parallel coders, **shared tests**, disjoint file scopes).
+- **Coverage gate**: Single agent; may **loop** back to RED.
+- **Regression after local deployment**: Sequential unit → integration → e2e (the e2e phase may list two agents in parallel with shared workflow scope).
+- **Quality review** then **final holistic review**: Gate then parallel approvers on the same implementation.
 
-### Choosing a Pattern
+### Choosing a pattern
 
-1. Single isolated task? **Single Agent.**
-2. Tasks can run independently? **Parallel Swarm.**
-3. Tasks share artefacts (tests, schemas)? **Hive.**
-4. Tasks have sequential dependencies? **Sequential Chain.**
-5. Output needs iterative refinement? **Iterative Loop.**
+1. Single isolated task? **Single agent.**
+2. Same plan, tests, or design handoff for everyone? **Hive** (default path parallel phases are usually this).
+3. Truly disjoint ownership until merge? **Parallel swarm** (uncommon in shipped default YAML).
+4. Strict A-then-B output dependency? **Sequential chain.**
+5. Output needs iterative refinement? **Iterative loop.**
 
 ### Token Optimisation
 
