@@ -48,7 +48,7 @@ flowchart TD
     research --> draft
 
     subgraph draft["✍️ Draft (1-2h)"]
-        doc1["@documentation<br/>technical-writer persona<br/>Conversational, question-driven"]
+        doc1["@documentation<br/>chosen persona<br/>(technical-writer or opinionated-blogger)"]
     end
 
     draft --> review
@@ -108,18 +108,19 @@ Key messages: [list 3-5 key points]
 ---
 
 ### Phase 2: Draft
-**Agent**: `@documentation` with `technical-writer` persona
+**Agent**: `@documentation` with chosen persona
 
-**Purpose**: Write first draft using Dr. Sarah Chen voice
+**Purpose**: Write first draft in the appropriate voice
 
 **You invoke**:
 ```
-@documentation Write [blog post/paper] about [topic]
+@documentation Write [blog post/guide/paper] about [topic]
 
-Use technical-writer persona (context/persona/technical-writer.md).
+Use [technical-writer / opinionated-blogger] persona
+(context/persona/technical-writer.md or context/persona/opinionated-blogger.md).
 
 Audience: [engineering leaders / practitioners]
-Length: [400-800 words for blog / longer for paper]
+Length: [400-800 words for blog / longer for guide or paper]
 Key messages:
 - [message 1]
 - [message 2]
@@ -128,19 +129,22 @@ Key messages:
 Context: [relevant background, project details, research notes]
 ```
 
+**Persona selection**:
+- `technical-writer` (Amara Osei): Guides, reference material, framework docs. Mechanism-first, trade-offs named, examples with inputs and outputs.
+- `opinionated-blogger` (Dr. Sarah Chen): Blog posts, opinion pieces, thought leadership. Provocative hooks, personal anecdotes, conversational tone.
+
 **Outputs**:
 - `artefacts/content/drafts/{title}-draft.md`
 
 **Validation**:
-- Opening hook present (provocative statement, question, personal observation)
-- Conversational tone (contractions, parentheticals, direct address)
-- Question-driven structure
-- Concrete examples with real numbers
+- Persona voice applied consistently
+- Concrete examples present
 - British English (colour, optimise, whilst)
+- No AI slop (see `no-ai-slop.mdc`)
 
 **Duration**: ~1-2 hours
 
-**Critical**: Agent must read `context/persona/technical-writer.md` first
+**Critical**: Agent must read the chosen persona file first
 
 ---
 
@@ -156,7 +160,7 @@ Context: [relevant background, project details, research notes]
 Use editor persona (context/persona/editor.md).
 
 Check for:
-- Voice consistency (Dr. Sarah Chen persona maintained?)
+- Voice consistency (chosen persona maintained throughout?)
 - British English throughout
 - No AI slop (em dashes, triads, vapid transitions)
 - Concrete examples (not abstract descriptions)
@@ -232,6 +236,22 @@ Move to: artefacts/content/published/{title}.md
 ### Technical Writer (Default)
 
 **File**: `context/persona/technical-writer.md`
+
+**Character**: Amara Osei
+- Eight years at Stripe documenting payment APIs
+- Four years at Hashicorp writing infrastructure guides
+- Practitioner cookbook style
+
+**Voice traits**:
+- Leads with the problem
+- Explains the mechanism step by step
+- Working examples with inputs and outputs
+- Names trade-offs directly
+- No filler
+
+### Opinionated Blogger
+
+**File**: `context/persona/opinionated-blogger.md`
 
 **Character**: Dr. Sarah Chen
 - PhD in Software Engineering from MIT
@@ -457,7 +477,8 @@ starting point.)
 
 - `context/workflows/documentation-for-humans.yaml` - Workflow definition
 - `context/docs/writing-personas.md` - Complete persona guide
-- `context/persona/technical-writer.md` - Dr. Sarah Chen persona
+- `context/persona/technical-writer.md` - Amara Osei persona (guides, reference)
+- `context/persona/opinionated-blogger.md` - Dr. Sarah Chen persona (blogs, opinion)
 - `context/persona/editor.md` - Editorial persona
 - `context/persona/expert-reviewer.md` - Reviewer persona
 - `context/standards/doc-standards.md` - Documentation standards (technical)
