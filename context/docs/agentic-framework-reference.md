@@ -1,7 +1,7 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.4
+**Version**: 0.5
 **Last Updated**: 13 April 2026
 **Word Count**: ~8,600 words
 **Reading Time**: ~36 minutes
@@ -18,20 +18,20 @@
 5. [Standards](#standards)
 6. [Rules](#rules)
 7. [Agents](#agents)
+   - [Writing Personas](#writing-personas)
 8. [Workflows](#workflows)
    - [The Default Workflow](#the-default-workflow)
    - [The Prototype Workflow](#the-prototype-workflow)
    - [Human-Facing Content Workflow](#human-facing-content-workflow)
    - [Other Workflows](#other-workflows)
+   - [Measuring Effectiveness](#measuring-effectiveness)
 9. [Orchestration Patterns](#orchestration-patterns)
 10. [Templates](#templates)
-11. [Writing Personas](#writing-personas)
-12. [Scripts and Automation](#scripts-and-automation)
-13. [Portability and Framework Adapters](#portability-and-framework-adapters)
-14. [Measuring Effectiveness](#measuring-effectiveness)
-15. [How the Parts Connect](#how-the-parts-connect)
-16. [Design Themes](#design-themes)
-17. [Reading Paths](#reading-paths)
+11. [Scripts and Automation](#scripts-and-automation)
+12. [Portability and Framework Adapters](#portability-and-framework-adapters)
+13. [How the Parts Connect](#how-the-parts-connect)
+14. [Design Themes](#design-themes)
+15. [Reading Paths](#reading-paths)
 
 ---
 
@@ -379,6 +379,59 @@ The framework defines 18 specialised agents, organised by kind of judgement.
 4. Write a concise body with role definition, workflow steps, and output expectations
 5. Add the agent to the appropriate workflow YAML phase
 6. Regenerate `AGENTS.md`
+
+### Writing Personas
+
+Personas are stored in `context/persona/` and provide voice guidance for human-facing content. They are used by the `documentation` agent when writing blogs, technical papers, user guides, and marketing materials. They are explicitly *not* used for technical handoffs, API documentation, architecture documents, or internal artefacts.
+
+For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Human-Facing Content Workflow](#human-facing-content-workflow) under Workflows.
+
+#### When to Use a Persona
+
+**Use a persona for**: blog posts, articles, thought leadership, technical papers, user-facing guides for non-technical audiences, marketing materials, conference talks.
+
+**Do not use a persona for**: technical handoffs (README, HANDOFF.md, build notes), API documentation, code references, architecture documents, design specifications, internal artefacts (requirements, tasks, review reports), code comments, error messages.
+
+#### Available Personas
+
+##### Technical Writer
+
+**File**: `context/persona/technical-writer.md`
+**Character**: Amara Osei. Eight years at Stripe documenting payment APIs, four years at Hashicorp writing infrastructure guides.
+**Use for**: Technical guides, framework documentation, practitioner reference material.
+
+Key traits: leads with the problem, not a hook. Explains the mechanism step by step. Working examples with inputs and outputs. Names trade-offs and costs directly. Structured for reference use with scannable headings and front-loaded information. No filler.
+
+##### Opinionated Blogger
+
+**File**: `context/persona/opinionated-blogger.md`
+**Character**: Dr. Sarah Chen. PhD from MIT, 10 years as principal engineer at Google.
+**Use for**: Blog posts, opinion pieces, thought leadership.
+
+Key traits: provocative opening hooks. Conversational with contractions and parenthetical asides. Personal anecdotes as entry points. Self-deprecating honesty. Question-driven framing. Memorable one-liners. Short paragraphs, 2-4 minute read times.
+
+##### Editor
+
+**File**: `context/persona/editor.md`
+**Use for**: Refining and polishing existing content. Checking voice consistency, removing AI slop, verifying British English.
+
+##### Expert Reviewer
+
+**File**: `context/persona/expert-reviewer.md`
+**Use for**: Reviewing technical accuracy and completeness of human-facing content.
+
+#### Selecting a Persona
+
+The selection depends on audience and content type:
+
+- Writing a practitioner guide with code examples? **Technical writer.**
+- Writing a blog post or opinion piece? **Opinionated blogger.**
+- Writing for a non-technical audience about high-level concepts? **Opinionated blogger.**
+- Writing implementation details for developers? **Technical writer.**
+- Polishing an existing draft? **Editor.**
+- Checking technical claims? **Expert reviewer.**
+
+All personas use British English throughout (colour, optimise, behaviour, whilst, programme, organisation).
 
 ---
 
@@ -849,6 +902,84 @@ Tone: direct, neutral, no narrative voice.
 | `continuous-improvement.yaml` | Incident response (reactive) and retrospective analysis (proactive). The framework's mechanism for evolving itself. | Variable |
 | `retrospective.yaml` | Process review and pattern identification. Modelled directly rather than folded into informal meetings. | 1-2 hours |
 
+### Measuring Effectiveness
+
+Framework improvement and measurement are governed by **`context/workflows/continuous-improvement.yaml`**, not by ad hoc scorecards. That workflow defines two **modes** (incident and retrospective), explicit **phases**, what gets **written to disk**, and a **quality gate** in retrospective mode. The `workflow-analyst` agent appears only in retrospective **review**; other phases are orchestrator- and human-led as the YAML states.
+
+#### Workflow file and modes
+
+| Mode | Trigger | Purpose |
+|------|---------|---------|
+| **incident** | Human reports a specific failure | Capture, diagnose, fix, record one incident |
+| **retrospective** | After deployment, after a sprint, or on demand | Mine logs and git for patterns, discuss with human, fix, record |
+
+**Workflow rules** (from YAML): incident mode is human-triggered; retrospective mode is periodic or on demand; **every finding or incident must identify a fixable gap in the framework** (rules, standards, templates, scripts), not vanity metrics; in retrospective mode the **human decides** which findings to implement; incident mode proceeds once diagnosis is sound.
+
+---
+
+#### Incident mode (reactive)
+
+Sequential phases:
+
+| Phase | Agents | Role |
+|-------|--------|------|
+| `report` | None (orchestrator + human) | Append a new entry to `artefacts/build/agent-incidents.md`: severity, symptom, root cause and fix initially **pending** |
+| `diagnose` | None | Trace **symptom → mechanism → file → gap** with path-level evidence; read configs and code, do not infer from names alone |
+| `fix` | `python-coder`, `typescript-coder` (parallel) | Apply changes to rules, standards, templates, or small orchestration edits; commit after each logical fix |
+| `record` | None | Update the incident entry with root cause, fix summary, and commit hash; optionally add a portability task to `artefacts/build/tasks-context-framework.md` |
+
+**Validation highlights**: diagnosis must cite specific files and complete the causal chain; `fix` must satisfy acceptance checks (for example grep confirms an anti-pattern removed).
+
+The YAML lists `fix` with `depends_on: [diagnose, discuss]`. **Retrospective** runs `discuss` (human gate) before `fix`. **Incident** runs `diagnose` after `report`; the orchestrator should advance to `fix` once diagnosis is complete (the `discuss` phase exists only in retrospective mode).
+
+---
+
+#### Retrospective mode (proactive)
+
+Sequential phases:
+
+| Phase | Agents | Role |
+|-------|--------|------|
+| `review` | `workflow-analyst` | Read **artefacts/build/agent-interruptions.md** (questions, tool approvals, escalations), **artefacts/build/agent-incidents.md**, and **git log** bodies for **Agent-Session** telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find **patterns** with counts and examples; each finding must point at **concrete files** that would change |
+| `discuss` | None (**gate**: human approval) | Present **pattern → root cause → proposed fix**; human chooses what to act on |
+| `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
+| `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
+
+**Quality gate**: `discuss` (retrospective only) requires **human approval** before fixes proceed.
+
+**Validation highlights**: git log parsed for session metrics; interruption and incident logs read; patterns evidenced; no aggregate “health scores” (explicitly disallowed by workflow rules).
+
+---
+
+#### Data the retrospective `review` phase is built to consume
+
+The YAML lists these sources explicitly:
+
+- **`artefacts/build/agent-interruptions.md`**: blocking moments (questions, approvals, escalations)
+- **`artefacts/build/agent-incidents.md`**: prior framework failures
+- **`git log`** with `%H`, subject, body: reconstruct **tokens=**, **duration=**, **agents=**, **dispatch=**, **interactions=**, **approvals=** from commit trailers
+
+From those, the analyst is expected to answer questions such as: total tokens per agent, sprint, or task; duration per task; which agents cost the most tokens relative to output; token trends; autonomy rate (commits with orchestrator dispatch and zero interactions); distribution of human interactions and approvals. **Repeated rule violations**, **agents over token budget**, and **incidents with shared root causes** are examples of valid pattern classes.
+
+---
+
+#### Relationship to other artefacts
+
+**Tasks and handoffs** (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful **secondary** context when the orchestrator or `@workflow-analyst` widens an investigation, but they are **not** the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
+
+The agent definition **`context/agents/workflow-analyst.md`** still describes broader analysis habits (for example task and handoff mining). When in doubt, **the workflow YAML wins** for phase order, outputs, and validation.
+
+---
+
+#### Common fix targets (illustrative)
+
+These are examples of **fixable gaps**, not a separate scoring methodology:
+
+- **Coverage discipline**: tests landed after GREEN instead of strengthening RED or failing `coverage-gate` (see `build.yaml`).
+- **Tooling drift**: repeated bash-for-files or wrong package managers; tighten prompts or rules.
+- **Integration cost**: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
+- **Parallel misuse**: duplicated context without time savings; narrow parallel phases to truly independent work.
+
 ---
 
 ## Orchestration Patterns
@@ -949,61 +1080,6 @@ Standardised shapes reduce ambiguity for both writers and readers. When every re
 | `user-stories-template.md` | Standard user story format |
 
 The task prompt template deserves particular attention. It carries rule resolution and file-scope discipline into subagent execution. When the orchestrator spawns an agent, the task prompt template ensures the agent receives its definition file path, resolved rules, immediate context, file scope constraints, and escalation instructions in a consistent structure.
-
----
-
-## Writing Personas
-
-Personas are stored in `context/persona/` and provide voice guidance for human-facing content. They are used by the `documentation` agent when writing blogs, technical papers, user guides, and marketing materials. They are explicitly *not* used for technical handoffs, API documentation, architecture documents, or internal artefacts.
-
-For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Human-Facing Content Workflow](#human-facing-content-workflow) under Workflows.
-
-### When to Use a Persona
-
-**Use a persona for**: blog posts, articles, thought leadership, technical papers, user-facing guides for non-technical audiences, marketing materials, conference talks.
-
-**Do not use a persona for**: technical handoffs (README, HANDOFF.md, build notes), API documentation, code references, architecture documents, design specifications, internal artefacts (requirements, tasks, review reports), code comments, error messages.
-
-### Available Personas
-
-#### Technical Writer
-
-**File**: `context/persona/technical-writer.md`
-**Character**: Amara Osei. Eight years at Stripe documenting payment APIs, four years at Hashicorp writing infrastructure guides.
-**Use for**: Technical guides, framework documentation, practitioner reference material.
-
-Key traits: leads with the problem, not a hook. Explains the mechanism step by step. Working examples with inputs and outputs. Names trade-offs and costs directly. Structured for reference use with scannable headings and front-loaded information. No filler.
-
-#### Opinionated Blogger
-
-**File**: `context/persona/opinionated-blogger.md`
-**Character**: Dr. Sarah Chen. PhD from MIT, 10 years as principal engineer at Google.
-**Use for**: Blog posts, opinion pieces, thought leadership.
-
-Key traits: provocative opening hooks. Conversational with contractions and parenthetical asides. Personal anecdotes as entry points. Self-deprecating honesty. Question-driven framing. Memorable one-liners. Short paragraphs, 2-4 minute read times.
-
-#### Editor
-
-**File**: `context/persona/editor.md`
-**Use for**: Refining and polishing existing content. Checking voice consistency, removing AI slop, verifying British English.
-
-#### Expert Reviewer
-
-**File**: `context/persona/expert-reviewer.md`
-**Use for**: Reviewing technical accuracy and completeness of human-facing content.
-
-### Selecting a Persona
-
-The selection depends on audience and content type:
-
-- Writing a practitioner guide with code examples? **Technical writer.**
-- Writing a blog post or opinion piece? **Opinionated blogger.**
-- Writing for a non-technical audience about high-level concepts? **Opinionated blogger.**
-- Writing implementation details for developers? **Technical writer.**
-- Polishing an existing draft? **Editor.**
-- Checking technical claims? **Expert reviewer.**
-
-All personas use British English throughout (colour, optimise, behaviour, whilst, programme, organisation).
 
 ---
 
@@ -1170,86 +1246,6 @@ def load_with_metadata(name: str):
     prompt = "---".join(parts[2:]) if len(parts) > 2 else content
     return {"prompt": prompt, "metadata": metadata}
 ```
-
----
-
-## Measuring Effectiveness
-
-Framework improvement and measurement are governed by **`context/workflows/continuous-improvement.yaml`**, not by ad hoc scorecards. That workflow defines two **modes** (incident and retrospective), explicit **phases**, what gets **written to disk**, and a **quality gate** in retrospective mode. The `workflow-analyst` agent appears only in retrospective **review**; other phases are orchestrator- and human-led as the YAML states.
-
-### Workflow file and modes
-
-| Mode | Trigger | Purpose |
-|------|---------|---------|
-| **incident** | Human reports a specific failure | Capture, diagnose, fix, record one incident |
-| **retrospective** | After deployment, after a sprint, or on demand | Mine logs and git for patterns, discuss with human, fix, record |
-
-**Workflow rules** (from YAML): incident mode is human-triggered; retrospective mode is periodic or on demand; **every finding or incident must identify a fixable gap in the framework** (rules, standards, templates, scripts), not vanity metrics; in retrospective mode the **human decides** which findings to implement; incident mode proceeds once diagnosis is sound.
-
----
-
-### Incident mode (reactive)
-
-Sequential phases:
-
-| Phase | Agents | Role |
-|-------|--------|------|
-| `report` | None (orchestrator + human) | Append a new entry to `artefacts/build/agent-incidents.md`: severity, symptom, root cause and fix initially **pending** |
-| `diagnose` | None | Trace **symptom → mechanism → file → gap** with path-level evidence; read configs and code, do not infer from names alone |
-| `fix` | `python-coder`, `typescript-coder` (parallel) | Apply changes to rules, standards, templates, or small orchestration edits; commit after each logical fix |
-| `record` | None | Update the incident entry with root cause, fix summary, and commit hash; optionally add a portability task to `artefacts/build/tasks-context-framework.md` |
-
-**Validation highlights**: diagnosis must cite specific files and complete the causal chain; `fix` must satisfy acceptance checks (for example grep confirms an anti-pattern removed).
-
-The YAML lists `fix` with `depends_on: [diagnose, discuss]`. **Retrospective** runs `discuss` (human gate) before `fix`. **Incident** runs `diagnose` after `report`; the orchestrator should advance to `fix` once diagnosis is complete (the `discuss` phase exists only in retrospective mode).
-
----
-
-### Retrospective mode (proactive)
-
-Sequential phases:
-
-| Phase | Agents | Role |
-|-------|--------|------|
-| `review` | `workflow-analyst` | Read **artefacts/build/agent-interruptions.md** (questions, tool approvals, escalations), **artefacts/build/agent-incidents.md**, and **git log** bodies for **Agent-Session** telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find **patterns** with counts and examples; each finding must point at **concrete files** that would change |
-| `discuss` | None (**gate**: human approval) | Present **pattern → root cause → proposed fix**; human chooses what to act on |
-| `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
-| `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
-
-**Quality gate**: `discuss` (retrospective only) requires **human approval** before fixes proceed.
-
-**Validation highlights**: git log parsed for session metrics; interruption and incident logs read; patterns evidenced; no aggregate “health scores” (explicitly disallowed by workflow rules).
-
----
-
-### Data the retrospective `review` phase is built to consume
-
-The YAML lists these sources explicitly:
-
-- **`artefacts/build/agent-interruptions.md`**: blocking moments (questions, approvals, escalations)
-- **`artefacts/build/agent-incidents.md`**: prior framework failures
-- **`git log`** with `%H`, subject, body: reconstruct **tokens=**, **duration=**, **agents=**, **dispatch=**, **interactions=**, **approvals=** from commit trailers
-
-From those, the analyst is expected to answer questions such as: total tokens per agent, sprint, or task; duration per task; which agents cost the most tokens relative to output; token trends; autonomy rate (commits with orchestrator dispatch and zero interactions); distribution of human interactions and approvals. **Repeated rule violations**, **agents over token budget**, and **incidents with shared root causes** are examples of valid pattern classes.
-
----
-
-### Relationship to other artefacts
-
-**Tasks and handoffs** (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful **secondary** context when the orchestrator or `@workflow-analyst` widens an investigation, but they are **not** the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
-
-The agent definition **`context/agents/workflow-analyst.md`** still describes broader analysis habits (for example task and handoff mining). When in doubt, **the workflow YAML wins** for phase order, outputs, and validation.
-
----
-
-### Common fix targets (illustrative)
-
-These are examples of **fixable gaps**, not a separate scoring methodology:
-
-- **Coverage discipline**: tests landed after GREEN instead of strengthening RED or failing `coverage-gate` (see `build.yaml`).
-- **Tooling drift**: repeated bash-for-files or wrong package managers; tighten prompts or rules.
-- **Integration cost**: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
-- **Parallel misuse**: duplicated context without time savings; narrow parallel phases to truly independent work.
 
 ---
 
