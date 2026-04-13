@@ -476,7 +476,7 @@ starting point.)
 ## See Also
 
 - `context/workflows/documentation-for-humans.yaml` - Workflow definition
-- `context/docs/writing-personas.md` - Complete persona guide
+- `context/docs/agentic-framework-reference.md` (Writing Personas) - Persona selection and usage
 - `context/persona/technical-writer.md` - Amara Osei persona (guides, reference)
 - `context/persona/opinionated-blogger.md` - Dr. Sarah Chen persona (blogs, opinion)
 - `context/persona/editor.md` - Editorial persona
