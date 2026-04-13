@@ -146,9 +146,9 @@ The framework defines 18 specialised agents, organised by kind of judgement rath
 
 Each agent's frontmatter declares which rules and standards it requires. The orchestrator resolves the applicable rules by matching file globs against the task scope, injecting only what is relevant.
 
-This produces narrow, focused prompts with clear handoff boundaries. The roster is extensible: copy the template, fill in the frontmatter, add the agent to a workflow, regenerate `AGENTS.md`.
+This produces narrow, focused prompts with clear handoff boundaries. The roster is extensible: copy the agent template, fill in the frontmatter, add the agent to a workflow phase, and regenerate.
 
-The alternative (fewer, broader agents) was rejected because prompt dilution degrades output quality. When a single agent carries too many responsibilities, its rule set becomes unwieldy and its outputs less reliable. The current count of 18 balances specialisation against coordination cost, with the `prototype.yaml` workflow available for situations where full specialisation is unnecessary.
+**`AGENTS.md` is generated, not authored.** A generator script (`context/scripts/generators/generate_agents_md.py`) reads every workflow YAML and every agent definition, then produces `AGENTS.md` as a single derived file containing the phase sequence, agent dispatch rules, spawn patterns, and state recovery procedures. This is the framework's portability mechanism: the same authoritative sources (workflow YAML and agent definitions) can be projected into `AGENTS.md` for one runtime, `CLAUDE.md` for another, or any format a different framework requires. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing `AGENTS.md` by hand is always wrong; editing the sources and regenerating is the only valid path.
 
 ---
 
