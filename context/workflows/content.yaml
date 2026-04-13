@@ -14,7 +14,7 @@ phases:
     name: Write First Draft
     depends_on: [research]
     agents:
-      - documentation  # Write first draft using technical-writer persona (Dr. Sarah Chen voice)
+      - documentation  # Write first draft using chosen persona (technical-writer or opinionated-blogger)
     outputs:
       - artefacts/content/drafts/{title}-draft.md
     validation:
@@ -23,7 +23,7 @@ phases:
       - Opening hook present
       - Concrete examples included
     notes:
-      - Agent reads context/persona/technical-writer.md
+      - Agent reads the persona specified in the task (technical-writer for guides, opinionated-blogger for blog posts)
       - "Target length: blog 400-800 words; paper longer"
 
   - id: review
@@ -60,7 +60,7 @@ phases:
 quality_gates: []
 
 workflow_rules:
-  - Always use writing persona (technical-writer by default)
+  - Always use a writing persona (technical-writer for guides, opinionated-blogger for blog posts)
   - British English throughout (colour, optimise, whilst)
   - No AI slop (em dashes, triads, vapid transitions)
   - Concrete examples, not abstract descriptions
@@ -74,5 +74,5 @@ workflow_rules:
 #
 # This workflow is for HUMAN-FACING content only (blogs, papers, guides).
 # For technical handoffs and API docs, use the docs-cleanup phase in build.yaml.
-# Always specify which persona to use (default: technical-writer).
+# Always specify which persona to use (technical-writer for guides, opinionated-blogger for blogs).
 # technical-review phase is optional — skip for non-technical content.

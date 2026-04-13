@@ -6,7 +6,7 @@ alwaysApply: false
 
 # No AI Slop
 
-**Applies to**: All agents writing human-facing content using a persona
+Applies to: all agents writing human-facing content using a persona.
 
 Human writing has intent behind every choice. AI slop appears correct but lacks substance. Follow these constraints when writing under any persona.
 

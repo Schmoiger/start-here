@@ -63,7 +63,7 @@ This context system works with multiple AI frameworks beyond Claude Code.
 **Native support**: Claude Code (CLI), Claude Desktop
 **Adaptable to**: LangGraph, CrewAI, AutoGen, Cursor, Aider, Continue, Windsurf
 
-See `context/docs/framework-adapters.md` for integration guides showing how to load agent definitions, map tools, and adapt workflows for each framework.
+See `context/docs/agentic-framework-reference.md` (Portability and Framework Adapters) for integration guides showing how to load agent definitions, map tools, and adapt workflows for each framework.
 
 ---
 
@@ -71,7 +71,7 @@ See `context/docs/framework-adapters.md` for integration guides showing how to l
 
 - **Issues**: https://github.com/Schmoiger/start-here/issues
 - **Full documentation**: `context/README.md`
-- **Framework adapters**: `context/docs/framework-adapters.md`
+- **Framework reference**: `context/docs/agentic-framework-reference.md`
 - **Customization**: See `context/README.md` for adding agents, rules, validators
 
 ---
@@ -81,7 +81,7 @@ See `context/docs/framework-adapters.md` for integration guides showing how to l
 - **18 specialized agents** - Discovery, design, development, review, testing, deployment
 - **14 standards** - Coding, testing, tech stack, documentation, workflows
 - **18 rules** - Enforceable constraints with validators
-- **4 workflows** - Default (full TDD), prototype (fast iteration), agent-effectiveness (retrospective), documentation-for-humans (blogs/papers)
+- **9 workflows** in `context/workflows/` - Including build (TDD), design, prototype, content (blogs and papers with personas), deploy, bugfix, full-test, continuous-improvement, retrospective
 - **12 templates** - Handoffs, reviews, artefacts
 
 **Total**: ~66 context files for structured, high-quality multi-agent workflows.

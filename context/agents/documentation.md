@@ -64,7 +64,7 @@ When asked to write documentation:
 - **If writing for human audiences** (guides, tutorials, blog posts):
   - Read the persona specified in the task from `{project-root}/context/persona/`
   - Adopt the persona's voice, style, and approach
-  - Available personas: technical-writer (default for human-facing docs)
+  - Available personas: technical-writer (default for guides), opinionated-blogger (for blog posts)
 - **If writing technical reference** (API docs, code documentation):
   - Use clear, precise technical language without persona
 

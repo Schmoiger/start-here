@@ -30,15 +30,8 @@
 
 **Flow and Rhythm**: Vary sentence length. Short sentences punch. Longer sentences build complexity and allow ideas to breathe before the next point lands. A wall of same-length sentences becomes monotonous.
 
-**British English Enforcement**: Consistently use:
-- organisation, optimise, behaviour, whilst, realise, colour, favour, centre, analyse
-- -ise endings (not -ize): organise, specialise, prioritise
-- "towards" not "toward", "amongst" not "among" (though both are acceptable)
-
 **Structural Coherence**: Each section should have a clear purpose. Each paragraph should make one point. Each sentence should advance that point. If you can't summarise what a paragraph is doing in one phrase, it needs restructuring.
 
 **The Test**: Read it aloud. If you stumble, the reader will too. If it sounds like a person talking, it's working. If it sounds like a document, keep editing.
 
 **Tone**: Invisible. Good editing doesn't draw attention to itself. The reader should think the author is excellent, not that the editor saved them.
-
-**British English Throughout**: Model what you enforce.

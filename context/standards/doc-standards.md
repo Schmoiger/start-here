@@ -436,7 +436,7 @@ Use Mermaid notation for all diagrams. Renders natively in GitHub, GitLab, Notio
 
 **Example:**
 ```mermaid
-flowchart LR
+flowchart TD
     A[Input] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[Other]
@@ -486,7 +486,25 @@ CI validates cross-file references on PR to main.
 
 **Enforcement:** Broken ref → CI fails → Fix before merge.
 
-### 8.2. UX/UI Documentation Standards
+### 8.2. Long-form documents (`context/docs`)
+
+Strategic papers and long catalogue references under `context/docs/` (for example Vision, Journey, Roadmap, framework reference) shall carry **maintained metadata** immediately after the H1:
+
+- `**Document Status**` (for example Draft, Approved)
+- `**Version**` — a [Semantic Versioning 2.0.0](https://semver.org/) version number: `MAJOR.MINOR.PATCH` (three non-negative integers; each component without leading zeros, as defined in the spec). This is not used like a package dependency range; it communicates how much the document's commitments changed. Treat the published Markdown (headings, normative guidance, revision history) as the versioned public surface, analogous to a declared API in the SemVer introduction.
+- While status remains Draft (or another explicitly unstable label), keep `MAJOR` at `0` (initial development: anything may change, per the spec). Prefer `0.1.0` as the first published version, then:
+  - increment **PATCH** for typographical fixes, link repairs, formatting, or clarifications that do not change meaning or structure;
+  - increment **MINOR** and reset **PATCH** to `0` for new sections, reorganisation, new normative guidance, or other substantive edits;
+  - when the document is promoted to a stable baseline (for example Approved), set `1.0.0` and continue with SemVer semantics for later incompatible vs compatible changes to that baseline.
+- Legacy metadata that used two segments only (for example `0.16`) shall be read as `0.16.0` until the line is updated to three segments.
+- `**Last Updated**` — calendar date in British English long form (for example `13 April 2026`) or ISO 8601 (`2026-04-13`)
+- Optional: `**Word Count**`, `**Reading Time**`, `**Companion**` (path to a paired document)
+
+End each metadata line with two spaces so Markdown renderers break lines between fields.
+
+Include a terminal `## Revision History` section with a table: Version, Date, Author, Changes. The **Version** column shall use the same `MAJOR.MINOR.PATCH` form. Dates in the table shall use ISO 8601 (`YYYY-MM-DD`) for sortability. When the document is also rendered through Typst, wrap the revision table in `<!-- typst-skip-start -->` and `<!-- typst-skip-end -->` so export tooling can omit boilerplate.
+
+### 8.3. UX/UI Documentation Standards
 
 **Component Documentation:**
 - Include state variations (default, hover, focus, error, loading, disabled)
@@ -495,7 +513,7 @@ CI validates cross-file references on PR to main.
 - Provide usage examples with code snippets
 
 **Design System Documentation:**
-- Maintain design tokens in `artefacts/design/design-system.md` (§1, §1.6)
+- Maintain design tokens in `artefacts/design/design-system.md` (section 1, section 1.6)
 - Document component relationships and dependencies
 - Include visual examples (screenshots or Mermaid diagrams)
 - Specify when to use vs when not to use each component
