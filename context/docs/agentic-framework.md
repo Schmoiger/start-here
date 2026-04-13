@@ -245,8 +245,8 @@ The framework's design principles are not novel; they adapt ideas from distribut
 - Fowler, M. and Lewis, J. (2014). "Microservices." martinfowler.com. The principle of smart endpoints and dumb pipes: keeping logic in the services (agents) rather than coupling it to the transport or runtime infrastructure.
 
 **Strategic principles and operating model:**
-- *New DevX Vision* (`context/docs/vision.md`). Establishes the three strategic principles (Elevate the Next Constraint, Everything as Code, Humans Above The Loop) and three shifts in perspective (Sequence Speed and Rigour, Work the Way Agents Work, Navigate Don't Arrive) that this framework implements. Covers the four-phase workflow, context hierarchy, risk-based oversight, and the autonomy horizon.
-- *Journey to New DevX* (`context/docs/journey.md`). The implementation companion to the Vision. Introduces the operating triangle (execution time, token cost, autonomy horizon), AgentOps as an operational discipline, the comprehension gap, the three maturity stages (DevX as Supervisor, Reviewer, Orchestrator), and context infrastructure. This framework implements those concepts as a portable directory structure.
+- Sinharay, A. (2026). *New DevX Vision*. `context/docs/vision.md`. Establishes the three strategic principles (Elevate the Next Constraint, Everything as Code, Humans Above The Loop) and three shifts in perspective (Sequence Speed and Rigour, Work the Way Agents Work, Navigate Don't Arrive) that this framework implements. Covers the four-phase workflow, context hierarchy, risk-based oversight, and the autonomy horizon.
+- Sinharay, A. (2026). *Journey to New DevX*. `context/docs/journey.md`. The implementation companion to the Vision. Introduces the operating triangle (execution time, token cost, autonomy horizon), AgentOps as an operational discipline, the comprehension gap, the three maturity stages (DevX as Supervisor, Reviewer, Orchestrator), and context infrastructure. This framework implements those concepts as a portable directory structure.
 
 ---
 
