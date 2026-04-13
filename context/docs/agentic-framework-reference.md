@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.3
+**Version**: 0.4
 **Last Updated**: 13 April 2026
-**Word Count**: ~8,800 words
-**Reading Time**: ~37 minutes
+**Word Count**: ~8,600 words
+**Reading Time**: ~36 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -1175,60 +1175,81 @@ def load_with_metadata(name: str):
 
 ## Measuring Effectiveness
 
-The `workflow-analyst` agent measures and improves the development workflow by analysing completed work cycles for efficiency, bottlenecks, and improvement opportunities.
+Framework improvement and measurement are governed by **`context/workflows/continuous-improvement.yaml`**, not by ad hoc scorecards. That workflow defines two **modes** (incident and retrospective), explicit **phases**, what gets **written to disk**, and a **quality gate** in retrospective mode. The `workflow-analyst` agent appears only in retrospective **review**; other phases are orchestrator- and human-led as the YAML states.
 
-### When to Measure
+### Workflow file and modes
 
-**After deployment** (recommended): Full cycle data is available. Run a complete analysis to identify what worked and what stalled.
+| Mode | Trigger | Purpose |
+|------|---------|---------|
+| **incident** | Human reports a specific failure | Capture, diagnose, fix, record one incident |
+| **retrospective** | After deployment, after a sprint, or on demand | Mine logs and git for patterns, discuss with human, fix, record |
 
-**Mid-cycle health check**: During development, to catch bottlenecks early before they compound.
+**Workflow rules** (from YAML): incident mode is human-triggered; retrospective mode is periodic or on demand; **every finding or incident must identify a fixable gap in the framework** (rules, standards, templates, scripts), not vanity metrics; in retrospective mode the **human decides** which findings to implement; incident mode proceeds once diagnosis is sound.
 
-**Quarterly trend analysis**: Compare metrics across multiple cycles to track whether the framework is improving or degrading.
+---
 
-**Troubleshooting**: When the workflow feels inefficient, run a focused analysis on the symptomatic area.
+### Incident mode (reactive)
 
-### Data Sources
+Sequential phases:
 
-The analyst draws on four categories of evidence:
+| Phase | Agents | Role |
+|-------|--------|------|
+| `report` | None (orchestrator + human) | Append a new entry to `artefacts/build/agent-incidents.md`: severity, symptom, root cause and fix initially **pending** |
+| `diagnose` | None | Trace **symptom → mechanism → file → gap** with path-level evidence; read configs and code, do not infer from names alone |
+| `fix` | `python-coder`, `typescript-coder` (parallel) | Apply changes to rules, standards, templates, or small orchestration edits; commit after each logical fix |
+| `record` | None | Update the incident entry with root cause, fix summary, and commit hash; optionally add a portability task to `artefacts/build/tasks-context-framework.md` |
 
-**Task files** (`artefacts/build/tasks.md`): Task count, completion time, blocked tasks, rework frequency.
+**Validation highlights**: diagnosis must cite specific files and complete the causal chain; `fix` must satisfy acceptance checks (for example grep confirms an anti-pattern removed).
 
-**Handoff files** (`HANDOFF.md`, `artefacts/shared/handoffs/`): Handoff completeness, clarity, and timing.
+The YAML lists `fix` with `depends_on: [diagnose, discuss]`. **Retrospective** runs `discuss` (human gate) before `fix`. **Incident** runs `diagnose` after `report`; the orchestrator should advance to `fix` once diagnosis is complete (the `discuss` phase exists only in retrospective mode).
 
-**Git history**: Commit frequency per phase, commit message quality, agent session telemetry, rework commits (fixes to previous work).
+---
 
-**Conversation flow**: Agent spawning patterns, tool usage compliance, user interruptions, token distribution.
+### Retrospective mode (proactive)
 
-### Key Metrics
+Sequential phases:
 
-**Efficiency**: Cycle duration (total time from discovery to deployment), task velocity (tasks completed per day), first-time pass rate (percentage of tasks passing review first time), token efficiency (actual vs estimated token usage).
+| Phase | Agents | Role |
+|-------|--------|------|
+| `review` | `workflow-analyst` | Read **artefacts/build/agent-interruptions.md** (questions, tool approvals, escalations), **artefacts/build/agent-incidents.md**, and **git log** bodies for **Agent-Session** telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find **patterns** with counts and examples; each finding must point at **concrete files** that would change |
+| `discuss` | None (**gate**: human approval) | Present **pattern → root cause → proposed fix**; human chooses what to act on |
+| `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
+| `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
 
-**Quality**: Rework rate (percentage of tasks requiring rework), standards adherence rate (percentage of prompts following protocols), test coverage (actual vs target).
+**Quality gate**: `discuss` (retrospective only) requires **human approval** before fixes proceed.
 
-**Health Score**: An aggregate score from 0-100, weighted across phase duration vs targets (30%), review rejection rate (20%), handoff quality (20%), tool usage efficiency (15%), and rework rate (15%).
+**Validation highlights**: git log parsed for session metrics; interruption and incident logs read; patterns evidenced; no aggregate “health scores” (explicitly disallowed by workflow rules).
 
-| Score | Assessment | Action |
-|-------|------------|--------|
-| 90-100 | Excellent | Maintain current practices |
-| 70-89 | Good | Minor optimisations |
-| 50-69 | Fair | Address top 3 bottlenecks |
-| Below 50 | Poor | Major process improvements required |
+---
 
-### Common Bottleneck Patterns
+### Data the retrospective `review` phase is built to consume
 
-**Long integration testing**: Missing mock fixtures or slow database setup. Create reusable test data in `artefacts/shared/fixtures/`.
+The YAML lists these sources explicitly:
 
-**Multiple review rejections**: Design phase skipped critical considerations. Run a lightweight review (tech-lead only) after design before the full gate.
+- **`artefacts/build/agent-interruptions.md`**: blocking moments (questions, approvals, escalations)
+- **`artefacts/build/agent-incidents.md`**: prior framework failures
+- **`git log`** with `%H`, subject, body: reconstruct **tokens=**, **duration=**, **agents=**, **dispatch=**, **interactions=**, **approvals=** from commit trailers
 
-**Coverage gaps at final gates**: Tests added late rather than in RED or after failing `coverage-gate`. Keep failing tests in RED; use BLUE only for refactors. The build workflow enforces 95% on changed or new files at `coverage-gate` and again at `quality-review` (see `build.yaml`).
+From those, the analyst is expected to answer questions such as: total tokens per agent, sprint, or task; duration per task; which agents cost the most tokens relative to output; token trends; autonomy rate (commits with orchestrator dispatch and zero interactions); distribution of human interactions and approvals. **Repeated rule violations**, **agents over token budget**, and **incidents with shared root causes** are examples of valid pattern classes.
 
-**Agent tool misuse**: Frequent permission prompts, slow execution. Agents using bash for file operations instead of Write/Edit tools. Enhance agent prompts with explicit tool requirements.
+---
 
-**Parallel execution overhead**: Context duplication and coordination overhead exceed time savings. Use parallel execution only for genuinely independent work.
+### Relationship to other artefacts
 
-### Output
+**Tasks and handoffs** (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful **secondary** context when the orchestrator or `@workflow-analyst` widens an investigation, but they are **not** the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
 
-The primary report lands at `artefacts/build/efficiency-report.md` with an executive summary, detailed metrics, bottleneck analysis, recommendations, and trend comparison. Raw data for custom analysis and dashboards lands at `artefacts/build/efficiency-data/`.
+The agent definition **`context/agents/workflow-analyst.md`** still describes broader analysis habits (for example task and handoff mining). When in doubt, **the workflow YAML wins** for phase order, outputs, and validation.
+
+---
+
+### Common fix targets (illustrative)
+
+These are examples of **fixable gaps**, not a separate scoring methodology:
+
+- **Coverage discipline**: tests landed after GREEN instead of strengthening RED or failing `coverage-gate` (see `build.yaml`).
+- **Tooling drift**: repeated bash-for-files or wrong package managers; tighten prompts or rules.
+- **Integration cost**: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
+- **Parallel misuse**: duplicated context without time savings; narrow parallel phases to truly independent work.
 
 ---
 
@@ -1313,9 +1334,10 @@ Five themes repeat across the framework's structure.
 
 ### Evaluating Workflow Health
 
-1. [Measuring Effectiveness](#measuring-effectiveness) (this document)
-2. `context/agents/workflow-analyst.md`
-3. `context/standards/workflow-standards.md`
+1. `context/workflows/continuous-improvement.yaml`
+2. [Measuring Effectiveness](#measuring-effectiveness) (this document)
+3. `context/agents/workflow-analyst.md`
+4. `context/standards/workflow-standards.md`
 
 ### Writing Human-Facing Content (Blogs, Papers, Guides)
 
