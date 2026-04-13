@@ -1,7 +1,7 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 1.3
+**Version**: 1.4
 **Last Updated**: 13 April 2026
 **Word Count**: ~8,400 words
 **Reading Time**: ~35 minutes
@@ -924,7 +924,7 @@ The task prompt template deserves particular attention. It carries rule resoluti
 
 Scripts are stored in `context/scripts/` and form the automation layer that turns the framework from a collection of ideas into an operating system with enforcement.
 
-Layout on disk: **`generators/`** holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); **`validators/`** holds pre-commit Python checks; **`tests/`** exercises validators and generators against fixtures; **`prepare-commit-msg.*`** lives alongside those directories and backs the Agent-Session commit trailers described under [Measuring Effectiveness](#measuring-effectiveness). Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
+Layout on disk: **`generators/`** holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); **`validators/`** holds pre-commit Python checks; **`tests/`** exercises validators and generators against fixtures; **`prepare-commit-msg.*`** (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to **`Agent-Session:`** lines for [Continuous improvement](#measuring-effectiveness) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
 
 ### Generators
 
@@ -955,9 +955,25 @@ A rule without a validator is a suggestion. A rule with a validator is enforceab
 
 **`validate_agent_definitions.py`**: Validates structural integrity of agent definitions: frontmatter completeness, required sections, path conventions. Run to check that agent files conform to the expected format.
 
-### Git Hooks
+### `prepare-commit-msg` hook (agent tokens on commits)
 
-**`prepare-commit-msg.py`** and **`prepare-commit-msg.sh`**: A git hook that injects agent session telemetry into commit messages. Token usage, duration, and interaction count are recorded in commit trailers, making session metrics reconstructable from `git log` without a separate metrics database.
+<a id="prepare-commit-msg-hook-agent-tokens-on-commits"></a>
+
+**Files**: `context/scripts/prepare-commit-msg.sh` (wrapper that runs `uv run python …/prepare-commit-msg.py`) and **`context/scripts/prepare-commit-msg.py`** (implementation).
+
+Git calls **`prepare-commit-msg`** with the path to the commit message draft. The Python script **only augments commits that already contain an `Agent-Session:` line** (see `context/templates/commit-message-template.md`); if that trailer is absent, it assumes a human-only commit and exits without writing.
+
+**What it does**
+
+1. **Finds Claude Code session telemetry** — From `git rev-parse --show-toplevel`, derives the Claude Code project directory under `~/.claude/projects/` (mangled repo path), then selects the **most recently modified** session folder under it.
+2. **Sums tokens** — Reads the session’s main `*.jsonl` plus `subagents/*.jsonl`, accumulating `input_tokens`, cache-related input token fields, and `output_tokens` from each line’s `message.usage` object.
+3. **Uses a watermark file** — In that same session directory it reads **`.tokens-watermark`**, a JSON file `{"in": <int>, "out": <int>}` holding **cumulative** token totals **after the last commit this hook successfully annotated**. It computes **deltas** (`current_cumulative − watermark`) and appends **`tokens=<delta_in>/<delta_out>`** to the `Agent-Session:` line (replacing an existing `tokens=…` token pair if already present). **`duration`**, **`dispatch`**, **`interactions`**, and **`approvals`** are not produced by this script—they must be supplied by the orchestrator in the message body per the commit template. After updating the message, the script **rewrites `.tokens-watermark`** with the new cumulative totals so the **next** commit records only usage **since** this one.
+
+**Edge behaviour**
+
+- **Merge and squash** commit sources are skipped entirely (no token injection).
+- If both deltas are zero, the hook does not touch the message or watermark.
+- The watermark lives **outside the repository** (next to Claude’s JSONL); deleting or losing it makes the next run attribute a **larger** delta (everything since the lost baseline)—operators should treat it as part of session-local state, not something to version in git.
 
 ### Tests
 
