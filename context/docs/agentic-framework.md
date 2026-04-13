@@ -161,8 +161,8 @@ Workflows are YAML files encoding phase dependencies, agent assignments, quality
 
 | Workflow | Purpose |
 |----------|---------|
-| **build** | Primary TDD loop: plan, red, green, blue, review, regress, deploy |
 | **design** | Discovery through design review; run before build |
+| **build** | Primary TDD loop: plan, red, green, blue, review, regress, docs cleanup |
 | **prototype** | Fast iteration, no quality gates; rewrite before production |
 | **deploy** | GCP cloud deployment after local verification |
 | **bugfix** | Empirical reproduction, diagnosis, fix, verification |
@@ -170,6 +170,8 @@ Workflows are YAML files encoding phase dependencies, agent assignments, quality
 | **content** | Human-facing writing with personas |
 | **continuous-improvement** | Incident response and retrospective analysis |
 | **retrospective** | Process review and pattern identification |
+
+Per-file summaries, phase tables, and how **design → build → deploy** compose as default delivery: `context/docs/agentic-framework-reference.md` (Workflows).
 
 Storing orchestration logic in versionable YAML rather than ad hoc conversation makes it inspectable, diffable, reviewable, and recoverable after context compaction. The orchestration process itself is a governed, versioned artefact. The trade-off is reduced flexibility for novel situations. The `prototype.yaml` workflow addresses this by providing a minimal path with no gates or rigid sequencing, suited to exploratory work where speed matters more than rigour. For production-quality work, inspectable process consistently outperforms adaptive improvisation.
 
