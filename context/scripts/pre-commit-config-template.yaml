@@ -70,6 +70,13 @@ repos:
 
 
 
+      - id: framework-docs-staleness
+        name: Check framework docs updated with context/ changes
+        entry: uv run python context/scripts/validators/framework_docs_staleness.py
+        language: python
+        files: ^context/
+        pass_filenames: false
+
       # AGENTS.md regeneration disabled - run manually when needed:
       # uv run python context/scripts/generators/generate_agents_md.py
       #

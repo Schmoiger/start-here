@@ -1,10 +1,11 @@
 # Hive Mind: Framework Reference
 
-**Document Status**: Draft
-**Version**: 1.4
-**Last Updated**: 13 April 2026
-**Word Count**: ~8,400 words
+**Document Status**: Draft  
+**Version**: 0.3.0  
+**Last Updated**: 13 April 2026  
+**Word Count**: ~8,400 words  
 **Reading Time**: ~35 minutes
+
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -37,6 +38,7 @@
 12. [Portability and Framework Adapters](#portability-and-framework-adapters)
 13. [How the Parts Connect](#how-the-parts-connect)
 14. [Reading Paths](#reading-paths)
+15. [Revision History](#revision-history)
 
 ---
 
@@ -54,9 +56,9 @@ Use this document when you need to answer questions such as:
 
 Each section covers one structural area of the framework: what it contains, how it operates, and where to make changes.
 
-The companion paper develops the *why* and the trade-offs behind those choices. As you read the catalogue below, the same posture shows up repeatedly: **explicitness** (written phases, gates, paths, recovery—not tacit convention); **durability** (artefacts and handoffs—not chat memory); **reuse** (templates, shared agents, generated registries—not one-off prose); **portability** (Markdown and YAML at the core—not a single vendor runtime); and **verification** (validators, tests, reviews, gates, telemetry—not unevidenced claims). For the full argument, see `context/docs/agentic-framework.md`.
+The companion paper develops the *why* and the trade-offs behind those choices. As you read the catalogue below, the same posture shows up repeatedly: explicitness (written phases, gates, paths, recovery—not tacit convention); durability (artefacts and handoffs—not chat memory); reuse (templates, shared agents, generated registries—not one-off prose); portability (Markdown and YAML at the core—not a single vendor runtime); and verification (validators, tests, reviews, gates, telemetry—not unevidenced claims). For the full argument, see `context/docs/agentic-framework.md`.
 
-This reference summarises the tree on disk. If anything here disagrees with an authoritative file (a workflow YAML, an agent definition, a rule, or a generator script), **trust the file** and treat the mismatch as documentation drift to fix.
+This reference summarises the tree on disk. If anything here disagrees with an authoritative file (a workflow YAML, an agent definition, a rule, or a generator script), trust the file and treat the mismatch as documentation drift to fix.
 
 ---
 
@@ -79,10 +81,10 @@ The layering determines where changes should be made. To change what agents do, 
 
 The design pattern is consistent throughout:
 
-- **define** the role or rule
-- **explain** how to use it
-- **standardise** the output
-- **validate** the result
+- define the role or rule
+- explain how to use it
+- standardise the output
+- validate the result
 
 ---
 
@@ -92,10 +94,10 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Role |
 |------|----------|------|
-| **Authoritative source** | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/templates/*.md`, `context/persona/*.md` | These define how the framework behaves. Edit these to change it. |
-| **Derived projection** | `AGENTS.md`, `CLAUDE.md` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
-| **Operator guidance** | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
-| **Enforcement** | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
+| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/templates/*.md`, `context/persona/*.md` | These define how the framework behaves. Edit these to change it. |
+| Derived projection | `AGENTS.md`, `CLAUDE.md` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
+| Operator guidance | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
+| Enforcement | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
 
 The principle: change the authoritative source, let derived projections follow. Contributors should be able to look at any file and know whether it is the right place to make a change or whether the real change needs to happen upstream.
 
@@ -131,15 +133,15 @@ Each agent definition lists the standards it depends on in its frontmatter. When
 
 Rules and standards serve different purposes, and the separation is the framework's most consequential structural decision.
 
-**Rules** are under 200 tokens each. They state what must happen: "use `uv run pytest`, not bare `pytest`"; "agents do not commit; the orchestrator commits on their behalf." They are designed for repeated injection into spawn prompts without significant context window cost. A typical agent spawn injects 5-8 rules at ~100-200 tokens each, plus the agent definition at ~500-1,000 tokens, totalling roughly 1,500-2,500 tokens of framework overhead.
+Rules are under 200 tokens each. They state what must happen: "use `uv run pytest`, not bare `pytest`"; "agents do not commit; the orchestrator commits on their behalf." They are designed for repeated injection into spawn prompts without significant context window cost. A typical agent spawn injects 5-8 rules at ~100-200 tokens each, plus the agent definition at ~500-1,000 tokens, totalling roughly 1,500-2,500 tokens of framework overhead.
 
-**Standards** run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume.
+Standards run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume.
 
 An agent executing a straightforward Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight.
 
 ### Standards Catalogue
 
-`context/standards/README.md` is the lightweight index for humans navigating the folder. The tables below describe **what each standard is for** when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
+`context/standards/README.md` is the lightweight index for humans navigating the folder. The tables below describe what each standard is for when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
 
 #### Foundational
 
@@ -187,11 +189,11 @@ alwaysApply: false
 ---
 ```
 
-**`description`**: A short summary of what the rule covers.
+`description`: A short summary of what the rule covers.
 
-**`globs`**: File patterns that determine when this rule applies. The orchestrator matches the task's files against these globs and injects only the rules whose patterns match.
+`globs`: File patterns that determine when this rule applies. The orchestrator matches the task's files against these globs and injects only the rules whose patterns match.
 
-**`alwaysApply`**: If `true`, the rule is injected into every agent spawn regardless of file scope.
+`alwaysApply`: If `true`, the rule is injected into every agent spawn regardless of file scope.
 
 The body of the rule is concise instruction text, typically structured as a table of correct vs incorrect usage, followed by a brief rationale. The entire rule stays under 200 tokens.
 
@@ -256,9 +258,9 @@ Only a subset of rules currently have matching Python validators under `context/
 
 A candidate for a new rule should pass three tests:
 
-1. **Is it binary?** Can you definitively say "followed" or "not followed"?
-2. **Does it break things?** Not just a style preference; actual failures result from ignoring it.
-3. **Is it actionable?** Can you give clear DO/DON'T commands?
+1. Is it binary? Can you definitively say "followed" or "not followed"?
+2. Does it break things? Not just a style preference; actual failures result from ignoring it.
+3. Is it actionable? Can you give clear DO/DON'T commands?
 
 If all three are true, create a rule in `rules/*.mdc` and keep it under 200 tokens. If the topic requires nuance, explanation, or judgement, it belongs in a standard, not a rule.
 
@@ -268,7 +270,7 @@ If all three are true, create a rule in `rules/*.mdc` and keep it under 200 toke
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships **one orchestrator** plus **eighteen** delegatable specialists (nineteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with **recommended model tiers** for operators who tune cost versus capability. Which agent runs in which phase is **never** implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus eighteen delegatable specialists (nineteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -311,25 +313,25 @@ testable, production-grade Python code.
 5. Write handoff
 ```
 
-**`name`**: Identifier used in workflow YAML and spawn prompts.
+`name`: Identifier used in workflow YAML and spawn prompts.
 
-**`description`**: Brief role summary. Helps the orchestrator select the right agent.
+`description`: Brief role summary. Helps the orchestrator select the right agent.
 
-**`model`**: Recommended model tier (e.g. `opus`, `sonnet`, `haiku`). The orchestrator uses this as guidance, not a hard constraint.
+`model`: Recommended model tier (e.g. `opus`, `sonnet`, `haiku`). The orchestrator uses this as guidance, not a hard constraint.
 
-**`standards`**: List of standard files the agent should read before starting work. These are loaded on demand, not injected automatically.
+`standards`: List of standard files the agent should read before starting work. These are loaded on demand, not injected automatically.
 
-**`rules`**: List of rule files that apply to this agent's work. The orchestrator injects these into the spawn prompt.
+`rules`: List of rule files that apply to this agent's work. The orchestrator injects these into the spawn prompt.
 
-**`mcp_tools`** (optional, common on specialists here): MCP server identifiers the author expects the runtime to attach for that role (for example library docs or database inspection). Other products use **`allowed_tools`** or an equivalent allow-list instead. Neither field executes by itself—it documents **intent** for whoever configures the runtime.
+`mcp_tools` (optional, common on specialists here): MCP server identifiers the author expects the runtime to attach for that role (for example library docs or database inspection). Other products use `allowed_tools` or an equivalent allow-list instead. Neither field executes by itself—it documents intent for whoever configures the runtime.
 
 The body below the frontmatter is the agent's system prompt: role definition, workflow steps, output expectations, and any role-specific constraints.
 
 ### Tool and MCP surfaces (runtime vs frontmatter)
 
-Agent YAML declares what a role *should* be able to reach; the **orchestrator runtime** (Cursor, Claude Code, a headless worker, and so on) still decides which tools and MCP servers actually exist, which paths are writable, and which invocations require human approval. Those layers live outside `context/agents/`—often in **workspace or user settings** that are **not** committed. In Cursor, permissions and MCP wiring frequently sit in **`.cursor/settings.local.json`** (typically git-ignored), so two machines with the same checkout can behave differently.
+Agent YAML declares what a role *should* be able to reach; the orchestrator runtime (Cursor, Claude Code, a headless worker, and so on) still decides which tools and MCP servers actually exist, which paths are writable, and which invocations require human approval. Those layers live outside `context/agents/`—often in workspace or user settings that are not committed. In Cursor, permissions and MCP wiring frequently sit in `.cursor/settings.local.json` (typically git-ignored), so two machines with the same checkout can behave differently.
 
-When frontmatter and local configuration **diverge**, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a **deployment alignment** problem: update the local settings (or your organisation’s standard Cursor profile) when you add `mcp_tools:` entries, add a new agent, or enable a new server—**and** keep frontmatter honest about what is truly required versus optional.
+When frontmatter and local configuration diverge, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a deployment alignment problem: update the local settings (or your organisation’s standard Cursor profile) when you add `mcp_tools:` entries, add a new agent, or enable a new server—and keep frontmatter honest about what is truly required versus optional.
 
 Rule injection and file scope (see `context/agents/orchestrator.md`) remain mandatory regardless of tool lists; missing rules cause as much pain as missing MCP entries.
 
@@ -416,48 +418,48 @@ For the phased pipeline (research through publish) used for blogs, papers, and s
 
 #### When to Use a Persona
 
-**Use a persona for**: blog posts, articles, thought leadership, technical papers, user-facing guides for non-technical audiences, marketing materials, conference talks.
+Use a persona for: blog posts, articles, thought leadership, technical papers, user-facing guides for non-technical audiences, marketing materials, conference talks.
 
-**Do not use a persona for**: technical handoffs (README, HANDOFF.md, build notes), API documentation, code references, architecture documents, design specifications, internal artefacts (requirements, tasks, review reports), code comments, error messages.
+Do not use a persona for: technical handoffs (README, HANDOFF.md, build notes), API documentation, code references, architecture documents, design specifications, internal artefacts (requirements, tasks, review reports), code comments, error messages.
 
 #### Available Personas
 
 ##### Technical Writer
 
-**File**: `context/persona/technical-writer.md`
-**Character**: Amara Osei. Eight years at Stripe documenting payment APIs, four years at Hashicorp writing infrastructure guides.
-**Use for**: Technical guides, framework documentation, practitioner reference material.
+File: `context/persona/technical-writer.md`
+Character: Amara Osei. Eight years at Stripe documenting payment APIs, four years at Hashicorp writing infrastructure guides.
+Use for: Technical guides, framework documentation, practitioner reference material.
 
 Key traits: leads with the problem, not a hook. Explains the mechanism step by step. Working examples with inputs and outputs. Names trade-offs and costs directly. Structured for reference use with scannable headings and front-loaded information. No filler.
 
 ##### Opinionated Blogger
 
-**File**: `context/persona/opinionated-blogger.md`
-**Character**: Dr. Sarah Chen. PhD from MIT, 10 years as principal engineer at Google.
-**Use for**: Blog posts, opinion pieces, thought leadership.
+File: `context/persona/opinionated-blogger.md`
+Character: Dr. Sarah Chen. PhD from MIT, 10 years as principal engineer at Google.
+Use for: Blog posts, opinion pieces, thought leadership.
 
 Key traits: provocative opening hooks. Conversational with contractions and parenthetical asides. Personal anecdotes as entry points. Self-deprecating honesty. Question-driven framing. Memorable one-liners. Short paragraphs, 2-4 minute read times.
 
 ##### Editor
 
-**File**: `context/persona/editor.md`
-**Use for**: Refining and polishing existing content. Checking voice consistency, removing AI slop, verifying British English.
+File: `context/persona/editor.md`
+Use for: Refining and polishing existing content. Checking voice consistency, removing AI slop, verifying British English.
 
 ##### Expert Reviewer
 
-**File**: `context/persona/expert-reviewer.md`
-**Use for**: Reviewing technical accuracy and completeness of human-facing content.
+File: `context/persona/expert-reviewer.md`
+Use for: Reviewing technical accuracy and completeness of human-facing content.
 
 #### Selecting a Persona
 
 The selection depends on audience and content type:
 
-- Writing a practitioner guide with code examples? **Technical writer.**
-- Writing a blog post or opinion piece? **Opinionated blogger.**
-- Writing for a non-technical audience about high-level concepts? **Opinionated blogger.**
-- Writing implementation details for developers? **Technical writer.**
-- Polishing an existing draft? **Editor.**
-- Checking technical claims? **Expert reviewer.**
+- Writing a practitioner guide with code examples? Technical writer.
+- Writing a blog post or opinion piece? Opinionated blogger.
+- Writing for a non-technical audience about high-level concepts? Opinionated blogger.
+- Writing implementation details for developers? Technical writer.
+- Polishing an existing draft? Editor.
+- Checking technical claims? Expert reviewer.
 
 All personas use British English throughout (colour, optimise, behaviour, whilst, programme, organisation).
 
@@ -469,45 +471,45 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 
 | Workflow | File | Purpose |
 |----------|------|---------|
-| **design** | `design.yaml` | Discovery through design review; run before build |
-| **build** | `build.yaml` | Primary TDD loop: plan, red, green, blue, review, regress, docs cleanup |
-| **prototype** | `prototype.yaml` | Fast iteration, no quality gates; rewrite before production |
-| **deploy** | `deploy.yaml` | GCP cloud deployment after local verification |
-| **bugfix** | `bugfix.yaml` | Empirical reproduction, diagnosis, fix, verification |
-| **full-test** | `full-test.yaml` | Complete regression across all modules |
-| **content** | `content.yaml` | Human-facing writing with personas |
-| **continuous-improvement** | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
-| **retrospective** | `retrospective.yaml` | Standalone process review and pattern identification |
+| design | `design.yaml` | Discovery through design review; run before build |
+| build | `build.yaml` | Primary TDD loop: plan, red, green, blue, review, regress, docs cleanup |
+| prototype | `prototype.yaml` | Fast iteration, no quality gates; rewrite before production |
+| deploy | `deploy.yaml` | GCP cloud deployment after local verification |
+| bugfix | `bugfix.yaml` | Empirical reproduction, diagnosis, fix, verification |
+| full-test | `full-test.yaml` | Complete regression across all modules |
+| content | `content.yaml` | Human-facing writing with personas |
+| continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
+| retrospective | `retrospective.yaml` | Standalone process review and pattern identification |
 
 <a id="design-designyaml"></a>
 <a id="the-default-workflow"></a>
 
 ### Design (`design.yaml`)
 
-**Purpose**: Discovery through design review; run before `build.yaml`.
+Purpose: Discovery through design review; run before `build.yaml`.
 
-**Pattern**: Six phases, one approval gate at the end (`design-review`).
+Pattern: Six phases, one approval gate at the end (`design-review`).
 
 | Phase | Agents (pattern) | Role |
 |-------|------------------|------|
 | `discovery` | `product-expert` then `product-owner` (sequential) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
 | `design-architecture` | `solution-architect` | Architecture, logical API contracts, data model, component design docs |
-| `design-contracts` | `database-designer` and `api-designer` (**parallel**) | Physical schema and migrations; OpenAPI with HTTP semantics |
+| `design-contracts` | `database-designer` and `api-designer` (parallel) | Physical schema and migrations; OpenAPI with HTTP semantics |
 | `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows |
 | `design-visuals` | `visual-designer` | Visual assets under `artefacts/design/visuals/` |
 | `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `visual-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
 
-**Design gate** (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
+Design gate (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
 
 <a id="build-buildyaml"></a>
 
 ### Build (`build.yaml`)
 
-**Purpose**: Primary TDD implementation pipeline after design approval.
+Purpose: Primary TDD implementation pipeline after design approval.
 
-**Pattern**: Subtask-driven TDD with automated coverage gate, per-sprint review, local deployment, scoped regression, documentation cleanup, and two final approval gates. Runs against `artefacts/build/subtask-plan.yaml` (subtasks, file scopes, acceptance criteria). Canonical phase order and validation live in the YAML; this is a digest.
+Pattern: Subtask-driven TDD with automated coverage gate, per-sprint review, local deployment, scoped regression, documentation cleanup, and two final approval gates. Runs against `artefacts/build/subtask-plan.yaml` (subtasks, file scopes, acceptance criteria). Canonical phase order and validation live in the YAML; this is a digest.
 
-Sixteen phases (plus a **sprint loop** that repeats for each sprint in `subtask-plan.yaml`). High-level shape:
+Sixteen phases (plus a sprint loop that repeats for each sprint in `subtask-plan.yaml`). High-level shape:
 
 ```
 task-planning → tasks-review (gate) → schema-migration →
@@ -520,25 +522,25 @@ docs-cleanup → quality-review (gate) → final-holistic-review (gate)
 | Phase | Role |
 |-------|------|
 | `task-planning` | `tech-lead` decomposes work into subtasks with verifiable acceptance criteria and file scopes (`artefacts/build/subtask-plan.yaml`). |
-| `tasks-review` | `tech-lead`, `solution-architect`, `principles-reviewer` in **parallel**; gate on subtask plan before implementation. |
+| `tasks-review` | `tech-lead`, `solution-architect`, `principles-reviewer` in parallel; gate on subtask plan before implementation. |
 | `schema-migration` | `devops` writes and applies migrations when the sprint changes schema (skippable if no schema work). |
 | `tdd-red` | `functional-tester` writes failing tests for all ACs. |
 | `test-plan-review` | `code-reviewer` checks every AC maps to a failing test before GREEN. |
-| `tdd-green` | `python-coder` and `typescript-coder` in **parallel**; minimal code to pass tests; no test edits. |
-| `coverage-gate` | `functional-tester`; **automated gate** — at least 95% coverage on **changed or new files** only; fail sends work back to RED. |
-| `tdd-blue` | Both coders in **parallel**; refactor only; tests stay green. |
-| `sprint-review` | `code-reviewer`, `ui-tester`, `security-tester` in **parallel**; browser screenshots for new UI; findings feed the next sprint. |
+| `tdd-green` | `python-coder` and `typescript-coder` in parallel; minimal code to pass tests; no test edits. |
+| `coverage-gate` | `functional-tester`; automated gate — at least 95% coverage on changed or new files only; fail sends work back to RED. |
+| `tdd-blue` | Both coders in parallel; refactor only; tests stay green. |
+| `sprint-review` | `code-reviewer`, `ui-tester`, `security-tester` in parallel; browser screenshots for new UI; findings feed the next sprint. |
 | `local-deployment` | `devops` local apply, smoke test, rollback notes. |
 | `unit-regression` | `functional-tester` on changed modules (95% on changed scope). |
 | `integration-regression` | `functional-tester` on changed interfaces. |
-| `e2e-regression` | `ui-tester` and `code-reviewer` in **parallel**; screenshots and design compliance for changed workflows. |
+| `e2e-regression` | `ui-tester` and `code-reviewer` in parallel; screenshots and design compliance for changed workflows. |
 | `docs-cleanup` | `documentation` archives and updates README, API docs, `HANDOFF.md`, tasks. |
 | `quality-review` | `tech-lead` only; code and documentation gate before holistic review. |
-| `final-holistic-review` | `solution-architect`, `tech-lead`, `visual-designer`, `principles-reviewer` in **parallel**; all must approve. |
+| `final-holistic-review` | `solution-architect`, `tech-lead`, `visual-designer`, `principles-reviewer` in parallel; all must approve. |
 
-**Build gates** (see `quality_gates` in `build.yaml`): `tasks-review` (approval), `coverage-gate` (automated threshold), `quality-review` (approval), `final-holistic-review` (approval). Thresholds and metrics are defined in YAML; aggregate coverage for quality-review is 95% on new or changed files, not a separate 97% deployment-review phase in this workflow file.
+Build gates (see `quality_gates` in `build.yaml`): `tasks-review` (approval), `coverage-gate` (automated threshold), `quality-review` (approval), `final-holistic-review` (approval). Thresholds and metrics are defined in YAML; aggregate coverage for quality-review is 95% on new or changed files, not a separate 97% deployment-review phase in this workflow file.
 
-**Subtask execution**: RED, GREEN, and BLUE run as orchestrated subtasks per stream (Python and TypeScript can progress in parallel with disjoint `file_scope`). Recovery uses `HANDOFF.md`, `artefacts/build/dispatch.md`, and `subtask-plan.yaml` status fields (see `state_recovery` in `build.yaml`).
+Subtask execution: RED, GREEN, and BLUE run as orchestrated subtasks per stream (Python and TypeScript can progress in parallel with disjoint `file_scope`). Recovery uses `HANDOFF.md`, `artefacts/build/dispatch.md`, and `subtask-plan.yaml` status fields (see `state_recovery` in `build.yaml`).
 
 ```mermaid
 ---
@@ -552,7 +554,7 @@ flowchart TD
 
 #### When to use design and build
 
-Use **design** then **build** for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
+Use design then build for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
 Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#the-prototype-workflow) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) when you want process or framework follow-up; they are not phases inside `build.yaml`.
 
@@ -561,9 +563,9 @@ Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#t
 
 ### Prototype (`prototype.yaml`)
 
-**Purpose**: Fast iteration without quality gates.
+Purpose: Fast iteration without quality gates.
 
-**Use for**: POCs, experiments, spikes, throwaway code.
+Use for: POCs, experiments, spikes, throwaway code.
 
 The prototype workflow trades rigour for speed: 4 phases, no quality gates, 5 agents.
 
@@ -630,7 +632,7 @@ Cleaning up a prototype takes longer than rewriting it properly. The technical d
 
 ### Deploy (`deploy.yaml`)
 
-**Purpose**: GCP cloud deployment and deployment review **after** `build.yaml` has completed local deployment and verification.
+Purpose: GCP cloud deployment and deployment review after `build.yaml` has completed local deployment and verification.
 
 | Phase | Agents | Role |
 |-------|--------|------|
@@ -643,33 +645,33 @@ Cleaning up a prototype takes longer than rewriting it properly. The technical d
 
 ### Bugfix (`bugfix.yaml`)
 
-**Purpose**: Reproduce, fix, and verify defects with **empirical evidence** (browser screenshots and file-cited causal chains), not feature-sized planning.
+Purpose: Reproduce, fix, and verify defects with empirical evidence (browser screenshots and file-cited causal chains), not feature-sized planning.
 
-**Shape**: `reproduce` (gated; `ui-tester` and `functional-tester` in parallel) → `fix` (failing test first, then `python-coder` / `typescript-coder` as needed) → `verify` (gated; parallel UI and test confirmation). Evidence lands under `artefacts/bugfix/`.
+Shape: `reproduce` (gated; `ui-tester` and `functional-tester` in parallel) → `fix` (failing test first, then `python-coder` / `typescript-coder` as needed) → `verify` (gated; parallel UI and test confirmation). Evidence lands under `artefacts/bugfix/`.
 
-**Quality gates**: Evidence gates on `reproduce` and `verify`—tests passing alone is not sufficient; see YAML for gate metrics and workflow rules (TDD on the fix, commit body records causal chain).
+Quality gates: Evidence gates on `reproduce` and `verify`—tests passing alone is not sufficient; see YAML for gate metrics and workflow rules (TDD on the fix, commit body records causal chain).
 
 <a id="full-test-full-testyaml"></a>
 
 ### Full-test (`full-test.yaml`)
 
-**Purpose**: Full-suite testing across **all** modules—release confidence, not the per-feature changed-scope regressions in `build.yaml`.
+Purpose: Full-suite testing across all modules—release confidence, not the per-feature changed-scope regressions in `build.yaml`.
 
-**Phases** (sequential): `full-unit-test` → `full-integration-test` → `full-e2e-test` → `quality-check` (tech-lead gate). Reports under `artefacts/test-results/`. **No code changes** in this workflow—failures are reported for follow-up elsewhere.
+Phases (sequential): `full-unit-test` → `full-integration-test` → `full-e2e-test` → `quality-check` (tech-lead gate). Reports under `artefacts/test-results/`. No code changes in this workflow—failures are reported for follow-up elsewhere.
 
-**When to run**: Before merging a long-running branch to main, after large refactors, or on demand for health checks (see YAML `workflow_rules`).
+When to run: Before merging a long-running branch to main, after large refactors, or on demand for health checks (see YAML `workflow_rules`).
 
 <a id="content-contentyaml"></a>
 <a id="human-facing-content-workflow"></a>
 
 ### Content (`content.yaml`)
 
-**File**: `context/workflows/content.yaml`
-**Pattern**: Sequential chain — `product-expert` for research, then `documentation` with a **different persona per phase** (draft → editor → optional expert reviewer → finalize).
-**Use for**: External-facing prose: blogs, papers, guides, talks, marketing where voice matters.
-**Do not use for**: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use [Design](#design-designyaml) then [Build](#build-buildyaml) with `doc-standards.md` without personas.
+File: `context/workflows/content.yaml`
+Pattern: Sequential chain — `product-expert` for research, then `documentation` with a different persona per phase (draft → editor → optional expert reviewer → finalize).
+Use for: External-facing prose: blogs, papers, guides, talks, marketing where voice matters.
+Do not use for: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use [Design](#design-designyaml) then [Build](#build-buildyaml) with `doc-standards.md` without personas.
 
-Five phases, **no** quality gates (YAML `quality_gates: []`); typical wall time about **2–4 hours**. Shape, validation strings, and `workflow_rules` live in **`content.yaml`**; this subsection is a digest only.
+Five phases, no quality gates (YAML `quality_gates: []`); typical wall time about 2–4 hours. Shape, validation strings, and `workflow_rules` live in `content.yaml`; this subsection is a digest only.
 
 ```
 research → draft → review → technical-review (optional) → finalize
@@ -720,25 +722,25 @@ flowchart TD
 | `research` | `product-expert` | Audience, purpose, key messages, sources | Research notes (see YAML `outputs`) |
 | `draft` | `documentation` | `technical-writer` or `opinionated-blogger` | `artefacts/content/drafts/{title}-draft.md` |
 | `review` | `documentation` | `editor` | `artefacts/content/drafts/{title}-reviewed.md` |
-| `technical-review` | `documentation` | `expert-reviewer` (**optional** — skip for non-technical pieces) | `artefacts/content/drafts/{title}-tech-reviewed.md` |
+| `technical-review` | `documentation` | `expert-reviewer` (optional — skip for non-technical pieces) | `artefacts/content/drafts/{title}-tech-reviewed.md` |
 | `finalize` | `documentation` | Publication formatting per task | `artefacts/content/published/{title}.md` |
 
-Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in **`context/rules/no-ai-slop.mdc`**). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
+Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in `context/rules/no-ai-slop.mdc`). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
 
 ### Continuous improvement (`continuous-improvement.yaml`)
 
 <a id="measuring-effectiveness"></a>
 
-Framework improvement and measurement are governed by **`context/workflows/continuous-improvement.yaml`**, not by ad hoc scorecards. That workflow defines two **modes** (incident and retrospective), explicit **phases**, what gets **written to disk**, and a **quality gate** in retrospective mode. The `workflow-analyst` agent appears only in retrospective **review**; other phases are orchestrator- and human-led as the YAML states.
+Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `workflow-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
 
 #### Workflow file and modes
 
 | Mode | Trigger | Purpose |
 |------|---------|---------|
-| **incident** | Human reports a specific failure | Capture, diagnose, fix, record one incident |
-| **retrospective** | After deployment, after a sprint, or on demand | Mine logs and git for patterns, discuss with human, fix, record |
+| incident | Human reports a specific failure | Capture, diagnose, fix, record one incident |
+| retrospective | After deployment, after a sprint, or on demand | Mine logs and git for patterns, discuss with human, fix, record |
 
-**Workflow rules** (from YAML): incident mode is human-triggered; retrospective mode is periodic or on demand; **every finding or incident must identify a fixable gap in the framework** (rules, standards, templates, scripts), not vanity metrics; in retrospective mode the **human decides** which findings to implement; incident mode proceeds once diagnosis is sound.
+Workflow rules (from YAML): incident mode is human-triggered; retrospective mode is periodic or on demand; every finding or incident must identify a fixable gap in the framework (rules, standards, templates, scripts), not vanity metrics; in retrospective mode the human decides which findings to implement; incident mode proceeds once diagnosis is sound.
 
 ---
 
@@ -748,14 +750,14 @@ Sequential phases:
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `report` | None (orchestrator + human) | Append a new entry to `artefacts/build/agent-incidents.md`: severity, symptom, root cause and fix initially **pending** |
-| `diagnose` | None | Trace **symptom → mechanism → file → gap** with path-level evidence; read configs and code, do not infer from names alone |
+| `report` | None (orchestrator + human) | Append a new entry to `artefacts/build/agent-incidents.md`: severity, symptom, root cause and fix initially pending |
+| `diagnose` | None | Trace symptom → mechanism → file → gap with path-level evidence; read configs and code, do not infer from names alone |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Apply changes to rules, standards, templates, or small orchestration edits; commit after each logical fix |
 | `record` | None | Update the incident entry with root cause, fix summary, and commit hash; optionally add a portability task to `artefacts/build/tasks-context-framework.md` |
 
-**Validation highlights**: diagnosis must cite specific files and complete the causal chain; `fix` must satisfy acceptance checks (for example grep confirms an anti-pattern removed).
+Validation highlights: diagnosis must cite specific files and complete the causal chain; `fix` must satisfy acceptance checks (for example grep confirms an anti-pattern removed).
 
-The YAML lists `fix` with `depends_on: [diagnose, discuss]`. **Retrospective** runs `discuss` (human gate) before `fix`. **Incident** runs `diagnose` after `report`; the orchestrator should advance to `fix` once diagnosis is complete (the `discuss` phase exists only in retrospective mode).
+The YAML lists `fix` with `depends_on: [diagnose, discuss]`. Retrospective runs `discuss` (human gate) before `fix`. Incident runs `diagnose` after `report`; the orchestrator should advance to `fix` once diagnosis is complete (the `discuss` phase exists only in retrospective mode).
 
 ---
 
@@ -765,14 +767,14 @@ Sequential phases:
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read **artefacts/build/agent-interruptions.md** (questions, tool approvals, escalations), **artefacts/build/agent-incidents.md**, and **git log** bodies for **Agent-Session** telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find **patterns** with counts and examples; each finding must point at **concrete files** that would change |
-| `discuss` | None (**gate**: human approval) | Present **pattern → root cause → proposed fix**; human chooses what to act on |
+| `review` | `workflow-analyst` | Read artefacts/build/agent-interruptions.md (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
+| `discuss` | None (gate: human approval) | Present pattern → root cause → proposed fix; human chooses what to act on |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
 | `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
 
-**Quality gate**: `discuss` (retrospective only) requires **human approval** before fixes proceed.
+Quality gate: `discuss` (retrospective only) requires human approval before fixes proceed.
 
-**Validation highlights**: git log parsed for session metrics; interruption and incident logs read; patterns evidenced; no aggregate “health scores” (explicitly disallowed by workflow rules).
+Validation highlights: git log parsed for session metrics; interruption and incident logs read; patterns evidenced; no aggregate “health scores” (explicitly disallowed by workflow rules).
 
 ---
 
@@ -780,42 +782,42 @@ Sequential phases:
 
 The YAML lists these sources explicitly:
 
-- **`artefacts/build/agent-interruptions.md`**: blocking moments (questions, approvals, escalations)
-- **`artefacts/build/agent-incidents.md`**: prior framework failures
-- **`git log`** with `%H`, subject, body: reconstruct **tokens=**, **duration=**, **agents=**, **dispatch=**, **interactions=**, **approvals=** from commit trailers
+- `artefacts/build/agent-interruptions.md`: blocking moments (questions, approvals, escalations)
+- `artefacts/build/agent-incidents.md`: prior framework failures
+- `git log` with `%H`, subject, body: reconstruct tokens=, duration=, agents=, dispatch=, interactions=, approvals= from commit trailers
 
-From those, the analyst is expected to answer questions such as: total tokens per agent, sprint, or task; duration per task; which agents cost the most tokens relative to output; token trends; autonomy rate (commits with orchestrator dispatch and zero interactions); distribution of human interactions and approvals. **Repeated rule violations**, **agents over token budget**, and **incidents with shared root causes** are examples of valid pattern classes.
+From those, the analyst is expected to answer questions such as: total tokens per agent, sprint, or task; duration per task; which agents cost the most tokens relative to output; token trends; autonomy rate (commits with orchestrator dispatch and zero interactions); distribution of human interactions and approvals. Repeated rule violations, agents over token budget, and incidents with shared root causes are examples of valid pattern classes.
 
 ---
 
 #### Relationship to other artefacts
 
-**Tasks and handoffs** (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful **secondary** context when the orchestrator or `@workflow-analyst` widens an investigation, but they are **not** the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
+Tasks and handoffs (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful secondary context when the orchestrator or `@workflow-analyst` widens an investigation, but they are not the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
 
-The agent definition **`context/agents/workflow-analyst.md`** still describes broader analysis habits (for example task and handoff mining). When in doubt, **the workflow YAML wins** for phase order, outputs, and validation.
+The agent definition `context/agents/workflow-analyst.md` still describes broader analysis habits (for example task and handoff mining). When in doubt, the workflow YAML wins for phase order, outputs, and validation.
 
 ---
 
 #### Common fix targets (illustrative)
 
-These are examples of **fixable gaps**, not a separate scoring methodology:
+These are examples of fixable gaps, not a separate scoring methodology:
 
-- **Coverage discipline**: tests landed after GREEN instead of strengthening RED or failing `coverage-gate` (see `build.yaml`).
-- **Tooling drift**: repeated bash-for-files or wrong package managers; tighten prompts or rules.
-- **Integration cost**: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
-- **Parallel misuse**: duplicated context without time savings; narrow parallel phases to truly independent work.
+- Coverage discipline: tests landed after GREEN instead of strengthening RED or failing `coverage-gate` (see `build.yaml`).
+- Tooling drift: repeated bash-for-files or wrong package managers; tighten prompts or rules.
+- Integration cost: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
+- Parallel misuse: duplicated context without time savings; narrow parallel phases to truly independent work.
 
 <a id="retrospective-retrospectiveyaml"></a>
 
 ### Retrospective (`retrospective.yaml`)
 
-**Purpose**: Standalone proactive review—`workflow-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. **Not** the same file as `continuous-improvement.yaml` (that file adds **incident** mode and git **Agent-Session** mining in its retrospective path).
+Purpose: Standalone proactive review—`workflow-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. Not the same file as `continuous-improvement.yaml` (that file adds incident mode and git Agent-Session mining in its retrospective path).
 
 | Phase | Agents | Role |
 |-------|--------|------|
 | `review` | `workflow-analyst` | Read `agent-interruptions.md`, `agent-metrics.log`, `agent-incidents.md`; report patterns with file:line evidence |
-| `discuss` | None (**human gate**) | Human selects which findings to implement |
-| `fix` | `python-coder`, `typescript-coder` (**parallel**) | Approved framework changes |
+| `discuss` | None (human gate) | Human selects which findings to implement |
+| `fix` | `python-coder`, `typescript-coder` (parallel) | Approved framework changes |
 | `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
 
 See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recovery`.
@@ -824,7 +826,7 @@ See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recov
 
 ## Orchestration Patterns
 
-This section documents the **four** coordination shapes the shipped workflows actually use: **single agent**, **sequential chain**, **hive** (parallel agents on a shared contract, with orchestrator scope rules), and **iterative loop** (gates and rework). They are vocabulary for reading YAML—not separate runtime features. On disk, behaviour is whatever each workflow file says: **phase order**, **`parallel: true`** (see `parallel_planning` in `build.yaml`), **disjoint `file_scope`** where required, and **gates**.
+This section documents the four coordination shapes the shipped workflows actually use: single agent, sequential chain, hive (parallel agents on a shared contract, with orchestrator scope rules), and iterative loop (gates and rework). They are vocabulary for reading YAML—not separate runtime features. On disk, behaviour is whatever each workflow file says: phase order, `parallel: true` (see `parallel_planning` in `build.yaml`), disjoint `file_scope` where required, and gates.
 
 ### Single Agent
 
@@ -832,11 +834,11 @@ One specialist, one task, no dependencies. Use for isolated tasks with clear req
 
 ### Sequential Chain
 
-Agents in strict order, each depending on the previous output. Use for tasks with clear dependencies and quality gates: most of **design** and **build** is sequential between phases.
+Agents in strict order, each depending on the previous output. Use for tasks with clear dependencies and quality gates: most of design and build is sequential between phases.
 
 ### Hive
 
-Parallel agents working against a **shared contract** (same tests, same subtask plan, same architecture outputs) with orchestrator-enforced **scope** and merge discipline. The canonical case in **`build.yaml`** is **TDD GREEN** and **TDD BLUE**: `python-coder` and `typescript-coder` run together with **disjoint `file_scope`** but the **same** failing-then-passing test suite (`parallel_planning` and `subtask_execution` in the YAML spell this out). **`design-contracts`** is hive-like too: both designers extend the same architecture handoff. **Tasks review**, **sprint-review**, **e2e-regression**, and **final-holistic-review** are parallel **reviewers** on the same body of work—again shared-artefact coordination.
+Parallel agents working against a shared contract (same tests, same subtask plan, same architecture outputs) with orchestrator-enforced scope and merge discipline. The canonical case in `build.yaml` is TDD GREEN and TDD BLUE: `python-coder` and `typescript-coder` run together with disjoint `file_scope` but the same failing-then-passing test suite (`parallel_planning` and `subtask_execution` in the YAML spell this out). `design-contracts` is hive-like too: both designers extend the same architecture handoff. Tasks review, sprint-review, e2e-regression, and final-holistic-review are parallel reviewers on the same body of work—again shared-artefact coordination.
 
 ### Iterative Loop
 
@@ -853,29 +855,29 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 
 ### How the default path uses patterns
 
-**`design.yaml`**
+`design.yaml`
 
-- **Discovery**: Sequential (`product-expert` then `product-owner`).
-- **Architecture**: Single agent (`solution-architect`).
-- **Contracts**: Parallel **hive-like** pair (`database-designer` and `api-designer` on the same architecture outputs).
-- **UI then visuals**: Sequential (`ui-designer` then `visual-designer`).
-- **Design review**: Sequential reviewers with **iterative** return to earlier phases when required.
+- Discovery: Sequential (`product-expert` then `product-owner`).
+- Architecture: Single agent (`solution-architect`).
+- Contracts: Parallel hive-like pair (`database-designer` and `api-designer` on the same architecture outputs).
+- UI then visuals: Sequential (`ui-designer` then `visual-designer`).
+- Design review: Sequential reviewers with iterative return to earlier phases when required.
 
-**`build.yaml`**
+`build.yaml`
 
-- **Planning and test planning**: Sequential (`tech-lead` then `code-reviewer` on the test plan).
-- **Tasks review**, **sprint-review**, **e2e-regression**, **final-holistic-review**: `parallel: true`, but agents share the **same** plan, sprint surface, workflows under test, or release candidate—**hive-style** coordination.
-- **TDD GREEN / BLUE**: Hive (parallel coders, **shared tests**, disjoint file scopes).
-- **Coverage gate**: Single agent; may **loop** back to RED.
-- **Regression after local deployment**: Sequential unit → integration → e2e (the e2e phase may list two agents in parallel with shared workflow scope).
-- **Quality review** then **final holistic review**: Gate then parallel approvers on the same implementation.
+- Planning and test planning: Sequential (`tech-lead` then `code-reviewer` on the test plan).
+- Tasks review, sprint-review, e2e-regression, final-holistic-review: `parallel: true`, but agents share the same plan, sprint surface, workflows under test, or release candidate—hive-style coordination.
+- TDD GREEN / BLUE: Hive (parallel coders, shared tests, disjoint file scopes).
+- Coverage gate: Single agent; may loop back to RED.
+- Regression after local deployment: Sequential unit → integration → e2e (the e2e phase may list two agents in parallel with shared workflow scope).
+- Quality review then final holistic review: Gate then parallel approvers on the same implementation.
 
 ### Choosing a pattern
 
-1. Single isolated task? **Single agent.**
-2. Same plan, tests, or design handoff for everyone? **Hive** (all `parallel: true` phases in default path YAML behave this way).
-3. Strict A-then-B output dependency? **Sequential chain.**
-4. Output needs iterative refinement? **Iterative loop.**
+1. Single isolated task? Single agent.
+2. Same plan, tests, or design handoff for everyone? Hive (all `parallel: true` phases in default path YAML behave this way).
+3. Strict A-then-B output dependency? Sequential chain.
+4. Output needs iterative refinement? Iterative loop.
 
 ### Token Optimisation
 
@@ -895,7 +897,7 @@ Templates are stored in `context/templates/` and define standard output shapes f
 
 Standardised shapes reduce ambiguity for both writers and readers. When every review follows the same structure, or every handoff includes the same fields, downstream agents and humans can consume the output predictably. Automation becomes reliable when the shape is known in advance.
 
-The **`commit-message-template.md`** is not only for humans formatting commits: it defines the **`Agent-Session:`** trailer that **`prepare-commit-msg`** completes and that **`continuous-improvement.yaml`** expects the orchestrator to parse from **`git log`** during retrospective **review**. The template specifies a machine-readable line with **`tool=`**, **`model=`**, **`agents=`** (role names), optional **`duration=`**, **`dispatch=`** (`orchestrator` or `human`), **`interactions=`**, and **`approvals=`**; the hook appends **`tokens=`** (input/output token counts). Together those fields support questions in the continuous-improvement workflow (for example cost per agent, autonomy when `dispatch=orchestrator` with zero interactions, and human-approval load). See `context/templates/commit-message-template.md` for the full field table and counting rules.
+The `commit-message-template.md` is not only for humans formatting commits: it defines the `Agent-Session:` trailer that `prepare-commit-msg` completes and that `continuous-improvement.yaml` expects the orchestrator to parse from `git log` during retrospective review. The template specifies a machine-readable line with `tool=`, `model=`, `agents=` (role names), optional `duration=`, `dispatch=` (`orchestrator` or `human`), `interactions=`, and `approvals=`; the hook appends `tokens=` (input/output token counts). Together those fields support questions in the continuous-improvement workflow (for example cost per agent, autonomy when `dispatch=orchestrator` with zero interactions, and human-approval load). See `context/templates/commit-message-template.md` for the full field table and counting rules.
 
 ### Available Templates
 
@@ -924,11 +926,11 @@ The task prompt template deserves particular attention. It carries rule resoluti
 
 Scripts are stored in `context/scripts/` and form the automation layer that turns the framework from a collection of ideas into an operating system with enforcement.
 
-Layout on disk: **`generators/`** holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); **`validators/`** holds pre-commit Python checks; **`tests/`** exercises validators and generators against fixtures; **`prepare-commit-msg.*`** (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to **`Agent-Session:`** lines for [Continuous improvement](#measuring-effectiveness) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
+Layout on disk: `generators/` holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); `validators/` holds pre-commit Python checks; `tests/` exercises validators and generators against fixtures; `prepare-commit-msg.*` (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to `Agent-Session:` lines for [Continuous improvement](#measuring-effectiveness) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
 
 ### Generators
 
-**`generators/generate_agents_md.py`**: Reads every workflow YAML and every agent definition, then produces the derived `AGENTS.md` registry. This is the framework's primary generation pipeline. Run it after changing any workflow or agent definition:
+`generators/generate_agents_md.py`: Reads every workflow YAML and every agent definition, then produces the derived `AGENTS.md` registry. This is the framework's primary generation pipeline. Run it after changing any workflow or agent definition:
 
 ```bash
 uv run python context/scripts/generators/generate_agents_md.py
@@ -953,27 +955,27 @@ A rule without a validator is a suggestion. A rule with a validator is enforceab
 
 ### Agent Definition Validator
 
-**`validate_agent_definitions.py`**: Validates structural integrity of agent definitions: frontmatter completeness, required sections, path conventions. Run to check that agent files conform to the expected format.
+`validate_agent_definitions.py`: Validates structural integrity of agent definitions: frontmatter completeness, required sections, path conventions. Run to check that agent files conform to the expected format.
 
 ### `prepare-commit-msg` hook (agent tokens on commits)
 
 <a id="prepare-commit-msg-hook-agent-tokens-on-commits"></a>
 
-**Files**: `context/scripts/prepare-commit-msg.sh` (wrapper that runs `uv run python …/prepare-commit-msg.py`) and **`context/scripts/prepare-commit-msg.py`** (implementation).
+Files: `context/scripts/prepare-commit-msg.sh` (wrapper that runs `uv run python …/prepare-commit-msg.py`) and `context/scripts/prepare-commit-msg.py` (implementation).
 
-Git calls **`prepare-commit-msg`** with the path to the commit message draft. The Python script **only augments commits that already contain an `Agent-Session:` line** (see `context/templates/commit-message-template.md`); if that trailer is absent, it assumes a human-only commit and exits without writing.
+Git calls `prepare-commit-msg` with the path to the commit message draft. The Python script only augments commits that already contain an `Agent-Session:` line (see `context/templates/commit-message-template.md`); if that trailer is absent, it assumes a human-only commit and exits without writing.
 
-**What it does**
+What it does
 
-1. **Finds Claude Code session telemetry** — It does **not** look up a single hard-coded path name. From `git rev-parse --show-toplevel` it builds `~/.claude/projects/<repo-root-with-each-slash-replaced-by-a-hyphen>` (the same string transform Claude Code uses for project folders in this hook’s implementation). Under that directory it lists session subfolders and picks the **most recently modified** one—so the active session is **whichever directory Claude last wrote to**, not one global filename shared by every repository. Token lines are then read from that folder’s `*.jsonl` files as described below.
-2. **Sums tokens** — Reads the session’s main `*.jsonl` plus `subagents/*.jsonl`, accumulating `input_tokens`, cache-related input token fields, and `output_tokens` from each line’s `message.usage` object.
-3. **Uses a watermark file** — In that same session directory it reads **`.tokens-watermark`**, a JSON file `{"in": <int>, "out": <int>}` holding **cumulative** token totals **after the last commit this hook successfully annotated**. It computes **deltas** (`current_cumulative − watermark`) and appends **`tokens=<delta_in>/<delta_out>`** to the `Agent-Session:` line (replacing an existing `tokens=…` token pair if already present). **`duration`**, **`dispatch`**, **`interactions`**, and **`approvals`** are not produced by this script—they must be supplied by the orchestrator in the message body per the commit template. After updating the message, the script **rewrites `.tokens-watermark`** with the new cumulative totals so the **next** commit records only usage **since** this one.
+1. Finds Claude Code session telemetry — It does not look up a single hard-coded path name. From `git rev-parse --show-toplevel` it builds `~/.claude/projects/<repo-root-with-each-slash-replaced-by-a-hyphen>` (the same string transform Claude Code uses for project folders in this hook’s implementation). Under that directory it lists session subfolders and picks the most recently modified one—so the active session is whichever directory Claude last wrote to, not one global filename shared by every repository. Token lines are then read from that folder’s `*.jsonl` files as described below.
+2. Sums tokens — Reads the session’s main `*.jsonl` plus `subagents/*.jsonl`, accumulating `input_tokens`, cache-related input token fields, and `output_tokens` from each line’s `message.usage` object.
+3. Uses a watermark file — In that same session directory it reads `.tokens-watermark`, a JSON file `{"in": <int>, "out": <int>}` holding cumulative token totals after the last commit this hook successfully annotated. It computes deltas (`current_cumulative − watermark`) and appends `tokens=<delta_in>/<delta_out>` to the `Agent-Session:` line (replacing an existing `tokens=…` token pair if already present). `duration`, `dispatch`, `interactions`, and `approvals` are not produced by this script—they must be supplied by the orchestrator in the message body per the commit template. After updating the message, the script rewrites `.tokens-watermark` with the new cumulative totals so the next commit records only usage since this one.
 
-**Edge behaviour**
+Edge behaviour
 
-- **Merge and squash** commit sources are skipped entirely (no token injection).
+- Merge and squash commit sources are skipped entirely (no token injection).
 - If both deltas are zero, the hook does not touch the message or watermark.
-- The watermark lives **outside the repository** (next to Claude’s JSONL); deleting or losing it makes the next run attribute a **larger** delta (everything since the lost baseline)—operators should treat it as part of session-local state, not something to version in git.
+- The watermark lives outside the repository (next to Claude’s JSONL); deleting or losing it makes the next run attribute a larger delta (everything since the lost baseline)—operators should treat it as part of session-local state, not something to version in git.
 
 ### Tests
 
@@ -985,11 +987,11 @@ The scripts directory includes its own test suite in `context/scripts/tests/`. T
 
 The framework is designed to survive changes in agent runtime or orchestration platform. Agent definitions are markdown files. Workflows are YAML. The core logic lives in the system prompt body, which is framework-agnostic. The frontmatter carries runtime-specific metadata (tool names, model tiers) that adapts to each platform.
 
-The code samples in this section are **illustrative**: they show how to load markdown prompts and map tool names, not a supported SDK matrix. Your runtime may use different client libraries, different tool primitives, or different sandbox rules—keep the portable assets (markdown, YAML, rules, standards) and replace the adapter glue per platform.
+The code samples in this section are illustrative: they show how to load markdown prompts and map tool names, not a supported SDK matrix. Your runtime may use different client libraries, different tool primitives, or different sandbox rules—keep the portable assets (markdown, YAML, rules, standards) and replace the adapter glue per platform.
 
 ### Agent Definition Portability
 
-Frontmatter may list **`mcp_tools:`** (this tree) or **`allowed_tools:`** (other runtimes)—both are platform-specific hints. The markdown **body** (role, workflow, constraints) is what ports cleanly. Moving to a new platform means mapping those hints onto that platform’s tool and MCP configuration (often a settings file or admin console, not something validators in this repo can see); the prompt itself travels unchanged.
+Frontmatter may list `mcp_tools:` (this tree) or `allowed_tools:` (other runtimes)—both are platform-specific hints. The markdown body (role, workflow, constraints) is what ports cleanly. Moving to a new platform means mapping those hints onto that platform’s tool and MCP configuration (often a settings file or admin console, not something validators in this repo can see); the prompt itself travels unchanged.
 
 ### Adapter Examples
 
@@ -1082,7 +1084,7 @@ aider --read context/agents/python-coder.md \
 
 Most frameworks do not parse YAML frontmatter automatically. Two approaches:
 
-**Strip frontmatter** for frameworks that only need the system prompt:
+Strip frontmatter for frameworks that only need the system prompt:
 
 ```python
 def load_prompt_only(name: str) -> str:
@@ -1091,7 +1093,7 @@ def load_prompt_only(name: str) -> str:
     return "---".join(parts[2:]) if len(parts) > 2 else content
 ```
 
-**Parse frontmatter** for frameworks that can use the metadata (model choice, tool list, rule references):
+Parse frontmatter for frameworks that can use the metadata (model choice, tool list, rule references):
 
 ```python
 import yaml
@@ -1108,7 +1110,7 @@ def load_with_metadata(name: str):
 
 ## How the Parts Connect
 
-End to end: **workflows** pick which **agent** runs in each phase and which **outputs** must exist; the orchestrator loads that agent's **rules** (injected) and **standards** (referenced), wraps the task in the **task prompt template**, and dispatches execution; agents write artefacts that match **templates**; **validators** and **hooks** ensure the committed tree still matches the declared rules; **state recovery** blocks in YAML plus `HANDOFF.md` let a new session resume after compaction. The subsections below spell out each pairwise relationship.
+End to end: workflows pick which agent runs in each phase and which outputs must exist; the orchestrator loads that agent's rules (injected) and standards (referenced), wraps the task in the task prompt template, and dispatches execution; agents write artefacts that match templates; validators and hooks ensure the committed tree still matches the declared rules; state recovery blocks in YAML plus `HANDOFF.md` let a new session resume after compaction. The subsections below spell out each pairwise relationship.
 
 ### Agents Read Rules and Standards
 
@@ -1185,3 +1187,17 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 2. [Writing Personas](#writing-personas) (this document)
 3. `context/workflows/content.yaml`
 4. `context/rules/no-ai-slop.mdc`
+
+---
+
+<!-- typst-skip-start -->
+
+## Revision History
+
+| Version | Date       | Author    | Changes |
+| ------- | ---------- | --------- | ------- |
+| 0.1.0   | 2026-04-13 | Initial   | Standalone framework reference: topology, source-of-truth tiers, standards, rules, agents (including personas and tool surfaces), workflows (one subsection per shipped YAML), templates, scripts and hooks, portability, orchestration patterns, reading paths; material from removed standalone docs absorbed here. |
+| 0.2.0   | 2026-04-13 | Editorial | Document metadata and revision history aligned with `context/standards/doc-standards.md` section 8.2; prose emphasis normalised outside fenced examples (fence-safe). |
+| 0.3.0   | 2026-04-13 | Editorial | Versioning policy: `MAJOR.MINOR.PATCH` per [Semantic Versioning 2.0.0](https://semver.org/) (section 8.2); draft documents stay on major version `0`; revision table uses three-part versions. |
+
+<!-- typst-skip-end -->
