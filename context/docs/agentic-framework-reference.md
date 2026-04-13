@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.1
+**Version**: 0.2
 **Last Updated**: 13 April 2026
-**Word Count**: ~6,500 words
-**Reading Time**: ~28 minutes
+**Word Count**: ~8,200 words
+**Reading Time**: ~35 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -21,6 +21,7 @@
 8. [Workflows](#workflows)
    - [The Default Workflow](#the-default-workflow)
    - [The Prototype Workflow](#the-prototype-workflow)
+   - [Human-Facing Content Workflow](#human-facing-content-workflow)
    - [Other Workflows](#other-workflows)
 9. [Orchestration Patterns](#orchestration-patterns)
 10. [Templates](#templates)
@@ -615,6 +616,315 @@ If a prototype validates its hypothesis and should become production code:
 
 Cleaning up a prototype takes longer than rewriting it properly. The technical debt in prototype code is architectural, not superficial.
 
+### Human-Facing Content Workflow
+
+**File**: `context/workflows/content.yaml`
+**Pattern**: Sequential chain; one agent (`documentation`) with different personas per phase
+**Use for**: Blog posts, articles, thought leadership, technical papers, user-facing guides for non-technical audiences, marketing copy, conference talks, announcements
+
+**Do not use for**: technical handoffs (README, HANDOFF.md), API or reference documentation, architecture or design specifications, internal artefacts (requirements, tasks, review reports), code comments, error messages, log output.
+
+For technical documentation and repository docs, use the default workflow (`build.yaml` / design path) without personas.
+
+#### Summary
+
+Five phases, zero quality gates, typical duration 2-4 hours. The `documentation` agent reads a different persona file each phase (see [Writing Personas](#writing-personas) for persona definitions and selection).
+
+```
+research → draft → review → technical-review (optional) → finalize
+```
+
+```mermaid
+---
+title: Human-Facing Content Workflow
+---
+flowchart TD
+    start([Start]) --> research
+
+    subgraph research["Research"]
+        pe["product-expert"]
+    end
+
+    research --> draft
+
+    subgraph draft["Draft"]
+        d1["documentation + persona"]
+    end
+
+    draft --> review
+
+    subgraph review["Editorial review"]
+        d2["documentation + editor"]
+    end
+
+    review --> tech_review
+
+    subgraph tech_review["Technical review"]
+        d3["documentation + expert-reviewer"]
+    end
+
+    tech_review --> fin["Finalize: documentation"]
+
+    fin --> finish([Published])
+
+    classDef optionalStyle fill:#e9ecef,stroke:#868e96,stroke-dasharray: 5 5
+
+    class tech_review optionalStyle
+```
+
+#### Phase 1: Research and context gathering
+
+**Agent**: `product-expert`
+
+**Purpose**: Gather background context, clarify audience and purpose, surface key messages.
+
+**You invoke**:
+
+```
+@product-expert Gather context for [blog post / paper / guide] about [topic]
+
+Audience: [engineering leaders / practitioners / general public]
+Purpose: [educate / persuade / inform]
+Key messages: [list 3-5 key points]
+```
+
+**Outputs**: Research notes, source materials, audience analysis.
+
+**Duration**: about 30 minutes (can be short if you already have material; the phase still anchors the pipeline in `content.yaml`).
+
+---
+
+#### Phase 2: Draft
+
+**Agent**: `documentation` with **technical-writer** or **opinionated-blogger** persona (files under `context/persona/`).
+
+**Purpose**: First draft in the correct voice. The agent must read the chosen persona file before writing.
+
+**You invoke**:
+
+```
+@documentation Write [blog post / guide / paper] about [topic]
+
+Use [technical-writer / opinionated-blogger] persona
+(context/persona/technical-writer.md or context/persona/opinionated-blogger.md).
+
+Audience: [engineering leaders / practitioners]
+Length: [400-800 words for blog; longer for guide or paper]
+Key messages:
+- [message 1]
+- [message 2]
+- [message 3]
+
+Context: [background, project details, research notes]
+```
+
+**Outputs**: `artefacts/content/drafts/{title}-draft.md`
+
+**Checks before handoff**: persona voice sustained; concrete examples; British English; no patterns forbidden in `context/rules/no-ai-slop.mdc` (see also [AI slop and editorial constraints](#ai-slop-and-editorial-constraints) below).
+
+**Duration**: about 1-2 hours.
+
+---
+
+#### Phase 3: Editorial review
+
+**Agent**: `documentation` with **editor** persona (`context/persona/editor.md`).
+
+**Purpose**: Voice consistency, tighten structure, strip AI slop.
+
+**You invoke**:
+
+```
+@documentation Review draft for editorial quality
+
+Use editor persona (context/persona/editor.md).
+
+Check for:
+- Voice consistency (chosen persona maintained throughout)
+- British English throughout
+- No AI slop (em dashes as connectors, triads, empty transitions)
+- Concrete examples (not abstract descriptions)
+- Scannable structure (short paragraphs, clear headings)
+```
+
+**Outputs**: `artefacts/content/drafts/{title}-reviewed.md`
+
+**Duration**: about 30 minutes.
+
+---
+
+#### Phase 4: Technical review (optional)
+
+**Agent**: `documentation` with **expert-reviewer** persona (`context/persona/expert-reviewer.md`).
+
+**Purpose**: Verify technical accuracy of claims, code samples, and product references.
+
+**Skip when**: purely non-technical content, a domain expert already signed off, or low technical depth.
+
+**You invoke**:
+
+```
+@documentation Technical review for accuracy
+
+Use expert-reviewer persona (context/persona/expert-reviewer.md).
+
+Verify:
+- Technical claims are accurate
+- Code examples work
+- Product and API references are correct
+- No misleading statements
+```
+
+**Outputs**: `artefacts/content/drafts/{title}-tech-reviewed.md`
+
+**Duration**: about 30 minutes.
+
+---
+
+#### Phase 5: Finalize
+
+**Agent**: `documentation` (no persona switch required; follows `doc-standards.md` and publication format).
+
+**Purpose**: Final edits, platform formatting, metadata, move to published location.
+
+**You invoke**:
+
+```
+@documentation Finalize content for publication
+
+Format for: [Medium / blog / conference paper]
+Add metadata: date, author, tags
+Move to: artefacts/content/published/{title}.md
+```
+
+**Outputs**: `artefacts/content/published/{title}.md`
+
+**Duration**: about 30 minutes.
+
+---
+
+#### Content type guidelines
+
+**Blog posts (about 400-800 words)**
+
+1. Opening hook (question, observation, or tension)
+2. Three to five sections with clear headings
+3. Concrete examples with numbers where possible
+4. Closing that states why it matters
+
+Target read time about 2-4 minutes.
+
+**Technical papers (2000+ words)**
+
+1. Abstract (about 150 words)
+2. Introduction with hook
+3. Background and related work
+4. Main body (three to seven sections)
+5. Discussion ("So what?")
+6. Conclusion with actionable takeaways
+
+Include data, figures, references, and working code where relevant.
+
+**User guides (variable length)**
+
+1. Problem the guide solves
+2. Quick start (three to five steps)
+3. Common use cases (question-led)
+4. Troubleshooting
+
+Keep tone conversational but task-focused.
+
+---
+
+#### British English reminders
+
+| American | British |
+|----------|---------|
+| optimize | optimise |
+| organization | organisation |
+| behavior | behaviour |
+| while (stylistic) | whilst (where appropriate) |
+| program (TV, schedule) | programme |
+| color | colour |
+| analyze | analyse |
+| -ize endings | -ise where British usage requires |
+
+---
+
+#### AI slop and editorial constraints
+
+The rule file `context/rules/no-ai-slop.mdc` applies to persona-driven content. In brief:
+
+**Avoid**: em dashes (—) as connectors; three-beat lists ("fast, reliable, secure"); empty transitions ("Furthermore", "In today's fast-paced world"); marketing superlatives without evidence; filler sentences.
+
+**Prefer**: short sentences; varied list lengths; hooks that introduce a real idea; specific numbers and examples; honest limits.
+
+---
+
+#### Example: technical handoff versus persona blog
+
+**Without persona** (correct for README or API docs):
+
+```markdown
+# JWT Authentication
+
+## Overview
+
+Access tokens expire after 15 minutes; refresh tokens after 7 days.
+
+## Endpoints
+
+- POST /auth/login
+- POST /auth/refresh
+```
+
+Tone: direct, neutral, no narrative voice.
+
+**With persona** (blog or opinion piece): conversational hook, question-led sections, disclosure where claims are generalisations, still no banned punctuation patterns from `no-ai-slop.mdc`. (When illustrating voice, keep examples compliant; avoid em dashes even inside quoted blog prose.)
+
+---
+
+#### Tips
+
+**Before starting**: fix audience (leaders vs practitioners), three to five key messages, content shape (blog vs paper vs guide), and gather sources.
+
+**While drafting**: read the persona file first; open with tension or a real question; after each factual block, ask what changes for the reader.
+
+**After drafting**: read aloud; search for American spellings; remove triads and connector em dashes; cut paragraphs that add no new information.
+
+---
+
+#### Common issues
+
+| Symptom | Remedy |
+|---------|--------|
+| Reads like an essay rubric, not a person | Add contractions, specifics, one honest limitation |
+| Abstract claims ("many users") | Replace with measurable detail ("51% in a sample of 10,000") |
+| American spellings | Systematic replace; run British English checks |
+| Weak opening | Start from observation, disagreement, or question |
+| AI slop patterns | Rewrite sentences; break lists of three into two plus a separate sentence |
+
+---
+
+#### Comparison with the default workflow
+
+| Aspect | Human-facing content (`content.yaml`) | Default (`build.yaml`) |
+|--------|--------------------------------------|-------------------------|
+| Phases | 5 | 14 |
+| Personas | Required | No (technical tone) |
+| Duration | 2-4 hours | 2-3 days typical |
+| Quality gates | 0 (per-phase checks only) | 3 |
+| Typical output | Blogs, papers, guides | Production code, tests, technical docs |
+| Voice | Persona-led | Direct, evidence-led |
+
+---
+
+#### See also
+
+- `context/workflows/content.yaml` (source of truth for phase IDs and validation)
+- [Writing Personas](#writing-personas) (persona files and when to use each)
+- `context/standards/doc-standards.md` (technical documentation structure; complements this workflow for non-persona docs)
+
 ### Other Workflows
 
 | Workflow | Purpose | Typical Duration |
@@ -622,7 +932,7 @@ Cleaning up a prototype takes longer than rewriting it properly. The technical d
 | `bugfix.yaml` | Reproduce, diagnose, fix, and verify defects. Empirical evidence pattern rather than feature-development pattern. | Hours |
 | `deploy.yaml` | GCP cloud deployment after local verification. | 1-2 hours |
 | `full-test.yaml` | Complete regression across all modules. Separated from targeted testing to distinguish changed-scope verification from release-confidence testing. | 1-2 hours |
-| `content.yaml` | Human-facing written content using writing personas. Different outputs and style requirements from code work. | 2-4 hours |
+| `content.yaml` | Human-facing content with personas. Full runbook: [Human-Facing Content Workflow](#human-facing-content-workflow). | 2-4 hours |
 | `continuous-improvement.yaml` | Incident response (reactive) and retrospective analysis (proactive). The framework's mechanism for evolving itself. | Variable |
 | `retrospective.yaml` | Process review and pattern identification. Modelled directly rather than folded into informal meetings. | 1-2 hours |
 
@@ -723,6 +1033,8 @@ The task prompt template deserves particular attention. It carries rule resoluti
 ## Writing Personas
 
 Personas are stored in `context/persona/` and provide voice guidance for human-facing content. They are used by the `documentation` agent when writing blogs, technical papers, user guides, and marketing materials. They are explicitly *not* used for technical handoffs, API documentation, architecture documents, or internal artefacts.
+
+For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Human-Facing Content Workflow](#human-facing-content-workflow) under Workflows.
 
 ### When to Use a Persona
 
@@ -1082,3 +1394,10 @@ Five themes repeat across the framework's structure.
 1. [Measuring Effectiveness](#measuring-effectiveness) (this document)
 2. `context/agents/workflow-analyst.md`
 3. `context/standards/workflow-standards.md`
+
+### Writing Human-Facing Content (Blogs, Papers, Guides)
+
+1. [Human-Facing Content Workflow](#human-facing-content-workflow) (this document)
+2. [Writing Personas](#writing-personas) (this document)
+3. `context/workflows/content.yaml`
+4. `context/rules/no-ai-slop.mdc`

@@ -81,7 +81,7 @@ See `context/docs/agentic-framework-reference.md` (Portability and Framework Ada
 - **18 specialized agents** - Discovery, design, development, review, testing, deployment
 - **14 standards** - Coding, testing, tech stack, documentation, workflows
 - **18 rules** - Enforceable constraints with validators
-- **4 workflows** - Default (full TDD), prototype (fast iteration), agent-effectiveness (retrospective), documentation-for-humans (blogs/papers)
+- **9 workflows** in `context/workflows/` - Including build (TDD), design, prototype, content (blogs and papers with personas), deploy, bugfix, full-test, continuous-improvement, retrospective
 - **12 templates** - Handoffs, reviews, artefacts
 
 **Total**: ~66 context files for structured, high-quality multi-agent workflows.

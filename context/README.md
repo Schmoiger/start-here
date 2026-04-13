@@ -162,8 +162,7 @@ context/
 │   └── continuous-improvement.yaml # Incident response + retrospective
 ├── docs/                          # Design essays and operator reference
 │   ├── agentic-framework.md            # Why the framework exists (essay)
-│   ├── agentic-framework-reference.md # What it contains and how to run it
-│   ├── workflow-documentation-for-humans.md # Content workflow with personas
+│   ├── agentic-framework-reference.md # What it contains and how to run it (incl. content workflow)
 │   ├── vision.md · journey.md · roadmap.md # New DevX programme documents
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
 ├── persona/                       # Writing voice for human-facing content
