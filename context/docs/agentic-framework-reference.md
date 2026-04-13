@@ -1,7 +1,7 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 1.2
+**Version**: 1.3
 **Last Updated**: 13 April 2026
 **Word Count**: ~8,400 words
 **Reading Time**: ~35 minutes
@@ -826,8 +826,6 @@ See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recov
 
 This section documents the **four** coordination shapes the shipped workflows actually use: **single agent**, **sequential chain**, **hive** (parallel agents on a shared contract, with orchestrator scope rules), and **iterative loop** (gates and rework). They are vocabulary for reading YAML—not separate runtime features. On disk, behaviour is whatever each workflow file says: **phase order**, **`parallel: true`** (see `parallel_planning` in `build.yaml`), **disjoint `file_scope`** where required, and **gates**.
 
-**Out of scope here:** “Swarm” exploration (many agents trying different approaches to the same problem, pick-or-merge the winner) is **not** represented in `context/workflows/*.yaml`. It appears only in forward-looking product narrative—see `context/docs/vision.md` (Build phase, glossary) and **Limitations** in `context/docs/agentic-framework.md`. Do not expect a `parallel: true` phase in this repository to mean swarm; almost all parallelism in **`design.yaml`** and **`build.yaml`** is **hive-style** (shared plan, tests, architecture, or release candidate).
-
 ### Single Agent
 
 One specialist, one task, no dependencies. Use for isolated tasks with clear requirements: fix a specific bug, add a simple feature, write documentation.
@@ -896,6 +894,8 @@ Templates are stored in `context/templates/` and define standard output shapes f
 ### Why Templates Exist
 
 Standardised shapes reduce ambiguity for both writers and readers. When every review follows the same structure, or every handoff includes the same fields, downstream agents and humans can consume the output predictably. Automation becomes reliable when the shape is known in advance.
+
+The **`commit-message-template.md`** is not only for humans formatting commits: it defines the **`Agent-Session:`** trailer that **`prepare-commit-msg`** completes and that **`continuous-improvement.yaml`** expects the orchestrator to parse from **`git log`** during retrospective **review**. The template specifies a machine-readable line with **`tool=`**, **`model=`**, **`agents=`** (role names), optional **`duration=`**, **`dispatch=`** (`orchestrator` or `human`), **`interactions=`**, and **`approvals=`**; the hook appends **`tokens=`** (input/output token counts). Together those fields support questions in the continuous-improvement workflow (for example cost per agent, autonomy when `dispatch=orchestrator` with zero interactions, and human-approval load). See `context/templates/commit-message-template.md` for the full field table and counting rules.
 
 ### Available Templates
 
