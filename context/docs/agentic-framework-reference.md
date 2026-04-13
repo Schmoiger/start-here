@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.2
+**Version**: 0.3
 **Last Updated**: 13 April 2026
-**Word Count**: ~8,200 words
-**Reading Time**: ~35 minutes
+**Word Count**: ~8,800 words
+**Reading Time**: ~37 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -388,166 +388,79 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 
 ### The Default Workflow
 
-**File**: `context/workflows/build.yaml` and `context/workflows/design.yaml`
-**Pattern**: Full TDD with comprehensive reviews and testing
-**Use for**: Production code, critical features, quality-focused development
+**Files**: `context/workflows/design.yaml` then `context/workflows/build.yaml`. Cloud deployment after local verification is `deploy.yaml`.
 
-The default workflow runs 14 phases through 3 quality gates using all 18 agents.
+**Pattern**: Design gate, then subtask-driven TDD with automated coverage gate, per-sprint review, local deployment, scoped regression, documentation cleanup, and two final approval gates.
+
+**Use for**: Production code, critical features, quality-focused development.
+
+Production delivery is split on purpose: **design** captures requirements and reviewed artefacts before code; **build** runs the implementation pipeline against `artefacts/build/subtask-plan.yaml` (subtasks, file scopes, acceptance criteria). The canonical phase order and validation rules live in the YAML files; this section summarises them.
+
+#### Design (`design.yaml`)
+
+Six phases, one approval gate at the end.
+
+| Phase | Agents (pattern) | Role |
+|-------|------------------|------|
+| `discovery` | `product-expert` then `product-owner` (sequential) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
+| `design-architecture` | `solution-architect` | Architecture, logical API contracts, data model, component design docs |
+| `design-contracts` | `database-designer` and `api-designer` (**parallel**) | Physical schema and migrations; OpenAPI with HTTP semantics |
+| `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows |
+| `design-visuals` | `visual-designer` | Visual assets under `artefacts/design/visuals/` |
+| `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `visual-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
+
+**Design gate** (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
+
+#### Build (`build.yaml`)
+
+Sixteen phases (plus a **sprint loop** that repeats for each sprint in `subtask-plan.yaml`). High-level shape:
 
 ```
-discovery → design → design-review (GATE) →
-tdd-red → tdd-green → tdd-blue →
-unit-test → integration-test → e2e-test →
-quality-review (GATE) → docs-cleanup →
-deployment → deployment-review (GATE) → retrospective (optional)
+task-planning → tasks-review (gate) → schema-migration →
+  [ per sprint: tdd-red → test-plan-review → tdd-green → coverage-gate (gate) →
+    tdd-blue → sprint-review ] →
+local-deployment → unit-regression → integration-regression → e2e-regression →
+docs-cleanup → quality-review (gate) → final-holistic-review (gate)
 ```
+
+| Phase | Role |
+|-------|------|
+| `task-planning` | `tech-lead` decomposes work into subtasks with verifiable acceptance criteria and file scopes (`artefacts/build/subtask-plan.yaml`). |
+| `tasks-review` | `tech-lead`, `solution-architect`, `principles-reviewer` in **parallel**; gate on subtask plan before implementation. |
+| `schema-migration` | `devops` writes and applies migrations when the sprint changes schema (skippable if no schema work). |
+| `tdd-red` | `functional-tester` writes failing tests for all ACs. |
+| `test-plan-review` | `code-reviewer` checks every AC maps to a failing test before GREEN. |
+| `tdd-green` | `python-coder` and `typescript-coder` in **parallel**; minimal code to pass tests; no test edits. |
+| `coverage-gate` | `functional-tester`; **automated gate** — at least 95% coverage on **changed or new files** only; fail sends work back to RED. |
+| `tdd-blue` | Both coders in **parallel**; refactor only; tests stay green. |
+| `sprint-review` | `code-reviewer`, `ui-tester`, `security-tester` in **parallel**; browser screenshots for new UI; findings feed the next sprint. |
+| `local-deployment` | `devops` local apply, smoke test, rollback notes. |
+| `unit-regression` | `functional-tester` on changed modules (95% on changed scope). |
+| `integration-regression` | `functional-tester` on changed interfaces. |
+| `e2e-regression` | `ui-tester` and `code-reviewer` in **parallel**; screenshots and design compliance for changed workflows. |
+| `docs-cleanup` | `documentation` archives and updates README, API docs, `HANDOFF.md`, tasks. |
+| `quality-review` | `tech-lead` only; code and documentation gate before holistic review. |
+| `final-holistic-review` | `solution-architect`, `tech-lead`, `visual-designer`, `principles-reviewer` in **parallel**; all must approve. |
+
+**Build gates** (see `quality_gates` in `build.yaml`): `tasks-review` (approval), `coverage-gate` (automated threshold), `quality-review` (approval), `final-holistic-review` (approval). Thresholds and metrics are defined in YAML; aggregate coverage for quality-review is 95% on new or changed files, not a separate 97% deployment-review phase in this workflow file.
+
+**Subtask execution**: RED, GREEN, and BLUE run as orchestrated subtasks per stream (Python and TypeScript can progress in parallel with disjoint `file_scope`). Recovery uses `HANDOFF.md`, `artefacts/build/dispatch.md`, and `subtask-plan.yaml` status fields (see `state_recovery` in `build.yaml`).
 
 ```mermaid
 ---
-title: Default Workflow
+title: Default delivery (high level)
 ---
 flowchart TD
-    start([Start]) --> discovery
-
-    subgraph discovery["Discovery"]
-        pe["product-expert"]
-        po["product-owner"]
-        pe --> po
-    end
-
-    discovery --> design
-
-    subgraph design["Design (parallel)"]
-        sa["solution-architect"]
-        dd["database-designer"]
-        ad["api-designer"]
-        ud["ui-designer"]
-        vd["visual-designer"]
-    end
-
-    design --> design_review
-
-    subgraph design_review["Design Review Gate"]
-        dr1["tech-lead APPROVE"]
-        dr2["code-reviewer"]
-        dr3["principles-reviewer"]
-        dr4["visual-designer"]
-        dr5["security-tester"]
-        dr1 --> dr2 --> dr3 --> dr4 --> dr5
-    end
-
-    design_review --> tdd_red
-
-    subgraph tdd_red["TDD RED"]
-        ft1["functional-tester writes failing tests"]
-    end
-
-    tdd_red --> tdd_green
-
-    subgraph tdd_green["TDD GREEN (parallel)"]
-        pc1["python-coder"]
-        tc1["typescript-coder"]
-    end
-
-    tdd_green --> tdd_blue
-
-    subgraph tdd_blue["TDD BLUE (parallel)"]
-        pc2["python-coder refactors"]
-        tc2["typescript-coder refactors"]
-    end
-
-    tdd_blue --> testing
-
-    subgraph testing["Testing"]
-        ft2["functional-tester: unit"]
-        ft3["functional-tester: integration"]
-        ut["ui-tester: e2e + screenshots"]
-        ft2 --> ft3 --> ut
-    end
-
-    testing --> quality_review
-
-    subgraph quality_review["Quality Review Gate"]
-        qr1["tech-lead APPROVE"]
-        qr2["code-reviewer"]
-        qr3["principles-reviewer"]
-        qr4["visual-designer"]
-        qr5["security-tester"]
-        qr1 --> qr2 --> qr3 --> qr4 --> qr5
-    end
-
-    quality_review --> docs
-
-    subgraph docs["Documentation Cleanup"]
-        doc["documentation agent"]
-    end
-
-    docs --> deployment
-
-    subgraph deployment["Deployment"]
-        gcp["devops"]
-    end
-
-    deployment --> deployment_review
-
-    subgraph deployment_review["Deployment Review Gate"]
-        tl["tech-lead"]
-    end
-
-    deployment_review --> retro
-
-    subgraph retro["Retrospective (optional)"]
-        wa["workflow-analyst"]
-    end
-
-    retro --> finish([Complete])
-
-    classDef gateStyle fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px
-    classDef optionalStyle fill:#e9ecef,stroke:#868e96,stroke-dasharray: 5 5
-
-    class design_review,quality_review,deployment_review gateStyle
-    class retro optionalStyle
+    start([Start]) --> design_yaml["design.yaml through design-review gate"]
+    design_yaml --> build_yaml["build.yaml through final-holistic-review"]
+    build_yaml --> deploy_yaml["deploy.yaml when needed"]
 ```
 
-#### Phase-by-Phase Guide
+#### When to Use the Default Path
 
-**Discovery** (sequential): `product-expert` clarifies requirements through conversation, then `product-owner` formalises them into structured requirements and user stories. Outputs land in `artefacts/product/`.
+Use **design** then **build** for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
-**Design** (parallel): Five agents work simultaneously on architecture, database schema, API specification, UI structure, and visual design. This is the framework's primary use of the parallel swarm pattern. Outputs land in `artefacts/architecture/` and `artefacts/design/`.
-
-**Design Review** (sequential gate): Five reviewers assess the design in order. The `tech-lead` must approve before subsequent reviewers begin. A "CHANGES REQUIRED" result returns the workflow to the design phase. This gate has two hard criteria: zero architecture blockers and zero design security issues.
-
-**TDD RED** (single agent): `functional-tester` writes tests that define the intended behaviour. All tests must fail when first run. This is the contract that implementation will satisfy.
-
-**TDD GREEN** (parallel): `python-coder` and `typescript-coder` implement code to make the failing tests pass. They work simultaneously against the shared test suite. No test modifications are allowed during this phase; coders make the tests pass, not the other way around.
-
-**TDD BLUE** (parallel): The same two coders refactor the implementation for quality: remove duplication, improve naming, simplify logic. Tests must still pass at 100%. No new functionality is added.
-
-**Testing** (sequential): Unit tests verify coverage (target: 95%), integration tests verify API contracts and service interactions, and UI end-to-end tests verify complete user workflows with browser screenshots.
-
-**Quality Review** (sequential gate): The same five reviewers as the design review, but now assessing the implementation. Hard criteria: 95% test coverage, zero critical security issues, at least one UI screenshot, and visual regression pass.
-
-**Documentation Cleanup** (single agent): `documentation` updates README files, API documentation, and archives superseded artefacts.
-
-**Deployment** (single agent): `devops` deploys to staging and prepares production deployment.
-
-**Deployment Review** (gate): `tech-lead` reviews the deployment, confirms monitoring is configured, and verifies the rollback plan. Coverage threshold rises to 97% at this gate.
-
-**Retrospective** (optional): `workflow-analyst` analyses the workflow cycle for bottlenecks and efficiency improvements.
-
-#### Quality Gates Summary
-
-| Gate | Phase | Key Thresholds |
-|------|-------|---------------|
-| Design Review | After design | 0 architecture blockers, 0 design security issues |
-| Quality Review | After testing | 95% coverage, 0 critical issues, 1+ screenshot |
-| Deployment Review | Before production | 97% coverage, deployment verified, rollback tested |
-
-#### When to Use the Default Workflow
-
-Use it for production features, quality-critical work, and anything that will be maintained long-term. Expect 2-3 days for a typical feature.
-
-Do not use it for prototyping, experiments, or throwaway code. Use the prototype workflow instead.
+Do not use this path for throwaway spikes; use [The Prototype Workflow](#the-prototype-workflow) instead. Run **retrospective** or **continuous-improvement** workflows when you want process or framework follow-up; they are not phases inside `build.yaml`.
 
 ### The Prototype Workflow
 
@@ -908,12 +821,12 @@ Tone: direct, neutral, no narrative voice.
 
 #### Comparison with the default workflow
 
-| Aspect | Human-facing content (`content.yaml`) | Default (`build.yaml`) |
-|--------|--------------------------------------|-------------------------|
-| Phases | 5 | 14 |
+| Aspect | Human-facing content (`content.yaml`) | Default (`design.yaml` + `build.yaml`) |
+|--------|--------------------------------------|--------------------------------------|
+| Phases | 5 | 6 design + 16 build (sprint loop repeats in build) |
 | Personas | Required | No (technical tone) |
-| Duration | 2-4 hours | 2-3 days typical |
-| Quality gates | 0 (per-phase checks only) | 3 |
+| Duration | 2-4 hours | Multi-day; scales with sprints and scope |
+| Quality gates | 0 (per-phase checks only) | 1 design + 4 build (see build `quality_gates`) |
 | Typical output | Blogs, papers, guides | Production code, tests, technical docs |
 | Voice | Persona-led | Direct, evidence-led |
 
@@ -952,7 +865,7 @@ Agents in strict order, each depending on the previous output. Use for tasks wit
 
 ### Parallel Swarm
 
-Independent agents running simultaneously with no shared state. Use when tasks are truly independent and can be merged later: the design phase runs five agents in parallel. Token cost is higher (context duplicated across agents) but execution is 40-50% faster.
+Independent agents running simultaneously with no shared state. Use when tasks are truly independent and can be merged later: for example `design-contracts` runs `database-designer` and `api-designer` in parallel, and `tasks-review` runs three reviewers in parallel. Token cost is higher (context duplicated across agents) but execution is often materially faster than strict sequencing.
 
 ### Hive
 
@@ -968,20 +881,29 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 |---------|-------|------------|--------------|-------------|
 | Single | Fast | Low | None | Bug fix, documentation |
 | Sequential | Slow | Low | Linear | TDD phases, review gates |
-| Parallel Swarm | Fastest | High | None | Design phase |
+| Parallel Swarm | Fastest | High | None | Contract design, tasks-review, sprint-review, e2e-regression |
 | Hive | Fast | High | Shared artefacts | Parallel coders with shared tests |
 | Iterative | Varies | Medium | Approval loops | Quality gates |
 
-### How the Default Workflow Uses Patterns
+### How the Default Path Uses Patterns
 
-- **Discovery**: Sequential chain (product-expert then product-owner)
-- **Design**: Parallel swarm (five designers, independent)
-- **Design review**: Sequential chain with iterative loop (five reviewers; may reject back to design)
-- **TDD RED**: Single agent (functional-tester)
-- **TDD GREEN / BLUE**: Hive (parallel coders, shared test suite)
-- **Testing**: Sequential chain (unit then integration then e2e)
-- **Quality review**: Sequential chain with iterative loop
-- **Deployment**: Sequential chain (deploy then review)
+**`design.yaml`**
+
+- **Discovery**: Sequential chain (`product-expert` then `product-owner`).
+- **Architecture**: Single agent (`solution-architect`).
+- **Contracts**: Parallel swarm (`database-designer` and `api-designer`).
+- **UI then visuals**: Sequential chain (`ui-designer` then `visual-designer`).
+- **Design review**: Sequential chain with iterative loop (five reviewers in order; may return to earlier design phases).
+
+**`build.yaml`**
+
+- **Planning and test planning**: Sequential chain (`tech-lead` planning; `code-reviewer` on test plan).
+- **Tasks review** and **sprint-review** and **e2e-regression**: Parallel swarm where phases list multiple agents with `parallel: true`.
+- **TDD RED**: Single agent (`functional-tester`).
+- **TDD GREEN / BLUE**: Hive (parallel coders, shared test contract).
+- **Coverage gate**: Single agent with automated threshold (loop back to RED if failing).
+- **Regression after local deployment**: Sequential chain (unit then integration, then e2e with parallel agents in the e2e phase).
+- **Quality review** then **final holistic review**: Approval gates (`tech-lead` alone, then four parallel approvers).
 
 ### Choosing a Pattern
 
@@ -1298,7 +1220,7 @@ The analyst draws on four categories of evidence:
 
 **Multiple review rejections**: Design phase skipped critical considerations. Run a lightweight review (tech-lead only) after design before the full gate.
 
-**Coverage gaps at deployment**: Tests added after implementation rather than during TDD BLUE. Add tests during the refactor phase, verify 97% before quality review.
+**Coverage gaps at final gates**: Tests added late rather than in RED or after failing `coverage-gate`. Keep failing tests in RED; use BLUE only for refactors. The build workflow enforces 95% on changed or new files at `coverage-gate` and again at `quality-review` (see `build.yaml`).
 
 **Agent tool misuse**: Frequent permission prompts, slow execution. Agents using bash for file operations instead of Write/Edit tools. Enhance agent prompts with explicit tool requirements.
 
