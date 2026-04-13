@@ -101,6 +101,34 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 The principle: change the authoritative source, let derived projections follow. Contributors should be able to look at any file and know whether it is the right place to make a change or whether the real change needs to happen upstream.
 
+### Antipattern: Personal Agent Settings and Memories
+
+The source of truth hierarchy above governs files inside the repository. But agent runtimes introduce a precedence layer the repository cannot control: user-level configuration and accumulated memories that load *before* project-level files, silently overriding framework authority.
+
+**How it works.** Claude Code reads `~/.claude/CLAUDE.md` and accumulated session memories before it reads the project's `CLAUDE.md` or `AGENTS.md`. Cursor reads user-scoped rules (in `~/.cursor/rules/`) and user settings before workspace-level rules. Other runtimes follow similar patterns. The result is a shadow configuration layer that sits above the framework's authoritative sources in the effective precedence order:
+
+| Precedence | Source | Controlled by |
+|------------|--------|---------------|
+| 1 (highest) | User memories (auto-accumulated) | Runtime |
+| 2 | User-level config (`~/.claude/CLAUDE.md`, `~/.cursor/rules/`) | Individual contributor |
+| 3 | Project-level derived files (`CLAUDE.md`, `AGENTS.md`) | Framework (generated) |
+| 4 | Authoritative sources (`context/`) | Framework (versioned) |
+
+Anything at precedence 1 or 2 that contradicts precedence 3 or 4 wins — and the framework has no mechanism to detect or prevent it.
+
+**Why this breaks the framework.** The framework's design assumes that `context/` is the authoritative operating model and that derived projections (`AGENTS.md`, `CLAUDE.md`) faithfully represent it at runtime. Personal settings and memories violate that assumption. A contributor whose agent runtime has memorised "always use `pip install`" will have that memory override the framework's `python-environment.mdc` rule requiring `uv add`. A user-level `CLAUDE.md` that says "keep responses concise" can override the framework's handoff requirements. These overrides are invisible to other contributors, to review agents, and to the framework's validators — the pre-commit hooks check committed files, not what was in the agent's context window.
+
+**Symptoms.** Inconsistent agent behaviour across contributors working on the same repository. Rules that are correctly defined and injected but not followed. Agents that produce output in a style or format that does not match any framework standard. Validators passing at commit time on rules that were violated during execution (because the violation was in approach, not in the committed artefact). Debugging these failures is difficult because the cause lives outside the repository.
+
+**Mitigations.**
+
+- **Disable agent memories** for repositories governed by this framework. In Claude Code: do not use `/memory` and clear any existing memories that overlap with framework concerns. The framework's durable context (handoffs, task files, standards) replaces what memories are meant to provide, with the advantage of being versioned, shared, and inspectable.
+- **Avoid user-level configuration that overlaps with framework concerns.** If `context/rules/python-environment.mdc` governs Python tooling, do not also set Python tooling preferences in `~/.claude/CLAUDE.md` or `~/.cursor/rules/`. User-level configuration should be limited to genuinely personal, project-independent preferences (editor keybindings, display settings) that do not intersect with anything the framework manages.
+- **Audit when behaviour diverges.** If an agent ignores a correctly injected rule, check user-level configuration and memories before assuming the rule is broken or the model is non-compliant. The most common cause is a higher-precedence instruction contradicting the rule.
+- **Document the requirement.** Onboarding instructions for contributors should explicitly state that personal agent configuration must not overlap with framework-managed concerns, and that agent memories should be disabled or cleared.
+
+The framework cannot enforce this boundary — it sits below the precedence layer it needs to control. This is a governance and onboarding discipline, not an automated check.
+
 ---
 
 ## Root-Level Framework Files
@@ -940,22 +968,50 @@ The generator is also an enforcement point. If an agent definition references a 
 
 ### Validators
 
-Validators are pre-commit hooks stored in `context/scripts/validators/`. Each validator enforces one or more rules at commit time.
+Validators are pre-commit hooks stored in `context/scripts/validators/`. Each validator enforces one or more rules at commit time. A rule without a validator is a suggestion. A rule with a validator is enforceable. Not every rule has automated enforcement yet; validator coverage is expanding.
 
 | Validator | What It Checks |
 |-----------|---------------|
-| `conventional_commits.py` | Commit message format matches the conventional commits specification |
-| `british_english.py` | British English spelling conventions in framework outputs |
-| `ears_notation.py` | EARS requirements notation in requirements documents |
-| `design_system.py` | Design system compliance |
-| `metrics_logging.py` | Workflow or session metrics logging format |
-| `supabase_boundary.py` | Supabase boundary constraints |
+| `conventional_commits.py` | Commit message format |
+| `british_english.py` | British English spelling |
+| `ears_notation.py` | EARS requirements notation |
+| `design_system.py` | Frontend design system compliance |
+| `metrics_logging.py` | Agent metrics JSONL format |
+| `supabase_boundary.py` | Supabase import boundary |
+| `framework_docs_staleness.py` | Framework docs updated with context/ changes |
+| `validate_agent_definitions.py` | Agent definition structural integrity |
 
-A rule without a validator is a suggestion. A rule with a validator is enforceable. Not every rule has automated enforcement yet; validator coverage is expanding.
+#### `conventional_commits.py`
 
-### Agent Definition Validator
+Reads `.git/COMMIT_EDITMSG` (passed as `$1` at the `commit-msg` stage). Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped.
 
-`validate_agent_definitions.py`: Validates structural integrity of agent definitions: frontmatter completeness, required sections, path conventions. Run to check that agent files conform to the expected format.
+#### `british_english.py`
+
+Receives file paths from pre-commit. Scans each line outside fenced code blocks for American spellings: `color`, `behavior`, `organize`/`realize`/`recognize`/`specialize`/`generalize`, `center`, and `license` (noun form). Lines containing inline code (backticks) or markdown tables are skipped. The word list is hardcoded — new American/British pairs must be added manually.
+
+#### `ears_notation.py`
+
+Receives file paths from pre-commit. Only runs on files matching `artefacts/product/(requirements|user-stories).md`. For any line containing "shall," checks it against six EARS patterns: ubiquitous (`THE x SHALL`), event (`WHEN y, THE x SHALL`), state (`WHILE y, THE x SHALL`), optional (`IF y, THE x SHALL`), forbidden (`THE x SHALL NOT`), and complex (`WHEN y, IF z, THE x SHALL`). Lines inside code blocks, headers, table separators, and list markers are skipped.
+
+#### `design_system.py`
+
+Scans `frontend/src/` (hardcoded path relative to repo root via `Path(__file__).parents[3]`). Four checks: only `index.css` allowed (no component-scoped CSS); no Tailwind concrete colour classes like `text-green-500` (use DaisyUI semantic tokens); no direct `@heroicons/react` imports outside the barrel file `components/icons/HeroIcons.tsx`; and spacing tokens restricted to `gap-1`, `gap-2`, `gap-4`, `p-2`, `p-4`, `px-4` (with `md:gap-6`/`md:px-6` exempted in `PriceHeader` only). Test and spec files are excluded from colour and spacing checks. Bypassed with `SKIP=design-system`. Does nothing if `frontend/src/` does not exist.
+
+#### `metrics_logging.py`
+
+Receives file paths from pre-commit. Only validates `.jsonl` files whose path contains `metrics`. Parses each line as JSON and checks for required fields (`ts`, `task`, `agent`, `event`, `tokens`), ISO 8601 timestamp format, event type from a fixed set (`start`, `handoff`, `escalate`, `complete`, `blocked`), token object structure (`in`, `out`, `source`), and that `handoff`/`escalate` events include a `to` field.
+
+#### `supabase_boundary.py`
+
+Receives file paths from pre-commit. Regex-checks each file for `import supabase` or `from supabase import` at any indentation level. Any match outside the database service fails the commit. No path-based exclusion in the script itself — the pre-commit config's `files` pattern controls which files are checked.
+
+#### `framework_docs_staleness.py`
+
+Does not receive file paths — runs with `pass_filenames: false`. Queries `git diff --cached` for any staged file under `context/`. If context files are staged, checks whether the two framework docs are also staged. If the reference doc (`agentic-framework-reference.md`) is missing, blocks the commit (exit 1). If the brief doc (`agentic-framework.md`) is missing, warns but passes (exit 0). If the commit message in `.git/COMMIT_EDITMSG` contains `[docs-ok]`, passes unconditionally — the marker is an explicit assertion that the committer assessed docs impact. Auditable via `git log --grep='docs-ok'`. The only hardcoded exclusion is the two framework docs themselves, to avoid circular triggering.
+
+#### `validate_agent_definitions.py`
+
+Not wired into pre-commit; run manually. Validates every `.md` file in `context/agents/` (excluding `README.md` and `TEMPLATE.md`). Checks: YAML frontmatter is present and parseable; required fields `name` and `model` exist; every entry in `standards:` points to a file that exists in `context/standards/`; every entry in `rules:` points to a file that exists in `context/rules/`; the body contains no hardcoded absolute paths (`/Users/`, `/home/`). Existence checks are relative to the repo working directory at runtime.
 
 ### `prepare-commit-msg` hook (agent tokens on commits)
 
