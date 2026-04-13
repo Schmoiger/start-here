@@ -12,8 +12,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Reference docs**         | `standards/*.md`                 | Read when agent needs guidance                       |
 | **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
 | **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies                           |
-| **Workflow usage guides**  | `docs/workflow-*.md`             | How to use each workflow (with diagrams)             |
-| **Orchestration patterns** | `docs/orchestration-patterns.md` | Multi-agent coordination patterns                    |
+| **Framework reference**    | `docs/agentic-framework-reference.md` | Workflows, patterns, personas, adapters, measurement |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
 | **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD                              |
@@ -31,7 +30,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml)
 
-**Usage guides**: [patterns](docs/orchestration-patterns.md) · [writing-personas](docs/writing-personas.md)
+**Framework reference**: [agentic-framework-reference](docs/agentic-framework-reference.md)
 
 **Templates**: [index](templates/README.md)
 
@@ -68,17 +67,12 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Each phase lists agents, outputs, validation
 - Source of truth for phase ordering
 
-**Workflow Usage Guides** (`docs/workflow-*.md`):
+**Framework reference** (`docs/agentic-framework-reference.md`):
 
-- How to use each workflow (when, how to invoke agents, phase-by-phase)
-- Each includes mermaid diagram showing phase flow
-- Best practices, common issues, tips
-
-**Orchestration Patterns** (`docs/orchestration-patterns.md`):
-
-- Multi-agent coordination patterns (single, chain, swarm, hive, loop)
-- Decision tree for choosing patterns
-- Token optimization strategies
+- Default and prototype workflows (phase-by-phase, diagrams)
+- Orchestration patterns (single, chain, swarm, hive, loop)
+- Writing personas, portability adapters, effectiveness measurement
+- Standards, rules, agents, templates, and scripts at operational depth
 
 **Templates** (`templates/`):
 
@@ -90,7 +84,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 - Writing voice/style for human-facing content (blogs, papers, marketing)
 - NOT for technical handoffs (README, API docs, architecture)
-- See `docs/writing-personas.md` for complete guide
+- See `docs/agentic-framework-reference.md` (Writing Personas) for when and how to use them
 
 **Scripts** (`scripts/`):
 
@@ -140,7 +134,7 @@ See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.y
 
 **continuous-improvement** — Framework improvement: reactive (human reports incident) or proactive (review interruptions, incidents, and git log metrics).
 
-**Orchestration patterns**: Single Agent, Sequential Chain, Parallel Swarm, Hive, Iterative Loop (see `docs/orchestration-patterns.md`)
+**Orchestration patterns**: Single Agent, Sequential Chain, Parallel Swarm, Hive, Iterative Loop (see `docs/agentic-framework-reference.md`)
 
 ---
 
@@ -166,15 +160,11 @@ context/
 │   ├── full-test.yaml            # Full regression suite
 │   ├── content.yaml              # Human-facing content with personas
 │   └── continuous-improvement.yaml # Incident response + retrospective
-├── docs/                          # Usage guides
-│   ├── orchestration-patterns.md       # Multi-agent coordination
-│   ├── workflow-default.md             # Default workflow guide (with diagram)
-│   ├── workflow-prototype.md           # Prototype workflow guide (with diagram)
-│   ├── workflow-agent-effectiveness.md # Effectiveness guide (with diagram)
-│   ├── workflow-documentation-for-humans.md # Human-facing content guide (with diagram)
-│   ├── how-to-measure-agent-effectiveness.md # Detailed measurement examples
-│   ├── writing-personas.md             # When/how to use writing personas
-│   └── framework-adapters.md           # Cross-framework compatibility
+├── docs/                          # Design essays and operator reference
+│   ├── agentic-framework.md            # Why the framework exists (essay)
+│   ├── agentic-framework-reference.md # What it contains and how to run it
+│   ├── workflow-documentation-for-humans.md # Content workflow with personas
+│   ├── vision.md · journey.md · roadmap.md # New DevX programme documents
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
 ├── persona/                       # Writing voice for human-facing content
 │   ├── technical-writer.md       # Amara Osei persona (practitioner guides, technical prose)

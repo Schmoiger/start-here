@@ -54,7 +54,7 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **The constraint keeps moving.** Accelerating code generation does not eliminate bottlenecks; it relocates them. The binding constraint will migrate from code to review, from review to deployment, from deployment to intent clarity. The operating model must follow the constraint, not defend a fixed process. The `continuous-improvement` workflow is the mechanism for this: in incident mode, failures are traced through a causal chain (symptom, mechanism, file, gap) to a fixable defect in the framework itself; in retrospective mode, commit telemetry, interruption logs, and incident patterns are parsed to surface recurring weaknesses in rules, standards, or templates. Both modes target the coordination and verification systems, not just the code those systems govern.
 
-**Portability is a structural requirement.** Agent definitions are markdown files. Workflows are YAML. The framework includes adapter guidance for LangGraph, CrewAI, AutoGen, Cursor, and other runtimes. The current implementation leans on Claude Code, and adapting to a different runtime requires real work. The design ensures that no single tool is a hard dependency. See `context/docs/framework-adapters.md` for the current state of cross-runtime support.
+**Portability is a structural requirement.** Agent definitions are markdown files. Workflows are YAML. The framework includes adapter guidance for LangGraph, CrewAI, AutoGen, Cursor, and other runtimes. The current implementation leans on Claude Code, and adapting to a different runtime requires real work. The design ensures that no single tool is a hard dependency. See `context/docs/agentic-framework-reference.md` (Portability and Framework Adapters) for cross-runtime integration guidance.
 
 ---
 
@@ -260,8 +260,7 @@ The framework's design principles are not novel; they adapt ideas from distribut
 
 - `context/docs/agentic-framework-reference.md`: directory-level reference map
 - `context/README.md`: framework entry point
-- `context/docs/orchestration-patterns.md`: coordination patterns
-- `context/docs/framework-adapters.md`: cross-runtime portability
+- `context/docs/agentic-framework-reference.md`: workflows, coordination patterns, portability adapters
 - `context/standards/context-framework.md`: context theory
 - `context/agents/orchestrator.md`: orchestrator behaviour
 

@@ -36,7 +36,7 @@
 
 ## How To Use This Reference
 
-The companion essay explains why the framework exists and the design principles behind it. This reference explains what the framework contains and how each part works. It is structured so that either document can be read first, or independently.
+The companion technical paper explains why the framework exists and the design principles behind it. This reference explains what the framework contains and how each part works. It is structured so that either document can be read first, or independently.
 
 Use this document when you need to answer questions such as:
 
@@ -1075,7 +1075,7 @@ Five themes repeat across the framework's structure.
 1. [The Default Workflow](#the-default-workflow) (this document)
 2. `context/workflows/build.yaml` and `context/workflows/design.yaml`
 3. `context/agents/orchestrator.md`
-4. `context/docs/orchestration-patterns.md`
+4. [Orchestration Patterns](#orchestration-patterns) (this document)
 
 ### Evaluating Workflow Health
 
