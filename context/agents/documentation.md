@@ -9,6 +9,7 @@ standards:
 rules:
   - EARS-notation-requirements.mdc
   - british-english.mdc
+  - no-ai-slop.mdc
   - bash-environment.mdc
   - handoff-hygiene.mdc
   - escalation.mdc
@@ -28,6 +29,7 @@ Read 1 standards file before starting work.
 |------|------------|
 | `EARS-notation-requirements.mdc` | Requirements notation format |
 | `british-english.mdc` | colour, behaviour, organisation |
+| `no-ai-slop.mdc` | No em dashes, triads, vapid transitions, filler, purposeless formatting |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
 | `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
 | `escalation.mdc` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
