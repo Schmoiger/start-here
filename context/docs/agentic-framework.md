@@ -1,10 +1,12 @@
 # Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery
 
-**Status**: Second pass (reviewed)
-**Date**: 2026-04-13
-**Author**: Dr. Sarah Chen
-**Reviewer**: Priya Raghavan
-**Companion**: `context/docs/agentic-framework-reference.md` (directory-level reference map)
+**Document Status**: Draft  
+**Version**: 0.2.0  
+**Last Updated**: 13 April 2026  
+**Word Count**: ~3,500 words  
+**Reading Time**: ~15 minutes
+
+**Companion**: *Hive Mind: Framework Reference* (`context/docs/agentic-framework-reference.md`)
 
 ---
 
@@ -206,11 +208,21 @@ The overhead is real: pre-spawn handoff writes, `state_recovery` blocks in every
 
 ## Templates and Validators
 
-The framework ships 15 output templates and 6 pre-commit validators.
+The framework ships 15 output templates and 7 pre-commit validators.
 
 **Templates** standardise recurring artefacts: requirements, tasks, bugs, reviews, handoffs, design docs, commit messages, PR descriptions, and agent definitions. Standardised shapes reduce cognitive load for both producing and consuming agents, and make downstream automation reliable.
 
-**Validators** enforce rules at commit time: conventional commit format, EARS requirements notation, British English spelling, metrics logging format, design system compliance, and Supabase boundary constraints. A rule without a validator is a suggestion. A rule with a validator is an enforceable standard. Validator coverage is expanding; not every rule has automated enforcement yet.
+**Validators** enforce rules at commit time. A rule without a validator is a suggestion that we trust agents will follow. A rule with a validator is an enforceable standard.
+
+| Validator | How it works |
+|-----------|-------------|
+| `conventional_commits.py` | Reads `.git/COMMIT_EDITMSG`. Regex-checks the subject line against `type(scope): description` format, validates max 72 chars, imperative mood heuristic, and `Agent-Session:` trailer format if present. Runs at `commit-msg` stage. |
+| `british_english.py` | Receives file paths from pre-commit. Scans lines outside code blocks for American spellings (`color`, `behavior`, `organize`, `center`, `license`). Brittle: the word list is hardcoded — new pairs need adding manually. |
+| `ears_notation.py` | Receives file paths. Matches lines containing "shall" against six EARS patterns (`THE x SHALL`, `WHEN y, THE x SHALL`, etc.). Only triggers on files under `artefacts/product/`. |
+| `design_system.py` | Scans `frontend/src/` for CSS violations: multiple CSS files, Tailwind concrete colour classes, direct `@heroicons` imports outside the barrel, and off-scale spacing tokens. Hardcoded to `frontend/src/` relative to repo root. |
+| `metrics_logging.py` | Receives JSONL file paths. Validates each line has required fields (`ts`, `task`, `agent`, `event`, `tokens`), valid event types, and correct token source annotations. |
+| `supabase_boundary.py` | Receives file paths. Regex-checks for `import supabase` or `from supabase import` outside the database service. |
+| `framework_docs_staleness.py` | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. `[docs-ok]` in the commit message bypasses the check (auditable via `git log --grep='docs-ok'`). Only hardcoded exclusion: the two framework docs themselves, to avoid circular triggering. |
 
 Consistency compounds. Drift taxes. The templates and validators exist to keep that equation favourable over time.
 
@@ -221,6 +233,8 @@ Consistency compounds. Drift taxes. The templates and validators exist to keep t
 **This is not an application architecture.** It does not prescribe service boundaries, data models, or UI patterns. It prescribes how agents coordinate whilst building those things.
 
 **Rule compliance is probabilistic.** Injecting a rule into a spawn prompt does not guarantee the agent will follow it. Models sometimes ignore injected instructions, particularly under context pressure. Validators catch some violations post-hoc, but real-time enforcement during agent execution is not currently possible.
+
+**Personal agent settings and memories undermine framework authority.** Most agent runtimes load user-level configuration before project-level files. Claude Code reads `~/.claude/CLAUDE.md` and accumulated session memories before it reads the project's `CLAUDE.md` or `AGENTS.md`. Cursor reads user-scoped rules and settings before workspace rules. This means personal preferences, habits, and stale memories can silently override framework rules, standards, and workflows. The framework cannot enforce its operating model if the runtime has already loaded contradictory instructions at higher precedence.
 
 **This is not a replacement for human judgement.** Human judgement sits at review gates, design approvals, escalation boundaries, and framework evolution decisions. The framework automates the mechanical coordination so that human attention is spent governing above the loop rather than embedded in every step.
 
