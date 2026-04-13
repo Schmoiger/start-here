@@ -1,7 +1,7 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.9
+**Version**: 1.0
 **Last Updated**: 13 April 2026
 **Word Count**: ~8,400 words
 **Reading Time**: ~35 minutes
@@ -21,11 +21,16 @@
    - [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter)
    - [Writing Personas](#writing-personas)
 8. [Workflows](#workflows)
-   - [The Default Workflow](#the-default-workflow)
-   - [The Prototype Workflow](#the-prototype-workflow)
-   - [Human-Facing Content Workflow](#human-facing-content-workflow)
-   - [Other Workflows](#other-workflows)
-   - [Measuring Effectiveness](#measuring-effectiveness)
+   - [Design (`design.yaml`)](#design-designyaml)
+   - [Build (`build.yaml`)](#build-buildyaml)
+   - [Prototype (`prototype.yaml`)](#prototype-prototypeyaml)
+   - [Deploy (`deploy.yaml`)](#deploy-deployyaml)
+   - [Bugfix (`bugfix.yaml`)](#bugfix-bugfixyaml)
+   - [Full-test (`full-test.yaml`)](#full-test-full-testyaml)
+   - [Content (`content.yaml`)](#content-contentyaml)
+   - [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml)
+   - [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml)
+   - [Other workflows](#other-workflows)
 9. [Orchestration Patterns](#orchestration-patterns)
 10. [Templates](#templates)
 11. [Scripts and Automation](#scripts-and-automation)
@@ -407,7 +412,7 @@ The framework defines 18 specialised agents, organised by kind of judgement.
 
 Personas are stored in `context/persona/` and provide voice guidance for human-facing content. They are used by the `documentation` agent when writing blogs, technical papers, user guides, and marketing materials. They are explicitly *not* used for technical handoffs, API documentation, architecture documents, or internal artefacts.
 
-For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Human-Facing Content Workflow](#human-facing-content-workflow) under Workflows.
+For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Content (`content.yaml`)](#human-facing-content-workflow) under Workflows.
 
 #### When to Use a Persona
 
@@ -462,19 +467,28 @@ All personas use British English throughout (colour, optimise, behaviour, whilst
 
 Workflows are YAML files in `context/workflows/` that encode phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. Storing orchestration logic in versionable YAML rather than ad hoc conversation makes it inspectable, diffable, reviewable, and recoverable after context compaction.
 
-### The Default Workflow
+The **as-built workflow set** in this repository is nine files under `context/workflows/`. The table below matches the companion essay (`context/docs/agentic-framework.md`); each row has a matching subsection (default product delivery is **design → build → deploy**, three files in sequence—not a single combined YAML).
 
-**Files**: `context/workflows/design.yaml` then `context/workflows/build.yaml`. Cloud deployment after local verification is `deploy.yaml`.
+| Workflow | File | Purpose |
+|----------|------|---------|
+| **design** | `design.yaml` | Discovery through design review; run before build |
+| **build** | `build.yaml` | Primary TDD loop: plan, red, green, blue, review, regress, docs cleanup |
+| **prototype** | `prototype.yaml` | Fast iteration, no quality gates; rewrite before production |
+| **deploy** | `deploy.yaml` | GCP cloud deployment after local verification |
+| **bugfix** | `bugfix.yaml` | Empirical reproduction, diagnosis, fix, verification |
+| **full-test** | `full-test.yaml` | Complete regression across all modules |
+| **content** | `content.yaml` | Human-facing writing with personas |
+| **continuous-improvement** | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
+| **retrospective** | `retrospective.yaml` | Standalone process review and pattern identification |
 
-**Pattern**: Design gate, then subtask-driven TDD with automated coverage gate, per-sprint review, local deployment, scoped regression, documentation cleanup, and two final approval gates.
+<a id="design-designyaml"></a>
+<a id="the-default-workflow"></a>
 
-**Use for**: Production code, critical features, quality-focused development.
+### Design (`design.yaml`)
 
-Production delivery is split on purpose: **design** captures requirements and reviewed artefacts before code; **build** runs the implementation pipeline against `artefacts/build/subtask-plan.yaml` (subtasks, file scopes, acceptance criteria). The canonical phase order and validation rules live in the YAML files; this section summarises them.
+**Purpose**: Discovery through design review; run before `build.yaml`.
 
-#### Design (`design.yaml`)
-
-Six phases, one approval gate at the end.
+**Pattern**: Six phases, one approval gate at the end (`design-review`).
 
 | Phase | Agents (pattern) | Role |
 |-------|------------------|------|
@@ -487,7 +501,13 @@ Six phases, one approval gate at the end.
 
 **Design gate** (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
 
-#### Build (`build.yaml`)
+<a id="build-buildyaml"></a>
+
+### Build (`build.yaml`)
+
+**Purpose**: Primary TDD implementation pipeline after design approval.
+
+**Pattern**: Subtask-driven TDD with automated coverage gate, per-sprint review, local deployment, scoped regression, documentation cleanup, and two final approval gates. Runs against `artefacts/build/subtask-plan.yaml` (subtasks, file scopes, acceptance criteria). Canonical phase order and validation live in the YAML; this is a digest.
 
 Sixteen phases (plus a **sprint loop** that repeats for each sprint in `subtask-plan.yaml`). High-level shape:
 
@@ -532,17 +552,20 @@ flowchart TD
     build_yaml --> deploy_yaml["deploy.yaml when needed"]
 ```
 
-#### When to Use the Default Path
+#### When to use design and build
 
 Use **design** then **build** for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
-Do not use this path for throwaway spikes; use [The Prototype Workflow](#the-prototype-workflow) instead. Run **retrospective** or **continuous-improvement** workflows when you want process or framework follow-up; they are not phases inside `build.yaml`.
+Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#the-prototype-workflow) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) when you want process or framework follow-up; they are not phases inside `build.yaml`.
 
-### The Prototype Workflow
+<a id="prototype-prototypeyaml"></a>
+<a id="the-prototype-workflow"></a>
 
-**File**: `context/workflows/prototype.yaml`
-**Pattern**: Fast iteration without quality gates
-**Use for**: POCs, experiments, spikes, throwaway code
+### Prototype (`prototype.yaml`)
+
+**Purpose**: Fast iteration without quality gates.
+
+**Use for**: POCs, experiments, spikes, throwaway code.
 
 The prototype workflow trades rigour for speed: 4 phases, no quality gates, 5 agents.
 
@@ -586,7 +609,7 @@ flowchart TD
     class validate optionalStyle
 ```
 
-#### Prototype Rules
+#### Prototype rules
 
 - Speed over quality. Technical debt is acceptable.
 - No formal reviews, no coverage requirements, no security audits.
@@ -594,23 +617,59 @@ flowchart TD
 - Hard-coded values, skipped error handling, and incomplete documentation are all acceptable.
 - Mark code clearly as prototype.
 
-#### Migrating Prototype to Production
+#### Migrating prototype to production
 
 If a prototype validates its hypothesis and should become production code:
 
 1. Archive the prototype on a separate branch
 2. Extract learnings: document what worked and what did not
-3. Start fresh with the default workflow
+3. Start fresh with design then build (this section’s default path)
 4. Do not copy-paste prototype code; rewrite with TDD from the beginning
 
 Cleaning up a prototype takes longer than rewriting it properly. The technical debt in prototype code is architectural, not superficial.
 
-### Human-Facing Content Workflow
+<a id="deploy-deployyaml"></a>
+
+### Deploy (`deploy.yaml`)
+
+**Purpose**: GCP cloud deployment and deployment review **after** `build.yaml` has completed local deployment and verification.
+
+| Phase | Agents | Role |
+|-------|--------|------|
+| `gcp-deployment` | `devops` | Terraform, Cloud Run or Firebase Hosting, staging validation, rollback plan under `artefacts/gcp/` |
+| `deployment-review` | `tech-lead` (gate) | Approve production readiness; monitoring and rollback confirmed |
+
+`quality_gates` in the YAML require tech-lead approval on `deployment-review`. Criteria include deployment success and coverage sign-off as defined in the file (see `deploy.yaml` for thresholds and notes).
+
+<a id="bugfix-bugfixyaml"></a>
+
+### Bugfix (`bugfix.yaml`)
+
+**Purpose**: Reproduce, fix, and verify defects with **empirical evidence** (browser screenshots and file-cited causal chains), not feature-sized planning.
+
+**Shape**: `reproduce` (gated; `ui-tester` and `functional-tester` in parallel) → `fix` (failing test first, then `python-coder` / `typescript-coder` as needed) → `verify` (gated; parallel UI and test confirmation). Evidence lands under `artefacts/bugfix/`.
+
+**Quality gates**: Evidence gates on `reproduce` and `verify`—tests passing alone is not sufficient; see YAML for gate metrics and workflow rules (TDD on the fix, commit body records causal chain).
+
+<a id="full-test-full-testyaml"></a>
+
+### Full-test (`full-test.yaml`)
+
+**Purpose**: Full-suite testing across **all** modules—release confidence, not the per-feature changed-scope regressions in `build.yaml`.
+
+**Phases** (sequential): `full-unit-test` → `full-integration-test` → `full-e2e-test` → `quality-check` (tech-lead gate). Reports under `artefacts/test-results/`. **No code changes** in this workflow—failures are reported for follow-up elsewhere.
+
+**When to run**: Before merging a long-running branch to main, after large refactors, or on demand for health checks (see YAML `workflow_rules`).
+
+<a id="content-contentyaml"></a>
+<a id="human-facing-content-workflow"></a>
+
+### Content (`content.yaml`)
 
 **File**: `context/workflows/content.yaml`
 **Pattern**: Sequential chain — `product-expert` for research, then `documentation` with a **different persona per phase** (draft → editor → optional expert reviewer → finalize).
 **Use for**: External-facing prose: blogs, papers, guides, talks, marketing where voice matters.
-**Do not use for**: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use the default path and `doc-standards.md` without personas.
+**Do not use for**: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use [Design](#design-designyaml) then [Build](#build-buildyaml) with `doc-standards.md` without personas.
 
 Five phases, **no** quality gates (YAML `quality_gates: []`); typical wall time about **2–4 hours**. Shape, validation strings, and `workflow_rules` live in **`content.yaml`**; this subsection is a digest only.
 
@@ -670,7 +729,7 @@ Draft and review phases list concrete checks in YAML (persona voice, British Eng
 
 #### Comparison with the default workflow
 
-| Aspect | Human-facing content (`content.yaml`) | Default (`design.yaml` + `build.yaml`) |
+| Aspect | Content (`content.yaml`) | Design + build |
 |--------|--------------------------------------|--------------------------------------|
 | Phases | 5 | 6 design + 16 build (sprint loop repeats in build) |
 | Personas | Required | No (technical tone) |
@@ -685,18 +744,11 @@ Draft and review phases list concrete checks in YAML (persona voice, British Eng
 - [Writing Personas](#writing-personas) — persona files and selection
 - `context/standards/doc-standards.md` — structure for technical docs (non-persona path)
 
-### Other Workflows
+<a id="continuous-improvement-continuous-improvementyaml"></a>
 
-| Workflow | Purpose | Typical Duration |
-|----------|---------|-----------------|
-| `bugfix.yaml` | Reproduce, diagnose, fix, and verify defects. Empirical evidence pattern rather than feature-development pattern. | Hours |
-| `deploy.yaml` | GCP cloud deployment after local verification. | 1-2 hours |
-| `full-test.yaml` | Complete regression across all modules. Separated from targeted testing to distinguish changed-scope verification from release-confidence testing. | 1-2 hours |
-| `content.yaml` | Human-facing content with personas. Full runbook: [Human-Facing Content Workflow](#human-facing-content-workflow). | 2-4 hours |
-| `continuous-improvement.yaml` | Incident response (reactive) and retrospective analysis (proactive). The framework's mechanism for evolving itself. | Variable |
-| `retrospective.yaml` | Process review and pattern identification. Modelled directly rather than folded into informal meetings. | 1-2 hours |
+### Continuous improvement (`continuous-improvement.yaml`)
 
-### Measuring Effectiveness
+<a id="measuring-effectiveness"></a>
 
 Framework improvement and measurement are governed by **`context/workflows/continuous-improvement.yaml`**, not by ad hoc scorecards. That workflow defines two **modes** (incident and retrospective), explicit **phases**, what gets **written to disk**, and a **quality gate** in retrospective mode. The `workflow-analyst` agent appears only in retrospective **review**; other phases are orchestrator- and human-led as the YAML states.
 
@@ -773,6 +825,25 @@ These are examples of **fixable gaps**, not a separate scoring methodology:
 - **Tooling drift**: repeated bash-for-files or wrong package managers; tighten prompts or rules.
 - **Integration cost**: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
 - **Parallel misuse**: duplicated context without time savings; narrow parallel phases to truly independent work.
+
+<a id="retrospective-retrospectiveyaml"></a>
+
+### Retrospective (`retrospective.yaml`)
+
+**Purpose**: Standalone proactive review—`workflow-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. **Not** the same file as `continuous-improvement.yaml` (that file adds **incident** mode and git **Agent-Session** mining in its retrospective path).
+
+| Phase | Agents | Role |
+|-------|--------|------|
+| `review` | `workflow-analyst` | Read `agent-interruptions.md`, `agent-metrics.log`, `agent-incidents.md`; report patterns with file:line evidence |
+| `discuss` | None (**human gate**) | Human selects which findings to implement |
+| `fix` | `python-coder`, `typescript-coder` (**parallel**) | Approved framework changes |
+| `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
+
+See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recovery`.
+
+### Other workflows
+
+There is **no tenth** workflow file. What operators call “default delivery” is a **sequence** of three YAML files: [Design](#design-designyaml) → [Build](#build-buildyaml) → optional [Deploy](#deploy-deployyaml). **Human-facing editorial** content is **only** [Content](#content-contentyaml); technical docs from implementation use design/build and `doc-standards.md` without personas.
 
 ---
 
@@ -1112,21 +1183,21 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 
 ### Running a Default Workflow
 
-1. [The Default Workflow](#the-default-workflow) (this document)
-2. `context/workflows/build.yaml` and `context/workflows/design.yaml`
+1. [Design](#design-designyaml) and [Build](#build-buildyaml) (this document); optional [Deploy](#deploy-deployyaml)
+2. `context/workflows/design.yaml` and `context/workflows/build.yaml` (and `deploy.yaml` when promoting to cloud)
 3. `context/agents/orchestrator.md`
 4. [Orchestration Patterns](#orchestration-patterns) (this document)
 
 ### Evaluating Workflow Health
 
 1. `context/workflows/continuous-improvement.yaml`
-2. [Measuring Effectiveness](#measuring-effectiveness) (this document)
+2. [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) (this document — effectiveness and incident handling)
 3. `context/agents/workflow-analyst.md`
 4. `context/standards/workflow-standards.md`
 
 ### Writing Human-Facing Content (Blogs, Papers, Guides)
 
-1. [Human-Facing Content Workflow](#human-facing-content-workflow) (this document)
+1. [Content (`content.yaml`)](#human-facing-content-workflow) (this document)
 2. [Writing Personas](#writing-personas) (this document)
 3. `context/workflows/content.yaml`
 4. `context/rules/no-ai-slop.mdc`
