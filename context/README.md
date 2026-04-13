@@ -70,7 +70,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 **Framework reference** (`docs/agentic-framework-reference.md`):
 
 - Default and prototype workflows (phase-by-phase, diagrams)
-- Orchestration patterns (single, chain, swarm, hive, loop)
+- Orchestration patterns (single, chain, hive, loop — see `docs/agentic-framework-reference.md`; swarm is vision-level only)
 - Writing personas, portability adapters, effectiveness measurement
 - Standards, rules, agents, templates, and scripts at operational depth
 
@@ -134,7 +134,7 @@ See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.y
 
 **continuous-improvement** — Framework improvement: reactive (human reports incident) or proactive (review interruptions, incidents, and git log metrics).
 
-**Orchestration patterns**: Single Agent, Sequential Chain, Parallel Swarm, Hive, Iterative Loop (see `docs/agentic-framework-reference.md`)
+**Orchestration patterns**: Single Agent, Sequential Chain, Hive, Iterative Loop (see `docs/agentic-framework-reference.md`; exploration “swarm” is out of scope for shipped YAML — `docs/vision.md`)
 
 ---
 

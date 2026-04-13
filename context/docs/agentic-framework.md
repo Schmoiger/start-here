@@ -183,9 +183,10 @@ The framework documents five coordination patterns, from simple to complex:
 
 1. **Single Agent**: one specialist, one task, no dependencies
 2. **Sequential Chain**: agents in strict order (A then B then C)
-3. **Parallel Swarm**: independent agents running simultaneously
-4. **Hive**: parallel agents sharing artefacts (tests, API specs) with coordination points before and after
-5. **Iterative Loop**: review-fix cycles until approval
+3. **Hive**: parallel agents sharing artefacts (tests, API specs, plans) with coordination points before and after — this is what `parallel: true` means in shipped workflow YAML
+4. **Iterative Loop**: review-fix cycles until approval
+
+**Parallel swarm** (independent agents exploring alternative solutions in parallel) is **not** encoded in `context/workflows/*.yaml`; it appears only as forward-looking product narrative in `context/docs/vision.md` and under **Limitations** below.
 
 Production workflows combine these. **Design** adds one parallel phase (database and API designers on the same architecture handoff). **Build** uses a sequential chain for planning, a **hive** for parallel Python and TypeScript implementation against the **same** test contract (with disjoint file scopes), parallel **review** passes that still share one plan or codebase, and iterative loops at quality gates. Most `parallel: true` phases in the shipped YAML are hive-style coordination, not independent “swarms.” The hive pattern is the hardest to manage well and where explicit orchestration adds the most value. The framework's title reflects this emphasis.
 

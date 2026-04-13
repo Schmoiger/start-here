@@ -1,7 +1,7 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 1.1
+**Version**: 1.2
 **Last Updated**: 13 April 2026
 **Word Count**: ~8,400 words
 **Reading Time**: ~35 minutes
@@ -824,9 +824,9 @@ See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recov
 
 ## Orchestration Patterns
 
-The framework documents five coordination patterns, from simple to complex. They are **vocabulary** for describing orchestration—not separate runtime features. On disk, behaviour is whatever each workflow YAML says: **phase order**, **`parallel: true`** (spawn agents in one dispatch; see `parallel_planning` in `build.yaml`), **disjoint `file_scope`** for coders, and **gates**.
+This section documents the **four** coordination shapes the shipped workflows actually use: **single agent**, **sequential chain**, **hive** (parallel agents on a shared contract, with orchestrator scope rules), and **iterative loop** (gates and rework). They are vocabulary for reading YAML—not separate runtime features. On disk, behaviour is whatever each workflow file says: **phase order**, **`parallel: true`** (see `parallel_planning` in `build.yaml`), **disjoint `file_scope`** where required, and **gates**.
 
-In **`design.yaml`** and **`build.yaml`**, almost every `parallel: true` phase is **not** “independent agents with no shared state.” Multiple agents read the **same upstream artefacts** (architecture, `subtask-plan.yaml`, failing tests, the running app, design exports) and must stay consistent with each other. That is **coordination-heavy parallelism**—closest to the **hive** idea (shared contract) in the taxonomy below. The textbook **parallel swarm** (truly disjoint work merged only at the end) is rare in these files; do not read “parallel” in YAML as automatically meaning swarm.
+**Out of scope here:** “Swarm” exploration (many agents trying different approaches to the same problem, pick-or-merge the winner) is **not** represented in `context/workflows/*.yaml`. It appears only in forward-looking product narrative—see `context/docs/vision.md` (Build phase, glossary) and **Limitations** in `context/docs/agentic-framework.md`. Do not expect a `parallel: true` phase in this repository to mean swarm; almost all parallelism in **`design.yaml`** and **`build.yaml`** is **hive-style** (shared plan, tests, architecture, or release candidate).
 
 ### Single Agent
 
@@ -836,13 +836,9 @@ One specialist, one task, no dependencies. Use for isolated tasks with clear req
 
 Agents in strict order, each depending on the previous output. Use for tasks with clear dependencies and quality gates: most of **design** and **build** is sequential between phases.
 
-### Parallel Swarm
-
-Independent agents running simultaneously with **little or no shared mutable contract**—each owns a disjoint slice until merge. Rare in the shipped default path YAML; use the term carefully when reading `parallel: true` phases that still share a plan, a test suite, or design artefacts.
-
 ### Hive
 
-Parallel agents working against a **shared contract** (same tests, same subtask plan, same architecture outputs) with orchestrator-enforced **scope** and merge discipline. The canonical case in **`build.yaml`** is **TDD GREEN** and **TDD BLUE**: `python-coder` and `typescript-coder` run together with **disjoint `file_scope`** but the **same** failing-then-passing test suite (`parallel_planning` and `subtask_execution` in the YAML spell this out). **`design-contracts`** is hive-like too: both designers extend the same architecture handoff. **Tasks review**, **sprint-review**, **e2e-regression**, and **final-holistic-review** are parallel **reviewers** on the same body of work—again shared-artefact coordination, not swarm isolation.
+Parallel agents working against a **shared contract** (same tests, same subtask plan, same architecture outputs) with orchestrator-enforced **scope** and merge discipline. The canonical case in **`build.yaml`** is **TDD GREEN** and **TDD BLUE**: `python-coder` and `typescript-coder` run together with **disjoint `file_scope`** but the **same** failing-then-passing test suite (`parallel_planning` and `subtask_execution` in the YAML spell this out). **`design-contracts`** is hive-like too: both designers extend the same architecture handoff. **Tasks review**, **sprint-review**, **e2e-regression**, and **final-holistic-review** are parallel **reviewers** on the same body of work—again shared-artefact coordination.
 
 ### Iterative Loop
 
@@ -854,7 +850,6 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 |---------|-------|------------|--------------|-------------------------|
 | Single | Fast | Low | None | `tdd-red`, `coverage-gate`, many single-agent phases |
 | Sequential | Slow | Low | Linear | Discovery, architecture → contracts → UI chain |
-| Parallel swarm | Fastest | High | Disjoint ownership until merge | Uncommon in default path; do not assume every `parallel: true` is this |
 | Hive | Fast | High | Shared contract + scopes | `tdd-green` / `tdd-blue`; `design-contracts`; parallel review phases on one plan or codebase |
 | Iterative | Varies | Medium | Approval loops | `design-review`, quality gates |
 
@@ -871,7 +866,7 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 **`build.yaml`**
 
 - **Planning and test planning**: Sequential (`tech-lead` then `code-reviewer` on the test plan).
-- **Tasks review**, **sprint-review**, **e2e-regression**, **final-holistic-review**: `parallel: true`, but agents share the **same** plan, sprint surface, workflows under test, or release candidate—treat as **hive-style** coordination, not swarm.
+- **Tasks review**, **sprint-review**, **e2e-regression**, **final-holistic-review**: `parallel: true`, but agents share the **same** plan, sprint surface, workflows under test, or release candidate—**hive-style** coordination.
 - **TDD GREEN / BLUE**: Hive (parallel coders, **shared tests**, disjoint file scopes).
 - **Coverage gate**: Single agent; may **loop** back to RED.
 - **Regression after local deployment**: Sequential unit → integration → e2e (the e2e phase may list two agents in parallel with shared workflow scope).
@@ -880,10 +875,9 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 ### Choosing a pattern
 
 1. Single isolated task? **Single agent.**
-2. Same plan, tests, or design handoff for everyone? **Hive** (default path parallel phases are usually this).
-3. Truly disjoint ownership until merge? **Parallel swarm** (uncommon in shipped default YAML).
-4. Strict A-then-B output dependency? **Sequential chain.**
-5. Output needs iterative refinement? **Iterative loop.**
+2. Same plan, tests, or design handoff for everyone? **Hive** (all `parallel: true` phases in default path YAML behave this way).
+3. Strict A-then-B output dependency? **Sequential chain.**
+4. Output needs iterative refinement? **Iterative loop.**
 
 ### Token Optimisation
 
