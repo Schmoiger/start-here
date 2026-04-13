@@ -71,7 +71,7 @@ The framework is organised as a context hierarchy: a layered directory structure
 | Scripts | `context/scripts/` | Enforce *everything above*: validators, generators, git hooks | Every commit: pre-commit validators check output against rules |
 | Workflows | `context/workflows/` | Define *when*: phase order, dependencies, gates, outputs, recovery | Once per task: orchestrator reads at the start to plan the work |
 | Docs | `context/docs/` | Provide *further reading*: design rationale, strategic context, orchestration patterns, workflow guides, portability how-tos | Human reference: guides and design documents for contributors and operators, not consumed by agents |
-| Personas | `persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only: applied when writing human-facing material |
+| Personas | `context/persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only: applied when writing human-facing material |
 
 The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. Nothing bleeds across boundaries unless explicitly designed to.
 
@@ -80,6 +80,9 @@ The layering determines where changes should be made. To change what agents do, 
 ## Execution Model
 
 ```mermaid
+---
+title: Execution Model
+---
 flowchart TD
     A[User request] --> B[Orchestrator]
     B --> C[Selects workflow]
@@ -251,6 +254,8 @@ The framework's design principles are not novel; they adapt ideas from distribut
 
 ---
 
+<!-- typst-skip-start -->
+
 ## Related Documents
 
 - `context/docs/agentic-framework-reference.md`: directory-level reference map
@@ -259,3 +264,5 @@ The framework's design principles are not novel; they adapt ideas from distribut
 - `context/docs/framework-adapters.md`: cross-runtime portability
 - `context/standards/context-framework.md`: context theory
 - `context/agents/orchestrator.md`: orchestrator behaviour
+
+<!-- typst-skip-end -->
