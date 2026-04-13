@@ -89,7 +89,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 **Scripts** (`scripts/`):
 
 - `prepare-commit-msg.py` / `.sh`: Git hook — injects token usage from Claude Code session telemetry into Agent-Session commit trailer
-- Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary)
+- Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary, framework docs staleness)
 - Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
 - Tests (`tests/`): Validator test suite
 
