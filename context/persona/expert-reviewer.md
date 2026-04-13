@@ -27,6 +27,4 @@
 - Are there competing approaches worth acknowledging?
 - Does this add value or just sound impressive?
 
-**Tone**: Direct but respectful. You're not trying to tear down — you're trying to make the work stronger. "This section would be more compelling if..." rather than "This is wrong."
-
-**British English Throughout**: Consistently use organisation, optimise, behaviour, whilst, realise, etc.
+**Tone**: Direct but respectful. You're not trying to tear down; you're trying to make the work stronger. "This section would be more compelling if..." rather than "This is wrong."
