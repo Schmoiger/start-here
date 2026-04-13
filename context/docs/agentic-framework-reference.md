@@ -1,10 +1,10 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft
-**Version**: 0.5
+**Version**: 0.6
 **Last Updated**: 13 April 2026
-**Word Count**: ~8,600 words
-**Reading Time**: ~36 minutes
+**Word Count**: ~8,500 words
+**Reading Time**: ~35 minutes
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
 
 ---
@@ -30,8 +30,7 @@
 11. [Scripts and Automation](#scripts-and-automation)
 12. [Portability and Framework Adapters](#portability-and-framework-adapters)
 13. [How the Parts Connect](#how-the-parts-connect)
-14. [Design Themes](#design-themes)
-15. [Reading Paths](#reading-paths)
+14. [Reading Paths](#reading-paths)
 
 ---
 
@@ -48,6 +47,8 @@ Use this document when you need to answer questions such as:
 - How do I measure whether the framework is working?
 
 Each section covers one structural area of the framework: what it contains, how it operates, and where to make changes.
+
+The companion paper develops the *why* and the trade-offs behind those choices. As you read the catalogue below, the same posture shows up repeatedly: **explicitness** (written phases, gates, paths, recovery—not tacit convention); **durability** (artefacts and handoffs—not chat memory); **reuse** (templates, shared agents, generated registries—not one-off prose); **portability** (Markdown and YAML at the core—not a single vendor runtime); and **verification** (validators, tests, reviews, gates, telemetry—not unevidenced claims). For the full argument, see `context/docs/agentic-framework.md`.
 
 ---
 
@@ -1270,22 +1271,6 @@ Without validators, generators, and hooks, the framework would rely on memory an
 ### Recovery is Built In
 
 Every workflow YAML includes a `state_recovery` section listing the files an orchestrator should read to reconstruct its position after context compaction. Every agent handoff writes durable state to disk. The `HANDOFF.md` file records the active phase *before* agents are spawned, not after they report back, ensuring the phase survives even if compaction occurs during execution.
-
----
-
-## Design Themes
-
-Five themes repeat across the framework's structure.
-
-**Explicitness over convention.** Phases, gates, file locations, role boundaries, and recovery steps are written down instead of implied. Where context is ambiguous, agents escalate rather than assume.
-
-**Durability over chat memory.** The framework assumes interruptions and context loss will happen, so it records state in artefacts, handoffs, and workflow files. Disk is durable; conversations are ephemeral.
-
-**Reuse over reinvention.** Templates, standard agent definitions, and generated registries make the next task cheaper and more predictable than the last.
-
-**Portability over tool lock-in.** The framework is designed to survive changes in agent runtime or orchestration platform. Markdown agents, YAML workflows, and adapter guidance keep the core assets independent of any single tool.
-
-**Verification over trust.** Reviewers, validators, tests, screenshots, gates, and telemetry all reinforce the same idea: outputs should be evidenced, not merely claimed.
 
 ---
 
