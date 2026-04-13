@@ -210,53 +210,15 @@ Consistency compounds. Drift taxes. The templates and validators exist to keep t
 
 ---
 
-## Known Limitations
-
-**Onboarding surface area.** 18 agents, 9 workflows, 19 rules, 14 standards, 15 templates. The framework has a steep learning curve. The recommended reading order and the companion reference document mitigate this, but the cost of operational rigour over immediate approachability is a genuine trade-off.
-
-**Rule compliance is probabilistic.** Injecting a rule into a spawn prompt does not guarantee the agent will follow it. Models sometimes ignore injected instructions, particularly under context pressure. Validators catch some violations post-hoc, but real-time enforcement during agent execution is not currently possible.
-
-**Coverage thresholds are configurable judgement calls.** The 95% coverage gate in `build.yaml` is a deliberately high bar aimed at catching the "technically tested but practically untested" failure mode. Teams with different risk profiles should adjust this threshold. The framework does not claim 95% is universally optimal.
-
-**Centralised orchestration.** All rule resolution, scope assignment, commit coordination, and workflow progression flow through a single orchestrator agent. A bad orchestrator decision propagates downstream. Escalation rules and quality gates provide mitigation, but the architecture is inherently hub-and-spoke.
-
-**Portability gap.** The design is runtime-agnostic in principle; the current implementation leans on Claude Code. Adaptation to other runtimes is documented in `context/docs/framework-adapters.md` but requires non-trivial work.
-
-**Agent count is provisional.** 18 agents is a working configuration, not a proven optimum. The framework is designed to make merging or splitting agents inexpensive, and the roster should be expected to evolve as more data accumulates.
-
----
-
-## Boundaries
+## Limitations
 
 **This is not an application architecture.** It does not prescribe service boundaries, data models, or UI patterns. It prescribes how agents coordinate whilst building those things.
 
+**Rule compliance is probabilistic.** Injecting a rule into a spawn prompt does not guarantee the agent will follow it. Models sometimes ignore injected instructions, particularly under context pressure. Validators catch some violations post-hoc, but real-time enforcement during agent execution is not currently possible.
+
 **This is not a replacement for human judgement.** Human judgement sits at review gates, design approvals, escalation boundaries, and framework evolution decisions. The framework automates the mechanical coordination so that human attention is spent governing above the loop rather than embedded in every step.
 
-**This is not the only viable approach.** Simpler configurations (a single well-prompted agent with good context) can be effective for smaller or less demanding projects where supervision overhead is acceptable. This framework is designed for production-quality work where the coordination cost is justified by quality and durability requirements.
-
----
-
-## Getting Started
-
-Recommended reading order for new contributors:
-
-1. `context/README.md`: framework orientation
-2. `AGENTS.md`: agent roster and workflow summary
-3. `context/docs/orchestration-patterns.md`: coordination models
-4. The workflow YAML for the intended task type
-5. The relevant agent definition
-6. The relevant output template
-7. The rules and standards referenced by that agent
-
-This sequence mirrors the framework's own logic: orient, understand the workers, understand the sequencing, understand the expectations, then inspect the detailed policy.
-
----
-
-## Summary
-
-The central observation behind this framework: **multi-agent systems fail from lost context more often than from bad code.** The rules, standards, templates, validators, recovery procedures, and structured handoffs all follow from that observation.
-
-Context is durable. Context is explicit. Context is the product.
+**This is not the only viable approach.** Simpler configurations (a single well-prompted agent with good context) can be effective for smaller or less demanding projects where supervision overhead is acceptable. A swarm model (multiple agents exploring different approaches in parallel, with the best result selected) trades coordination overhead for exploration breadth and may suit problems where the optimal solution is unclear. This framework defaults to a hive model because production-quality work benefits more from coordinated specialisation than parallel exploration.
 
 ---
 
