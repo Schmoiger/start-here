@@ -177,7 +177,8 @@ context/
 │   └── framework-adapters.md           # Cross-framework compatibility
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
 ├── persona/                       # Writing voice for human-facing content
-│   ├── technical-writer.md       # Dr. Sarah Chen persona (blogs, papers)
+│   ├── technical-writer.md       # Amara Osei persona (practitioner guides, technical prose)
+│   ├── opinionated-blogger.md   # Dr. Sarah Chen persona (blogs, opinion pieces)
 │   ├── editor.md                 # Editorial voice
 │   └── expert-reviewer.md        # Review voice
 ├── mcp/                          # MCP server configuration
