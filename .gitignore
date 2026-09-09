@@ -212,3 +212,7 @@ __marimo__/
 # MCP config (contains API keys)
 context/mcp/mcp.json
 bollinger-context
+
+# Claude Code local configuration
+.claude/settings.local.json
+.claude/settings.local.json.backup*

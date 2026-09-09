@@ -50,3 +50,5 @@ Claude Code's permission system evaluates commands by:
 2. **Pipe boundary splitting** — compound commands are split at `|`; each segment is checked independently.
 3. **Line-based scanning** — multiline strings are scanned line by line; `#`-prefixed lines and consecutive quotes trigger injection heuristics.
 4. **Compound command heuristics** — `cd X && Y` triggers the bare-repository-attack check regardless of allowlist entries.
+
+See `context/templates/settings-local-template.json` (deployed to `.claude/settings.local.json`) for the baseline repository allowlist conforming to these rules.
