@@ -1,4 +1,15 @@
-# Agents
+# AGENTS.md
+
+## System Instructions
+Always follow the specific instructions in the `context/` directory. 
+
+## Standards
+INLINE_COMPREHENSIVE
+
+## Tool Mappings
+- Use `replace_file_content` for editing contiguous blocks of code.
+- Use `run_command` for executing terminal commands.
+- Use `call_mcp_tool` for MCP interactions.
 
 ## On Start
 Glob `**/artefacts/README.md` and read all matches. Run `git log --oneline -5`.
