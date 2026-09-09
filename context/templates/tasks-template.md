@@ -107,9 +107,9 @@ After T-1 RED, dispatch 2:
 
 Define commit granularity and message format upfront. One commit per task is the default.
 Agents do not commit — they write a commit message to `/tmp/{task-id}_commit_msg.txt` and
-report the file list. The orchestrator commits on their behalf (see `agent-standards.md` §4.4).
+report the file list. The orchestrator commits and pushes on their behalf (see `agent-standards.md` §4.4).
 
-Push cadence: the orchestrator pushes after each completed sprint or logical group, not per commit.
+Push cadence: the orchestrator pushes immediately after each commit (commit & push per task) to protect from accidental deletion.
 
 ```markdown
 ### Commit Strategy
@@ -121,7 +121,7 @@ One commit per task, on the `{branch}` branch. Commit messages follow convention
 | T-1 | `type(scope): description` |
 | T-2 | `type(scope): description` |
 
-Push after: Sprint 1 complete, Sprint 2 complete.
+Push after: every commit (immediate push to remote).
 ```
 
 Additional guidance to include when relevant:

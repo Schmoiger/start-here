@@ -10,14 +10,14 @@ alwaysApply: true
 
 ## Who Commits
 
-**Agents do not commit.** They lint their code, write a commit message to `/tmp/{task-id}_commit_msg.txt`, and report the file list + message path back to the orchestrator. The orchestrator formats, stages, and commits on their behalf — one at a time.
+**Agents do not commit.** They lint their code, write a commit message to `/tmp/{task-id}_commit_msg.txt`, and report the file list + message path back to the orchestrator. The orchestrator formats, stages, commits, and pushes on their behalf — one at a time.
 
 ## Commit Commands (Orchestrator Only)
 
 | Action | Correct | Wrong |
 |--------|---------|-------|
-| Multi-line commit | Write tool → `/tmp/msg.txt`, then `git add <files> && git commit -F /tmp/msg.txt` | `git commit -m "$(...)"`, `printf ... \| git commit -F -` |
-| Single-line commit | `git commit -m "type(scope): description"` | N/A |
+| Multi-line commit | Write tool → `/tmp/msg.txt`, then `git add <files> && git commit -F /tmp/msg.txt && git push` | `git commit -m "$(...)"`, `printf ... \| git commit -F -` |
+| Single-line commit | `git commit -m "type(scope): description" && git push` | N/A |
 | Directory-specific | `git -C /abs/path <subcommand>` | `cd /path && git`, subshells |
 
 ## Pre-Commit: Format Before Staging
@@ -88,6 +88,7 @@ When committing on behalf of an agent, the orchestrator SHALL verify the message
 4. **Check** for a `Co-Authored-By:` line; append if missing
 5. **Format** source files (ruff/biome) before staging
 6. **Commit**: `git add {files} && git commit -F /tmp/{task-id}_commit_msg.txt`
+7. **Push**: `git push` immediately to publish the commit to the remote tracking branch and protect work from accidental deletion.
 
 The orchestrator owns the commit — if the agent's message is incomplete, fix it rather than rejecting the task.
 
