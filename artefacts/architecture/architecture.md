@@ -43,6 +43,38 @@ The Agentic Orchestration Harness is a multi-agent coordination framework that d
 
 **Consequences**: Centralises the maintenance of the core harness while allowing downstream projects to seamlessly pull updates and regenerate their platform-specific adapters.
 
+### Orchestrator Delegation Pattern
+
+**Decision**: A central `@orchestrator` agent coordinates work by delegating all implementation to specialised subagents (e.g., `@python-coder`, `@functional-tester`) rather than writing code directly.
+
+**Rationale**: Specialised agents carry targeted environment rules and tools. If a single agent attempts to orchestrate, write code, and test, its context window rapidly degrades, leading to rule amnesia and tool hallucinations. The orchestrator dynamically resolves rules (`.mdc`), assigns disjoint file scopes for parallel execution, and dispatches subagents.
+
+**Consequences**: Imposes a slight overhead per task for subagent spawning, but drastically increases adherence to standards and allows parallel agent execution without file conflicts.
+
+### Durable Workflows and Quality Gates
+
+**Decision**: Development processes (e.g. TDD, Bugfix, Design) are codified as phase-based YAML (e.g. `default.yaml`), enforcing linear phase transitions with explicit quality gates.
+
+**Rationale**: Agent LLMs are eager to skip directly to implementation. Defining workflows strictly on disk forces the orchestrator to follow a process (e.g., TDD RED → GREEN → BLUE) and wait for explicit **APPROVED** verdicts at quality gates (staffed by reviewers like `@tech-lead`) before proceeding. 
+
+**Consequences**: Halts cascading failures by catching architectural or standard violations before they propagate to later implementation phases.
+
+### Compaction Resilience via Disk State
+
+**Decision**: The framework uses `HANDOFF.md`, `tasks.md`, and durable artefacts on disk as the sole source of truth for session state, strictly eschewing long-term chat memory.
+
+**Rationale**: Chat memory is ephemeral and subject to context compaction (where the LLM runtime silently truncates history). If an agent relies on chat history to know what phase it is in, it will hallucinate upon compaction. 
+
+**Consequences**: The orchestrator must write its current phase to `HANDOFF.md` *before* spawning subagents, enabling flawless state recovery if compaction occurs during a subagent run.
+
+### Telemetry and Observability
+
+**Decision**: The framework records execution telemetry (models used, agent combinations, duration, and human interaction cost) as structured metadata (`Agent-Session:` trailers) within Git commit messages, rather than relying on external dashboards or runtime logs.
+
+**Rationale**: Traditional APM tools are poorly suited for agentic orchestration where the primary metrics of interest are autonomy (zero-interaction executions) and model overhead. By injecting this directly into the Git commit history, telemetry is perfectly correlated with the code changes it produced. The orchestrator records the task, tools, and human intervention counts (approvals, interactions), and a Git hook (`prepare-commit-msg.py`) automatically appends token usage.
+
+**Consequences**: Enables querying Git history to measure framework effectiveness (e.g., how many tasks the `@python-coder` completed with zero human interventions).
+
 ---
 
 ## 3. System Context
@@ -74,32 +106,27 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph Core["Canonical Core (Source of Truth)"]
-        Rules["Rules\n(.mdc)"]
-        Workflows["Workflows\n(.yaml)"]
-        Agents["Agent Definitions\n(.md)"]
+    subgraph Compilation["Compilation Phase (Adapters)"]
+        Core["Canonical Core\n(Rules, Agents, Workflows)"]
+        CLI["Generator Engine"]
+        Target["Runtime Targets\n(CLAUDE.md, etc.)"]
+        
+        Core --> CLI
+        CLI --> Target
     end
 
-    subgraph Compiler["Adapter Generator Engine"]
-        CLI["Unified Generator CLI\n(Python)"]
-        IR["Intermediate Representation\n(Dataclasses)"]
-        Plugin["Adapter Plugins\n(Claude, Gemini, GitHub)"]
+    subgraph Runtime["Runtime Execution Environment"]
+        Orchestrator["@orchestrator"]
+        Subagents["Specialised Agents\n(Coder, Tester, Reviewer)"]
+        State["Disk State\n(HANDOFF.md, tasks.md)"]
+        Gates["Quality Gates\n(Verification)"]
+        
+        Target -.-> Orchestrator
+        Orchestrator -->|Delegates & Assigns Scope| Subagents
+        Subagents -->|Reports Verdicts| Orchestrator
+        Orchestrator -->|Writes Phase Transition| State
+        Orchestrator -->|Awaits Approval| Gates
     end
-
-    subgraph Targets["Runtime Targets (Generated)"]
-        ClaudeTarget["CLAUDE.md\nAGENTS.md"]
-        GeminiTarget["SKILL.md\nGEMINI.md"]
-        GitHubTarget["copilot-instructions.md"]
-    end
-
-    Rules --> IR
-    Workflows --> IR
-    Agents --> IR
-    IR --> CLI
-    CLI --> Plugin
-    Plugin --> ClaudeTarget
-    Plugin --> GeminiTarget
-    Plugin --> GitHubTarget
 ```
 
 ### Container Details
@@ -107,19 +134,20 @@ flowchart TB
 #### Canonical Core (`context/`)
 
 - **Responsibility**: Holds the vendor-agnostic business logic of the software engineering process.
-- **Technology**: Markdown, MDC (Markdown for Claude/AI), YAML.
+- **Technology**: Markdown, MDC, YAML.
 - **Owns**: The single source of truth for team standards and multi-agent DAG topologies.
 
 #### Adapter Generator Engine (`context/scripts/generators/`)
 
 - **Responsibility**: Parses the Core into a strongly-typed intermediate representation (IR), resolves tool mappings, and compiles target-specific payloads.
 - **Technology**: Python, `yaml`, `pydantic`/`dataclasses`.
-- **Exposes**: CLI (`generate_adapters.py --target [all|claude|gemini|github]`).
+- **Exposes**: CLI (`generate_adapters.py`).
 
-#### Runtime Targets
+#### Runtime Execution Engine (Orchestrator & Subagents)
 
-- **Responsibility**: The projected, runtime-native instruction sets that govern actual LLM execution.
-- **Technology**: Runtime-specific Markdown and JSON formats.
+- **Responsibility**: The active agents running the framework. The `@orchestrator` manages the workflow phases, state recovery, and delegates implementation tasks to specialised agents (e.g., `@python-coder`, `@tech-lead`).
+- **Technology**: Underlying LLM runtimes (Claude Code, Gemini, Copilot).
+- **Owns**: Session state management via `HANDOFF.md` and `tasks.md`.
 
 ---
 
