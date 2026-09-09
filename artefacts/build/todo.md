@@ -16,3 +16,5 @@
 [ ] Merge ui-designer and visual-designer agents
 [ ] Add template for settings.local.json
 [ ] Check standards are DRY, do not include code samples, even no installation notes (tech-standards needs work)
+[ ] Investigate Option 2 (Failure-Mode Transparency / Fail-Fast Rule): Update agent-standards with an explicit invariant forbidding silent tool substitution when standard-mandated tools (e.g. uv, yarn dlx) fail.
+[ ] Investigate Option 4 (Comprehensive Pre-Commit Validators): Upgrade british_english.py beyond a hardcoded list to comprehensive dictionary-based checks (e.g. pyspelling/Hunspell) and add pre-commit enforcement against forbidden toolchains.
