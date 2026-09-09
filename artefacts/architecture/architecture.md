@@ -37,11 +37,11 @@ The Agentic Orchestration Harness is a multi-agent coordination framework that d
 
 ### Framework Distribution via Managed Template and Internal CLI Library
 
-**Decision**: The framework is distributed to downstream projects using a template synchronization tool (e.g., `cruft`) combined with an internal Python package, replacing manual `rsync` copying.
+**Decision**: The framework is distributed to downstream projects using a template synchronisation tool (e.g., `cruft`) combined with an internal Python package, replacing manual `rsync` copying.
 
 **Rationale**: When multiple projects adopt this framework, propagating upstream improvements (new agents, improved standards, bugfixes in generators) via `rsync` leads to messy merge conflicts and divergence. By packaging the generator scripts as a versioned internal library (e.g., `pip install acme-agent-harness`) and managing the `context/` directory boilerplate via a stateful templating tool like `cruft`, downstream repositories can receive upstream updates via automated 3-way git merges, while preserving their project-specific rule overrides.
 
-**Consequences**: Centralizes the maintenance of the core harness while allowing downstream projects to seamlessly pull updates and regenerate their platform-specific adapters.
+**Consequences**: Centralises the maintenance of the core harness while allowing downstream projects to seamlessly pull updates and regenerate their platform-specific adapters.
 
 ---
 
@@ -153,7 +153,7 @@ The framework operates entirely statelessly in memory during compilation. Runtim
 The framework is "deployed" via two primary mechanisms:
 
 1. **Local Developer Workstation**: Developers run the generator CLI locally before committing.
-2. **CI/CD Pipeline**: GitHub Actions (or equivalent) runs the drift validator to ensure no PR merges with desynchronized adapters.
+2. **CI/CD Pipeline**: GitHub Actions (or equivalent) runs the drift validator to ensure no PR merges with desynchronised adapters.
 
 ```mermaid
 flowchart TB
