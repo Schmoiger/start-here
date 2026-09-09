@@ -1,5 +1,6 @@
 ---
 applyTo: "**/*.py"
+excludeAgent: "cloud-agent"
 ---
 # Python Deployment Safety
 
