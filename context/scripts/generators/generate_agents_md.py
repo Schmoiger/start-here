@@ -51,6 +51,7 @@ def collect_all_agents(workflows: dict) -> list[str]:
         'devops', 'gcp-devops',
         'documentation',
         'workflow-analyst',
+        'tokenomics-analyst',
     ]
     all_agents: set[str] = set()
     for data in workflows.values():
@@ -315,7 +316,7 @@ def generate_agent_reference(agents: dict) -> str:
         'Testing': ['ui-tester', 'security-tester'],
         'Deployment': ['gcp-devops', 'devops'],
         'Documentation': ['documentation'],
-        'Analysis': ['workflow-analyst'],
+        'Analysis': ['workflow-analyst', 'tokenomics-analyst'],
     }
     for category, agent_names in categories.items():
         present = [a for a in agent_names if a in agents]

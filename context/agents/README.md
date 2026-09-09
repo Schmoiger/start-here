@@ -26,4 +26,7 @@
 | **devops** | haiku | Deploys and validates infrastructure |
 | **documentation** | sonnet | Generates user-facing docs, API references, and guides |
 | | | |
-| **workflow-analyst** | sonnet | Analyses workflow efficiency for retrospectives |
+| **workflow-analyst** | sonnet (medium) | Analyses workflow efficiency for retrospectives |
+| **tokenomics-analyst** | sonnet (medium) | Audits agent effectiveness, token economics, and model tiering |
+
+*Note: Model tiers (small, medium, large) are mapped to specific provider models via `context/models.yaml`.*

@@ -12,6 +12,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Reference docs**         | `standards/*.md`                 | Read when agent needs guidance                       |
 | **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
 | **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies                           |
+| **Model profiles (LUT)**   | `models.yaml`                    | Maps abstract intent tiers to provider families and telemetry |
 | **Framework reference**    | `docs/agentic-framework-reference.md` | Workflows, patterns, personas, adapters, measurement |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
@@ -27,6 +28,8 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 **Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/git-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [bash](rules/bash-environment.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc) · [browser](rules/browser-automation.mdc)
 
 **Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
+
+**Model Profiles (LUT)**: [models](models.yaml) — Abstract model intent tiers (`small`, `medium`, `large`), provider mapping, and telemetry locations.
 
 **Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml)
 
@@ -60,6 +63,13 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Frontmatter lists applicable `rules`, `standards`, and `model`
 - `orchestrator.md` defines orchestrator behaviour — read at session start
 - Orchestrator spawns with Task tool; see AGENTS.md for the complete registry
+
+**Model Profiles & Runtime Telemetry LUT** (`models.yaml`):
+
+- Decouples agent definitions from vendor-specific model identifiers
+- Defines abstract intent tiers (`small`, `medium`, `large`) mapped to model families
+- Delegates precise model resolution to runtime adapters / environment configurations
+- Catalogues multi-platform telemetry locations (Git trailers, Claude JSONL & Managed Agents Dreams, Antigravity transcripts)
 
 **Workflows** (`workflows/*.yaml`):
 
