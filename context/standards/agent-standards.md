@@ -138,11 +138,18 @@ Agents have access to multiple tools for different purposes. To minimise user in
 | Operation | Preferred Tool | Avoid |
 |-----------|---------------|-------|
 | Create/modify files | Write, Edit | `echo >`, `cat <<EOF`, `sed` |
-| Run tests | Bash | N/A |
+| Run tests | Bash (`uv run`, `yarn test`) | Bare `pytest`, `vitest`, `python -m pytest` |
 | Git operations | Bash | N/A |
 | Find files | Glob | `find`, `ls` |
 | Search contents | Grep | `grep`, `rg`, `ack` |
-| Install dependencies | Bash (`uv add`, `yarn add`) | Manual edits to lock files |
+| Install dependencies | Bash (`uv add`, `yarn add`) | Manual edits to lock files, `pip`, `npm` |
+
+#### 4.3.5. Failure-Mode Transparency and Fail-Fast Rule (Strict Invariant)
+
+When standard-mandated tooling (such as `uv`, `yarn dlx`, or specified linter commands) fails due to missing dependencies, path mismatches, or sandbox permissions:
+*   Agents **SHALL NOT** silently substitute unapproved alternatives (e.g. falling back to system `python`, `python3`, `pip`, or injecting ad-hoc `PYTHONPATH` exports).
+*   Silent fallback masks defects, creates untracked drift, and violates reproducibility.
+*   Agents shall treat tool execution failures as environment defects: diagnose the root cause, fix the project configuration, or escalate uncertainty per `context/rules/escalation.mdc`.
 
 ### 4.4. Version Control
 

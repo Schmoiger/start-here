@@ -28,6 +28,11 @@ Write/Edit/Glob/Grep tools execute without user permission. Bash equivalents req
 | Pattern | Problem | Fix |
 |---------|---------|-----|
 | `cd /path && command` | Triggers bare-repository-attack heuristic | Use `git -C /path` for git; use `--project /abs/path` for uv |
+| `python ...`, `python3 ...` | Bypasses project virtualenv and managed dependencies | Use `uv run [--project <path>] python ...` |
+| `pytest ...` | Bypasses project virtualenv and test dependencies | Use `uv run [--project <path>] pytest ...` |
+| `pip ...`, `pip3 ...` | Non-deterministic unpinned dependency management | Use `uv add` or `uv sync` |
+| `PYTHONPATH=...` path hacks | Masks broken environment configurations and violates isolation | Fix project virtualenv via `uv sync` |
+| Silent fallback when tool fails | Masks defects, causes environment drift, violates fail-fast invariant | Diagnose root cause of failure or escalate per `escalation.mdc` |
 | `printf ... \| git commit -F -` | Pipe splits at `\|`; each segment checked independently | Write to `/tmp/msg.txt`, then `git commit -F /tmp/msg.txt` |
 | `$(...)` command substitution | Blocked by sandbox | Write output to temp file; read separately |
 | `<(...)` process substitution | Blocked by sandbox | Write to temp file |

@@ -5,7 +5,7 @@
 [ ] When agents commit they should push as well (to protect from accidental deletion) - update agent-standards
 [x] When an orchestrator spawns a sub-agent does it give the right context files (rules, standards)? They always seem to forget.
 [WON'TDO] Keep both context and context-compressed folders - don't know which is more effective yet.
-[ ] Update the readme
+[x] Update the readme
 [x] Change artifact to artefact
 [x] Workflow should have tasks.md for tracking
 [x] Add persona (e.g. Dr. Sarah Chen from new-dev)
@@ -16,6 +16,6 @@
 [ ] Merge ui-designer and visual-designer agents
 [ ] Add template for settings.local.json
 [ ] Check standards are DRY, do not include code samples, even no installation notes (tech-standards needs work)
-[ ] Investigate Option 2 (Failure-Mode Transparency / Fail-Fast Rule): Update agent-standards with an explicit invariant forbidding silent tool substitution when standard-mandated tools (e.g. uv, yarn dlx) fail.
+[x] Investigate Option 2 (Failure-Mode Transparency / Fail-Fast Rule): Update agent-standards with an explicit invariant forbidding silent tool substitution when standard-mandated tools (e.g. uv, yarn dlx) fail.
 [ ] Investigate Option 4 (Comprehensive Pre-Commit Validators): Upgrade british_english.py beyond a hardcoded list to comprehensive dictionary-based checks (e.g. pyspelling/Hunspell) and add pre-commit enforcement against forbidden toolchains.
 [ ] Remove `context/scripts/coordinate.sh` — superseded by YAML workflow definitions (`context/workflows/*.yaml`) and agent runtime orchestration.
