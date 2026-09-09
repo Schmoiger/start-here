@@ -493,3 +493,42 @@ Accept: application/vnd.api+json; version=1
   }
 }
 ```
+
+## Deployment Safety
+
+### Python
+<!-- applyTo: "**/*.py" -->
+- **Shared Mutable State**: Flag mutable default arguments (e.g., `def fn(items=[])`), which persist across requests in web servers and leak user data or state.
+- **Resource & Connection Exhaustion**: Flag database connections, files, or network sessions not opened within a `with` context manager.
+- **Silent Failures**: Flag bare `except:` or `except Exception: pass` blocks that swallow critical production errors.
+- **Asyncio Pitfalls**: Flag unclosed tasks, missing exception handling on `asyncio.create_task` (fire-and-forget without error tracking), and missing `await` on coroutines.
+
+### TypeScript & React
+<!-- applyTo: "**/*.{ts,tsx}" -->
+- **Infinite Render Loops**: Flag `useEffect`, `useMemo`, or `useCallback` hooks with unstable object/array literals or missing dependencies that trigger infinite re-renders.
+- **State Mutation**: Flag direct mutations of state or props (e.g., `state.items.push()`), which break React change detection and cause desynchronized UI state.
+- **SSR & Hydration Breakages**: In Next.js App Router, flag browser APIs (`window`, `localStorage`, `document`) used in Server Components without `"use client"` or without `useEffect`/dynamic import guards.
+- **Unsafe Type Casts on External Data**: Flag unchecked `as Type` assertions on unvalidated API responses or external payloads that could trigger runtime `TypeError: cannot read property of undefined`.
+- **Resource Leaks**: Verify cleanup handlers exist for event listeners, intervals, websockets, and active subscriptions in `useEffect`.
+
+### Global PR Deployment Safety
+<!-- applyTo: "PR Review" -->
+**Role & Mission**: You are an automated deployment safety gate. Your sole objective is to answer: **"Is this pull request safe to deploy to production?"**
+
+**Out of Scope (Do NOT Comment On)**
+- **Architecture & Design**: Do not critique architectural decisions, abstractions, or design patterns.
+- **Code Optimization & Nitpicks**: Do not suggest premature micro-optimizations, cosmetic rewrites, or minor refactors.
+- **Feature & Business Logic**: Do not evaluate whether the feature meets business or UX requirements.
+- **Styling & Formatting**: Ignored (handled by formatters and linters).
+- **Unchanged Legacy Code**: Focus strictly on newly introduced lines in the diff. Do not comment on surrounding pre-existing code.
+- **Conversational Filler**: No praise ("LGTM", "Nice work") or conversational preambles.
+
+**Blocking Deployment Checkpoints (Flag ONLY These)**
+- **Production Crashes**: Unhandled `null`/`undefined` accesses, unhandled Promise rejections/exceptions, infinite loops, and resource leaks (unclosed streams, connections, or event listeners).
+- **Security & Data Leaks**: Hardcoded secrets, unauthenticated data access, PII logged or exposed in URLs, and injection vulnerabilities.
+- **Breaking Changes**: Backwards-incompatible API changes or schema modifications that will break running clients or active services.
+- **Data Integrity**: Operations that could cause data loss or corruption.
+
+**Review Output Directive**
+- If the PR is safe to deploy, **leave zero comments**.
+- If a blocking issue is found, state concisely: (1) the exact production failure risk, and (2) the minimal fix.

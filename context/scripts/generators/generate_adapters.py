@@ -6,6 +6,11 @@ from context.scripts.generators.adapters.gemini.generator import (
     generate_gemini_md,
     generate_skills,
 )
+from context.scripts.generators.adapters.github.generator import (
+    generate_copilot_instructions,
+    generate_prompts,
+    generate_scoped_instructions,
+)
 
 
 def main():
@@ -19,6 +24,12 @@ def main():
     generate_skills(context, repo_root)
     generate_gemini_md(context, repo_root)
     print("Successfully generated Gemini projections.")
+
+    # Generate GitHub Projections
+    generate_copilot_instructions(context, repo_root)
+    generate_prompts(context, repo_root)
+    generate_scoped_instructions(repo_root)
+    print("Successfully generated GitHub projections.")
 
 
 if __name__ == "__main__":
