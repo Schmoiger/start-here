@@ -120,9 +120,3 @@ llm = [
     "anthropic>=0.18.0",
 ]
 ```
-
-Shell tests require:
-```bash
-brew install bats-core  # macOS
-apt-get install bats    # Linux
-```
