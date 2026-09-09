@@ -103,9 +103,9 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-1 | critical | pending | - | Define intermediate canonical representation model and loader |
-| AD-2 | high | pending | AD-1 | Implement abstract tool capability mapping registry |
-| AD-3 | high | pending | AD-1 | Implement context budgeting and token delivery strategies |
+| AD-1 | critical | completed | - | Define intermediate canonical representation model and loader |
+| AD-2 | high | completed | AD-1 | Implement abstract tool capability mapping registry |
+| AD-3 | high | completed | AD-1 | Implement context budgeting and token delivery strategies |
 
 ### Sprint 2: Gemini / Antigravity Adapter Layer
 

@@ -17,6 +17,10 @@ Subagents do not auto-load rules. The orchestrator injects rules into each spawn
 
 This means a rule with `alwaysApply: true` in its `.mdc` frontmatter will NOT be injected unless it is also listed in the orchestrator's always-apply list.
 
+### Canonical Asset Parsing
+
+Markdown files in the `context/` directory (such as agents, personas, and rules) use YAML frontmatter separated by `---`. Any automated parsers or runtime adapters reading these files MUST extract this metadata by splitting on the `---` delimiters, keeping the parsed frontmatter separate from the markdown body.
+
 ## 1.2. Input Standards vs Output Artefacts
 
 Agents read from input standards and write to output artefacts. For full directory layout see [doc-standards.md §2.1](doc-standards.md#21-directory-structure).
