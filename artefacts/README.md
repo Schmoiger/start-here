@@ -11,7 +11,7 @@ System-wide outputs representing completed work across discovery, design, develo
 | **Product** | `product/` | `requirements.md`, `user-stories.md`, `open-questions.md` | `@product-expert`, `@product-owner` |
 | **Architecture** | `architecture/` | `architecture.md`, `data-model.md`, `api-catalogue.md` | `@solution-architect`, `@database-designer` |
 | **API** | `api/` | `openapi.yaml`, `api-contract.json`, `api-design-guide.md` | `@api-designer` |
-| **Design** | `design/` | `design-tokens.json`, `components.md`, `user-flows.md`, `visuals/` | `@ui-designer`, `@visual-designer` |
+| **Design** | `design/` | `design-tokens.json`, `components.md`, `user-flows.md`, `visuals/` | `@ui-designer` |
 | **Build & Tasks** | `build/` | `tasks.md`, `todo.md`, `bugs.md`, quality gate reviews | `@orchestrator`, `@tech-lead`, `@code-reviewer` |
 | **Test Results** | `test-results/` | `DASHBOARD.md`, `unit/`, `integration/`, `e2e/`, `security/` | `@functional-tester`, `@ui-tester`, `@security-tester` |
 | **Cross-Service** | `shared/` | `handoffs/`, `fixtures/`, `mocks/` | All agents |

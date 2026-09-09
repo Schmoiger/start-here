@@ -26,7 +26,6 @@ tiers:
     token_budget_guideline: "10k-30k tokens per task"
     typical_tasks:
       - Browser UI testing (@ui-tester)
-      - Visual mockup inspection and asset generation (@visual-designer)
       - Infrastructure deployment commands (@devops)
       - Simple mechanical file refactors and formatting
       - Basic smoke checks and pre-flight validation
@@ -50,6 +49,7 @@ tiers:
     cost_tier: "medium"
     token_budget_guideline: "30k-80k tokens per task"
     typical_tasks:
+      - UI and visual design, design systems, and mockups (@ui-designer)
       - Production backend and frontend coding (@python-coder, @typescript-coder)
       - TDD test authorship and execution (@functional-tester)
       - Architecture fidelity and technical review gate (@tech-lead)

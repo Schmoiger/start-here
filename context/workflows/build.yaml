@@ -317,7 +317,7 @@ phases:
     agents:
       - solution-architect  # Architecture coherence at full-feature scale
       - tech-lead           # Aggregate test health and pre-commit hooks clean
-      - visual-designer     # End-to-end design system consistency
+      - ui-designer         # End-to-end design system consistency
       - principles-reviewer # LESS principles on completed implementation
     outputs:
       - artefacts/build/
@@ -375,7 +375,7 @@ quality_gates:
   - phase: final-holistic-review
     type: approval
     required: true
-    description: "All four reviewers in parallel: solution-architect + tech-lead + visual-designer + principles-reviewer."
+    description: "All four reviewers in parallel: solution-architect + tech-lead + ui-designer + principles-reviewer."
     criteria:
       - metric: architecture_blockers
         threshold: 0

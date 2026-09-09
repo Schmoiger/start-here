@@ -10,8 +10,7 @@
 | **solution-architect** | opus | Designs system architecture, component boundaries, and data flow |
 | **database-designer** | sonnet | Designs schemas, relationships, and migrations |
 | **api-designer** | sonnet | Designs APIs with OpenAPI specifications |
-| **ui-designer** | sonnet | Designs UI layouts, component specs, and design systems |
-| **visual-designer** | haiku | Generates mockups and diagrams using AI design tools |
+| **ui-designer** | sonnet | Designs UI layouts, component specs, design systems, and visual assets |
 | | | |
 | **python-coder** | sonnet | Writes production Python code |
 | **typescript-coder** | sonnet | Builds frontend and backend TypeScript |

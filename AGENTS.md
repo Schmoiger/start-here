@@ -29,8 +29,7 @@ Load `context/workflows/<workflow>.yaml`. If no HANDOFF.md exists, ask the user 
 | `@solution-architect` | Designs system architecture, component boundaries, and data flow |
 | `@database-designer` | Designs database schemas, relationships, and migrations |
 | `@api-designer` | Designs RESTful and GraphQL APIs with OpenAPI specifications |
-| `@ui-designer` | Designs user interfaces, component layouts, and design systems |
-| `@visual-designer` | Creates visual design artefacts from structured inputs using AI design tools |
+| `@ui-designer` | Designs user interfaces, component layouts, design systems, and visual assets |
 | `@functional-tester` | Writes and runs tests for Python and TypeScript code using Detroit-school TDD |
 | `@python-coder` | Writes production Python code with testing in mind |
 | `@typescript-coder` | Builds frontend or backend TypeScript, integrating with Python APIs |

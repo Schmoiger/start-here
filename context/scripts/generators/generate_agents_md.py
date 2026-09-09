@@ -44,7 +44,7 @@ def collect_all_agents(workflows: dict) -> list[str]:
     """Union of all agents across all workflows, in workflow-stage order."""
     category_order = [
         'product-owner', 'product-expert',
-        'solution-architect', 'database-designer', 'api-designer', 'ui-designer', 'visual-designer',
+        'solution-architect', 'database-designer', 'api-designer', 'ui-designer',
         'functional-tester', 'python-coder', 'typescript-coder',
         'tech-lead', 'code-reviewer', 'principles-reviewer',
         'ui-tester', 'security-tester',
@@ -310,7 +310,7 @@ def generate_agent_reference(agents: dict) -> str:
     sections = []
     categories = {
         'Discovery': ['product-owner', 'product-expert'],
-        'Design': ['solution-architect', 'database-designer', 'api-designer', 'ui-designer', 'visual-designer'],
+        'Design': ['solution-architect', 'database-designer', 'api-designer', 'ui-designer'],
         'Development': ['functional-tester', 'python-coder', 'typescript-coder'],
         'Review': ['tech-lead', 'code-reviewer', 'principles-reviewer'],
         'Testing': ['ui-tester', 'security-tester'],

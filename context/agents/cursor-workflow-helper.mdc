@@ -53,8 +53,7 @@ Then reference: "Following the python-coder rule, implement..."
 - `solution-architect.md` - System architecture
 - `database-designer.md` - Database schema
 - `api-designer.md` - OpenAPI specs
-- `ui-designer.md` - UI wireframes
-- `visual-designer.md` - Visual assets
+- `ui-designer.md` - UI wireframes and visual design assets
 
 **Phase 2-3: Development**
 - `python-coder.md` - Python backend

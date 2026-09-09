@@ -13,7 +13,7 @@
 [x] We have security agent at the end. Better is to have LESS agents by-design = at QA points: architecture, tasks, blocking points. Bugs are added and fixed before proceeding.
 [x] For full YOLO mode how can we have some bash commands authorised and not others? Need a risk rating surfaced with all human intervention requests.
 [x] Add section in agent-standards on agent invocation because it's not in the expected .claude/agents way
-[ ] Merge ui-designer and visual-designer agents
+[x] Merge ui-designer and visual-designer agents
 [ ] Add template for settings.local.json
 [ ] Check standards are DRY, do not include code samples, even no installation notes (tech-standards needs work)
 [x] Investigate Option 2 (Failure-Mode Transparency / Fail-Fast Rule): Update agent-standards with an explicit invariant forbidding silent tool substitution when standard-mandated tools (e.g. uv, yarn dlx) fail.

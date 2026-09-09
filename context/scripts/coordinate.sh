@@ -121,8 +121,7 @@ list_agents() {
     echo "  @solution-architect  - System architecture and API contracts"
     echo "  @database-designer   - Database schema and migrations"
     echo "  @api-designer        - OpenAPI specifications"
-    echo "  @ui-designer         - UI wireframes, components, design tokens"
-    echo "  @visual-designer     - Visual assets using AI tools"
+    echo "  @ui-designer         - UI wireframes, components, design tokens, visual assets"
     echo ""
 
     log_phase "Phase 2: Tests First (domain: backend/frontend)"
@@ -177,8 +176,7 @@ Phase 1: Design (parallel)
     @solution-architect  -> architecture.md, api-contract.json
     @database-designer   -> schema.sql, migrations/
     @api-designer        -> openapi.yaml
-    @ui-designer         -> design-system.md
-    @visual-designer     -> design/visuals/
+    @ui-designer         -> design-system.md, design/visuals/
                 |
                 v
 Phase 2: Tests First (TDD RED)
@@ -409,7 +407,7 @@ worktree_switch() {
             echo "Agents in this domain: @product-owner"
             ;;
         design)
-            echo "Agents in this domain: @solution-architect, @database-designer, @api-designer, @ui-designer, @visual-designer"
+            echo "Agents in this domain: @solution-architect, @database-designer, @api-designer, @ui-designer"
             ;;
         backend)
             echo "Agents in this domain: @python-coder, @functional-tester (Python)"
