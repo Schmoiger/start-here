@@ -142,7 +142,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ### AD-1: Define intermediate canonical representation model and loader
 
-**Rationale**: The canonical layer contains YAML workflows, markdown agents with frontmatter, MDC rules, and markdown standards. Before generating platform-specific files, a parsed, type-safe intermediate representation (IR) is needed so adapters do not duplicate file parsing and validation logic.
+**Rationale**: The canonical layer contains YAML workflows, markdown agents with frontmatter, MDC rules, markdown standards, and writing personas. Before generating platform-specific files, a parsed, type-safe intermediate representation (IR) is needed so adapters do not duplicate file parsing and validation logic.
 
 **Files**:
 - Create `context/scripts/generators/adapters/__init__.py`
@@ -150,7 +150,7 @@ Update status immediately when work begins and when it completes. Every task in 
 - Create `context/scripts/generators/adapters/core/loader.py`
 
 **Acceptance**:
-- Python dataclasses or Pydantic models define `CanonicalAgent`, `CanonicalRule`, `CanonicalStandard`, `WorkflowDAG`, and `Phase`.
+- Python dataclasses or Pydantic models define `CanonicalAgent`, `CanonicalRule`, `CanonicalStandard`, `WorkflowDAG`, `Phase`, and `CanonicalPersona`.
 - `load_canonical_context()` parses all files in `context/` into strongly typed IR objects.
 - Raises structured errors if an agent references a non-existent rule or a workflow references an unmapped agent.
 
@@ -185,16 +185,18 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ### AD-4: Implement Claude Code adapter generator
 
-**Rationale**: Claude Code relies on `CLAUDE.md`, `AGENTS.md`, and subagent prompts dispatched via the Task tool. The adapter must generate `AGENTS.md` and `CLAUDE.md` with phase transitions, agent spawn templates, and token telemetry hook configurations.
+**Rationale**: Claude Code relies on `CLAUDE.md`, `AGENTS.md`, and subagent prompts dispatched via the Task tool. The adapter must generate `AGENTS.md` and `CLAUDE.md` with phase transitions, agent spawn templates, and token telemetry hook configurations. To satisfy REQ-ADP-006 (Claude Native Orchestration Reconciliation), this adapter is the most complex: it must balance the framework's governance (rule injection, file scopes, quality gates, handoffs) with Claude's native multi-agent primitives (subagent spawning, Task tool).
 
 **Files**:
 - Create `context/scripts/generators/adapters/claude/__init__.py`
 - Create `context/scripts/generators/adapters/claude/generator.py`
+- Create `context/scripts/generators/adapters/claude/reconciler.py` (to handle native orchestration mapping)
 
 **Acceptance**:
 - Generates `AGENTS.md` and `CLAUDE.md` reflecting all workflows and agent frontmatter.
 - Formats spawn prompts with mandatory tool requirement blocks (`Write`/`Edit`, `uv run`, `yarn dlx`).
 - Includes session telemetry git hook configuration guidance.
+- Reconciles Claude's native orchestration primitives (Task tool, subagents) with framework governance (quality gates, phase execution, handoffs).
 
 ---
 
@@ -345,7 +347,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ### AD-15: Update framework reference and portability adapter documentation
 
-**Rationale**: Operators and contributors need comprehensive documentation explaining how to run, configure, and extend the runtime adapter system.
+**Rationale**: Operators and contributors need comprehensive documentation explaining how to run, configure, and extend the runtime adapter system, as well as how the adapters ensure the three foundational NFR axes (autonomy, token efficiency, intent preservation).
 
 **Files**:
 - Update `context/docs/agentic-framework-reference.md`
@@ -354,6 +356,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 **Acceptance**:
 - Details the Ports and Adapters architecture, CLI commands, and platform configuration guides.
+- Explains how the adapters uphold autonomy, token efficiency, and intent preservation requirements.
 - British English spelling and documentation standards strictly maintained.
 
 ---
