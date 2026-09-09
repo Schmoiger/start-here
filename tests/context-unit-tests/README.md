@@ -12,9 +12,6 @@ uv sync
 # Run all Python tests
 uv run pytest . -v
 
-# Run shell tests (requires bats-core)
-bats coordinate.bats
-
 # Run LLM consistency check (requires API key)
 ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 ```
@@ -26,7 +23,6 @@ ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 | `test_doc_format.py` | Validates YAML frontmatter, required sections, markdown syntax | No |
 | `test_references.py` | Validates cross-references between docs, agent-standards consistency | No |
 | `test_llm_consistency.py` | Semantic consistency checks via LLM call | Yes |
-| `coordinate.bats` | Shell tests for coordinate.sh worktree management | No |
 
 ## Running Tests
 
@@ -43,8 +39,6 @@ uv run pytest test_doc_format.py -v
 # Cross-reference validation
 uv run pytest test_references.py -v
 
-# Shell script tests (requires bats-core)
-bats coordinate.bats
 ```
 
 ### LLM Consistency Check (Slow, Requires API Key)
@@ -59,7 +53,7 @@ ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 The LLM test performs a single API call to check for:
 - File reference errors
 - Agent name mismatches
-- Domain inconsistencies between agent-standards.md and coordinate.sh
+- Domain inconsistencies between agent-standards.md and workflow definitions
 - Artifact path conflicts
 - Standards contradictions
 - Missing cross-references
@@ -90,24 +84,13 @@ The LLM test performs a single API call to check for:
 - Context paths in agents reference valid patterns
 - File references in standards point to existing files
 - Agents listed in agent-standards.md have definition files
-- Domains in coordinate.sh match agent-standards.md
-- Links in docs/README.md are valid
-
-### coordinate.bats
-
-- coordinate.sh is executable
-- All commands work: help, list, workflow, structure, init
-- Worktree commands: create, list, switch, sync
-- Directory structure created correctly
-- Domain configuration matches expectations
 
 ## CI Integration
 
 The GitHub Actions workflow (`.github/workflows/docs-test.yml`) runs:
 
 1. **lint** job: Static analysis tests (always runs, uses uv)
-2. **shell** job: Bats tests for coordinate.sh (always runs)
-3. **llm-consistency** job: LLM checks (optional, requires secret)
+2. **llm-consistency** job: LLM checks (optional, requires secret)
 
 To enable LLM tests in CI:
 1. Add `ANTHROPIC_API_KEY` as a repository secret

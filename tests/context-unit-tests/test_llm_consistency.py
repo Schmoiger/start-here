@@ -61,7 +61,7 @@ CHECK FOR THESE SPECIFIC ISSUES:
 
 1. **File Reference Errors**: Any `./path/to/file` references that point to files not in this doc set
 2. **Agent Name Mismatches**: Agent names in CLAUDE.md that don't match actual agent file names
-3. **Domain Inconsistencies**: Domains in agent-standards.md that don't match coordinate.sh or CLAUDE.md
+3. **Domain Inconsistencies**: Domains in agent-standards.md that don't match workflow definitions or CLAUDE.md
 4. **Artifact Path Conflicts**: Different docs claiming different output paths for the same agent
 5. **Standards Contradictions**: Rules in one doc that contradict rules in another
 6. **Missing Cross-References**: Agents mentioned but not defined, or standards referenced but not present
