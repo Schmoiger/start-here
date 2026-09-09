@@ -111,9 +111,9 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-4 | critical | pending | AD-2, AD-3 | Implement Gemini / Antigravity adapter (skills, `GEMINI.md`, MCP bindings) |
-| AD-5 | high | pending | AD-4 | Add unit test suite for Gemini adapter generator |
-| AD-6 | medium | pending | AD-5 | Generate and verify initial Gemini projections in repository |
+| AD-4 | critical | completed | AD-2, AD-3 | Implement Gemini / Antigravity adapter (skills, `GEMINI.md`, MCP bindings) |
+| AD-5 | high | completed | AD-4 | Add unit test suite for Gemini adapter generator |
+| AD-6 | medium | completed | AD-5 | Generate and verify initial Gemini projections in repository |
 
 ### Sprint 3: GitHub Copilot Adapter Layer
 
