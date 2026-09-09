@@ -2,10 +2,10 @@
 
 **Branch**: `env/runtime-adapters`  
 **Status**: Planning  
-**Scope**: Build the multi-platform runtime adapter system to compile canonical `context/` assets into native configurations, prompts, and tool mappings for Claude Code, Google Gemini / Antigravity, GitHub Copilot, and OpenAI Codex.  
+**Scope**: Build the multi-platform runtime adapter system to compile canonical `context/` assets into native configurations, prompts, and tool mappings for Google Gemini / Antigravity, GitHub Copilot, Claude Code, and OpenAI Codex.  
 **Design**: `artefacts/architecture/architecture.md`  
 **Created**: 2026-09-09  
-**Amended**: N/A  
+**Amended**: 2026-09-09  
 
 ---
 
@@ -13,19 +13,23 @@
 
 ### Parallelism Strategy
 
-Tasks are grouped into six sequential sprints. Within each sprint, tasks with disjoint file scopes can be executed in parallel.
+Tasks are grouped into eight sequential sprints, prioritising the adapters in order: Gemini / Antigravity, GitHub Copilot, Claude Code, and OpenAI / Codex. Within each sprint, tasks with disjoint file scopes can be executed in parallel.
 
 - **Sprint 1 (Foundation)**: AD-1 → AD-2 + AD-3 (parallel)  
   *file_scope*: `context/scripts/generators/adapters/core/`, `context/standards/`
-- **Sprint 2 (Claude & Gemini)**: AD-4 + AD-5 (parallel) → AD-6 + AD-7 (parallel)  
-  *file_scope*: `context/scripts/generators/adapters/claude/`, `context/scripts/generators/adapters/gemini/`, `.agents/`
-- **Sprint 3 (GitHub & Codex)**: AD-8 + AD-9 (parallel) → AD-10 + AD-11 (parallel)  
-  *file_scope*: `context/scripts/generators/adapters/github/`, `context/scripts/generators/adapters/codex/`, `.github/`
-- **Sprint 4 (CLI & Drift Enforcement)**: AD-12 → AD-13 + AD-14 (parallel)  
-  *file_scope*: `context/scripts/generators/generate_adapters.py`, `context/scripts/validators/`
-- **Sprint 5 (Docs & E2E Verification)**: AD-15 + AD-16 (parallel) → AD-17  
+- **Sprint 2 (Gemini / Antigravity)**: AD-4 → AD-5 → AD-6  
+  *file_scope*: `context/scripts/generators/adapters/gemini/`, `context/scripts/tests/test_gemini_adapter.py`, `.agents/skills/`, `GEMINI.md`
+- **Sprint 3 (GitHub Copilot)**: AD-7 → AD-8 → AD-9  
+  *file_scope*: `context/scripts/generators/adapters/github/`, `context/scripts/tests/test_github_adapter.py`, `.github/`
+- **Sprint 4 (Claude Code)**: AD-10 → AD-11 → AD-12  
+  *file_scope*: `context/scripts/generators/adapters/claude/`, `context/scripts/tests/test_claude_adapter.py`, `CLAUDE.md`, `AGENTS.md`
+- **Sprint 5 (OpenAI / Codex)**: AD-13 → AD-14 → AD-15  
+  *file_scope*: `context/scripts/generators/adapters/codex/`, `context/scripts/runners/`, `context/scripts/tests/test_codex_adapter.py`
+- **Sprint 6 (CLI & Drift Enforcement)**: AD-16 → AD-17 → AD-18  
+  *file_scope*: `context/scripts/generators/generate_adapters.py`, `context/scripts/validators/`, `.pre-commit-config.yaml`
+- **Sprint 7 (Docs & E2E Verification)**: AD-19 + AD-20 (parallel) → AD-21  
   *file_scope*: `context/docs/`, `context/scripts/tests/`, `README.md`
-- **Sprint 6 (Packaging & Distribution)**: AD-18 + AD-19 (parallel)  
+- **Sprint 8 (Packaging & Distribution)**: AD-22 + AD-23 (parallel)  
   *file_scope*: `pyproject.toml`, `cookiecutter.json`, `{{cookiecutter.project_name}}/`
 
 ### Commit Strategy
@@ -37,22 +41,26 @@ One commit per task on branch `env/runtime-adapters`. Conventional commit format
 | AD-1 | `feat(adapters): define intermediate canonical representation and schema` |
 | AD-2 | `feat(adapters): implement abstract tool capability mapping registry` |
 | AD-3 | `feat(adapters): implement context budgeting and ingestion strategies` |
-| AD-4 | `feat(adapters): implement claude code adapter generator` |
-| AD-5 | `feat(adapters): implement gemini and antigravity adapter generator` |
-| AD-6 | `test(adapters): add test suite for claude and gemini adapters` |
-| AD-7 | `feat(adapters): generate initial claude and gemini projections` |
-| AD-8 | `feat(adapters): implement github copilot adapter generator` |
-| AD-9 | `feat(adapters): implement codex and openai adapter generator` |
-| AD-10 | `test(adapters): add test suite for github and codex adapters` |
-| AD-11 | `feat(adapters): generate initial github and codex projections` |
-| AD-12 | `feat(adapters): create unified generate_adapters.py cli dispatcher` |
-| AD-13 | `feat(validators): implement adapter_drift.py pre-commit validator` |
-| AD-14 | `ci(hooks): wire adapter drift verification into git pre-commit hooks` |
-| AD-15 | `docs(adapters): update framework reference and architecture documentation` |
-| AD-16 | `test(adapters): add end-to-end multi-target compilation tests` |
-| AD-17 | `chore(build): final quality review and tasks sign-off` |
-| AD-18 | `feat(packaging): scaffold cruft and cookiecutter template for framework distribution` |
-| AD-19 | `build(packaging): configure pyproject.toml to publish generator engine as CLI library` |
+| AD-4 | `feat(adapters): implement gemini and antigravity adapter generator` |
+| AD-5 | `test(adapters): add test suite for gemini adapter generator` |
+| AD-6 | `feat(adapters): generate and verify initial gemini projections` |
+| AD-7 | `feat(adapters): implement github copilot adapter generator` |
+| AD-8 | `test(adapters): add test suite for github copilot adapter generator` |
+| AD-9 | `feat(adapters): generate and verify initial github projections` |
+| AD-10 | `feat(adapters): implement claude code adapter generator` |
+| AD-11 | `test(adapters): add test suite for claude code adapter generator` |
+| AD-12 | `feat(adapters): generate and verify initial claude projections` |
+| AD-13 | `feat(adapters): implement codex and openai adapter generator` |
+| AD-14 | `test(adapters): add test suite for codex and openai adapter generator` |
+| AD-15 | `feat(adapters): generate and verify initial codex and openai projections` |
+| AD-16 | `feat(adapters): create unified generate_adapters.py cli dispatcher` |
+| AD-17 | `feat(validators): implement adapter_drift.py pre-commit validator` |
+| AD-18 | `ci(hooks): wire adapter drift verification into git pre-commit hooks` |
+| AD-19 | `docs(adapters): update framework reference and architecture documentation` |
+| AD-20 | `test(adapters): add end-to-end multi-target compilation tests` |
+| AD-21 | `chore(build): final quality review and tasks sign-off` |
+| AD-22 | `feat(packaging): scaffold cruft and cookiecutter template for framework distribution` |
+| AD-23 | `build(packaging): configure pyproject.toml to publish generator engine as CLI library` |
 
 Push cadence: Push after each completed sprint.
 
@@ -64,21 +72,25 @@ Push cadence: Push after each completed sprint.
 | AD-2 | python-coder | Medium (30–50k tokens) |
 | AD-3 | python-coder | Small (20–30k tokens) |
 | AD-4 | python-coder | Medium (40–60k tokens) |
-| AD-5 | python-coder | Medium (40–60k tokens) |
-| AD-6 | functional-tester | Medium (30–50k tokens) |
-| AD-7 | python-coder | Small (15–25k tokens) |
-| AD-8 | python-coder | Medium (40–60k tokens) |
-| AD-9 | python-coder | Medium (40–60k tokens) |
-| AD-10 | functional-tester | Medium (30–50k tokens) |
-| AD-11 | python-coder | Small (15–25k tokens) |
-| AD-12 | python-coder | Medium (30–50k tokens) |
-| AD-13 | python-coder | Small (20–30k tokens) |
-| AD-14 | devops | Small (15–25k tokens) |
-| AD-15 | documentation | Medium (30–50k tokens) |
-| AD-16 | functional-tester | Medium (35–55k tokens) |
-| AD-17 | tech-lead | Small (15–25k tokens) |
-| AD-18 | devops | Medium (30–50k tokens) |
-| AD-19 | devops | Small (20–30k tokens) |
+| AD-5 | functional-tester | Small (20–30k tokens) |
+| AD-6 | python-coder | Small (15–25k tokens) |
+| AD-7 | python-coder | Medium (40–60k tokens) |
+| AD-8 | functional-tester | Small (20–30k tokens) |
+| AD-9 | python-coder | Small (15–25k tokens) |
+| AD-10 | python-coder | Medium (40–60k tokens) |
+| AD-11 | functional-tester | Small (20–30k tokens) |
+| AD-12 | python-coder | Small (15–25k tokens) |
+| AD-13 | python-coder | Medium (40–60k tokens) |
+| AD-14 | functional-tester | Small (20–30k tokens) |
+| AD-15 | python-coder | Small (15–25k tokens) |
+| AD-16 | python-coder | Medium (30–50k tokens) |
+| AD-17 | python-coder | Small (20–30k tokens) |
+| AD-18 | devops | Small (15–25k tokens) |
+| AD-19 | documentation | Medium (30–50k tokens) |
+| AD-20 | functional-tester | Medium (35–55k tokens) |
+| AD-21 | tech-lead | Small (15–25k tokens) |
+| AD-22 | devops | Medium (30–50k tokens) |
+| AD-23 | devops | Small (20–30k tokens) |
 | **Total** | | **~520–800k tokens** |
 
 ---
@@ -95,46 +107,60 @@ Update status immediately when work begins and when it completes. Every task in 
 | AD-2 | high | pending | AD-1 | Implement abstract tool capability mapping registry |
 | AD-3 | high | pending | AD-1 | Implement context budgeting and token delivery strategies |
 
-### Sprint 2: Claude Code & Gemini / Antigravity Adapters
+### Sprint 2: Gemini / Antigravity Adapter Layer
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-4 | critical | pending | AD-2, AD-3 | Implement Claude Code adapter (`CLAUDE.md`, `AGENTS.md`, subagent prompts) |
-| AD-5 | critical | pending | AD-2, AD-3 | Implement Gemini / Antigravity adapter (skills, `GEMINI.md`, MCP bindings) |
-| AD-6 | high | pending | AD-4, AD-5 | Add unit test suite for Claude and Gemini adapter generators |
-| AD-7 | medium | pending | AD-6 | Generate and verify initial Claude and Gemini projections in repository |
+| AD-4 | critical | pending | AD-2, AD-3 | Implement Gemini / Antigravity adapter (skills, `GEMINI.md`, MCP bindings) |
+| AD-5 | high | pending | AD-4 | Add unit test suite for Gemini adapter generator |
+| AD-6 | medium | pending | AD-5 | Generate and verify initial Gemini projections in repository |
 
-### Sprint 3: GitHub Copilot & Codex / OpenAI Adapters
-
-| ID | Pri | Status | Blocked By | Task |
-|----|-----|--------|------------|------|
-| AD-8 | high | pending | AD-2, AD-3 | Implement GitHub Copilot adapter (`.github/copilot-instructions.md`, prompt files) |
-| AD-9 | high | pending | AD-2, AD-3 | Implement Codex / OpenAI adapter (system prompts, tool JSON schemas, runner harness) |
-| AD-10 | high | pending | AD-8, AD-9 | Add unit test suite for GitHub and Codex adapter generators |
-| AD-11 | medium | pending | AD-10 | Generate and verify initial GitHub and Codex projections in repository |
-
-### Sprint 4: Unified Adapter CLI & Drift Enforcement
+### Sprint 3: GitHub Copilot Adapter Layer
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-12 | high | pending | AD-7, AD-11 | Create unified `generate_adapters.py` CLI dispatcher |
-| AD-13 | high | pending | AD-12 | Implement `adapter_drift.py` pre-commit validator |
-| AD-14 | medium | pending | AD-13 | Wire adapter drift check into `.pre-commit-config.yaml` |
+| AD-7 | high | pending | AD-2, AD-3 | Implement GitHub Copilot adapter (`.github/copilot-instructions.md`, prompt files) |
+| AD-8 | high | pending | AD-7 | Add unit test suite for GitHub adapter generator |
+| AD-9 | medium | pending | AD-8 | Generate and verify initial GitHub projections in repository |
 
-### Sprint 5: Documentation & End-to-End Verification
-
-| ID | Pri | Status | Blocked By | Task |
-|----|-----|--------|------------|------|
-| AD-15 | medium | pending | AD-12 | Update framework reference and portability adapter documentation |
-| AD-16 | high | pending | AD-12, AD-13 | Add end-to-end multi-target compilation test suite |
-| AD-17 | critical | pending | AD-15, AD-16 | Quality gate review: verify all 4 adapters compile without errors |
-
-### Sprint 6: Packaging & Distribution
+### Sprint 4: Claude Code Adapter Layer
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-18 | high | pending | AD-17 | Scaffold Cruft / Cookiecutter template structure |
-| AD-19 | high | pending | AD-17 | Package the Generator Engine as a Python CLI library (`pyproject.toml`) |
+| AD-10 | critical | pending | AD-2, AD-3 | Implement Claude Code adapter (`CLAUDE.md`, `AGENTS.md`, subagent prompts, native orchestration reconciliation) |
+| AD-11 | high | pending | AD-10 | Add unit test suite for Claude adapter generator |
+| AD-12 | medium | pending | AD-11 | Generate and verify initial Claude projections in repository |
+
+### Sprint 5: OpenAI / Codex Adapter Layer
+
+| ID | Pri | Status | Blocked By | Task |
+|----|-----|--------|------------|------|
+| AD-13 | high | pending | AD-2, AD-3 | Implement Codex / OpenAI adapter (system prompts, tool JSON schemas, runner harness) |
+| AD-14 | high | pending | AD-13 | Add unit test suite for Codex and OpenAI adapter generator |
+| AD-15 | medium | pending | AD-14 | Generate and verify initial Codex and OpenAI projections in repository |
+
+### Sprint 6: Unified Adapter CLI & Drift Enforcement
+
+| ID | Pri | Status | Blocked By | Task |
+|----|-----|--------|------------|------|
+| AD-16 | high | pending | AD-6, AD-9, AD-12, AD-15 | Create unified `generate_adapters.py` CLI dispatcher |
+| AD-17 | high | pending | AD-16 | Implement `adapter_drift.py` pre-commit validator |
+| AD-18 | medium | pending | AD-17 | Wire adapter drift check into `.pre-commit-config.yaml` |
+
+### Sprint 7: Documentation & End-to-End Verification
+
+| ID | Pri | Status | Blocked By | Task |
+|----|-----|--------|------------|------|
+| AD-19 | medium | pending | AD-16 | Update framework reference and portability adapter documentation |
+| AD-20 | high | pending | AD-16, AD-17 | Add end-to-end multi-target compilation test suite |
+| AD-21 | critical | pending | AD-19, AD-20 | Quality gate review: verify all 4 adapters compile without errors |
+
+### Sprint 8: Packaging & Distribution
+
+| ID | Pri | Status | Blocked By | Task |
+|----|-----|--------|------------|------|
+| AD-22 | high | pending | AD-21 | Scaffold Cruft / Cookiecutter template structure |
+| AD-23 | high | pending | AD-21 | Package the Generator Engine as a Python CLI library (`pyproject.toml`) |
 
 ---
 
@@ -183,24 +209,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-4: Implement Claude Code adapter generator
-
-**Rationale**: Claude Code relies on `CLAUDE.md`, `AGENTS.md`, and subagent prompts dispatched via the Task tool. The adapter must generate `AGENTS.md` and `CLAUDE.md` with phase transitions, agent spawn templates, and token telemetry hook configurations. To satisfy REQ-ADP-006 (Claude Native Orchestration Reconciliation), this adapter is the most complex: it must balance the framework's governance (rule injection, file scopes, quality gates, handoffs) with Claude's native multi-agent primitives (subagent spawning, Task tool).
-
-**Files**:
-- Create `context/scripts/generators/adapters/claude/__init__.py`
-- Create `context/scripts/generators/adapters/claude/generator.py`
-- Create `context/scripts/generators/adapters/claude/reconciler.py` (to handle native orchestration mapping)
-
-**Acceptance**:
-- Generates `AGENTS.md` and `CLAUDE.md` reflecting all workflows and agent frontmatter.
-- Formats spawn prompts with mandatory tool requirement blocks (`Write`/`Edit`, `uv run`, `yarn dlx`).
-- Includes session telemetry git hook configuration guidance.
-- Reconciles Claude's native orchestration primitives (Task tool, subagents) with framework governance (quality gates, phase execution, handoffs).
-
----
-
-### AD-5: Implement Gemini / Antigravity adapter generator
+### AD-4: Implement Gemini / Antigravity adapter generator
 
 **Rationale**: Gemini and the Google Antigravity IDE use `.agents/skills/*/SKILL.md` structures, `GEMINI.md`, and MCP server configurations. Large context windows allow direct ingestion of reference standards.
 
@@ -215,27 +224,25 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-6: Add unit test suite for Claude and Gemini adapter generators
+### AD-5: Add unit test suite for Gemini adapter generator
 
 **Rationale**: Test-Driven Development requires verified tests for generators before deploying them to production pipelines.
 
 **Files**:
-- Create `context/scripts/tests/test_claude_adapter.py`
 - Create `context/scripts/tests/test_gemini_adapter.py`
 
 **Acceptance**:
-- Tests verify output structure, markdown syntax, frontmatter parsing, and tool mappings for both Claude and Gemini.
+- Tests verify output structure, markdown syntax, frontmatter parsing, and tool mappings for Gemini.
 - All tests pass via `python3 -m unittest` or `pytest`.
 
 ---
 
-### AD-7: Generate and verify initial Claude and Gemini projections in repository
+### AD-6: Generate and verify initial Gemini projections in repository
 
-**Rationale**: Apply the new generators to produce repository-level projections and verify that no manual drift exists.
+**Rationale**: Apply the new Gemini generator to produce repository-level projections and verify that no manual drift exists.
 
 **Files**:
-- Output `AGENTS.md`
-- Output `CLAUDE.md`
+- Output `GEMINI.md`
 - Output `.agents/skills/` (if enabled in repo configuration)
 
 **Acceptance**:
@@ -244,7 +251,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-8: Implement GitHub Copilot adapter generator
+### AD-7: Implement GitHub Copilot adapter generator
 
 **Rationale**: GitHub Copilot uses `.github/copilot-instructions.md`, custom reusable prompts (`.github/prompts/*.prompt.md`), and workspace indexing settings.
 
@@ -258,7 +265,78 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-9: Implement Codex / OpenAI adapter generator
+### AD-8: Add unit test suite for GitHub adapter generator
+
+**Rationale**: Ensure GitHub adapter outputs conform to target platform specifications.
+
+**Files**:
+- Create `context/scripts/tests/test_github_adapter.py`
+
+**Acceptance**:
+- Tests verify `.github/copilot-instructions.md` generation, prompt file formatting, and markdown syntax.
+- All tests pass with zero errors.
+
+---
+
+### AD-9: Generate and verify initial GitHub projections in repository
+
+**Rationale**: Produce actual GitHub Copilot instructions to validate real-world file layout.
+
+**Files**:
+- Output `.github/copilot-instructions.md`
+- Output `.github/prompts/`
+
+**Acceptance**:
+- Generated files adhere to GitHub Copilot conventions.
+- Auto-generation notices are clearly displayed.
+
+---
+
+### AD-10: Implement Claude Code adapter generator
+
+**Rationale**: Claude Code relies on `CLAUDE.md`, `AGENTS.md`, and subagent prompts dispatched via the Task tool. The adapter must generate `AGENTS.md` and `CLAUDE.md` with phase transitions, agent spawn templates, and token telemetry hook configurations. To satisfy REQ-ADP-006 (Claude Native Orchestration Reconciliation), this adapter must balance the framework's governance (rule injection, file scopes, quality gates, handoffs) with Claude's native multi-agent primitives (subagent spawning, Task tool).
+
+**Files**:
+- Create `context/scripts/generators/adapters/claude/__init__.py`
+- Create `context/scripts/generators/adapters/claude/generator.py`
+- Create `context/scripts/generators/adapters/claude/reconciler.py` (to handle native orchestration mapping)
+
+**Acceptance**:
+- Generates `AGENTS.md` and `CLAUDE.md` reflecting all workflows and agent frontmatter.
+- Formats spawn prompts with mandatory tool requirement blocks (`Write`/`Edit`, `uv run`, `yarn dlx`).
+- Includes session telemetry git hook configuration guidance.
+- Reconciles Claude's native orchestration primitives (Task tool, subagents) with framework governance (quality gates, phase execution, handoffs).
+
+---
+
+### AD-11: Add unit test suite for Claude adapter generator
+
+**Rationale**: Ensure Claude Code adapter outputs conform to target platform specifications and subagent dispatch schemas.
+
+**Files**:
+- Create `context/scripts/tests/test_claude_adapter.py`
+
+**Acceptance**:
+- Tests verify output structure, markdown syntax, frontmatter parsing, and tool mappings for Claude.
+- All tests pass via `python3 -m unittest` or `pytest`.
+
+---
+
+### AD-12: Generate and verify initial Claude projections in repository
+
+**Rationale**: Apply the new Claude generator to produce repository-level projections and verify that no manual drift exists.
+
+**Files**:
+- Output `AGENTS.md`
+- Output `CLAUDE.md`
+
+**Acceptance**:
+- Files contain auto-generated warning headers (`Auto-generated: Do not edit manually`).
+- Successfully passes `validate_agent_definitions.py` and `ears_notation.py`.
+
+---
+
+### AD-13: Implement Codex / OpenAI adapter generator
 
 **Rationale**: Codex and OpenAI developer tools rely on structured system prompts, JSON Schema function declarations, and API-based workflow execution harnesses.
 
@@ -274,35 +352,34 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-10: Add unit test suite for GitHub and Codex adapter generators
+### AD-14: Add unit test suite for Codex and OpenAI adapter generator
 
-**Rationale**: Ensure GitHub and Codex adapter outputs conform to target platform specifications and JSON schemas.
+**Rationale**: Ensure Codex and OpenAI adapter outputs conform to JSON schemas and system prompt structures.
 
 **Files**:
-- Create `context/scripts/tests/test_github_adapter.py`
 - Create `context/scripts/tests/test_codex_adapter.py`
 
 **Acceptance**:
-- Tests verify `.github/copilot-instructions.md` generation, prompt file formatting, and Codex JSON Schema validity.
+- Tests verify prompt formatting and Codex JSON Schema validity.
 - All tests pass with zero errors.
 
 ---
 
-### AD-11: Generate and verify initial GitHub and Codex projections in repository
+### AD-15: Generate and verify initial Codex and OpenAI projections in repository
 
-**Rationale**: Produce actual GitHub Copilot instructions and Codex configuration bundles to validate real-world file layout.
+**Rationale**: Produce actual Codex configuration bundles to validate real-world file layout.
 
 **Files**:
-- Output `.github/copilot-instructions.md`
-- Output `.github/prompts/`
+- Output `.openai/` or runtime prompt configurations
+- Output tool schema files
 
 **Acceptance**:
-- Generated files adhere to GitHub Copilot conventions.
+- Generated files adhere to OpenAI tool calling conventions.
 - Auto-generation notices are clearly displayed.
 
 ---
 
-### AD-12: Create unified `generate_adapters.py` CLI dispatcher
+### AD-16: Create unified `generate_adapters.py` CLI dispatcher
 
 **Rationale**: Developers need a single CLI entry point to regenerate all or individual adapter projections from canonical `context/` files.
 
@@ -311,13 +388,13 @@ Update status immediately when work begins and when it completes. Every task in 
 - Deprecate or wrap `context/scripts/generators/generate_agents_md.py`
 
 **Acceptance**:
-- CLI accepts `--target [all|claude|gemini|github|codex]`.
+- CLI accepts `--target [all|gemini|github|claude|codex]`.
 - `--dry-run` flag checks outputs without writing to disk.
 - Execution time across all targets is under 2.0 seconds.
 
 ---
 
-### AD-13: Implement `adapter_drift.py` pre-commit validator
+### AD-17: Implement `adapter_drift.py` pre-commit validator
 
 **Rationale**: If a developer updates `context/` but forgets to run the adapter generator, derived files drift. A pre-commit validator detects desynchronisation and fails the commit.
 
@@ -331,7 +408,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-14: Wire adapter drift check into `.pre-commit-config.yaml`
+### AD-18: Wire adapter drift check into `.pre-commit-config.yaml`
 
 **Rationale**: Automated pre-commit hooks ensure drift prevention is strictly enforced before commits enter git history.
 
@@ -345,7 +422,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-15: Update framework reference and portability adapter documentation
+### AD-19: Update framework reference and portability adapter documentation
 
 **Rationale**: Operators and contributors need comprehensive documentation explaining how to run, configure, and extend the runtime adapter system, as well as how the adapters ensure the three foundational NFR axes (autonomy, token efficiency, intent preservation).
 
@@ -361,7 +438,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-16: Add end-to-end multi-target compilation test suite
+### AD-20: Add end-to-end multi-target compilation test suite
 
 **Rationale**: Validate the full pipeline from reading canonical markdown/YAML files through all 4 adapter compilations and drift validation.
 
@@ -374,13 +451,12 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-17: Quality gate review: verify all 4 adapters compile without errors
+### AD-21: Quality gate review: verify all 4 adapters compile without errors
 
 **Rationale**: Formal quality review gate before concluding the feature build.
 
 **Files**:
 - Update `artefacts/build/tasks-runtime-adapters.md` (mark tasks complete)
-- Update `artefacts/build/tasks.md`
 
 **Acceptance**:
 - @tech-lead approval recorded.
@@ -388,7 +464,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-18: Scaffold Cruft / Cookiecutter template structure
+### AD-22: Scaffold Cruft / Cookiecutter template structure
 
 **Rationale**: As decided in architecture.md, relying on `rsync` for framework distribution causes merge conflicts and versioning issues. A stateful template manager like `cruft` allows downstream projects to apply upstream updates via 3-way git merges.
 
@@ -403,13 +479,13 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-19: Package the Generator Engine as a Python CLI library
+### AD-23: Package the Generator Engine as a Python CLI library
 
 **Rationale**: Downstream projects need a reliable way to run the adapter compilation step without copying complex Python logic. Packaging the `context/scripts/generators` folder as a standard Python package enables `uvx agent-harness` or `pip install` usage.
 
 **Files**:
 - Update / Create `pyproject.toml`
-- Update `context/scripts/generators/generate_adapters.py` (ensure entrypoint compatibility)
+- Update `context/scripts/generators/generate_adapters.py` (entrypoint compatibility)
 
 **Acceptance**:
 - `pyproject.toml` defines a `[project.scripts]` entrypoint (e.g., `agent-harness = "context.scripts.generators.generate_adapters:main"`).
