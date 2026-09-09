@@ -1,3 +1,7 @@
+---
+applyTo: "**"
+excludeAgent: "cloud-agent"
+---
 # PR Deployment Safety Review
 
 ## Role & Mission
