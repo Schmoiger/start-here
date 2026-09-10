@@ -30,7 +30,7 @@ Tasks are grouped into eight sequential sprints, prioritising the adapters in or
 - **Sprint 7 (Docs & E2E Verification)**: AD-19 + AD-20 (parallel) → AD-21  
   *file_scope*: `context/docs/`, `context/scripts/tests/`, `README.md`
 - **Sprint 8 (Packaging & Distribution)**: AD-22 + AD-23 (parallel)  
-  *file_scope*: `pyproject.toml`, `cookiecutter.json`, `{{cookiecutter.project_name}}/`
+  *file_scope*: `context/scripts/dist/`, `context/docs/`, `pyproject.toml`, `context/scripts/generators/`
 
 ### Commit Strategy
 
@@ -59,7 +59,7 @@ One commit per task on branch `env/runtime-adapters`. Conventional commit format
 | AD-19 | `docs(adapters): update framework reference and architecture documentation` |
 | AD-20 | `test(adapters): add end-to-end multi-target compilation tests` |
 | AD-21 | `chore(build): final quality review and tasks sign-off` |
-| AD-22 | `feat(packaging): scaffold cruft and cookiecutter template for framework distribution` |
+| AD-22 | `feat(subrepo): configure git-subrepo distribution and bi-directional sync for standards` |
 | AD-23 | `build(packaging): configure pyproject.toml and publish generator engine to GCP Artifact Registry` |
 
 Push cadence: Push after each completed sprint.
@@ -159,7 +159,7 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-22 | high | pending | AD-21 | Scaffold Cruft / Cookiecutter template structure |
+| AD-22 | high | pending | AD-21 | Configure git-subrepo distribution and bi-directional sync for context/ |
 | AD-23 | high | pending | AD-21 | Package and publish Generator Engine to GCP Artifact Registry |
 
 ---
@@ -476,30 +476,37 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-22: Scaffold Cruft / Cookiecutter template structure
+### AD-22: Configure git-subrepo distribution and bi-directional sync for context/
 
-**Rationale**: As decided in architecture.md, relying on `rsync` for framework distribution causes merge conflicts and versioning issues. A stateful template manager like `cruft` allows downstream projects to apply upstream updates via 3-way git merges.
+**Rationale**: Downstream projects need to import the canonical standards (`context/`) without inheriting project-specific state (`artefacts/build/`, `artefacts/product/`, or application code), and must be able to push standards improvements made in downstream projects back to `start-here`. Using `git-subrepo` against an isolated upstream `standards` distribution branch provides seamless, git-native bi-directional synchronisation with normal commit history and no submodule HEAD detachment issues.
 
 **Files**:
-- Create `cookiecutter.json`
-- Create `{{cookiecutter.project_name}}/context/` (template structure)
-- Create `{{cookiecutter.project_name}}/artefacts/`
+- Create `context/scripts/dist/publish_standards_branch.sh` (script to split and publish `context/` to the upstream `standards` branch)
+- Create `context/docs/downstream-subrepo.md` (downstream guide for cloning, pulling, and pushing standards via git-subrepo)
+- Update `.pre-commit-config.yaml` (template hook configuration for downstream repositories)
 
 **Acceptance**:
-- Running `cruft create` successfully scaffolds a new repository containing the canonical core.
-- Includes pre-commit hook configuration for downstream repositories.
+- An automated branch-splitting script creates or updates the clean upstream `standards` distribution branch containing the `context/` tree.
+- Downstream workflow is verified:
+  1. `git subrepo clone <url> context -b standards` imports only `context/`.
+  2. Project-specific directories (`artefacts/build/`, local services) remain strictly outside the subrepo boundary.
+  3. Upstream updates can be pulled cleanly via `git subrepo pull context`.
+  4. Changes made downstream to standards can be pushed upstream via `git subrepo push context`.
+- Detailed documentation in `context/docs/downstream-subrepo.md` guides downstream setup and pre-commit enforcement.
 
 ---
 
 ### AD-23: Package and publish Generator Engine to GCP Artifact Registry
 
-**Rationale**: Downstream projects need a reliable way to run the adapter compilation step without copying complex Python logic. Packaging the `context/scripts/generators` folder as a standard Python package and publishing it to a private GCP Artifact Registry repository enables seamless authentication via IAM and easy installation via `pip` or `uv`.
+**Rationale**: Downstream projects pulling standards via `git-subrepo` need to compile platform projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.) and enforce zero drift without managing complex Python logic or dependencies. Packaging the generator engine and drift validator as a standard Python package published to a private GCP Artifact Registry repository enables seamless IAM authentication and instant execution via `uvx` or `pip`.
 
 **Files**:
 - Update / Create `pyproject.toml`
 - Update `context/scripts/generators/generate_adapters.py` (entrypoint compatibility)
+- Update `context/scripts/validators/adapter_drift.py` (entrypoint compatibility)
 
 **Acceptance**:
-- `pyproject.toml` defines a `[project.scripts]` entrypoint (e.g., `agent-harness = "context.scripts.generators.generate_adapters:main"`).
-- The package builds successfully (`uv build`).
-- The package can be published to a private GCP Artifact Registry python repository using `twine` and `keyrings.google-artifactregistry-auth`.
+- `pyproject.toml` defines `[project.scripts]` entrypoints (`agent-harness = "context.scripts.generators.generate_adapters:main"` and `agent-drift = "context.scripts.validators.adapter_drift:main"`).
+- The package builds successfully with `uv build`.
+- The package can be published to a private GCP Artifact Registry repository using modern `uv publish` (via OAuth2 access token or keyring provider) or `twine`.
+- Post-sync workflow documented so downstream projects can run `uvx ... agent-harness` to regenerate projections after `git subrepo pull context`.
