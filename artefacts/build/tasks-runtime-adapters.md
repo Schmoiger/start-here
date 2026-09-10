@@ -135,9 +135,9 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-13 | high | pending | AD-2, AD-3 | Implement Codex / OpenAI adapter (system prompts, tool JSON schemas, runner harness) |
-| AD-14 | high | pending | AD-13 | Add unit test suite for Codex and OpenAI adapter generator |
-| AD-15 | medium | pending | AD-14 | Generate and verify initial Codex and OpenAI projections in repository |
+| AD-13 | high | completed | AD-2, AD-3 | Implement Codex / OpenAI adapter (system prompts, tool JSON schemas, runner harness) |
+| AD-14 | high | completed | AD-13 | Add unit test suite for Codex and OpenAI adapter generator |
+| AD-15 | medium | completed | AD-14 | Generate and verify initial Codex and OpenAI projections in repository |
 
 ### Sprint 6: Unified Adapter CLI & Drift Enforcement
 
