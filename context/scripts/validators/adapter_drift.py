@@ -4,6 +4,8 @@
 # ]
 # ///
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """Pre-commit validator: detects desynchronisation between canonical context/ and adapter projections.
 
 Compares on-disk adapter projections against fresh in-memory generation output.
@@ -39,7 +41,10 @@ def check_adapter_drift(
         Tuple of (is_synced: bool, drift_details: list[str]).
     """
     if repo_root is None:
-        repo_root = Path(__file__).resolve().parent.parent.parent.parent
+        if (Path.cwd() / "context").is_dir():
+            repo_root = Path.cwd()
+        else:
+            repo_root = Path(__file__).resolve().parent.parent.parent.parent
     if context_dir is None:
         context_dir = repo_root / "context"
 
@@ -95,7 +100,7 @@ def check_adapter_drift(
 def main() -> None:
     """CLI entry point for adapter drift validator."""
     parser = argparse.ArgumentParser(
-        prog="adapter_drift.py",
+        prog="agent-drift",
         description="Verify that runtime adapter projections are strictly synchronized with context/ definitions.",
     )
     parser.add_argument(

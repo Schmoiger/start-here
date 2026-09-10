@@ -4,6 +4,8 @@
 # ]
 # ///
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """Unified CLI dispatcher for runtime adapter projections.
 
 Generates runtime-specific projections (Antigravity/Gemini, Claude Code,
@@ -144,7 +146,10 @@ def run_generation(
         Dictionary containing execution summary and lists of affected paths.
     """
     if repo_root is None:
-        repo_root = Path(__file__).resolve().parent.parent.parent.parent
+        if (Path.cwd() / "context").is_dir():
+            repo_root = Path.cwd()
+        else:
+            repo_root = Path(__file__).resolve().parent.parent.parent.parent
     if context_dir is None:
         context_dir = repo_root / "context"
 
@@ -199,7 +204,7 @@ def run_generation(
 def build_parser() -> argparse.ArgumentParser:
     """Build command line argument parser with comprehensive help."""
     parser = argparse.ArgumentParser(
-        prog="generate_adapters.py",
+        prog="agent-harness",
         description="Regenerate runtime adapter projections from canonical context/ definitions.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
