@@ -1,5 +1,6 @@
 ---
 applyTo: "PR Review"
+excludeAgent: "cloud-agent"
 ---
 # Global PR Deployment Safety
 

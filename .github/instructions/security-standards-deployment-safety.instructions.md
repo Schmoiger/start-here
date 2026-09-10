@@ -1,5 +1,6 @@
 ---
 applyTo: "**/{firestore.rules,firebase.json,*.config.*,package.json,pyproject.toml,lib/**,app/api/**}"
+excludeAgent: "cloud-agent"
 ---
 # Deployment Safety
 

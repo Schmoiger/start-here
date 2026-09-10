@@ -1,5 +1,6 @@
 ---
 applyTo: "**/*.{ts,tsx}"
+excludeAgent: "cloud-agent"
 ---
 # TypeScript & React
 

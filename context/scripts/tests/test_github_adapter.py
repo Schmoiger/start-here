@@ -66,6 +66,30 @@ def test_generate_scoped_instructions(tmp_path: Path):
     content = instr_file.read_text()
     
     assert 'applyTo: "**/*.py"' in content
+    assert "excludeAgent" not in content
     assert "Auto-generated" in content
     assert "Safety rule 1" in content
     assert "Safety rule 2" in content
+
+
+def test_generate_scoped_instructions_with_exclude_agent(tmp_path: Path):
+    standards_dir = tmp_path / "context" / "standards"
+    standards_dir.mkdir(parents=True)
+    
+    standard_file = standards_dir / "test-standard.md"
+    standard_file.write_text(
+        "## Deployment Safety\n"
+        "<!-- applyTo: \"**/*.py\" -->\n"
+        "<!-- excludeAgent: \"cloud-agent\" -->\n"
+        "- Safety rule 1\n"
+    )
+    
+    generate_scoped_instructions(tmp_path)
+    
+    instr_file = tmp_path / ".github" / "instructions" / "test-standard-deployment-safety.instructions.md"
+    assert instr_file.exists()
+    content = instr_file.read_text()
+    
+    assert 'applyTo: "**/*.py"' in content
+    assert 'excludeAgent: "cloud-agent"' in content
+    assert "Safety rule 1" in content

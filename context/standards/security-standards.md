@@ -223,6 +223,7 @@ Common security mistakes to avoid:
 
 ## Deployment Safety
 <!-- applyTo: "**/{firestore.rules,firebase.json,*.config.*,package.json,pyproject.toml,lib/**,app/api/**}" -->
+<!-- excludeAgent: "cloud-agent" -->
 
 ### Data Access & Permission Gates
 - Flag database/Firestore security rules that permit unauthenticated writes or allow broad access without ownership checks (`allow write: if true;`).

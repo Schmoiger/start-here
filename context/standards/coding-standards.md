@@ -498,6 +498,7 @@ Accept: application/vnd.api+json; version=1
 
 ### Python
 <!-- applyTo: "**/*.py" -->
+<!-- excludeAgent: "cloud-agent" -->
 - **Shared Mutable State**: Flag mutable default arguments (e.g., `def fn(items=[])`), which persist across requests in web servers and leak user data or state.
 - **Resource & Connection Exhaustion**: Flag database connections, files, or network sessions not opened within a `with` context manager.
 - **Silent Failures**: Flag bare `except:` or `except Exception: pass` blocks that swallow critical production errors.
@@ -505,6 +506,7 @@ Accept: application/vnd.api+json; version=1
 
 ### TypeScript & React
 <!-- applyTo: "**/*.{ts,tsx}" -->
+<!-- excludeAgent: "cloud-agent" -->
 - **Infinite Render Loops**: Flag `useEffect`, `useMemo`, or `useCallback` hooks with unstable object/array literals or missing dependencies that trigger infinite re-renders.
 - **State Mutation**: Flag direct mutations of state or props (e.g., `state.items.push()`), which break React change detection and cause desynchronized UI state.
 - **SSR & Hydration Breakages**: In Next.js App Router, flag browser APIs (`window`, `localStorage`, `document`) used in Server Components without `"use client"` or without `useEffect`/dynamic import guards.
@@ -513,6 +515,7 @@ Accept: application/vnd.api+json; version=1
 
 ### Global PR Deployment Safety
 <!-- applyTo: "PR Review" -->
+<!-- excludeAgent: "cloud-agent" -->
 **Role & Mission**: You are an automated deployment safety gate. Your sole objective is to answer: **"Is this pull request safe to deploy to production?"**
 
 **Out of Scope (Do NOT Comment On)**
