@@ -139,15 +139,45 @@ telemetry_sources:
 
   google_antigravity:
     name: "Google Antigravity / Gemini IDE Telemetry"
-    description: "Transcript JSONL and step logs recorded in app data brain directory."
-    local_session_path: "<appDataDir>/brain/<conversation-id>/.system_generated/logs/"
+    description: "SQLite conversation database and protobuf generation metadata in app data."
+    local_session_path: "~/.gemini/antigravity-ide/conversations/{conversation-id}.db"
     session_files:
-      token_efficient: "transcript.jsonl"
-      full_trace: "transcript_full.jsonl"
+      database: "{conversation-id}.db"
+      transcripts: "<appDataDir>/brain/<conversation-id>/.system_generated/logs/transcript.jsonl"
+    storage_type: "sqlite_protobuf"
+    table: "gen_metadata"
+    repository_mapping:
+      table: "trajectory_metadata_blob"
+      field: "file://{repo-root}"
+    token_fields:
+      prompt_uncached: "Field 1.4.2 (varint)"
+      cached_context: "Field 1.4.5 (varint)"
+      total_input: "Field 1.4.2 + Field 1.4.5"
+      total_output: "Field 1.4.3 (varint)"
+      thinking: "Field 1.4.9 (varint)"
+      candidates: "Field 1.4.10 (varint)"
     event_types:
       planner_response: "PLANNER_RESPONSE"
       user_input: "USER_INPUT"
       subagent_spawn: "invoke_subagent"
+
+  github_copilot:
+    name: "GitHub Copilot Chat Telemetry"
+    description: "VS Code workspace storage chat session JSONL traces."
+    local_session_path: "~/Library/Application Support/Code/User/workspaceStorage/{workspace-hash}/chatSessions/"
+    linux_session_path: "~/.config/Code/User/workspaceStorage/{workspace-hash}/chatSessions/"
+    windows_session_path: "%APPDATA%/Code/User/workspaceStorage/{workspace-hash}/chatSessions/"
+    session_file_pattern: "*.jsonl"
+    storage_type: "jsonl"
+    repository_mapping:
+      file: "workspace.json"
+      key: "folder"
+      value: "file://{repo-root}"
+    token_fields:
+      input: "metadata.promptTokens"
+      output: "metadata.outputTokens / completionTokens"
+      thinking: "metadata.toolCallRounds[].thinking.tokens"
+      model: "metadata.resolvedModel / modelId"
 
   openai_codex:
     name: "OpenAI Codex & API Telemetry"
@@ -156,3 +186,4 @@ telemetry_sources:
       input: "prompt_tokens"
       output: "completion_tokens"
       reasoning: "completion_tokens_details.reasoning_tokens"
+

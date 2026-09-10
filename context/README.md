@@ -98,10 +98,11 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Scripts** (`scripts/`):
 
-- `prepare-commit-msg.py` / `.sh`: Git hook — injects token usage from Claude Code session telemetry into Agent-Session commit trailer
+- `prepare-commit-msg.py` / `.sh`: Git hook — extracts and injects session token usage across Claude Code, Google Antigravity, GitHub Copilot, and Codex into the Agent-Session commit trailer
 - Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary, framework docs staleness)
 - Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
-- Tests (`tests/`): Validator test suite
+- Tests (`tests/`): Test suite for validators, runtime adapters, and telemetry extractors
+
 
 ### DRY Between Rules & Standards
 
@@ -341,6 +342,45 @@ PATH="/opt/homebrew/bin:$PATH" git subrepo branch context -f
 # 2. Push to remote standards branch
 git push origin subrepo/context:standards
 ```
+
+---
+
+## Runtime Telemetry & Session Token Tracking
+
+The framework tracks cumulative token consumption directly from the underlying AI development runtimes and injects incremental deltas into the `Agent-Session:` git trailer at commit time via `.git/hooks/prepare-commit-msg` (delegating to `context/scripts/prepare-commit-msg.py`).
+
+### Multi-Runtime Comparison Matrix
+
+| Runtime | Local Telemetry Path | Repo Mapping Mechanism | Storage Format | Extracted Token Fields |
+|---|---|---|---|---|
+| **Anthropic Claude Code** | `~/.claude/projects/{mangled}/` | Path hash: `repo.replace('/', '-')` | JSONL (`{session}.jsonl` & `subagents/*.jsonl`) | `message.usage.input_tokens` (+ cache creation/read) & `output_tokens` |
+| **Google Antigravity** | `~/.gemini/antigravity-ide/conversations/*.db` | SQLite `trajectory_metadata_blob` (`file://{repo}`) | SQLite + Protobuf binary in `gen_metadata` | Protobuf Field 1.4: Varint 2 (prompt), Varint 5 (cached), Varint 3 (output), Varint 9/10 (thinking/candidates) |
+| **GitHub Copilot Chat** | `Code/User/workspaceStorage/<id>/chatSessions/` | `workspace.json` (`"folder": "file://{repo}"`) | JSONL (`<session-id>.jsonl`) | `metadata.promptTokens`, `metadata.outputTokens` / `completionTokens`, `toolCallRounds[].thinking.tokens` |
+| **OpenAI Codex** | `~/.codex/` or API run logs | Project directory or API run trace | JSON / SQLite | `prompt_tokens`, `completion_tokens`, `reasoning_tokens` |
+
+### Architectural Principles
+
+1. **Separation of Runtime Container vs Model**:
+   - The `tool=` field in `Agent-Session:` dictates the **execution container** (e.g. `tool=antigravity`, `tool=copilot`, `tool=claude-code`).
+   - The `model=` field specifies the LLM (e.g. `model=gemini-flash`, `model=sonnet`, `model=gpt-5-mini`).
+   - For example, running Claude Sonnet inside Google Antigravity produces `tool=antigravity model=sonnet`, causing the hook to query Antigravity's local session DB rather than Claude Code CLI storage.
+2. **$O(\Delta)$ Incremental Token & Compute Efficiency**:
+   - Never re-parse entire conversational histories on each commit.
+   - **Antigravity**: Watermark stores `last_idx` and queries SQLite incrementally:
+     `SELECT idx, data FROM gen_metadata WHERE idx > ? ORDER BY idx ASC`
+   - **Copilot & Claude**: Watermark stores the file byte offset and `seek()`s directly to newly appended lines.
+3. **Transparent Error Surfacing over Silent Failure**:
+   - If an agent commit trailer (`Agent-Session:`) is present but telemetry extraction fails (e.g., unexpected schema change or missing session), the hook injects:
+     ```text
+     Agent-Session: tool=antigravity model=gemini-flash ... tokens=error(schema_drift)
+     ```
+   - Diagnostic warnings are written to `stderr`, and the commit is allowed to succeed with exit code 0.
+4. **Brittleness & Maintenance**:
+   - Neither Antigravity nor Copilot provides a public, frozen API for local telemetry; extraction relies on internal storage patterns.
+   - The test suite in `context/scripts/tests/test_runtime_telemetry.py` includes live runtime sanity checks that run in local development:
+     - **Not installed**: Skipped cleanly.
+     - **Installed but idle**: Skipped with diagnostic note (`"Runtime installed but no active sessions found for validation"`).
+     - **Installed with active sessions**: Fails immediately if vendor schema changes or data formats drift.
 
 ---
 
