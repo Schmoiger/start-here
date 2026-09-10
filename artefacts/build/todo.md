@@ -2,7 +2,7 @@
 [x] Review agents for DRY compliance. For example: @python-coder has assumptions on tech (Pytest) embedded whereas it should look at tech-standards.md
 [x] Create agent that specifically looks at the effectiveness of other agents, i.e. efficient tokenomics.
 [x] Update all start-here /context from bollinger /context
-[x] When agents commit they should push as well (to protect from accidental deletion) - update agent-standards
+[ ] When agents commit they should push as well (to protect from accidental deletion) - update agent-standards
 [x] When an orchestrator spawns a sub-agent does it give the right context files (rules, standards)? They always seem to forget.
 [WON'TDO] Keep both context and context-compressed folders - don't know which is more effective yet.
 [x] Update the readme
