@@ -498,9 +498,9 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-23: Package and publish Generator Engine to GCP Artifact Registry
+### AD-23: Package Generator Engine and adopt Lean Subrepo-Native Distribution
 
-**Rationale**: Downstream projects pulling standards via `git-subrepo` need to compile platform projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.) and enforce zero drift without managing complex Python logic or dependencies. Packaging the generator engine and drift validator as a standard Python package published to a private GCP Artifact Registry repository enables seamless IAM authentication and instant execution via `uvx` or `pip`.
+**Rationale**: Downstream projects pulling standards via `git-subrepo` need to compile platform projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.) and enforce zero drift without managing complex Python logic or dependencies. Packaging the generator engine and drift validator as a standard Python package (`agent-harness`) with CLI entrypoints establishes standard packaging metadata, while distributing them directly inside the subrepo (`context/scripts/`) enables zero-infrastructure, atomic execution via `uv run` without external GCP Artifact Registry overhead or version drift.
 
 **Files**:
 - Create `pyproject.toml` (standard PEP 517/621 hatchling build configuration)
@@ -512,8 +512,8 @@ Update status immediately when work begins and when it completes. Every task in 
 **Acceptance**:
 - `pyproject.toml` defines `[project.scripts]` entrypoints (`agent-harness = "context.scripts.generators.generate_adapters:main"` and `agent-drift = "context.scripts.validators.adapter_drift:main"`).
 - The package builds successfully with `uv build` (`dist/*.whl` and `dist/*.tar.gz`).
-- The package can be published to a private GCP Artifact Registry repository using modern `uv publish` (via OAuth2 access token or keyring provider) or `twine`.
-- Post-sync workflow documented so downstream projects can run `uvx ... agent-harness` to regenerate projections after `git subrepo pull context`.
+- **Lean Distribution Decision**: External deployment to GCP Artifact Registry is bypassed in accordance with LESS principles. Because `context/scripts/` is natively distributed inside the subrepo alongside canonical definitions, downstream repositories execute `uv run context/scripts/...` (using PEP 723 inline script metadata), eliminating GCP repository maintenance, IAM configuration, and version desynchronisation.
+- Post-sync workflow documented in `context/README.md` for seamless downstream projection compilation and drift validation.
 
 **Quality Gate Review Record (Sprint 8 - 2026-09-10)**:
 - **Reviewer**: `@tech-lead`
