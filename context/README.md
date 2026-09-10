@@ -318,12 +318,24 @@ All validator, adapter, and compilation tests are packaged inside `context/scrip
 uv run pytest context/scripts/tests -v
 ```
 
-### 5. Upstream Maintenance (`start-here`)
+### 5. Upstream Maintenance & Automated Distribution (`start-here`)
 
-In the `start-here` repository, maintainers update the public `standards` distribution branch using native `git-subrepo` commands:
+The `start-here` repository automatically maintains the upstream `standards` distribution branch using the GitHub Actions workflow in `.github/workflows/sync-standards.yml`:
+
+#### Automated Synchronisation
+Whenever pull requests touching `context/**` are merged into `master`, the `sync-standards` workflow:
+1. Checks out the repository with complete commit history (`fetch-depth: 0`).
+2. Installs `git-subrepo`.
+3. Runs `git subrepo branch context -f` to isolate `context/` commits into a clean distribution branch.
+4. Pushes the branch directly to `origin/standards` using `GITHUB_TOKEN` with write permissions.
+
+This ensures downstream projects always receive the latest approved standards via `git subrepo pull context` without requiring manual extraction by maintainers.
+
+#### Manual Fallback
+Maintainers can also manually extract and push the `standards` distribution branch locally:
 
 ```bash
-# 1. Extract context/ commits into subrepo branch
+# 1. Extract context/ commits into subrepo branch (requires Bash 4.0+)
 PATH="/opt/homebrew/bin:$PATH" git subrepo branch context -f
 
 # 2. Push to remote standards branch
