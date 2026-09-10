@@ -60,7 +60,7 @@ One commit per task on branch `env/runtime-adapters`. Conventional commit format
 | AD-20 | `test(adapters): add end-to-end multi-target compilation tests` |
 | AD-21 | `chore(build): final quality review and tasks sign-off` |
 | AD-22 | `feat(packaging): scaffold cruft and cookiecutter template for framework distribution` |
-| AD-23 | `build(packaging): configure pyproject.toml to publish generator engine as CLI library` |
+| AD-23 | `build(packaging): configure pyproject.toml and publish generator engine to GCP Artifact Registry` |
 
 Push cadence: Push after each completed sprint.
 
@@ -160,7 +160,7 @@ Update status immediately when work begins and when it completes. Every task in 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
 | AD-22 | high | pending | AD-21 | Scaffold Cruft / Cookiecutter template structure |
-| AD-23 | high | pending | AD-21 | Package the Generator Engine as a Python CLI library (`pyproject.toml`) |
+| AD-23 | high | pending | AD-21 | Package and publish Generator Engine to GCP Artifact Registry |
 
 ---
 
@@ -479,9 +479,9 @@ Update status immediately when work begins and when it completes. Every task in 
 
 ---
 
-### AD-23: Package the Generator Engine as a Python CLI library
+### AD-23: Package and publish Generator Engine to GCP Artifact Registry
 
-**Rationale**: Downstream projects need a reliable way to run the adapter compilation step without copying complex Python logic. Packaging the `context/scripts/generators` folder as a standard Python package enables `uvx agent-harness` or `pip install` usage.
+**Rationale**: Downstream projects need a reliable way to run the adapter compilation step without copying complex Python logic. Packaging the `context/scripts/generators` folder as a standard Python package and publishing it to a private GCP Artifact Registry repository enables seamless authentication via IAM and easy installation via `pip` or `uv`.
 
 **Files**:
 - Update / Create `pyproject.toml`
@@ -490,3 +490,4 @@ Update status immediately when work begins and when it completes. Every task in 
 **Acceptance**:
 - `pyproject.toml` defines a `[project.scripts]` entrypoint (e.g., `agent-harness = "context.scripts.generators.generate_adapters:main"`).
 - The package builds successfully (`uv build`).
+- The package can be published to a private GCP Artifact Registry python repository using `twine` and `keyrings.google-artifactregistry-auth`.
