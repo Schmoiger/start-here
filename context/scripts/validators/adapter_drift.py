@@ -72,7 +72,7 @@ def check_adapter_drift(
         repo_root / ".claude" / "prompts",
         repo_root / ".github" / "prompts",
         repo_root / ".github" / "instructions",
-        repo_root / ".openai" / "prompts",
+        repo_root / ".openai",
     ]
 
     expected_paths_set = set(expected_projections.keys())
