@@ -1,8 +1,8 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft  
-**Version**: 0.3.0  
-**Last Updated**: 13 April 2026  
+**Version**: 0.4.0  
+**Last Updated**: 10 September 2026  
 **Word Count**: ~8,400 words  
 **Reading Time**: ~35 minutes
 
@@ -94,8 +94,8 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Role |
 |------|----------|------|
-| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/templates/*.md`, `context/persona/*.md` | These define how the framework behaves. Edit these to change it. |
-| Derived projection | `AGENTS.md`, `CLAUDE.md` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
+| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
+| Derived projection | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
 | Operator guidance | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
 | Enforcement | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
 
@@ -111,7 +111,7 @@ The source of truth hierarchy above governs files inside the repository. But age
 |------------|--------|---------------|
 | 1 (highest) | User memories (auto-accumulated) | Runtime |
 | 2 | User-level config (`~/.claude/CLAUDE.md`, `~/.cursor/rules/`) | Individual contributor |
-| 3 | Project-level derived files (`CLAUDE.md`, `AGENTS.md`) | Framework (generated) |
+| 3 | Project-level derived files (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`) | Framework (generated) |
 | 4 | Authoritative sources (`context/`) | Framework (versioned) |
 
 Anything at precedence 1 or 2 that contradicts precedence 3 or 4 wins — and the framework has no mechanism to detect or prevent it.
@@ -298,7 +298,7 @@ If all three are true, create a rule in `rules/*.mdc` and keep it under 200 toke
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus eighteen delegatable specialists (nineteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus nineteen delegatable specialists (twenty role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -308,7 +308,7 @@ Every agent follows this structure:
 ---
 name: python-coder
 description: Writes production Python code with testing in mind.
-model: sonnet
+model: medium
 standards:
   - tech-standards.md
   - coding-standards.md
@@ -345,7 +345,7 @@ testable, production-grade Python code.
 
 `description`: Brief role summary. Helps the orchestrator select the right agent.
 
-`model`: Recommended model tier (e.g. `opus`, `sonnet`, `haiku`). The orchestrator uses this as guidance, not a hard constraint.
+`model`: Recommended model tier (e.g. `large`, `medium`, `small`). Tiers are mapped to vendor-specific models via `context/models.yaml`. The orchestrator uses this as guidance, not a hard constraint.
 
 `standards`: List of standard files the agent should read before starting work. These are loaded on demand, not injected automatically.
 
@@ -378,7 +378,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines 18 specialised agents, organised by kind of judgement.
+The framework defines 19 specialised agents, organised by kind of judgement.
 
 #### Core Coordinator
 
@@ -400,8 +400,7 @@ The framework defines 18 specialised agents, organised by kind of judgement.
 | `solution-architect` | Designs architecture, boundaries, and data flow |
 | `database-designer` | Designs schemas, relationships, and migrations |
 | `api-designer` | Designs APIs and contract artefacts |
-| `ui-designer` | Designs UI structure, component behaviour, and user flow |
-| `visual-designer` | Produces visuals, mockups, and visual review input |
+| `ui-designer` | Designs UI structure, component behaviour, user flow, and visual assets |
 
 #### Implementation and Test
 
@@ -428,6 +427,7 @@ The framework defines 18 specialised agents, organised by kind of judgement.
 | `devops` | Handles deployment and infrastructure-related work |
 | `documentation` | Cleans up, archives, and maintains human-facing documentation |
 | `workflow-analyst` | Reviews process effectiveness and supports retrospectives |
+| `tokenomics-analyst` | Audits agent effectiveness, token economics, context efficiency, and model tiering |
 
 ### Creating a New Agent
 
@@ -523,9 +523,8 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 | `discovery` | `product-expert` then `product-owner` (sequential) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
 | `design-architecture` | `solution-architect` | Architecture, logical API contracts, data model, component design docs |
 | `design-contracts` | `database-designer` and `api-designer` (parallel) | Physical schema and migrations; OpenAPI with HTTP semantics |
-| `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows |
-| `design-visuals` | `visual-designer` | Visual assets under `artefacts/design/visuals/` |
-| `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `visual-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
+| `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows, and visual assets |
+| `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `ui-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
 
 Design gate (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
 
@@ -564,7 +563,7 @@ docs-cleanup → quality-review (gate) → final-holistic-review (gate)
 | `e2e-regression` | `ui-tester` and `code-reviewer` in parallel; screenshots and design compliance for changed workflows. |
 | `docs-cleanup` | `documentation` archives and updates README, API docs, `HANDOFF.md`, tasks. |
 | `quality-review` | `tech-lead` only; code and documentation gate before holistic review. |
-| `final-holistic-review` | `solution-architect`, `tech-lead`, `visual-designer`, `principles-reviewer` in parallel; all must approve. |
+| `final-holistic-review` | `solution-architect`, `tech-lead`, `ui-designer`, `principles-reviewer` in parallel; all must approve. |
 
 Build gates (see `quality_gates` in `build.yaml`): `tasks-review` (approval), `coverage-gate` (automated threshold), `quality-review` (approval), `final-holistic-review` (approval). Thresholds and metrics are defined in YAML; aggregate coverage for quality-review is 95% on new or changed files, not a separate 97% deployment-review phase in this workflow file.
 
@@ -891,7 +890,7 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 - Discovery: Sequential (`product-expert` then `product-owner`).
 - Architecture: Single agent (`solution-architect`).
 - Contracts: Parallel hive-like pair (`database-designer` and `api-designer` on the same architecture outputs).
-- UI then visuals: Sequential (`ui-designer` then `visual-designer`).
+- UI and visuals: Single phase (`ui-designer` — component specs, wireframes, and visual assets consolidated).
 - Design review: Sequential reviewers with iterative return to earlier phases when required.
 
 `build.yaml`
@@ -1044,15 +1043,33 @@ The scripts directory includes its own test suite in `context/scripts/tests/`. T
 
 ## Portability and Framework Adapters
 
-The framework is designed to survive changes in agent runtime or orchestration platform. Agent definitions are markdown files. Workflows are YAML. The core logic lives in the system prompt body, which is framework-agnostic. The frontmatter carries runtime-specific metadata (tool names, model tiers) that adapts to each platform.
+The framework is designed to survive changes in agent runtime or orchestration platform. It uses a **Hexagonal (Ports and Adapters) Architecture**. Agent definitions, workflows, rules, and standards serve as the framework-agnostic "domain logic." They are written in standard Markdown and YAML, and maintained in the `context/` directory.
 
-The code samples in this section are illustrative: they show how to load markdown prompts and map tool names, not a supported SDK matrix. Your runtime may use different client libraries, different tool primitives, or different sandbox rules—keep the portable assets (markdown, YAML, rules, standards) and replace the adapter glue per platform.
+To run these on specific platforms, the `generate_adapters.py` CLI compiles these canonical sources into native runtime projections. 
 
-### Agent Definition Portability
+### Supported Runtime Adapters
 
-Frontmatter may list `mcp_tools:` (this tree) or `allowed_tools:` (other runtimes)—both are platform-specific hints. The markdown body (role, workflow, constraints) is what ports cleanly. Moving to a new platform means mapping those hints onto that platform’s tool and MCP configuration (often a settings file or admin console, not something validators in this repo can see); the prompt itself travels unchanged.
+The framework ships with deterministic compiler support for four runtimes:
+- **Google Antigravity/Gemini**: Generates structured `.agents/skills/` directories, complete with `SKILL.md` frontmatter, and `GEMINI.md`.
+- **Claude Code**: Projects context into `CLAUDE.md` and `.claude/`.
+- **GitHub Copilot**: Projects instructions into `.github/copilot-instructions.md` and custom prompts into `.github/prompts/`.
+- **OpenAI/Codex**: Generates OpenAI-compatible system prompt bundles and JSON schema tool declarations in `.openai/`.
 
-### Adapter Examples
+You execute the generator via the repository's provided CLI (e.g., `uv run python context/scripts/generators/generate_adapters.py`). See the repository `README.md` for CLI usage, dry-run flags, and target filtering.
+
+### Drift Enforcement
+
+To prevent the generated projections from drifting out of sync with the canonical sources, the framework includes `adapter_drift.py`. It runs as a `pre-commit` validator, receiving staged file paths, regenerating all adapter projections in-memory, and failing if any projection is missing, modified, or orphaned.
+
+### Model Tiering (`models.yaml`)
+
+Agent definitions do not hardcode vendor model names (e.g., `claude-3-opus-20240229`). Instead, they declare abstract capability tiers (`small`, `medium`, `large`). 
+
+The `context/models.yaml` file maps these abstract tiers to concrete vendor models per runtime adapter. When `generate_adapters.py` runs, it resolves the tier declared in an agent's frontmatter into the appropriate vendor string for the target platform.
+
+### Manual Integration (Other Runtimes)
+
+The code samples below are illustrative. They show how you might load the portable markdown prompts and map tool names for runtimes that do not currently have a built adapter.
 
 #### LangGraph
 
@@ -1128,10 +1145,10 @@ aider --read context/agents/python-coder.md \
       --read context/standards/tech-standards.md
 ```
 
-### Tool Mapping Reference
+#### Tool Mapping Reference
 
-| Claude Code Tool | LangGraph | CrewAI | AutoGen | IDE-Based |
-|-----------------|-----------|--------|---------|-----------|
+| Expected Tool | LangGraph | CrewAI | AutoGen | IDE-Based |
+|---------------|-----------|--------|---------|-----------|
 | Write | `write_file()` | `FileWriterTool()` | `write_file()` func | Built-in |
 | Edit | `edit_file()` | `FileWriterTool()` | `edit_file()` func | Built-in |
 | Read | `read_file()` | `FileReadTool()` | `read_file()` func | Built-in |
@@ -1139,7 +1156,7 @@ aider --read context/agents/python-coder.md \
 | Grep | `grep_content()` | `FileSearchTool()` | `grep()` func | Built-in |
 | Bash | `subprocess.run()` | `ShellTool()` | `execute_code()` | Built-in |
 
-### Handling Frontmatter
+#### Handling Frontmatter
 
 Most frameworks do not parse YAML frontmatter automatically. Two approaches:
 
@@ -1250,6 +1267,14 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 ---
 
 <!-- typst-skip-start -->
+
+## Related Documents
+
+- [GitHub Repository](https://github.com/Schmoiger/start-here): framework source code and adapters
+- `context/docs/agentic-framework.md`: companion technical paper
+- `context/README.md`: framework entry point
+
+---
 
 ## Revision History
 

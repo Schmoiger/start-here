@@ -1,8 +1,8 @@
 # Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery
 
 **Document Status**: Draft  
-**Version**: 0.2.0  
-**Last Updated**: 13 April 2026  
+**Version**: 0.3.0  
+**Last Updated**: 10 September 2026  
 **Word Count**: ~3,500 words  
 **Reading Time**: ~15 minutes
 
@@ -12,11 +12,11 @@
 
 ## Solving The Coordination Problem
 
-Getting an LLM to write a function is table stakes in 2026. Getting _eighteen_ of them to build a system together without losing their context is not.
+Getting an LLM to write a function is table stakes in 2026. Getting *nineteen* of them to build a system together without losing their context is not.
 
 Without deliberate coordination, multi-agent workflows break in familiar ways. Agents do not know what the previous agent did so risk redoing work that has already been done. And it's done slightly differently, because each agent makes slightly different judgements. Reviewers lack a consistent standard to check against. Testers write tests against the code as-built rather than the intended interface, ossifying bugs into the test suite. Sessions compact mid-sprint, systemising forgetfulness. The symptoms look unpredictable, a different thing going wrong each time. But the outcome is the same: wasted effort, no consistency, incorrect assumptions, and no mechanism to prevent any of it. These are coordination problems, and they require coordination solutions.
 
-This document describes a framework designed to solve them. It is structured as a portable `context/` directory that encodes who does work, how work should be done, when work happens, what gets produced, and how quality is maintained. The patterns it applies (specialisation, explicit orchestration, durable context, verification over assertion) draw on established practices in distributed systems engineering and software delivery, adapted here for multi-agent coordination. 
+This document describes a framework designed to solve them. It is structured as a portable `context/` directory that encodes who does work, how work should be done, when work happens, what gets produced, and how quality is maintained. The patterns it applies (specialisation, explicit orchestration, durable context, verification over assertion) draw on established practices in distributed systems engineering and software delivery, adapted here for multi-agent coordination.
 
 ---
 
@@ -40,6 +40,8 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **Everything important is code.** Specifications, rules, agent definitions, workflows, templates, and handoffs are all versioned artefacts in the repository. The `context/` directory is the codified operating model. If knowledge is not committed and governed, it drifts, and drifted context degrades agent output more reliably than a weak model does.
 
+**Optimise for Autonomy, Tokenomics, and Intent Preservation.** These three Non-Functional Requirements (NFRs) replace the legacy iron triangle of Time, Cost, and Scope. Autonomy measures how long an agentic system can run without human intervention. Tokenomics measures the fully loaded cost of verifying output, not just generating it. Intent Preservation ensures human design intent survives delegation and context compaction. The framework's operating triangle balances these three axes.
+
 **Context durability has higher leverage than code quality.** Code quality is downstream of context quality. An agent that receives a clear handoff, a focused task, and the correct rules will produce better code than a capable agent operating blind. The critical path is usually context plus workflow, not model capability; a better model with poor context loses to a weaker model with strong context. The framework treats documentation, tasks, and handoffs as first-class deliverables, not optional support material.
 
 **Policy and explanation serve different purposes.** Rules are short, binary, and cheap to inject into agent prompts. Standards are rich, contextual, and expensive to load. Merging them would force a choice between token-efficient prompts and comprehensive reference material. Separating them serves both needs without compromise. (The token cost analysis appears in [The Rules-Standards Split](#the-rules-standards-split) below.)
@@ -56,7 +58,7 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **The constraint keeps moving.** Accelerating code generation does not eliminate bottlenecks; it relocates them. The binding constraint will migrate from code to review, from review to deployment, from deployment to intent clarity. The operating model must follow the constraint, not defend a fixed process. The `continuous-improvement` workflow is the mechanism for this: in incident mode, failures are traced through a causal chain (symptom, mechanism, file, gap) to a fixable defect in the framework itself; in retrospective mode, commit telemetry, interruption logs, and incident patterns are parsed to surface recurring weaknesses in rules, standards, or templates. Both modes target the coordination and verification systems, not just the code those systems govern.
 
-**Portability is a structural requirement.** Agent definitions are markdown files. Workflows are YAML. The framework includes adapter guidance for LangGraph, CrewAI, AutoGen, Cursor, and other runtimes. The current implementation leans on Claude Code, and adapting to a different runtime requires real work. The design ensures that no single tool is a hard dependency. See `context/docs/agentic-framework-reference.md` (Portability and Framework Adapters) for cross-runtime integration guidance.
+**Portability is a structural requirement.** Agent definitions are markdown files. Workflows are YAML. The framework includes deterministic adapter generators for Antigravity/Gemini, Claude Code, GitHub Copilot, and OpenAI/Codex. Illustrative guidance for LangGraph, CrewAI, AutoGen, and IDE-based systems is maintained in the reference document for runtimes without a built adapter. The design ensures that no single tool is a hard dependency. See `context/docs/agentic-framework-reference.md` (Portability and Framework Adapters) for cross-runtime integration guidance.
 
 ---
 
@@ -116,8 +118,8 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Action |
 |------|----------|--------|
-| **Authoritative** | `context/workflows/*.yaml`, `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md` | Edit these to change framework behaviour |
-| **Derived** | `AGENTS.md`, `CLAUDE.md` | Read for orientation; never hand-edit. Regenerate from source. |
+| **Authoritative** | `context/workflows/*.yaml`, `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md`, `context/models.yaml` | Edit these to change framework behaviour |
+| **Derived** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | Read for orientation; never hand-edit. Regenerate from source. |
 | **Operator guidance** | `context/docs/*.md`, `README.md`, this document | Use to understand and apply the framework |
 | **Enforcement** | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | Use to keep the repository aligned with the design |
 
@@ -141,21 +143,21 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ## The Agent Roster
 
-The framework defines 18 specialised agents, organised by kind of judgement rather than technology alone:
+The framework defines 19 specialised agents, organised by kind of judgement rather than technology alone:
 
 - **Discovery**: `product-expert` (elicits requirements), `product-owner` (formalises them)
-- **Design**: `solution-architect`, `database-designer`, `api-designer`, `ui-designer`, `visual-designer`
+- **Design**: `solution-architect`, `database-designer`, `api-designer`, `ui-designer`
 - **Implementation**: `python-coder`, `typescript-coder`
 - **Testing**: `functional-tester` (TDD), `ui-tester` (browser automation)
 - **Review**: `tech-lead` (the gate), `code-reviewer`, `principles-reviewer`, `security-tester`
-- **Operations**: `devops`, `documentation`, `workflow-analyst`
+- **Operations**: `devops`, `documentation`, `workflow-analyst`, `tokenomics-analyst`
 - **Coordination**: `orchestrator`
 
 Each agent's frontmatter declares which rules and standards it requires. The orchestrator resolves the applicable rules by matching file globs against the task scope, injecting only what is relevant.
 
 This produces narrow, focused prompts with clear handoff boundaries. The roster is extensible: copy the agent template, fill in the frontmatter, add the agent to a workflow phase, and regenerate.
 
-**`AGENTS.md` is generated, not authored.** A generator script (`context/scripts/generators/generate_agents_md.py`) reads every workflow YAML and every agent definition, then produces `AGENTS.md` as a single derived file containing the phase sequence, agent dispatch rules, spawn patterns, and state recovery procedures. This is the framework's portability mechanism: the same authoritative sources (workflow YAML and agent definitions) can be projected into `AGENTS.md` for one runtime, `CLAUDE.md` for another, or any format a different framework requires. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing `AGENTS.md` by hand is always wrong; editing the sources and regenerating is the only valid path.
+**Adapters are generated, not authored.** The `generate_adapters.py` CLI compiles all four native runtime projections (Antigravity/Gemini, Claude Code, GitHub Copilot, and OpenAI/Codex) from the same canonical sources in a single invocation, with smart change detection and per-target filtering. This is a unified CLI, not a single-file generator. It produces `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and runtime-specific prompts and skills. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing derived projections by hand is always wrong; editing the sources and regenerating is the only valid path.
 
 ---
 
@@ -202,7 +204,7 @@ Context compaction during active work is a routine occurrence in long-running ag
 
 Every workflow YAML includes a `state_recovery` section listing the files an orchestrator should read to reconstruct its position. Every agent handoff writes durable state to disk. The `HANDOFF.md` file records the active phase *before* agents are spawned, not after they report back. This ensures the phase survives even if compaction occurs during execution.
 
-Agent session telemetry is recorded in git commits via a `prepare-commit-msg` hook. Token usage, duration, and interaction count are all reconstructable from `git log`, eliminating the need for a separate metrics database.
+Agent session telemetry is recorded in git commits via a `prepare-commit-msg` hook. This multi-runtime token extractor reads telemetry from Antigravity (SQLite protobuf), GitHub Copilot (JSONL), Claude Code (JSONL), and Codex, using per-runtime watermark files for incremental delta computation. It injects `tokens=<in>K/<out>K` into every `Agent-Session:` commit trailer, and never blocks the commit on extraction failure. Token usage, duration, and interaction count are all reconstructable from `git log`, eliminating the need for a separate metrics database.
 
 The overhead is real: pre-spawn handoff writes, `state_recovery` blocks in every workflow, telemetry in every commit. The justification is straightforward: a single failed recovery (agents re-reading entire codebases, duplicating completed work, losing review context) wastes more tokens than the cumulative cost of pre-emptive state recording. Durable context is also the primary defence against the comprehension gap, where agent throughput outpaces the organisation's ability to understand what changed. If the trail of decisions is inspectable, both agents and humans can reconstruct what happened without relying on conversation memory.
 
@@ -210,7 +212,7 @@ The overhead is real: pre-spawn handoff writes, `state_recovery` blocks in every
 
 ## Templates and Validators
 
-The framework ships 15 output templates and 7 pre-commit validators.
+The framework ships 14 output templates and 8 pre-commit validators.
 
 **Templates** standardise recurring artefacts: requirements, tasks, bugs, reviews, handoffs, design docs, commit messages, PR descriptions, and agent definitions. Standardised shapes reduce cognitive load for both producing and consuming agents, and make downstream automation reliable.
 
@@ -225,6 +227,7 @@ The framework ships 15 output templates and 7 pre-commit validators.
 | `metrics_logging.py` | Receives JSONL file paths. Validates each line has required fields (`ts`, `task`, `agent`, `event`, `tokens`), valid event types, and correct token source annotations. |
 | `supabase_boundary.py` | Receives file paths. Regex-checks for `import supabase` or `from supabase import` outside the database service. |
 | `framework_docs_staleness.py` | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. `[docs-ok]` in the commit message bypasses the check (auditable via `git log --grep='docs-ok'`). Only hardcoded exclusion: the two framework docs themselves, to avoid circular triggering. |
+| `adapter_drift.py` | Receives staged file paths under `context/`, `AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.claude/`, `.github/`, `.openai/`, `.agents/skills/`. Regenerates all adapter projections in-memory and compares against committed files. Fails if any projection is missing, modified, or orphaned. Runs at `pre-commit` stage. |
 
 Consistency compounds. Drift taxes. The templates and validators exist to keep that equation favourable over time.
 
@@ -249,24 +252,30 @@ Consistency compounds. Drift taxes. The templates and validators exist to keep t
 The framework's design principles are not novel; they adapt ideas from distributed systems, software engineering, and domain-driven design. The following references ground each principle in its source material.
 
 **Specialisation and bounded responsibilities:**
+
 - Newman, S. (2021). *Building Microservices: Designing Fine-Grained Systems*, 2nd ed. O'Reilly. Chapters on modelling service boundaries around bounded contexts, and the trade-offs between cohesion and coupling in fine-grained systems.
 - Evans, E. (2003). *Domain-Driven Design: Tackling Complexity in the Heart of Software*. Addison-Wesley. The original treatment of bounded contexts: explicit boundaries within which a model applies, with well-defined interfaces between them.
 
 **Explicit orchestration over implicit choreography:**
+
 - Richardson, C. (2018). *Microservices Patterns: With Examples in Java*. Manning. Chapters 4-5 on saga orchestration vs choreography: when a central coordinator should manage workflow state and when event-driven coordination is preferable.
 - Helland, P. (2007). "Life beyond Distributed Transactions: an Apostate's Opinion." *CIDR 2007*. The case for managing state through explicit workflow and messaging rather than distributed transactions, and why uncertainty at a distance must be designed for rather than abstracted away.
 
 **Durable context and externalised state:**
+
 - Kleppmann, M. (2017). *Designing Data-Intensive Applications*. O'Reilly. Chapter 11 on stream processing, event sourcing, and deriving state from immutable logs. The principle that state should be reconstructable from a durable record rather than held only in memory.
 
 **Verification over assertion:**
+
 - Beck, K. (2002). *Test-Driven Development: By Example*. Addison-Wesley. The foundational TDD cycle (red, green, refactor) and the discipline of writing executable verification before implementation.
 - Fowler, M. (2007). "Mocks Aren't Stubs." martinfowler.com. The distinction between state verification (checking outcomes) and interaction verification (checking method calls), and why observable evidence is more trustworthy than reported behaviour.
 
 **Portability and tool-agnostic design:**
+
 - Fowler, M. and Lewis, J. (2014). "Microservices." martinfowler.com. The principle of smart endpoints and dumb pipes: keeping logic in the services (agents) rather than coupling it to the transport or runtime infrastructure.
 
 **Strategic principles and operating model:**
+
 - Sinharay, A. (2026). *New DevX Vision*. `context/docs/vision.md`. Establishes the three strategic principles (Elevate the Next Constraint, Everything as Code, Humans Above The Loop) and three shifts in perspective (Sequence Speed and Rigour, Work the Way Agents Work, Navigate Don't Arrive) that this framework implements. Covers the four-phase workflow, context hierarchy, risk-based oversight, and the autonomy horizon.
 - Sinharay, A. (2026). *Journey to New DevX*. `context/docs/journey.md`. The implementation companion to the Vision. Introduces the operating triangle (execution time, token cost, autonomy horizon), AgentOps as an operational discipline, the comprehension gap, the three maturity stages (DevX as Supervisor, Reviewer, Orchestrator), and context infrastructure. This framework implements those concepts as a portable directory structure.
 - Sinharay, A. (2026). *Roadmap: Planning the Journey to New DevX*. `context/docs/roadmap.md`. Adoption planning and measurement companion. Covers readiness assessment, present-forward vs future-back postures, stage benchmarks, the RACER operating loop for constraint elevation, and the metrics taxonomy (Focus, Speed, Predictability, Quality, Durability).
@@ -277,6 +286,7 @@ The framework's design principles are not novel; they adapt ideas from distribut
 
 ## Related Documents
 
+- [GitHub Repository](https://github.com/Schmoiger/start-here): framework source code and adapters
 - `context/docs/agentic-framework-reference.md`: directory-level reference map
 - `context/README.md`: framework entry point
 - `context/docs/agentic-framework-reference.md`: workflows, coordination patterns, portability adapters
