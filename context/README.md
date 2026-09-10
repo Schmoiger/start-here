@@ -16,8 +16,8 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Framework reference**    | `docs/agentic-framework-reference.md` | Workflows, patterns, personas, adapters, measurement |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
-| **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD                              |
-| **Generators**             | `scripts/generators/`            | CLAUDE.md/AGENTS.md generators                       |
+| **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD, adapter drift               |
+| **Generators**             | `scripts/generators/`            | Unified runtime adapter CLI (Gemini, Claude, Copilot, Codex) |
 
 ---
 
@@ -185,9 +185,11 @@ context/
 └── scripts/                      # Portable tools
     ├── prepare-commit-msg.py    # Hook: inject token metrics into commits
     ├── prepare-commit-msg.sh    # Shell wrapper (symlinked from .git/hooks/)
-    ├── validators/               # Rule validators (pre-commit hooks)
-    ├── generators/               # CLAUDE.md/AGENTS.md generators
-    └── tests/                    # Validator tests
+    ├── validators/               # Rule validators (pre-commit hooks, incl. adapter_drift.py)
+    ├── generators/               # Runtime adapter generators
+    │   ├── generate_adapters.py  # Unified CLI dispatcher
+    │   └── adapters/             # Platform adapters (core, gemini, claude, github, openai)
+    └── tests/                    # Test suites (validators, adapters, E2E compilation)
 ```
 
 ---
@@ -221,12 +223,12 @@ When a task domain needs repeated specialised work:
 3. List applicable `rules` and `standards` in frontmatter
 4. Write concise body with rules summary and workflow
 5. Add to workflow YAML if part of standard process
-6. Regenerate AGENTS.md: `uv run python context/scripts/generators/generate_agents_md.py`
+6. Regenerate adapter projections: `uv run python context/scripts/generators/generate_adapters.py`
 
 ---
 
 ## See Also
 
-- **AGENTS.md** — auto-generated workflow + agent registry (run `generate_agents_md.py` to update)
-- **Root README**: `../README.md` — deployment instructions for context system
+- **AGENTS.md** / **CLAUDE.md** / **GEMINI.md** — auto-generated workflow + agent registries (run `generate_adapters.py` to update)
+- **Root README**: `../README.md` — deployment instructions for context system and runtime adapters
 - **Standards index**: `standards/README.md` — detailed standards catalogue

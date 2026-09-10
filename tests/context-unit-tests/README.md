@@ -1,12 +1,14 @@
-# Documentation Unit Tests
+# Context & Documentation Unit Tests
 
-Unit tests for validating documentation consistency and format.
+Unit tests for validating context documentation consistency, frontmatter, and cross-references.
+
+For tests covering runtime adapters, generators, and pre-commit validators, see [`context/scripts/tests/`](../../context/scripts/tests/README.md).
 
 ## Quick Start
 
 ```bash
 # Install dependencies (using uv per tech-standards.md)
-cd tests/docs-unit-tests
+cd tests/context-unit-tests
 uv sync
 
 # Run all Python tests
@@ -31,14 +33,13 @@ ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 Run on every PR - these tests are fast and don't require API keys:
 
 ```bash
-cd tests/docs-unit-tests
+cd tests/context-unit-tests
 
 # Format validation
 uv run pytest test_doc_format.py -v
 
 # Cross-reference validation
 uv run pytest test_references.py -v
-
 ```
 
 ### LLM Consistency Check (Slow, Requires API Key)

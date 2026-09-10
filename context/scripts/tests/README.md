@@ -42,19 +42,49 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - {project-root} placeholder support
 - Referenced standards/rules existence checks
 
-### Generator (22 tests)
+### Generator & Adapter Projections (27 tests)
 
-**generate_claude_md.py**
-- Workflow loading and parsing
-- Agent definition loading
-- Description extraction
-- Mermaid diagram generation with dependencies and gates
-- Phase details with outputs and validation
-- Agent reference by category
-- Quality gates with criteria
-- Workflow rules and warnings
-- Complete CLAUDE.md structure
-- Portable path generation
+**generate_adapters.py & test_cli_dispatcher.py** (5 tests)
+- Target normalization and aliases (all, gemini, claude, github, copilot, codex, openai)
+- CLI parser flags and shortcuts (`-g`, `-c`, `-p`, `-o`, `-d`, `-a`, `-n`)
+- Dry-run mode (`-d`) filesystem isolation
+- Smart change detection (`--new` default) preserving mtimes on unchanged files
+- Benchmark assertion: projection compilation in < 2.0s
+
+**test_adapters_core.py** (5 tests)
+- CanonicalAgent and WorkflowDAG dataclasses
+- Loader validation and error handling for missing definitions
+- Capability registry extensibility
+- Token estimator budgeting
+
+**test_gemini_adapter.py** (2 tests)
+- Antigravity SKILL.md generation with standards and rules
+- GEMINI.md generation with system instructions and model tier mappings
+
+**test_claude_adapter.py** (2 tests)
+- CLAUDE.md generation with system instructions and subagent spawning
+- Subagent prompt generation in `.claude/prompts/`
+
+**test_github_adapter.py** (3 tests)
+- `.github/copilot-instructions.md` generation
+- Custom prompts in `.github/prompts/*.prompt.md`
+- Scoped instructions in `.github/instructions/*.instructions.md` via `applyTo` parsing
+
+**test_openai_adapter.py** (3 tests)
+- System prompts in `.openai/prompts/*.txt`
+- Function calling schemas in `.openai/tools.json`
+- Lightweight execution runner harness `.openai/runner.py`
+
+**test_adapter_drift.py** (4 tests)
+- Clean repository zero-drift verification
+- Drift detection on modified projections
+- Drift detection on missing projections
+- Drift detection on orphaned files
+
+**test_e2e_compilation.py** (3 tests)
+- End-to-end multi-target compilation in an isolated directory (86+ files)
+- Deterministic byte-for-byte reproducibility across repeated forced compilations
+- Minimal synthetic context compilation verifying end-to-end pipeline
 
 ## Running Tests
 
@@ -63,13 +93,12 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 uv run pytest context/scripts/tests/ -v
 
 # Specific test file
-uv run pytest context/scripts/tests/test_validators.py -v
+uv run pytest context/scripts/tests/test_cli_dispatcher.py -v
+uv run pytest context/scripts/tests/test_adapter_drift.py -v
+uv run pytest context/scripts/tests/test_e2e_compilation.py -v
 
 # With coverage
 uv run pytest context/scripts/tests/ --cov=context/scripts --cov-report=html
-
-# Single test
-uv run pytest context/scripts/tests/test_validators.py::TestConventionalCommits::test_valid_commit -v
 ```
 
 ## Test Fixtures
@@ -85,32 +114,25 @@ Located in `fixtures/`:
 ## Dependencies
 
 - pytest >= 7.4.0
-- pytest-cov >= 4.1.0 (optional, for coverage reports)
 - pyyaml >= 6.0
 
-Installed via root `pyproject.toml` dev dependencies.
+Installed via root `pyproject.toml` dev dependencies or managed via `uv run`.
 
 ## Test Organisation
 
 ```
 tests/
-├── README.md           # This file
-├── conftest.py         # Pytest configuration and fixtures
-├── test_validators.py  # Tests for all 4 validators
-├── test_agent_validator.py  # Tests for agent definition validator
-├── test_generator.py   # Tests for CLAUDE.md generator
-└── fixtures/           # Test data files
+├── README.md                 # This file
+├── conftest.py               # Pytest configuration and fixtures
+├── test_validators.py        # Rule validator tests (conventional commits, EARS, British English, metrics)
+├── test_agent_validator.py   # Agent definition validator tests
+├── test_adapters_core.py     # Canonical IR loader and registry tests
+├── test_gemini_adapter.py    # Antigravity/Gemini adapter tests
+├── test_claude_adapter.py    # Claude Code adapter tests
+├── test_github_adapter.py    # GitHub Copilot adapter tests
+├── test_openai_adapter.py    # OpenAI/Codex adapter tests
+├── test_cli_dispatcher.py    # generate_adapters.py CLI tests
+├── test_adapter_drift.py     # adapter_drift.py validator tests
+├── test_e2e_compilation.py   # End-to-end multi-target compilation tests
+└── fixtures/                 # Test data files
 ```
-
-## Adding New Tests
-
-1. Create fixture files in `fixtures/` if needed
-2. Add fixture functions to `conftest.py`
-3. Write test functions following existing patterns
-4. Run tests to verify: `uv run pytest context/scripts/tests/ -v`
-
-## Coverage Goals
-
-- Validators: 100% (critical for enforcement)
-- Generator: 90%+ (comprehensive but allows some edge cases)
-- Agent validator: 100% (ensures portable agent definitions)
