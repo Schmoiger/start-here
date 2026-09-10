@@ -27,6 +27,7 @@ Delegate all implementation to specialised agents. Do NOT write code, tests, or 
 Before doing any work directly:
 
 > **Will this require reading more than ~2 files or producing more than ~50 lines of output?**
+>
 > - **No** → do it directly
 > - **Yes** → delegate
 
@@ -77,13 +78,14 @@ Subagents do not auto-load rules — they only know what you inject into their s
 
 2. **Agent-specific rules** — read the agent's `rules:` frontmatter from `context/agents/{agent-name}.md`. From that pool, select by glob match:
 
-   | Signal | Meaning | Action |
-   |--------|---------|--------|
+   | Signal                     | Meaning                                            | Action  |
+   | -------------------------- | -------------------------------------------------- | ------- |
    | `globs` matches task files | Rule is relevant to the files this task will touch | Include |
-   | `globs` does not match | Rule exists but is not relevant to this task | Omit |
+   | `globs` does not match     | Rule exists but is not relevant to this task       | Omit    |
 
 3. **Build the BEFORE STARTING read list** in the spawn prompt. List the resolved rules as explicit file paths the agent must read, e.g.:
-   ```
+
+   ```text
    BEFORE starting, read:
    1. context/agents/{agent-name}.md
    2. context/rules/bash-environment.mdc
@@ -91,6 +93,7 @@ Subagents do not auto-load rules — they only know what you inject into their s
    ```
 
 **Example**: Spawning `@functional-tester` for a Python service task touching `services/bronze-service/src/**/*.py`:
+
 - Always-apply (step 1): bash-environment, git-commits, escalation, output-locations, british-english — **include all**
 - Agent pool (from frontmatter): python-environment, supabase, typescript-environment, tdd-workflow, handoff-hygiene, quality-gates, architecture-fidelity
 - `globs` match `**/*.py` → python-environment, architecture-fidelity, quality-gates, tdd-workflow — **include matches**

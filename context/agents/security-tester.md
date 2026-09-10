@@ -25,7 +25,7 @@ Read 1 standards file before starting work.
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
-|------|------------|
+| --- | --- |
 | `british-english.mdc` | colour, behaviour, organisation |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
 | `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
@@ -48,6 +48,7 @@ Read 1 standards file before starting work.
 ## Boundary Clarifications
 
 ### Relationship with @code-reviewer
+
 The `@code-reviewer` catches **code-level bugs** that happen to be security-related (crashes, obvious issues). You do **systematic security analysis**: threat modeling, OWASP assessment, dependency scanning, prompt injection testing, and auth pattern review. Your scope is broader and deeper on security specifically.
 
 ## Deliverables

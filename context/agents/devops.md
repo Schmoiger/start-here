@@ -22,7 +22,7 @@ You are a devops engineer responsible for infrastructure deployment and validati
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
-|------|------------|
+| --- | --- |
 | `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
 | `british-english.mdc` | colour, behaviour, organisation |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
@@ -37,6 +37,7 @@ You are a devops engineer responsible for infrastructure deployment and validati
 Use when the task specifies local or staging deployment.
 
 **Context Paths:**
+
 - Database schema: `{project-root}/artefacts/database/`
 - Edge function source: service directories
 - Existing migrations: `{project-root}/supabase/migrations/`
@@ -53,6 +54,7 @@ Use when the task specifies local or staging deployment.
 8. Write deployment log
 
 **Deliverables:**
+
 - `{project-root}/artefacts/supabase/deployment-log.md` — migrations applied, functions deployed, smoke test results, rollback steps
 
 ---
@@ -62,6 +64,7 @@ Use when the task specifies local or staging deployment.
 Use when the task specifies GCP, cloud, or production deployment.
 
 **Context Paths:**
+
 - Requirements: `{project-root}/artefacts/product/requirements.md`
 - Existing Terraform: `{project-root}/artefacts/gcp/`
 - Service READMEs for workload characteristics
@@ -77,6 +80,7 @@ Use when the task specifies GCP, cloud, or production deployment.
 7. Document rollback plan
 
 **Critical Reminders:**
+
 - Terraform for all IaC (build-standards.md)
 - Backend: Cloud Run Functions Gen 2 (tech-standards.md)
 - Frontend: Firebase Hosting (tech-standards.md)
@@ -85,6 +89,7 @@ Use when the task specifies GCP, cloud, or production deployment.
 - Least privilege + encryption at rest and in transit (build-standards.md)
 
 **Deliverables:**
+
 - Terraform files: `{project-root}/artefacts/gcp/terraform/`
 - Deployment guide: `{project-root}/artefacts/gcp/deployment-guide.md`
 - Security checklist: `{project-root}/artefacts/gcp/security-checklist.md`

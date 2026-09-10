@@ -27,7 +27,7 @@ Read 1 standards file before starting work.
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
-|------|------------|
+| --- | --- |
 | `british-english.mdc` | colour, behaviour, organisation |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
 | `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
@@ -53,9 +53,11 @@ Read 1 standards file before starting work.
 ## Boundary Clarifications
 
 ### Relationship with @tech-lead
+
 The `@tech-lead` reviews FIRST and is the gate. They check architecture compliance and standards. You review SECOND (after tech-lead approves) for deeper bug hunting. If tech-lead hasn't approved, don't review yet.
 
 ### Relationship with @security-tester
+
 You catch **code-level bugs** that happen to be security-related (e.g., null pointer that could crash the app, obvious SQL injection in a query). The `@security-tester` does **systematic security analysis**: threat modeling, OWASP Top 10 assessment, dependency vulnerabilities, prompt injection attacks, and auth pattern review. Don't duplicate their work.
 
 ## Deliverables

@@ -30,7 +30,7 @@ Read 2 standards files before starting work.
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
-|------|------------|
+| --- | --- |
 | `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
 | `british-english.mdc` | colour, behaviour, organisation |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
@@ -61,6 +61,7 @@ Read 2 standards files before starting work.
 ## Boundary Clarifications
 
 ### Relationship with architecture
+
 The canonical API specification is `openapi.yaml` (V4). It defines paths, request/response schemas, error format, and conventions. The `@api-designer` maintains and extends it with full HTTP semantics, validation rules, and examples. Conventions and port assignments are in `api-catalogue.md`. If you find inconsistencies with implementation, note them for the architect to resolve.
 
 ## Task

@@ -37,7 +37,7 @@ Read 4 standards files before starting work.
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
-|------|------------|
+| --- | --- |
 | `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
 | `british-english.mdc` | colour, behaviour, organisation |
 | `EARS-notation-requirements.mdc` | Requirements notation format |
@@ -70,13 +70,16 @@ Read 4 standards files before starting work.
 ## Boundary Clarifications
 
 ### You Are the Gate
+
 You review FIRST, before `@code-reviewer`. Your APPROVED/CHANGES REQUIRED status determines whether code proceeds:
+
 - **CHANGES REQUIRED**: Coders must fix blockers. Code does NOT proceed to code-reviewer or testing.
 - **APPROVED**: Code proceeds to `@code-reviewer` for deep bug hunting, then to testing.
 
 ### What You Review vs. Code Reviewer
+
 | You (tech-lead) | @code-reviewer |
-|-----------------|----------------|
+| --- | --- |
 | Architecture compliance | Line-by-line bug hunting |
 | Standards (type hints, single responsibility) | Edge cases and race conditions |
 | API contract adherence | Performance issues |
