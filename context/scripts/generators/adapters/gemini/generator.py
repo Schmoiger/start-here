@@ -5,20 +5,17 @@ from typing import Any
 from context.scripts.generators.adapters.core.models import CanonicalAgent
 
 
-def generate_skills(context: dict[str, Any], output_dir: Path) -> None:
+def generate_skills(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """
     Translates canonical agents into Antigravity SKILL.md files.
     """
     agents: dict[str, CanonicalAgent] = context.get("agents", {})
     skills_dir = output_dir / ".agents" / "skills"
     
-    # Do not clear the existing skills directory as per open question.
-    # We will selectively overwrite generated skills.
+    results: dict[Path, str] = {}
     
     for agent_name, agent in agents.items():
         agent_dir = skills_dir / agent_name
-        agent_dir.mkdir(parents=True, exist_ok=True)
-        
         skill_md_path = agent_dir / "SKILL.md"
         content = (
             "---\n"
@@ -41,7 +38,12 @@ def generate_skills(context: dict[str, Any], output_dir: Path) -> None:
                 content += f"- {rule}\n"
             content += "\n"
             
-        skill_md_path.write_text(content)
+        results[skill_md_path] = content
+        if not dry_run:
+            agent_dir.mkdir(parents=True, exist_ok=True)
+            skill_md_path.write_text(content)
+            
+    return results
 
 
 import yaml
@@ -72,7 +74,7 @@ def _extract_model_mappings(repo_root: Path, provider_name: str) -> str:
     return ""
 
 
-def generate_gemini_md(context: dict[str, Any], output_dir: Path) -> None:
+def generate_gemini_md(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """
     Generates the repository-level GEMINI.md file.
     """
@@ -92,4 +94,7 @@ def generate_gemini_md(context: dict[str, Any], output_dir: Path) -> None:
         f"{model_mappings}\n"
     )
     
-    gemini_md_path.write_text(content)
+    if not dry_run:
+        gemini_md_path.write_text(content)
+        
+    return {gemini_md_path: content}

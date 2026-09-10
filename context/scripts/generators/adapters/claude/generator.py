@@ -31,7 +31,7 @@ def _extract_model_mappings(repo_root: Path, provider_name: str) -> str:
     return ""
 
 
-def generate_claude_md(context: dict[str, Any], output_dir: Path) -> None:
+def generate_claude_md(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """Generates the repository-level CLAUDE.md file."""
     claude_md_path = output_dir / "CLAUDE.md"
     
@@ -51,14 +51,18 @@ def generate_claude_md(context: dict[str, Any], output_dir: Path) -> None:
         "To invoke a specific agent for a task, you must read its prompt: `@.claude/prompts/{agent_name}.md`\n"
     )
     
-    claude_md_path.write_text(content)
+    if not dry_run:
+        claude_md_path.write_text(content)
+        
+    return {claude_md_path: content}
 
 
-def generate_subagent_prompts(context: dict[str, Any], output_dir: Path) -> None:
+def generate_subagent_prompts(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """Generates standalone agent prompts for Claude Code."""
     agents: dict[str, CanonicalAgent] = context.get("agents", {})
     prompts_dir = output_dir / ".claude" / "prompts"
-    prompts_dir.mkdir(parents=True, exist_ok=True)
+    
+    results: dict[Path, str] = {}
     
     for agent_name, agent in agents.items():
         prompt_path = prompts_dir / f"{agent_name}.md"
@@ -79,4 +83,9 @@ def generate_subagent_prompts(context: dict[str, Any], output_dir: Path) -> None
                 content += f"- @context/rules/{rule}\n"
             content += "\n"
             
-        prompt_path.write_text(content)
+        results[prompt_path] = content
+        if not dry_run:
+            prompts_dir.mkdir(parents=True, exist_ok=True)
+            prompt_path.write_text(content)
+            
+    return results

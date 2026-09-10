@@ -143,9 +143,9 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-16 | high | pending | AD-6, AD-9, AD-12, AD-15 | Create unified `generate_adapters.py` CLI dispatcher |
-| AD-17 | high | pending | AD-16 | Implement `adapter_drift.py` pre-commit validator |
-| AD-18 | medium | pending | AD-17 | Wire adapter drift check into `.pre-commit-config.yaml` |
+| AD-16 | high | completed | AD-6, AD-9, AD-12, AD-15 | Create unified `generate_adapters.py` CLI dispatcher |
+| AD-17 | high | completed | AD-16 | Implement `adapter_drift.py` pre-commit validator |
+| AD-18 | medium | completed | AD-17 | Wire adapter drift check into `.pre-commit-config.yaml` |
 
 ### Sprint 7: Documentation & End-to-End Verification
 

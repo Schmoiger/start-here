@@ -5,11 +5,12 @@ from typing import Any
 from context.scripts.generators.adapters.core.models import CanonicalAgent
 
 
-def generate_system_prompts(context: dict[str, Any], output_dir: Path) -> None:
+def generate_system_prompts(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """Translates canonical agents into OpenAI system prompts."""
     agents: dict[str, CanonicalAgent] = context.get("agents", {})
     prompts_dir = output_dir / ".openai" / "prompts"
-    prompts_dir.mkdir(parents=True, exist_ok=True)
+    
+    results: dict[Path, str] = {}
     
     for agent_name, agent in agents.items():
         prompt_path = prompts_dir / f"{agent_name}.txt"
@@ -32,13 +33,18 @@ def generate_system_prompts(context: dict[str, Any], output_dir: Path) -> None:
                 lines.append(f"- {rule}")
             lines.append("")
             
-        prompt_path.write_text("\n".join(lines))
+        content = "\n".join(lines)
+        results[prompt_path] = content
+        if not dry_run:
+            prompts_dir.mkdir(parents=True, exist_ok=True)
+            prompt_path.write_text(content)
+            
+    return results
 
 
-def generate_tool_schemas(context: dict[str, Any], output_dir: Path) -> None:
+def generate_tool_schemas(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """Generates OpenAI Function Calling JSON schemas for agent tools."""
     tools_dir = output_dir / ".openai"
-    tools_dir.mkdir(parents=True, exist_ok=True)
     
     # Based on feedback: use models.yaml as the central registry (stubbed here)
     schema = {
@@ -57,13 +63,17 @@ def generate_tool_schemas(context: dict[str, Any], output_dir: Path) -> None:
     }
     
     tools_path = tools_dir / "tools.json"
-    tools_path.write_text(json.dumps([schema], indent=2))
+    content = json.dumps([schema], indent=2)
+    if not dry_run:
+        tools_dir.mkdir(parents=True, exist_ok=True)
+        tools_path.write_text(content)
+        
+    return {tools_path: content}
 
 
-def generate_runner_harness(output_dir: Path) -> None:
+def generate_runner_harness(output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """Generates a lightweight Python execution harness using httpx."""
     runner_dir = output_dir / ".openai"
-    runner_dir.mkdir(parents=True, exist_ok=True)
     runner_path = runner_dir / "runner.py"
     
     content = '''import os
@@ -114,4 +124,8 @@ if __name__ == "__main__":
     else:
         print("Usage: python runner.py <agent_name> <user_prompt>")
 '''
-    runner_path.write_text(content)
+    if not dry_run:
+        runner_dir.mkdir(parents=True, exist_ok=True)
+        runner_path.write_text(content)
+        
+    return {runner_path: content}
