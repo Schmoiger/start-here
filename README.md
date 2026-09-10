@@ -77,7 +77,7 @@ This framework employs a **Hexagonal (Ports and Adapters)** architecture to ensu
 ├───────────┤   ├───────────┤                 ├───────────┤   ├───────────┤
 │.agents/   │   │CLAUDE.md  │                 │.github/   │   │.openai/   │
 │skills/    │   │.claude/   │                 │prompts/   │   │prompts/   │
-│GEMINI.md  │   │prompts/   │                 │instructs/ │   │tools.json │
+│GEMINI.md  │   │prompts/   │                 │instructions/ │   │tools.json │
 └───────────┘   └───────────┘                 └───────────┘   └───────────┘
 ```
 
