@@ -90,8 +90,8 @@ def check_adapter_drift(
                             drift_issues.append(
                                 f"ORPHANED: {rel_f} exists on disk but is no longer generated from canonical context."
                             )
-                except Exception:
-                    pass
+                except (OSError, UnicodeDecodeError):
+                    continue
 
     is_synced = len(drift_issues) == 0
     return is_synced, drift_issues
