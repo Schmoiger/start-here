@@ -1,0 +1,31 @@
+name: Sync Standards Branch
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'context/**'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-standards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install git-subrepo
+        run: |
+          git clone --depth 1 https://github.com/ingydotnet/git-subrepo.git /tmp/git-subrepo
+          echo "/tmp/git-subrepo/lib" >> $GITHUB_PATH
+
+      - name: Extract and push standards branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git subrepo branch context -f
+          git push origin subrepo/context:standards
