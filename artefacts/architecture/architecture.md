@@ -82,13 +82,13 @@ The Agentic Orchestration Harness is a multi-agent coordination framework that d
 
 **Consequences**: The Claude adapter is the most complex adapter because it must balance two orchestration models. The adapter's output must preserve framework governance while leveraging Claude's native strengths (context management, subagent lifecycle, session telemetry).
 
-### Framework Distribution via Managed Template and Internal CLI Library
+### Framework Distribution via `git-subrepo` and Internal CLI Library
 
-**Decision**: The framework is distributed to downstream projects using a template synchronisation tool (e.g. `cruft`) combined with an internal Python package, replacing manual `rsync` copying.
+**Decision**: The framework is distributed to downstream projects using `git-subrepo` targeting an isolated `standards` branch, combined with an internal Python CLI package (`agent-harness`), replacing manual `rsync` copying or fragile template generators.
 
-**Rationale**: When multiple projects adopt this framework, propagating upstream improvements via `rsync` leads to merge conflicts and divergence. A stateful templating tool enables automated 3-way git merges; a versioned library packages the generator scripts so downstream repositories can regenerate their platform-specific adapters after pulling updates.
+**Rationale**: When multiple projects adopt this framework, propagating upstream improvements via `rsync` or one-way templates leads to divergence and prevents downstream improvements from feeding back into the core. Using `git-subrepo` against an isolated upstream `standards` distribution branch enables true bi-directional synchronisation (`git subrepo pull/push context`) without submodule HEAD detachment issues. A versioned CLI library (`agent-harness`) packages the generator and drift validator so downstream repositories can effortlessly recompile and verify runtime projections.
 
-**Consequences**: Centralises the maintenance of the core harness while allowing downstream projects to seamlessly pull updates and regenerate their platform-specific adapters.
+**Consequences**: Centralises the maintenance of the canonical harness while allowing downstream projects to seamlessly pull updates, push local standards improvements back upstream, and regenerate platform-specific adapters.
 
 ---
 
@@ -298,7 +298,7 @@ flowchart TB
         CloudSQL["Cloud SQL (PostgreSQL)"]
     end
 
-    Upstream -->|cruft update| LocalRun
+    Upstream <==>|git subrepo pull / push| LocalRun
     LocalRun --> AgentRuntime
     AgentRuntime -->|git push| CI
     CI -->|PR merge| CD
@@ -328,7 +328,7 @@ flowchart TB
 | Execution engine gap | Workflows (YAML) require an active orchestrator runner; not all runtimes (e.g. GitHub Copilot) support native multi-agent orchestration | Develop lightweight execution harnesses for runtimes without native orchestrators |
 | Token overhead in small context windows | Injecting comprehensive rules into constrained runtimes degrades reasoning quality | Implement `ON_DEMAND_LINK` context delivery strategy for constrained runtimes; rules stay under 200 tokens each |
 | Claude native orchestration complexity | Claude Code's built-in multi-agent primitives overlap with and partially compete with the framework's orchestration model | Claude adapter must reconcile both models, preserving framework governance while leveraging Claude's native strengths |
-| Framework adoption friction | Downstream projects face setup overhead when first adopting the framework | Cruft template and CLI library reduce onboarding to a single command; pre-commit config template standardises hook installation |
+| Framework adoption friction | Downstream projects face setup overhead when first adopting the framework | `git-subrepo` and `agent-harness` CLI library reduce onboarding to a single command; pre-commit config template standardises hook installation |
 
 ---
 

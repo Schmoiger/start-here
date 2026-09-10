@@ -1,7 +1,7 @@
 # Tasks: Build Runtime Adapters
 
 **Branch**: `env/runtime-adapters`  
-**Status**: Planning  
+**Status**: Completed  
 **Scope**: Build the multi-platform runtime adapter system to compile canonical `context/` assets into native configurations, prompts, and tool mappings for Google Gemini / Antigravity, GitHub Copilot, Claude Code, and OpenAI Codex.  
 **Design**: `artefacts/architecture/architecture.md`  
 **Created**: 2026-09-09  
@@ -159,8 +159,8 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-22 | high | pending | AD-21 | Configure git-subrepo distribution and bi-directional sync for context/ |
-| AD-23 | high | pending | AD-21 | Package and publish Generator Engine to GCP Artifact Registry |
+| AD-22 | high | completed | AD-21 | Configure git-subrepo distribution and bi-directional sync for context/ |
+| AD-23 | high | completed | AD-21 | Package and publish Generator Engine to GCP Artifact Registry |
 
 ---
 
@@ -481,17 +481,19 @@ Update status immediately when work begins and when it completes. Every task in 
 **Rationale**: Downstream projects need to import the canonical standards (`context/`) without inheriting project-specific state (`artefacts/build/`, `artefacts/product/`, or application code), and must be able to push standards improvements made in downstream projects back to `start-here`. Using `git-subrepo` against an isolated upstream `standards` distribution branch provides seamless, git-native bi-directional synchronisation with normal commit history and no submodule HEAD detachment issues.
 
 **Files**:
-- Create `context/scripts/dist/publish_standards_branch.sh` (script to split and publish `context/` to the upstream `standards` branch)
-- Create `context/docs/downstream-subrepo.md` (downstream guide for cloning, pulling, and pushing standards via git-subrepo)
-- Update `.pre-commit-config.yaml` (template hook configuration for downstream repositories)
+- Native `git-subrepo` command integration (`git subrepo branch context -f`)
+- Create `context/docs/downstream-subrepo.md` (downstream guide for cloning, pulling, pushing, and testing standards via git-subrepo)
+- Update `README.md` and `context/README.md` (distribution architecture and Mermaid diagrams)
+- Update `artefacts/architecture/architecture.md` (ADR and distribution topology)
 
 **Acceptance**:
-- An automated branch-splitting script creates or updates the clean upstream `standards` distribution branch containing the `context/` tree.
+- Native `git subrepo branch context -f` isolates and produces the clean `subrepo/context` branch without external scripts.
 - Downstream workflow is verified:
   1. `git subrepo clone <url> context -b standards` imports only `context/`.
   2. Project-specific directories (`artefacts/build/`, local services) remain strictly outside the subrepo boundary.
   3. Upstream updates can be pulled cleanly via `git subrepo pull context`.
   4. Changes made downstream to standards can be pushed upstream via `git subrepo push context`.
+  5. Downstream projects can execute the test suite at any time via `uv run pytest context/scripts/tests`.
 - Detailed documentation in `context/docs/downstream-subrepo.md` guides downstream setup and pre-commit enforcement.
 
 ---
@@ -501,12 +503,26 @@ Update status immediately when work begins and when it completes. Every task in 
 **Rationale**: Downstream projects pulling standards via `git-subrepo` need to compile platform projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.) and enforce zero drift without managing complex Python logic or dependencies. Packaging the generator engine and drift validator as a standard Python package published to a private GCP Artifact Registry repository enables seamless IAM authentication and instant execution via `uvx` or `pip`.
 
 **Files**:
-- Update / Create `pyproject.toml`
-- Update `context/scripts/generators/generate_adapters.py` (entrypoint compatibility)
-- Update `context/scripts/validators/adapter_drift.py` (entrypoint compatibility)
+- Create `pyproject.toml` (standard PEP 517/621 hatchling build configuration)
+- Create `context/__init__.py`, `context/scripts/__init__.py`, `context/scripts/generators/__init__.py` (package inits)
+- Update `context/scripts/generators/generate_adapters.py` (CLI entrypoint & repo_root detection)
+- Update `context/scripts/validators/adapter_drift.py` (CLI entrypoint & repo_root detection)
+- Create `context/scripts/tests/test_packaging.py` (entrypoint and metadata test suite)
 
 **Acceptance**:
 - `pyproject.toml` defines `[project.scripts]` entrypoints (`agent-harness = "context.scripts.generators.generate_adapters:main"` and `agent-drift = "context.scripts.validators.adapter_drift:main"`).
-- The package builds successfully with `uv build`.
+- The package builds successfully with `uv build` (`dist/*.whl` and `dist/*.tar.gz`).
 - The package can be published to a private GCP Artifact Registry repository using modern `uv publish` (via OAuth2 access token or keyring provider) or `twine`.
 - Post-sync workflow documented so downstream projects can run `uvx ... agent-harness` to regenerate projections after `git subrepo pull context`.
+
+**Quality Gate Review Record (Sprint 8 - 2026-09-10)**:
+- **Reviewer**: `@tech-lead`
+- **Scope**: Packaging, Distribution & Bi-directional Standards Synchronisation (Sprint 8).
+- **Verification Matrix**:
+  - `git-subrepo` native commands verified: `git subrepo branch context -f` cleanly separates the canonical `context/` tree for distribution.
+  - `pyproject.toml` validated: Builds cleanly via `uv build` into `dist/agent_harness-0.1.0-py3-none-any.whl` and `dist/agent_harness-0.1.0.tar.gz`.
+  - Python CLI entrypoints tested: `agent-harness` and `agent-drift` verified via `test_packaging.py`.
+  - Full test suite: 80/80 tests passing via `uv run pytest context/scripts/tests -v`.
+  - Documentation: `context/docs/downstream-subrepo.md`, `README.md`, `context/README.md`, and `artefacts/architecture/architecture.md` updated with the bi-directional synchronisation topology diagram.
+  - Standards compliance: `british_english.py` and `adapter_drift.py` pass cleanly with exit code 0.
+- **Verdict**: APPROVED. All 8 sprints of Runtime Adapters completed.

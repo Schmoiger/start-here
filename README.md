@@ -118,6 +118,50 @@ If any generated projection is missing, manually edited, or out of date, the val
 
 ---
 
+## Framework Distribution & Downstream Integration
+
+The framework distributes canonical context as an isolated, self-contained directory (`context/`). Downstream repositories import standards, workflows, and agents without inheriting project-specific state (`artefacts/build/`, `artefacts/product/`, or application code).
+
+Bi-directional synchronisation is managed via `git-subrepo` targeting an upstream `standards` distribution branch:
+
+```mermaid
+graph LR
+    subgraph Upstream ["start-here (main)"]
+        UContext["context/ (Canonical Source)"]
+        UBuild["artefacts/build/ (Ignored)"]
+        UBranch["standards branch (Split context/)"]
+    end
+
+    subgraph Downstream ["New Project"]
+        DContext["context/ (Subrepo)"]
+        DBuild["artefacts/build/ (Local Only)"]
+        DCode["src / services / (Local Only)"]
+    end
+
+    UContext -- "git subrepo branch" --> UBranch
+    UBranch <== "git subrepo pull / push" ==> DContext
+    UBuild -. "Strictly Isolated" .- DBuild
+```
+
+### Quick Commands for Downstream Projects
+
+```bash
+# 1. Adopt standards into a new or existing repository
+git subrepo clone git@github.com:your-org/start-here.git context -b standards
+
+# 2. Re-compile runtime adapter projections after pulling upstream updates
+git subrepo pull context
+uv run python context/scripts/generators/generate_adapters.py
+
+# 3. Push local standards improvements back upstream
+uv run python context/scripts/validators/adapter_drift.py
+git subrepo push context
+```
+
+For complete setup instructions and pre-commit hook configuration, see [`context/docs/downstream-subrepo.md`](context/docs/downstream-subrepo.md).
+
+---
+
 ## Documentation
 
 - **Getting started**: See `context/README.md` - Complete guide for agents and humans

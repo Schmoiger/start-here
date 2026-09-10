@@ -13,7 +13,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
 | **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies                           |
 | **Model profiles (LUT)**   | `models.yaml`                    | Maps abstract intent tiers to provider families and telemetry |
-| **Framework reference**    | `docs/agentic-framework-reference.md` | Workflows, patterns, personas, adapters, measurement |
+| **Downstream integration** | `docs/downstream-subrepo.md`     | Bi-directional standards synchronisation via `git-subrepo`   |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
 | **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD, adapter drift               |
@@ -33,7 +33,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml)
 
-**Framework reference**: [agentic-framework-reference](docs/agentic-framework-reference.md)
+**Downstream integration**: [downstream-subrepo](docs/downstream-subrepo.md)
 
 **Templates**: [index](templates/README.md)
 
@@ -171,8 +171,7 @@ context/
 │   ├── content.yaml              # Human-facing content with personas
 │   └── continuous-improvement.yaml # Incident response + retrospective
 ├── docs/                          # Design essays and operator reference
-│   ├── agentic-framework.md            # Why the framework exists (essay)
-│   ├── agentic-framework-reference.md # What it contains and how to run it (incl. content workflow)
+│   ├── downstream-subrepo.md     # Downstream git-subrepo integration and bi-directional sync guide
 │   ├── vision.md · journey.md · roadmap.md # New DevX programme documents
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
 ├── persona/                       # Writing voice for human-facing content
