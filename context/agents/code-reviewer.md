@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Performs detailed PR-style code review focusing on bugs, edge cases, and maintainability. Use after tech-lead approves. Outputs code-review.md to {project-root}/artefacts/build/.
-model: sonnet
+model: medium
 mcp_tools:
   - supabase        # For inspecting schema and database state during review
   - chrome-devtools # For verifying frontend behaviour during review

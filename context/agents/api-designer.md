@@ -1,7 +1,7 @@
 ---
 name: api-designer
 description: Designs RESTful and GraphQL APIs with OpenAPI specifications. Use when defining external or internal service interfaces. Outputs OpenAPI specs and API design documentation to {project-root}/artefacts/architecture/.
-model: sonnet
+model: medium
 mcp_tools:
   - context7 # For looking up API specs, library documentation and patterns
   - supabase # For inspecting schema to inform API design

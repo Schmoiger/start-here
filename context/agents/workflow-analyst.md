@@ -1,7 +1,7 @@
 ---
 name: workflow-analyst
 description: Analyzes workflow efficiency by examining handoffs, tasks, git history, token usage, and standards adherence. Produces efficiency report with actionable recommendations. Use after deployment or on-demand for retrospectives.
-model: sonnet
+model: medium
 standards:
   - workflow-standards.md
   - agent-standards.md

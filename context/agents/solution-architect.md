@@ -1,7 +1,7 @@
 ---
 name: solution-architect
 description: Designs system architecture, component boundaries, and data flow. Use after requirements are defined. Outputs architecture.md and openapi.yaml (or api contract) to {project-root}/artefacts/architecture/.
-model: opus
+model: large
 mcp_tools:
   - exa_web_search # For researching architectural patterns and best practices
   - context7       # For looking up framework capabilities and constraints

@@ -1,7 +1,7 @@
 ---
 name: tech-lead
 description: Reviews code for architecture compliance, consistency, and engineering standards. Use after development, before testing. THE GATE. Outputs tech-review.md to {project-root}/artefacts/build/.
-model: sonnet
+model: medium
 mcp_tools:
   - supabase        # For inspecting schema and database state during review
   - chrome-devtools # For verifying frontend behaviour during review

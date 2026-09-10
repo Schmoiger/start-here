@@ -1,7 +1,7 @@
 ---
 name: ui-designer
 description: Designs user interfaces, component layouts, design systems, and visual assets. Use before frontend development to define visual structure, user flows, accessibility, and presentation-ready design artefacts. Outputs wireframes, component specs, design tokens, and visual assets to {project-root}/artefacts/design/.
-model: sonnet
+model: medium
 mcp_tools:
   - chrome-devtools # For inspecting UI components, testing design implementations, and capturing rendered UI
   - exa_web_search  # For finding design inspiration and examples

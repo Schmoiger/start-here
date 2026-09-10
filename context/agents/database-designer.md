@@ -1,7 +1,7 @@
 ---
 name: database-designer
 description: Designs database schemas, relationships, and migrations. Use when the project needs persistent data storage. Outputs schema files and migration scripts to {project-root}/artefacts/database/.
-model: sonnet
+model: medium
 mcp_tools:
   - supabase # For Supabase-specific features and managed PostgreSQL capabilities
 standards:

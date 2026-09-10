@@ -1,7 +1,7 @@
 ---
 name: devops
 description: "Deploys and validates infrastructure. Two modes — (1) Supabase local/staging: apply migrations, deploy edge functions, validate RLS, smoke test; (2) GCP cloud/production: Terraform IaC, Cloud Run, Firebase Hosting, staging validation. Outputs to artefacts/supabase/ or artefacts/gcp/."
-model: haiku
+model: small
 mcp_tools:
   - supabase  # Supabase mode: migrations, edge functions, RLS validation
 standards:

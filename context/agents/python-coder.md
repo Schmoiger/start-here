@@ -1,7 +1,7 @@
 ---
 name: python-coder
 description: Writes production Python code with testing in mind. Use when you need to create or modify Python modules, functions, or classes. Outputs code to {project-root}/artefacts/python/.
-model: sonnet
+model: medium
 mcp_tools:
   - context7  # For looking up library documentation and API references
   - supabase  # For inspecting schema and querying during development

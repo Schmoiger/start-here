@@ -1,7 +1,7 @@
 ---
 name: documentation
 description: Generates user-facing documentation, API references, and guides. Also archives superseded artefacts. Use after code is stable or before reviews to clean up old docs. Outputs to {project-root}/artefacts/ and service-specific directories following doc-standards.md structure.
-model: sonnet
+model: medium
 mcp_tools:
   - context7 # For looking up library documentation and generating accurate API references
 standards:

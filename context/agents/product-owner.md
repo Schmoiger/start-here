@@ -1,7 +1,7 @@
 ---
 name: product-owner
 description: Transforms vague user requests into structured requirements and user stories. Use at project start or when scope needs clarification. Outputs requirements.md and user-stories.md to {project-root}/artefacts/product/.
-model: sonnet
+model: medium
 mcp_tools:
   - exa_web_search # For researching similar products and requirements patterns
   - context7       # For understanding technical constraints of libraries/frameworks

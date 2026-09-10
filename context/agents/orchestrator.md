@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Coordinates workflow execution, delegates implementation to specialised agents, and manages quality gates
-model: opus
+model: large
 standards:
   - agent-standards.md
   - workflow-standards.md

@@ -1,7 +1,7 @@
 ---
 name: security-tester
 description: Identifies security vulnerabilities using threat modelling and code analysis. Use for security audits, OWASP assessment, and dependency vulnerability scanning. Outputs to {project-root}/artefacts/test-results/security/.
-model: sonnet
+model: medium
 mcp_tools:
   - supabase # For inspecting RLS policies, auth patterns, and database security
 standards:
