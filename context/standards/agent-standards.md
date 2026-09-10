@@ -17,6 +17,10 @@ Subagents do not auto-load rules. The orchestrator injects rules into each spawn
 
 This means a rule with `alwaysApply: true` in its `.mdc` frontmatter will NOT be injected unless it is also listed in the orchestrator's always-apply list.
 
+### Canonical Asset Parsing
+
+Markdown files in the `context/` directory (such as agents, personas, and rules) use YAML frontmatter separated by `---`. Any automated parsers or runtime adapters reading these files MUST extract this metadata by splitting on the `---` delimiters, keeping the parsed frontmatter separate from the markdown body.
+
 ## 1.2. Input Standards vs Output Artefacts
 
 Agents read from input standards and write to output artefacts. For full directory layout see [doc-standards.md §2.1](doc-standards.md#21-directory-structure).
@@ -138,11 +142,18 @@ Agents have access to multiple tools for different purposes. To minimise user in
 | Operation | Preferred Tool | Avoid |
 |-----------|---------------|-------|
 | Create/modify files | Write, Edit | `echo >`, `cat <<EOF`, `sed` |
-| Run tests | Bash | N/A |
+| Run tests | Bash (`uv run`, `yarn test`) | Bare `pytest`, `vitest`, `python -m pytest` |
 | Git operations | Bash | N/A |
 | Find files | Glob | `find`, `ls` |
 | Search contents | Grep | `grep`, `rg`, `ack` |
-| Install dependencies | Bash (`uv add`, `yarn add`) | Manual edits to lock files |
+| Install dependencies | Bash (`uv add`, `yarn add`) | Manual edits to lock files, `pip`, `npm` |
+
+#### 4.3.5. Failure-Mode Transparency and Fail-Fast Rule (Strict Invariant)
+
+When standard-mandated tooling (such as `uv`, `yarn dlx`, or specified linter commands) fails due to missing dependencies, path mismatches, or sandbox permissions:
+*   Agents **SHALL NOT** silently substitute unapproved alternatives (e.g. falling back to system `python`, `python3`, `pip`, or injecting ad-hoc `PYTHONPATH` exports).
+*   Silent fallback masks defects, creates untracked drift, and violates reproducibility.
+*   Agents shall treat tool execution failures as environment defects: diagnose the root cause, fix the project configuration, or escalate uncertainty per `context/rules/escalation.mdc`.
 
 ### 4.4. Version Control
 
@@ -151,10 +162,10 @@ Agents have access to multiple tools for different purposes. To minimise user in
 *   The agent shall lint its own code before reporting back (see COMMIT section in task-prompt-template.md).
 *   The agent shall write a commit message to `/tmp/{task-id}_commit_msg.txt` following `context/templates/commit-message-template.md`.
 *   The agent shall report back with the exact file paths it changed and the commit message file path.
-*   The orchestrator formats, stages, and commits per agent report: `uv run --project /abs/path ruff format {files}` → `git add {files}` → `git commit -F {message}`.
-*   The orchestrator shall push to the remote after completing each sprint (or equivalent logical unit of work).
+*   The orchestrator formats, stages, commits, and pushes per agent report: `uv run --project /abs/path ruff format {files}` → `git add {files}` → `git commit -F {message}` → `git push`.
+*   Every commit shall be pushed immediately to the remote tracking branch to protect work from accidental deletion (e.g. branch wipe, local disk corruption, container recycling, or session reset).
 
-**Push cadence**: commit per task (orchestrator), push per sprint (orchestrator).
+**Push cadence**: commit and push per task (the orchestrator pushes immediately after each commit).
 
 ### 4.5. Agent Handoffs
 
@@ -316,7 +327,7 @@ When spawning parallel agents, the orchestrator shall:
 1. **Define disjoint scopes** — verify no path overlap before dispatching
 2. **Reserve shared files** — HANDOFF.md, tasks.md, bugs.md are not in any agent's scope
 3. **Sequence shared-type work** — if multiple agents need to modify `packages/shared-types/`, run them sequentially, not in parallel
-4. **Commit sequentially** — when parallel agents report back, the orchestrator formats and commits one at a time (format → stage → commit) to avoid ref-lock collisions
+4. **Commit and push sequentially** — when parallel agents report back, the orchestrator formats, commits, and pushes one at a time (format → stage → commit → push) to avoid ref-lock collisions and ensure work is persisted remotely immediately
 
 ```mermaid
 flowchart TD
@@ -327,7 +338,7 @@ flowchart TD
     PY1 -->|"files + msg"| ORCH
     TS -->|"files + msg"| ORCH
     CR -->|"report"| ORCH
-    ORCH -->|"format + commit"| GIT["git (one at a time)"]
+    ORCH -->|"format + commit + push"| GIT["git (one at a time)"]
     ORCH -->|"updates"| SHARED["HANDOFF.md, tasks.md"]
 ```
 

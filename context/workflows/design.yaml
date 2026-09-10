@@ -36,26 +36,19 @@ phases:
       - artefacts/database/
 
   - id: design-ui
-    name: UI Design
+    name: UI & Visual Design
     depends_on: [design-contracts]
     skills:
       - frontend-design
     agents:
-      - ui-designer  # Component specs, design tokens, wireframes, user-flows.md
+      - ui-designer  # Component specs, design tokens, wireframes, user flows, and visual assets
     outputs:
       - artefacts/design/
-
-  - id: design-visuals
-    name: Visual Design
-    depends_on: [design-ui]
-    agents:
-      - visual-designer  # Visual assets from ui-designer's specs → artefacts/design/visuals/
-    outputs:
       - artefacts/design/visuals/
 
   - id: design-review
     name: Design Review Gate
-    depends_on: [design-visuals]
+    depends_on: [design-ui]
     sequential: true
     gate: true
     skills:
@@ -65,7 +58,7 @@ phases:
       - tech-lead           # Architecture and standards gate; APPROVED unblocks remaining reviewers
       - code-reviewer       # Implementation feasibility and line-level issues
       - principles-reviewer # LESS principles compliance
-      - visual-designer     # Design system and visual standards
+      - ui-designer         # Design system, visual standards, and UI specs
       - security-tester     # Architectural security issues
     outputs:
       - artefacts/build/
@@ -74,14 +67,14 @@ phases:
       - CHANGES REQUIRED → return to design phase
       - No architectural security issues
       - Design meets LESS principles
-      - Visual design standards met
+      - UI and visual design standards met
       - Every complex component has a design doc in artefacts/design/ meeting the design_doc_standard below
 
 quality_gates:
   - phase: design-review
     type: approval
     required: true
-    description: "Design must be approved before implementation begins: tech-lead → code-reviewer → principles-reviewer → visual-designer → security-tester"
+    description: "Design must be approved before implementation begins: tech-lead → code-reviewer → principles-reviewer → ui-designer → security-tester"
     criteria:
       - metric: architecture_blockers
         threshold: 0
@@ -126,7 +119,7 @@ workflow_rules:
 
 state_recovery:
   after_compaction:
-    - Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter
+    - "Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter"
     - Run git log --oneline -5 to see recent changes
     - Read HANDOFF.md Phase: field to identify which phase was in flight
     - Read artefacts/product/requirements.md for the requirements being designed against
@@ -141,7 +134,7 @@ state_recovery:
 #
 # PHASE DEPENDENCIES:
 #   discovery → design-architecture → design-contracts (parallel: database-designer + api-designer)
-#   → design-ui → design-visuals → design-review (sequential: tech-lead → code-reviewer → ...)
+#   → design-ui → design-review (sequential: tech-lead → code-reviewer → ...)
 #
 # design-review is a gate: CHANGES REQUIRED returns to the appropriate design phase.
 # Output: artefacts/product/, artefacts/architecture/, artefacts/database/, artefacts/design/

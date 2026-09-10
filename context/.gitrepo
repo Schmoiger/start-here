@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/Schmoiger/start-here.git
+	branch = standards
+	commit = 71a38a44d8691651d1106f00c47e079b5817636a
+	method = merge
+	cmdver = 0.4.9

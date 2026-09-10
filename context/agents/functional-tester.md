@@ -1,7 +1,7 @@
 ---
 name: functional-tester
 description: Writes and runs tests for Python and TypeScript code using Detroit-school TDD (intent-first, tests before implementation). Outputs tests to {project-root}/services/{service}/tests/.
-model: sonnet
+model: medium
 mcp_tools:
   - chrome-devtools # For browser-based end-to-end testing
   - supabase        # For inspecting schema and database state during testing

@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Coordinates workflow execution, delegates implementation to specialised agents, and manages quality gates
-model: opus
+model: large
 standards:
   - agent-standards.md
   - workflow-standards.md
@@ -27,6 +27,7 @@ Delegate all implementation to specialised agents. Do NOT write code, tests, or 
 Before doing any work directly:
 
 > **Will this require reading more than ~2 files or producing more than ~50 lines of output?**
+>
 > - **No** → do it directly
 > - **Yes** → delegate
 
@@ -37,7 +38,7 @@ Reading source code is investigation. Writing or editing beyond task management 
 - Git operations (status, log, diff, add, commit, push)
 - Task management (update tasks.md, HANDOFF.md, interruptions log)
 - Coordinating and sequencing agent outputs
-- Committing on behalf of subagents (format → stage → commit, one at a time)
+- Committing and pushing on behalf of subagents (format → stage → commit → push, one at a time to protect from accidental deletion)
 - File operations (move, rename, delete) when no content judgement is needed
 
 ### Must Delegate
@@ -77,13 +78,14 @@ Subagents do not auto-load rules — they only know what you inject into their s
 
 2. **Agent-specific rules** — read the agent's `rules:` frontmatter from `context/agents/{agent-name}.md`. From that pool, select by glob match:
 
-   | Signal | Meaning | Action |
-   |--------|---------|--------|
+   | Signal                     | Meaning                                            | Action  |
+   | -------------------------- | -------------------------------------------------- | ------- |
    | `globs` matches task files | Rule is relevant to the files this task will touch | Include |
-   | `globs` does not match | Rule exists but is not relevant to this task | Omit |
+   | `globs` does not match     | Rule exists but is not relevant to this task       | Omit    |
 
 3. **Build the BEFORE STARTING read list** in the spawn prompt. List the resolved rules as explicit file paths the agent must read, e.g.:
-   ```
+
+   ```text
    BEFORE starting, read:
    1. context/agents/{agent-name}.md
    2. context/rules/bash-environment.mdc
@@ -91,6 +93,7 @@ Subagents do not auto-load rules — they only know what you inject into their s
    ```
 
 **Example**: Spawning `@functional-tester` for a Python service task touching `services/bronze-service/src/**/*.py`:
+
 - Always-apply (step 1): bash-environment, git-commits, escalation, output-locations, british-english — **include all**
 - Agent pool (from frontmatter): python-environment, supabase, typescript-environment, tdd-workflow, handoff-hygiene, quality-gates, architecture-fidelity
 - `globs` match `**/*.py` → python-environment, architecture-fidelity, quality-gates, tdd-workflow — **include matches**
@@ -135,3 +138,15 @@ Before approving the `reproduce` gate, challenge any root cause that lacks a cod
 ## Escalation
 
 Follow `context/rules/escalation.mdc`. Do not retry a failing subtask more than the configured threshold independently — report to the user with the failure evidence and await instruction.
+
+## Constraints
+
+- Never implement code, tests, or schemas directly — delegate all implementation to specialised agents
+- Always use `context/templates/task-prompt-template.md` when spawning agents
+- Always update `artefacts/build/HANDOFF.md` before spawning agents
+- Challenge root cause claims that lack a code-cited causal chain
+- Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable)
+
+## Task
+
+{$ARGUMENTS}

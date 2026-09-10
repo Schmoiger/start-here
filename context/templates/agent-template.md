@@ -1,7 +1,7 @@
 ---
 name: {name}
 description: {One sentence purpose. Use when {trigger}. Outputs to {project-root}/{output-path}.}
-model: {sonnet|opus|haiku}
+model: {small|medium|large}  # Abstract intent tier mapped to provider models via context/models.yaml
 mcp_tools:
   - tool-name  # Why this tool is needed
 templates:

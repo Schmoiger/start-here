@@ -11,6 +11,7 @@ These validators enforce consistency across the codebase by checking:
 3. **british_english.py** - British English spelling conventions
 4. **metrics_logging.py** - Agent metrics logging format
 5. **design_system.py** - Frontend compliance with `artefacts/design/design-system.md` (CSS only, colours, Heroicons barrel, spacing scale)
+6. **adapter_drift.py** - Synchronization between canonical context/ and runtime adapter projections
 
 ## Installation
 
@@ -40,6 +41,9 @@ uv run python scripts/validators/british_english.py README.md
 
 # Validate metrics log
 uv run python scripts/validators/metrics_logging.py metrics/session-log.jsonl
+
+# Validate runtime adapter projections are in sync
+uv run python context/scripts/validators/adapter_drift.py
 ```
 
 ### Pre-Commit Hooks
@@ -231,6 +235,22 @@ Validates frontend compliance with `artefacts/design/design-system.md`. Run from
 - **Spacing**: Only `gap-1`, `gap-2`, `gap-4`, `p-2`, `p-4`, `px-4`; `md:gap-6` / `md:px-6` only in PriceHeader (§1.2)
 
 **Target files:** Any change under `frontend/src` matching `*.tsx`, `*.ts`, `*.jsx`, `*.js`, `*.css` triggers the hook (full scan). Until design-system Phases 3–4 are complete, spacing violations are expected; use `SKIP=design-system git commit` to bypass.
+
+### Adapter Drift (`adapter_drift.py`)
+
+Ensures that all runtime adapter projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.claude/prompts/`, `.github/`, `.openai/`, `.agents/skills/`) match the fresh in-memory generation output from canonical `context/` definitions.
+
+```bash
+uv run python context/scripts/validators/adapter_drift.py
+```
+
+If drift is detected, regenerate projections using the unified CLI dispatcher:
+
+```bash
+uv run python context/scripts/generators/generate_adapters.py
+```
+
+**Target files:** Any change to `context/` or any generated adapter projection file triggers the hook.
 
 ## Exit Codes
 

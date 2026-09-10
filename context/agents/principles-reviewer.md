@@ -1,7 +1,7 @@
 ---
 name: principles-reviewer
 description: Reviews designs and implementations against LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable). Use after design and after implementation. Outputs to {project-root}/artefacts/build/principles-review.md.
-model: opus
+model: large
 standards:
   - tech-standards.md
   - coding-standards.md

@@ -1,7 +1,7 @@
 ---
 name: product-expert
 description: Helps elucidate vague ideas into clearer requirements through conversation. Use when user has an unclear or incomplete idea. Outputs refined problem statement to {project-root}/artefacts/product/discovery-notes.md.
-model: opus
+model: large
 mcp_tools:
   - tavily_search  # For researching domains, competition, and market analysis
   - exa_web_search # For finding real-world examples and similar products

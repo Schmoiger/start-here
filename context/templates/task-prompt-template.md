@@ -79,7 +79,7 @@ Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf
 
 ## COMMIT
 
-Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf.
+Do NOT run `git add` or `git commit` — the orchestrator formats, commits, and pushes on your behalf.
 Before reporting back, **lint your own code** — the orchestrator only auto-formats, it will not fix lint errors:
 - Python: `uv run --project /abs/path/to/service ruff check {files}` (fix any errors yourself)
 - TypeScript: `yarn --cwd /abs/path/to/project-root biome check {files}` (fix any errors yourself)

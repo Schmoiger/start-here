@@ -135,7 +135,7 @@ Use `context/templates/task-prompt-template.md` when spawning subagents. The tem
 
 **Key points:**
 - Agents do not commit — they lint, write a commit message to `/tmp/{task-id}_commit_msg.txt`, and report back with file list + message path
-- The orchestrator commits on their behalf (format → stage → commit, one at a time)
+- The orchestrator commits and pushes on their behalf (format → stage → commit → push, one at a time to protect from accidental deletion)
 - The orchestrator adds `duration=`, `dispatch=`, `interactions=`, `approvals=` to the Agent-Session line; `tokens=` is injected by the `prepare-commit-msg` hook
 - The orchestrator verifies the Agent-Session line is present before committing — see `context/rules/git-commits.mdc` Orchestrator Commit Procedure
 - See `context/agents/orchestrator.md` for Rule Resolution, File Scope, and Context Budget Test

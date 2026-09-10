@@ -1,46 +1,54 @@
 ---
 description: Python environment setup and command execution
 globs: ["**/*.py", "**/pyproject.toml", "**/requirements.txt"]
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Python Environment
 
 **Applies to**: All Python code execution
 
+## Strict Invariant: Fail-Fast (No Silent Tool Substitution)
+
+**NEVER fall back to bare `python`, `python3`, `pip`, or ad-hoc `PYTHONPATH` hacks if `uv` fails.**
+
+- When `uv` fails (due to missing virtualenvs, path mismatches, or sandbox permissions), the failure is an environment defect to diagnose or escalate—never an invitation to bypass `uv`.
+- Silent tool substitution masks defects, violates determinism, and produces untracked environment drift.
+- If a sandboxed agent environment blocks `uv` from accessing user-level installations (e.g. `~/.local/share/uv/python`), request sandbox bypass (`BypassSandbox: true`) or specify the runtime explicitly (`--python <path>`). Do not drop `uv`.
+
 ## Commands
 
 | Action | Correct | Wrong |
 |--------|---------|-------|
-| Run script | `uv run python script.py` | `python script.py` |
-| Run module | `uv run python -m module` | `python -m module` |
-| Run tests | `uv run pytest` | `pytest` |
-| Install package | `uv add package` | `pip install package` |
-| Sync dependencies | `uv sync` | `pip install -r requirements.txt` |
-| Python REPL | `uv run python` | `python` or `python3` |
+| Run script | `uv run [--project <path>] python script.py` | `python script.py`, `python3 script.py` |
+| Run module | `uv run [--project <path>] python -m module` | `python -m module`, `python3 -m module` |
+| Run tests | `uv run [--project <path>] pytest` | `pytest`, `python3 -m pytest`, `PYTHONPATH=... pytest` |
+| Install package | `uv add package` (or `--project <path>`) | `pip install package` |
+| Sync dependencies | `uv sync [--project <path>]` | `pip install -r requirements.txt` |
+| Python REPL | `uv run [--project <path>] python` | `python` or `python3` |
 | Run one-off tool | `uvx ruff check .` | `ruff check .` or `pipx run ruff` |
 | Run inline script | Write to `/tmp/script.py`, then `uv run --project /abs/path python /tmp/script.py` | `uv run python -c "..."` (multiline or with comments) |
 | Lint with ruff | `uv run --project /abs/path/to/service ruff check --fix file.py` | `uv run ruff check file.py`, `.venv/bin/ruff check file.py` |
 | Format with ruff | `uv run --project /abs/path/to/service ruff format file.py` | `uv run ruff format file.py`, `.venv/bin/ruff format file.py` |
 
-## Why
+## Monorepo `--project` Requirement
 
-`uv run ruff` without `--project` resolves the project from the current working
-directory. If ruff is not in that directory's dev dependencies, or the agent's
-working directory differs from the service root, the spawn fails. Always pass
-`--project /abs/path/to/service` so the correct environment is used regardless
-of working directory.
+When running commands from the repository root (or any directory other than the specific service/package directory), **always pass `--project <path-to-service-or-tests>`**.
 
-For banned bash patterns including multiline `python -c`, see `bash-environment.mdc`.
+Without `--project`:
+- `uv` attempts to resolve `pyproject.toml` from the current working directory.
+- If the repository root has no `pyproject.toml` (e.g. tests live in `tests/context-unit-tests/`), `uv` will fail to find installed tools (e.g. `pytest`) or dependencies.
 
-Bare `python` or `pytest` commands fail because:
+## Why Bare Python Commands Fail
+
+Bare `python`, `python3`, or `pytest` commands fail because:
 - No virtual environment is activated
-- Dependencies aren't available
-- Wrong Python version may be used
+- Dependencies aren't isolated or available
+- The wrong Python interpreter may be invoked
 
 `uv run` automatically:
 - Uses the project's virtual environment
-- Ensures dependencies are installed
+- Ensures dependencies are installed and in sync
 - Respects `.python-version`
 
 ## Project Setup
@@ -49,3 +57,4 @@ Each Python project must have:
 - `pyproject.toml` with dependencies
 - `.python-version` specifying Python version
 - Virtual environment managed by `uv`
+

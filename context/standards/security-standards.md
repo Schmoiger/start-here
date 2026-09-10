@@ -220,3 +220,20 @@ Common security mistakes to avoid:
 | Validating only on the client | Trivially bypassed | Always validate server-side |
 | Ignoring dependency audits | Known CVEs in your supply chain | Regular audits, automated alerts |
 | Over-engineering security for prototypes | Wasted effort, slows iteration | Match rigour to phase (see table above) |
+
+## Deployment Safety
+<!-- applyTo: "**/{firestore.rules,firebase.json,*.config.*,package.json,pyproject.toml,lib/**,app/api/**}" -->
+<!-- excludeAgent: "cloud-agent" -->
+
+### Data Access & Permission Gates
+- Flag database/Firestore security rules that permit unauthenticated writes or allow broad access without ownership checks (`allow write: if true;`).
+- Flag backend routes modifying data without validating user authentication and authorization.
+- **Input Validation**: Flag mutation routes (`POST`, `PUT`, `DELETE`) that accept external payloads without schema or field-level validation against unexpected/malicious input.
+
+### Secrets & PII Leaks
+- Flag hardcoded API keys, database credentials, or service accounts committed in code.
+- Flag console logging or telemetry capturing sensitive PII (emails, passwords, tokens, payment data).
+- Ensure client-exposed configs (`NEXT_PUBLIC_*`) do not contain private secrets.
+
+### Supply Chain & Dependencies
+- Flag newly added dependencies with known critical CVEs or suspicious, near-zero download typosquats.

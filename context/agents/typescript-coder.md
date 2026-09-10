@@ -1,7 +1,7 @@
 ---
 name: typescript-coder
 description: Builds frontend or backend TypeScript, integrating with Python APIs. Use when creating or modifying TypeScript/React code. Outputs to {project-root}/frontend/ or {project-root}/services/.
-model: sonnet
+model: medium
 mcp_tools:
   - context7        # For looking up library documentation and API references
   - chrome-devtools # For browser testing and debugging frontend code

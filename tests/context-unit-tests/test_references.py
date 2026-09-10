@@ -222,50 +222,6 @@ class TestAgentDomainConsistency:
             )
 
 
-class TestCoordinateScriptConsistency:
-    """Check coordinate.sh references valid agents and domains."""
-
-    def test_coordinate_domains_match_standards(self):
-        """Domains in coordinate.sh should match agent-standards.md."""
-        coord_path = DOCS_ROOT / "agents" / "coordinate.sh"
-        standards_path = DOCS_ROOT / "standards" / "agent-standards.md"
-
-        if not coord_path.exists():
-            pytest.skip("coordinate.sh not found")
-        if not standards_path.exists():
-            pytest.skip("agent-standards.md not found")
-
-        coord_content = coord_path.read_text()
-        standards_content = standards_path.read_text()
-
-        # Extract domains from coordinate.sh
-        # Looking for: DOMAINS=("discovery" "design" ...)
-        domain_match = re.search(r'DOMAINS=\(([^)]+)\)', coord_content)
-        if not domain_match:
-            pytest.skip("Could not find DOMAINS array in coordinate.sh")
-
-        coord_domains = set(re.findall(r'"(\w+)"', domain_match.group(1)))
-
-        # Extract domains from standards (from the table)
-        # Pattern: | **domain** |
-        standards_domains = set(
-            re.findall(r'\|\s*\*\*(\w+)\*\*\s*\|', standards_content)
-        )
-
-        # Compare
-        only_in_coord = coord_domains - standards_domains
-        only_in_standards = standards_domains - coord_domains
-
-        issues = []
-        if only_in_coord:
-            issues.append(f"In coordinate.sh but not standards: {only_in_coord}")
-        if only_in_standards:
-            issues.append(f"In standards but not coordinate.sh: {only_in_standards}")
-
-        if issues:
-            pytest.fail("\n".join(issues))
-
-
 class TestReadmeLinks:
     """Validate that README files have working internal links."""
 

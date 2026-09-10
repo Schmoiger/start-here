@@ -1,7 +1,7 @@
 ---
 name: ui-tester
 description: Tests UI behaviour using Chrome DevTools and browser automation. Use for end-to-end user workflow testing, screenshot capture, and accessibility checks. Outputs to {project-root}/artefacts/test-results/e2e/.
-model: haiku
+model: small
 mcp_tools:
   - chrome-devtools # For browser automation and UI testing
 standards:

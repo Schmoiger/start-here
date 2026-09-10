@@ -317,7 +317,7 @@ phases:
     agents:
       - solution-architect  # Architecture coherence at full-feature scale
       - tech-lead           # Aggregate test health and pre-commit hooks clean
-      - visual-designer     # End-to-end design system consistency
+      - ui-designer         # End-to-end design system consistency
       - principles-reviewer # LESS principles on completed implementation
     outputs:
       - artefacts/build/
@@ -375,7 +375,7 @@ quality_gates:
   - phase: final-holistic-review
     type: approval
     required: true
-    description: "All four reviewers in parallel: solution-architect + tech-lead + visual-designer + principles-reviewer."
+    description: "All four reviewers in parallel: solution-architect + tech-lead + ui-designer + principles-reviewer."
     criteria:
       - metric: architecture_blockers
         threshold: 0
@@ -423,7 +423,7 @@ workflow_rules:
 
 state_recovery:
   after_compaction:
-    - Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter
+    - "Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter"
     - Glob **/artefacts/README.md and read all matches for current state
     - Run git log --oneline -5 to see recent changes
     - Read HANDOFF.md Phase: field to identify which phase was in flight

@@ -1,7 +1,7 @@
 ---
 name: api-designer
 description: Designs RESTful and GraphQL APIs with OpenAPI specifications. Use when defining external or internal service interfaces. Outputs OpenAPI specs and API design documentation to {project-root}/artefacts/architecture/.
-model: sonnet
+model: medium
 mcp_tools:
   - context7 # For looking up API specs, library documentation and patterns
   - supabase # For inspecting schema to inform API design
@@ -30,7 +30,7 @@ Read 2 standards files before starting work.
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
-|------|------------|
+| --- | --- |
 | `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
 | `british-english.mdc` | colour, behaviour, organisation |
 | `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
@@ -44,6 +44,15 @@ Read 2 standards files before starting work.
 - `{project-root}/artefacts/architecture/`
 - `{project-root}/artefacts/database/`
 
+## Constraints
+
+- Follow OpenAPI 3.0+ specification
+- Use consistent naming: camelCase for JSON, kebab-case for URLs
+- Every endpoint must document all possible responses
+- Include realistic examples for all schemas
+- Design for backwards compatibility
+- Prefer standard HTTP semantics over custom solutions
+
 ## Deliverables
 
 - OpenAPI Spec: `{project-root}/artefacts/architecture/` — `openapi.yaml` (detailed HTTP specification)
@@ -52,6 +61,7 @@ Read 2 standards files before starting work.
 ## Boundary Clarifications
 
 ### Relationship with architecture
+
 The canonical API specification is `openapi.yaml` (V4). It defines paths, request/response schemas, error format, and conventions. The `@api-designer` maintains and extends it with full HTTP semantics, validation rules, and examples. Conventions and port assignments are in `api-catalogue.md`. If you find inconsistencies with implementation, note them for the architect to resolve.
 
 ## Task

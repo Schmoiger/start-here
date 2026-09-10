@@ -77,12 +77,12 @@ repos:
         files: ^context/
         pass_filenames: false
 
-      # AGENTS.md regeneration disabled - run manually when needed:
-      # uv run python context/scripts/generators/generate_agents_md.py
-      #
-      # - id: regenerate-agents-md
-      #   name: Regenerate AGENTS.md if context changed
-      #   entry: uv run python context/scripts/generators/generate_agents_md.py
-      #   language: python
-      #   files: ^context/(agents/|workflows/|README\.md)
-      #   pass_filenames: false
+      - id: adapter-drift
+        name: Check runtime adapter projections in sync with context/
+        entry: uv run python context/scripts/validators/adapter_drift.py
+        language: python
+        files: ^(context/|AGENTS\.md|GEMINI\.md|CLAUDE\.md|\.claude/|\.github/|\.openai/|\.agents/skills/)
+        pass_filenames: false
+
+      # Runtime adapter regeneration - run manually when needed:
+      # uv run python context/scripts/generators/generate_adapters.py

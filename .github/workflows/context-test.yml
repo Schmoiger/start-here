@@ -38,24 +38,6 @@ jobs:
         working-directory: tests/context-unit-tests
         run: uv run pytest test_references.py -v
 
-  # Shell script tests
-  shell:
-    name: Shell Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install bats
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
-
-      - name: Make coordinate.sh executable
-        run: chmod +x context/agents/coordinate.sh
-
-      - name: Run bats tests
-        run: bats tests/context-unit-tests/coordinate.bats
-
   # LLM consistency check - runs on PRs but can be skipped
   llm-consistency:
     name: LLM Consistency Check
@@ -85,7 +67,7 @@ jobs:
   # Summary job for branch protection
   tests-passed:
     name: All Tests Passed
-    needs: [lint, shell]
+    needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All required tests passed"

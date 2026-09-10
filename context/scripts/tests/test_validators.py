@@ -90,7 +90,7 @@ Co-Authored-By: Invalid Format"""
         """Test that Agent-Session requires Co-Authored-By."""
         msg = """feat(test): valid subject
 
-Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=1K/2K duration=5m"""
+Agent-Session: tool=cursor model=sonnet agents=python-coder duration=5m tokens=1K/2K"""
         is_valid, error = validate_commit_message(msg)
         assert not is_valid
         assert "require Co-Authored-By" in error

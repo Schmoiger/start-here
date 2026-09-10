@@ -24,10 +24,13 @@ Reusable formats for artefacts produced during development.
 | `design-template.md` | Feature design document | `artefacts/design/design-{feature}.md` |
 | `agent-template.md` | New agent definition | `context/agents/{name}.md` |
 | `task-prompt-template.md` | Agent task prompt (orchestrator use only) | — |
+| `settings-local-template.json` | Claude Code / local runtime permissions | `.claude/settings.local.json` |
 
 ---
 
 ## Format Notes
+
+**Local Settings** — copy to `.claude/settings.local.json` to configure autonomous command permissions (Git, `uv`, `yarn`, test runners) conforming to `bash-environment.mdc` without triggering manual prompt friction.
 
 **Handoffs** — keep summary under 500 characters; reference shared artefacts rather than duplicating content.
 
