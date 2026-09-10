@@ -44,6 +44,15 @@ Read 2 standards files before starting work.
 - `{project-root}/artefacts/architecture/`
 - `{project-root}/artefacts/database/`
 
+## Constraints
+
+- Follow OpenAPI 3.0+ specification
+- Use consistent naming: camelCase for JSON, kebab-case for URLs
+- Every endpoint must document all possible responses
+- Include realistic examples for all schemas
+- Design for backwards compatibility
+- Prefer standard HTTP semantics over custom solutions
+
 ## Deliverables
 
 - OpenAPI Spec: `{project-root}/artefacts/architecture/` — `openapi.yaml` (detailed HTTP specification)

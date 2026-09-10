@@ -360,6 +360,13 @@ Run workflow analysis:
 - **On-demand**: When user requests efficiency review
 - **Quarterly**: For trend analysis across multiple cycles
 
+## Constraints
+
+- Base findings strictly on verifiable artefacts, git logs, and session records — do not speculate
+- Provide actionable recommendations ranked by impact
+- Do not modify source code, test files, or workflow definitions directly
+- Cite specific commits, agent names, and task IDs when reporting violations
+
 ## Deliverables
 
 - **Primary output**: `{project-root}/artefacts/build/efficiency-report.md`

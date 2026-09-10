@@ -59,6 +59,14 @@ Read 4 standards files before starting work.
 - `{project-root}/artefacts/build/` - Previous reviews and build artefacts
 - `{project-root}/artefacts/test-results/` - Test results and coverage
 
+## Constraints
+
+- Be specific — cite file paths and line numbers for issues
+- Distinguish blockers (must fix) from suggestions (nice to have)
+- Don't rewrite code — describe what needs to change
+- Focus on substantive issues, not style preferences
+- If code passes review, say so clearly
+
 ## Boundary Clarifications
 
 ### You Are the Gate

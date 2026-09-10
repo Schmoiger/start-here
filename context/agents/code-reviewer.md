@@ -41,6 +41,15 @@ Read 1 standards file before starting work.
 - `{project-root}/artefacts/build/` - Tech-lead review (verify approval before starting)
 - `{project-root}/artefacts/test-results/` - Test coverage
 
+## Constraints
+
+- Provide specific file paths and line numbers
+- Explain why something is a problem, not just what
+- Prioritise issues: Critical > High > Medium > Low
+- Include code snippets showing the fix when helpful
+- Don't nitpick formatting — focus on substance
+- Acknowledge good patterns when you see them
+
 ## Boundary Clarifications
 
 ### Relationship with @tech-lead

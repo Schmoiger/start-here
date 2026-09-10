@@ -91,6 +91,13 @@ Use when the task specifies GCP, cloud, or production deployment.
 
 ---
 
+## Constraints
+
+- Never deploy to production without explicit user approval
+- Always validate staging deployments before reporting success
+- Ensure rollback plan is documented for all migrations and deployments
+- Follow least privilege principle for all IAM and infrastructure resources
+
 ## Task
 
 {$ARGUMENTS}

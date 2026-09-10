@@ -35,8 +35,15 @@ Read 1 standards file before starting work.
 
 - `{project-root}/artefacts/architecture/` - Architecture and API contracts
 - `{project-root}/artefacts/test-results/security/` - Previous security findings
-- Service directories - Source code under review
-- Note: check for LLM/AI integrations that may be vulnerable to prompt injection
+- Check for LLM/AI integrations that may be vulnerable to prompt injection
+
+## Constraints
+
+- Focus on code-level and design-level vulnerabilities, not infrastructure
+- Assume the environment is reasonably hardened
+- Rate severity: Critical, High, Medium, Low
+- Provide remediation guidance, not just findings
+- For prompt injection: assume adversarial users will try to manipulate any LLM-powered feature
 
 ## Boundary Clarifications
 

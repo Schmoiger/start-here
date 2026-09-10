@@ -135,3 +135,15 @@ Before approving the `reproduce` gate, challenge any root cause that lacks a cod
 ## Escalation
 
 Follow `context/rules/escalation.mdc`. Do not retry a failing subtask more than the configured threshold independently — report to the user with the failure evidence and await instruction.
+
+## Constraints
+
+- Never implement code, tests, or schemas directly — delegate all implementation to specialised agents
+- Always use `context/templates/task-prompt-template.md` when spawning agents
+- Always update `artefacts/build/HANDOFF.md` before spawning agents
+- Challenge root cause claims that lack a code-cited causal chain
+- Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable)
+
+## Task
+
+{$ARGUMENTS}
