@@ -482,8 +482,8 @@ Update status immediately when work begins and when it completes. Every task in 
 
 **Files**:
 - Native `git-subrepo` command integration (`git subrepo branch context -f`)
-- Create `context/docs/downstream-subrepo.md` (downstream guide for cloning, pulling, pushing, and testing standards via git-subrepo)
-- Update `README.md` and `context/README.md` (distribution architecture and Mermaid diagrams)
+- Update `context/README.md` (downstream guide for cloning, pulling, pushing, and testing standards via git-subrepo)
+- Update `README.md` (distribution architecture and Mermaid diagrams)
 - Update `artefacts/architecture/architecture.md` (ADR and distribution topology)
 
 **Acceptance**:
@@ -494,7 +494,7 @@ Update status immediately when work begins and when it completes. Every task in 
   3. Upstream updates can be pulled cleanly via `git subrepo pull context`.
   4. Changes made downstream to standards can be pushed upstream via `git subrepo push context`.
   5. Downstream projects can execute the test suite at any time via `uv run pytest context/scripts/tests`.
-- Detailed documentation in `context/docs/downstream-subrepo.md` guides downstream setup and pre-commit enforcement.
+- Detailed documentation in `context/README.md` guides downstream setup and pre-commit enforcement.
 
 ---
 
@@ -523,6 +523,6 @@ Update status immediately when work begins and when it completes. Every task in 
   - `pyproject.toml` validated: Builds cleanly via `uv build` into `dist/agent_harness-0.1.0-py3-none-any.whl` and `dist/agent_harness-0.1.0.tar.gz`.
   - Python CLI entrypoints tested: `agent-harness` and `agent-drift` verified via `test_packaging.py`.
   - Full test suite: 80/80 tests passing via `uv run pytest context/scripts/tests -v`.
-  - Documentation: `context/docs/downstream-subrepo.md`, `README.md`, `context/README.md`, and `artefacts/architecture/architecture.md` updated with the bi-directional synchronisation topology diagram.
+  - Documentation: `context/README.md`, `README.md`, and `artefacts/architecture/architecture.md` updated with the bi-directional synchronisation topology diagram.
   - Standards compliance: `british_english.py` and `adapter_drift.py` pass cleanly with exit code 0.
 - **Verdict**: APPROVED. All 8 sprints of Runtime Adapters completed.

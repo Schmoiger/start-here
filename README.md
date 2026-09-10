@@ -158,7 +158,7 @@ uv run python context/scripts/validators/adapter_drift.py
 git subrepo push context
 ```
 
-For complete setup instructions and pre-commit hook configuration, see [`context/docs/downstream-subrepo.md`](context/docs/downstream-subrepo.md).
+For complete setup instructions and pre-commit hook configuration, see [`context/README.md`](context/README.md#downstream-integration--standards-synchronisation-git-subrepo).
 
 ---
 
