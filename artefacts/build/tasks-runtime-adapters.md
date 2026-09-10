@@ -119,17 +119,17 @@ Update status immediately when work begins and when it completes. Every task in 
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-7 | high | pending | AD-2, AD-3 | Implement GitHub Copilot adapter (`.github/copilot-instructions.md`, prompt files) |
-| AD-8 | high | pending | AD-7 | Add unit test suite for GitHub adapter generator |
-| AD-9 | medium | pending | AD-8 | Generate and verify initial GitHub projections in repository |
+| AD-7 | high | completed | AD-2, AD-3 | Implement GitHub Copilot adapter (`.github/copilot-instructions.md`, prompt files) |
+| AD-8 | high | completed | AD-7 | Add unit test suite for GitHub adapter generator |
+| AD-9 | medium | completed | AD-8 | Generate and verify initial GitHub projections in repository |
 
 ### Sprint 4: Claude Code Adapter Layer
 
 | ID | Pri | Status | Blocked By | Task |
 |----|-----|--------|------------|------|
-| AD-10 | critical | pending | AD-2, AD-3 | Implement Claude Code adapter (`CLAUDE.md`, `AGENTS.md`, subagent prompts, native orchestration reconciliation) |
-| AD-11 | high | pending | AD-10 | Add unit test suite for Claude adapter generator |
-| AD-12 | medium | pending | AD-11 | Generate and verify initial Claude projections in repository |
+| AD-10 | critical | completed | AD-2, AD-3 | Implement Claude Code adapter (`CLAUDE.md`, `AGENTS.md`, subagent prompts, native orchestration reconciliation) |
+| AD-11 | high | completed | AD-10 | Add unit test suite for Claude adapter generator |
+| AD-12 | medium | completed | AD-11 | Generate and verify initial Claude projections in repository |
 
 ### Sprint 5: OpenAI / Codex Adapter Layer
 

@@ -21,13 +21,13 @@ def generate_prompts(context: dict[str, Any], output_dir: Path) -> None:
         if agent.standards:
             content += "## Standards\n"
             for std in agent.standards:
-                content += f"- {std}\n"
+                content += f"- @context/standards/{std}\n"
             content += "\n"
             
         if agent.rules:
             content += "## Rules\n"
             for rule in agent.rules:
-                content += f"- {rule}\n"
+                content += f"- @context/rules/{rule}\n"
             content += "\n"
             
         prompt_path.write_text(content)

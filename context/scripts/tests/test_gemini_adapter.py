@@ -49,13 +49,13 @@ class TestGeminiAdapter(unittest.TestCase):
 
     def test_generate_gemini_md(self):
         generate_gemini_md(self.context, self.output_dir)
-
+    
         gemini_md_path = self.output_dir / "GEMINI.md"
         self.assertTrue(gemini_md_path.exists())
-
+    
         content = gemini_md_path.read_text()
         self.assertIn("Auto-generated", content)
-        self.assertIn("INLINE_COMPREHENSIVE", content)
+        self.assertIn("@AGENTS.md", content)
         self.assertIn("replace_file_content", content)
 
 if __name__ == "__main__":
