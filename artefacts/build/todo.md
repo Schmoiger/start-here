@@ -20,3 +20,4 @@
 [ ] Investigate Option 4 (Comprehensive Pre-Commit Validators): Upgrade british_english.py beyond a hardcoded list to comprehensive dictionary-based checks (e.g. pyspelling/Hunspell) and add pre-commit enforcement against forbidden toolchains.
 [x] Remove `context/scripts/coordinate.sh` — superseded by YAML workflow definitions (`context/workflows/*.yaml`) and agent runtime orchestration.
 [ ] Fix `prepare-commit-msg` git hook and telemetry extraction via the runtime adapter layer (install hook symlink, support Claude Code, Antigravity, and Codex session telemetry per `context/models.yaml`).
+[ ] Replace per-repo context in existing repositories (e.g. bollinger) with the canonical standards subrepo (`git subrepo clone git@github.com:Schmoiger/start-here.git context -b standards`).
