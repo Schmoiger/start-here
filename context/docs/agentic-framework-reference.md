@@ -40,11 +40,9 @@
 15. [Reading Paths](#reading-paths)
 16. [Revision History](#revision-history)
 
-<a id="how-to-use-this-reference"></a>
-
 ---
 
-## Agentic Framework Reference
+## How To Use This Reference
 
 The companion technical paper explains why the framework exists and the design principles behind it. This reference explains what the framework contains and how each part works. It is structured so that either document can be read first, or independently.
 
@@ -463,7 +461,7 @@ The framework defines 19 specialised agents, organised by kind of judgement.
 
 Personas are stored in `context/persona/` and provide voice guidance for human-facing content. They are used by the `documentation` agent when writing blogs, technical papers, user guides, and marketing materials. They are explicitly *not* used for technical handoffs, API documentation, architecture documents, or internal artefacts.
 
-For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Content (`content.yaml`)](#human-facing-content-workflow) under Workflows.
+For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Content (`content.yaml`)](#content-contentyaml) under Workflows.
 
 #### When to Use a Persona
 
@@ -530,9 +528,6 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 | continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
 | retrospective | `retrospective.yaml` | Standalone process review and pattern identification |
 
-<a id="design-designyaml"></a>
-<a id="the-default-workflow"></a>
-
 ### Design (`design.yaml`)
 
 Purpose: Discovery through design review; run before `build.yaml`.
@@ -548,8 +543,6 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 | `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `ui-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
 
 Design gate (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
-
-<a id="build-buildyaml"></a>
 
 ### Build (`build.yaml`)
 
@@ -607,10 +600,7 @@ flowchart TD
 
 Use design then build for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
-Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#the-prototype-workflow) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) when you want process or framework follow-up; they are not phases inside `build.yaml`.
-
-<a id="prototype-prototypeyaml"></a>
-<a id="the-prototype-workflow"></a>
+Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#prototype-prototypeyaml) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) when you want process or framework follow-up; they are not phases inside `build.yaml`.
 
 ### Prototype (`prototype.yaml`)
 
@@ -682,8 +672,6 @@ If a prototype validates its hypothesis and should become production code:
 
 Cleaning up a prototype takes longer than rewriting it properly. The technical debt in prototype code is architectural, not superficial.
 
-<a id="deploy-deployyaml"></a>
-
 ### Deploy (`deploy.yaml`)
 
 Purpose: GCP cloud deployment and deployment review after `build.yaml` has completed local deployment and verification.
@@ -695,8 +683,6 @@ Purpose: GCP cloud deployment and deployment review after `build.yaml` has compl
 
 `quality_gates` in the YAML require tech-lead approval on `deployment-review`. Criteria include deployment success and coverage sign-off as defined in the file (see `deploy.yaml` for thresholds and notes).
 
-<a id="bugfix-bugfixyaml"></a>
-
 ### Bugfix (`bugfix.yaml`)
 
 Purpose: Reproduce, fix, and verify defects with empirical evidence (browser screenshots and file-cited causal chains), not feature-sized planning.
@@ -705,8 +691,6 @@ Shape: `reproduce` (gated; `ui-tester` and `functional-tester` in parallel) → 
 
 Quality gates: Evidence gates on `reproduce` and `verify`—tests passing alone is not sufficient; see YAML for gate metrics and workflow rules (TDD on the fix, commit body records causal chain).
 
-<a id="full-test-full-testyaml"></a>
-
 ### Full-test (`full-test.yaml`)
 
 Purpose: Full-suite testing across all modules—release confidence, not the per-feature changed-scope regressions in `build.yaml`.
@@ -714,9 +698,6 @@ Purpose: Full-suite testing across all modules—release confidence, not the per
 Phases (sequential): `full-unit-test` → `full-integration-test` → `full-e2e-test` → `quality-check` (tech-lead gate). Reports under `artefacts/test-results/`. No code changes in this workflow—failures are reported for follow-up elsewhere.
 
 When to run: Before merging a long-running branch to main, after large refactors, or on demand for health checks (see YAML `workflow_rules`).
-
-<a id="content-contentyaml"></a>
-<a id="human-facing-content-workflow"></a>
 
 ### Content (`content.yaml`)
 
@@ -785,8 +766,6 @@ flowchart TD
 Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in `context/rules/no-ai-slop.mdc`). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
 
 ### Continuous improvement (`continuous-improvement.yaml`)
-
-<a id="measuring-effectiveness"></a>
 
 Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `workflow-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
 
@@ -863,8 +842,6 @@ These are examples of fixable gaps, not a separate scoring methodology:
 - Tooling drift: repeated bash-for-files or wrong package managers; tighten prompts or rules.
 - Integration cost: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
 - Parallel misuse: duplicated context without time savings; narrow parallel phases to truly independent work.
-
-<a id="retrospective-retrospectiveyaml"></a>
 
 ### Retrospective (`retrospective.yaml`)
 
@@ -983,7 +960,7 @@ The task prompt template deserves particular attention. It carries rule resoluti
 
 Scripts are stored in `context/scripts/` and form the automation layer that turns the framework from a collection of ideas into an operating system with enforcement.
 
-Layout on disk: `generators/` holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); `validators/` holds pre-commit Python checks; `tests/` exercises validators and generators against fixtures; `prepare-commit-msg.*` (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to `Agent-Session:` lines for [Continuous improvement](#measuring-effectiveness) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
+Layout on disk: `generators/` holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); `validators/` holds pre-commit Python checks; `tests/` exercises validators and generators against fixtures; `prepare-commit-msg.*` (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to `Agent-Session:` lines for [Continuous improvement](#continuous-improvement-continuous-improvementyaml) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
 
 ### Generators
 
@@ -1043,8 +1020,6 @@ Does not receive file paths — runs with `pass_filenames: false`. Queries `git 
 Not wired into pre-commit; run manually. Validates every `.md` file in `context/agents/` (excluding `README.md` and `TEMPLATE.md`). Checks: YAML frontmatter is present and parseable; required fields `name` and `model` exist; every entry in `standards:` points to a file that exists in `context/standards/`; every entry in `rules:` points to a file that exists in `context/rules/`; the body contains no hardcoded absolute paths (`/Users/`, `/home/`). Existence checks are relative to the repo working directory at runtime.
 
 ### `prepare-commit-msg` hook (agent tokens on commits)
-
-<a id="prepare-commit-msg-hook-agent-tokens-on-commits"></a>
 
 Files: `context/scripts/prepare-commit-msg.sh` (wrapper that runs `uv run python …/prepare-commit-msg.py`) and `context/scripts/prepare-commit-msg.py` (implementation).
 
@@ -1281,13 +1256,13 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 ### Evaluating Workflow Health
 
 1. `context/workflows/continuous-improvement.yaml`
-2. [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) (this document — effectiveness and incident handling)
+2. [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) (this document — effectiveness and incident handling)
 3. `context/agents/workflow-analyst.md`
 4. `context/standards/workflow-standards.md`
 
 ### Writing Human-Facing Content (Blogs, Papers, Guides)
 
-1. [Content (`content.yaml`)](#human-facing-content-workflow) (this document)
+1. [Content (`content.yaml`)](#content-contentyaml) (this document)
 2. [Writing Personas](#writing-personas) (this document)
 3. `context/workflows/content.yaml`
 4. `context/rules/no-ai-slop.mdc`
