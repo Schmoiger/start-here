@@ -4,7 +4,7 @@
 ; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
 ;
 [subrepo]
-	remote = https://github.com/Schmoiger/start-here.git
+	remote = https://github.com/Schmoiger/agents-framework.git
 	branch = main
 	commit = 824082b3381aae07e09d9db7b703bf1f6b31490d
 	method = merge

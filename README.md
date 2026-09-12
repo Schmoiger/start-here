@@ -120,42 +120,39 @@ If any generated projection is missing, manually edited, or out of date, the val
 
 ## Framework Distribution & Downstream Integration
 
-The framework distributes canonical context as an isolated, self-contained directory (`context/`). Downstream repositories import standards, workflows, and agents without inheriting project-specific state (`artefacts/build/`, `artefacts/product/`, or application code).
+The framework distributes canonical context from the dedicated [`agents-framework`](https://github.com/Schmoiger/agents-framework) repository (`main` branch) as an isolated, self-contained directory (`context/`). Downstream repositories (including `start-here`) import standards, workflows, and agents without inheriting project-specific state (`artefacts/build/`, `artefacts/product/`, or application code).
 
-Bi-directional synchronisation is managed via `git-subrepo` targeting an upstream `standards` distribution branch:
+Bi-directional synchronisation is managed via `git-subrepo`:
 
 ```mermaid
 graph LR
-    subgraph Upstream ["start-here (main)"]
+    subgraph Upstream ["agents-framework (main)"]
         UContext["context/ (Canonical Source)"]
-        UBuild["artefacts/build/ (Ignored)"]
-        UBranch["standards branch (Split context/)"]
     end
 
-    subgraph Downstream ["New Project"]
+    subgraph Downstream ["start-here / Downstream Repos"]
         DContext["context/ (Subrepo)"]
         DBuild["artefacts/build/ (Local Only)"]
         DCode["src / services / (Local Only)"]
     end
 
-    UContext -- "git subrepo branch" --> UBranch
-    UBranch <== "git subrepo pull / push" ==> DContext
-    UBuild -. "Strictly Isolated" .- DBuild
+    UContext <== "git subrepo pull / push" ==> DContext
 ```
+
 
 ### Quick Commands for Downstream Projects
 
 ```bash
 # 1. Adopt standards into a new or existing repository
-git subrepo clone git@github.com:your-org/start-here.git context -b standards
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo clone https://github.com/Schmoiger/agents-framework.git context -b main
 
 # 2. Re-compile runtime adapter projections after pulling upstream updates
-git subrepo pull context
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo pull context
 uv run python context/scripts/generators/generate_adapters.py
 
 # 3. Push local standards improvements back upstream
 uv run python context/scripts/validators/adapter_drift.py
-git subrepo push context
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo push context
 ```
 
 For complete setup instructions and pre-commit hook configuration, see [`context/README.md`](context/README.md#downstream-integration--standards-synchronisation-git-subrepo).
