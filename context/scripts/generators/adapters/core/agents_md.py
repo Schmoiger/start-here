@@ -79,22 +79,30 @@ def generate_agents_md(context: dict[str, Any], output_dir: Path, dry_run: bool 
 
     skills_section = ""
     if skills:
-        skills_section = f"## Skills\n\n{generate_skill_table(skills)}\n\n"
+        skills_section = f"---\n\n## Skills\n\n{generate_skill_table(skills)}\n\n"
     
     agents_path = output_dir / "AGENTS.md"
     
     content = f"""# AGENTS.md
 
+---
+
 ## System Instructions
 Always follow the specific instructions in the `context/` directory.
 
+---
+
 ## Standards
 INLINE_COMPREHENSIVE
+
+---
 
 ## Tool Mappings
 - Use `replace_file_content` for editing contiguous blocks of code.
 - Use `run_command` for executing terminal commands.
 - Use `call_mcp_tool` for MCP interactions.
+
+---
 
 ## On Start
 Glob `**/artefacts/README.md` and read all matches. Run `git log --oneline -5`.
@@ -102,9 +110,13 @@ Read `@context/agents/orchestrator.md`.
 Read `artefacts/build/HANDOFF.md` if it exists — the `Workflow:` field identifies the active workflow.
 Load `@context/workflows/<workflow>.yaml`. If no HANDOFF.md exists, ask the user which workflow to start.
 
+---
+
 ## Workflows
 
 {generate_workflow_table(workflows)}
+
+---
 
 ## Agents
 

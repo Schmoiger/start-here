@@ -1,21 +1,31 @@
 # AGENTS.md
 
+---
+
 ## System Instructions
 Always follow the specific instructions in the `context/` directory.
 
+---
+
 ## Standards
 INLINE_COMPREHENSIVE
+
+---
 
 ## Tool Mappings
 - Use `replace_file_content` for editing contiguous blocks of code.
 - Use `run_command` for executing terminal commands.
 - Use `call_mcp_tool` for MCP interactions.
 
+---
+
 ## On Start
 Glob `**/artefacts/README.md` and read all matches. Run `git log --oneline -5`.
 Read `@context/agents/orchestrator.md`.
 Read `artefacts/build/HANDOFF.md` if it exists — the `Workflow:` field identifies the active workflow.
 Load `@context/workflows/<workflow>.yaml`. If no HANDOFF.md exists, ask the user which workflow to start.
+
+---
 
 ## Workflows
 
@@ -30,6 +40,8 @@ Load `@context/workflows/<workflow>.yaml`. If no HANDOFF.md exists, ask the user
 | `full-test` | Full-suite testing across all modules — run before merge to master or on demand |
 | `prototype` | Fast iteration workflow for prototyping and experimentation |
 | `retrospective` | Proactive framework review — analyse accumulated data, suggest improvements, fix and record |
+
+---
 
 ## Agents
 
@@ -54,6 +66,15 @@ Load `@context/workflows/<workflow>.yaml`. If no HANDOFF.md exists, ask the user
 | `@workflow-analyst` | Analyzes workflow efficiency by examining handoffs, tasks, git history, token usage, and standards adherence |
 | `@tokenomics-analyst` | Audits agent effectiveness, token economics, context efficiency, and model tiering across workflows and runtimes |
 | `@orchestrator` | Coordinates workflow execution, delegates implementation to specialised agents, and manages quality gates |
+
+---
+
+## Skills
+
+| Skill | Purpose | Globs / Triggers |
+|-------|---------|------------------|
+| `git-subrepo` | Procedural instructions and operational guidance for managing canonical context and upstream/downstream synchronisation using git-subrepo | `**/.gitrepo`, `context/**` |
+| `python-scripting` | Procedural guidance and JIT best practices for authoring, running, and testing Python scripts with uv, PEP 723 inline metadata, and the --with pattern | `**/*.py`, `**/pyproject.toml`, `context/scripts/**/*`, `scripts/**/*` |
 
 **Spawn**: `"Read @context/agents/{name}.md before starting. [task]"`
 
