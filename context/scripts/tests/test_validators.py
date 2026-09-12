@@ -11,6 +11,7 @@ from conventional_commits import validate_commit_message
 from ears_notation import validate_requirements_file, is_ears_requirement
 from british_english import validate_british_english
 from metrics_logging import validate_metrics_file, validate_metrics_entry
+from verify_typst_formatting import check_and_fix_file
 
 
 class TestConventionalCommits:
@@ -340,3 +341,75 @@ class TestMetricsLogging:
         errors = validate_metrics_file(bad_file)
         assert len(errors) > 0
         assert any("Invalid JSON" in e for e in errors)
+
+
+class TestTypstFormatting:
+    """Tests for Typst markdown formatting validator."""
+
+    def test_valid_formatting(self, tmp_path):
+        """Test that well-formatted markdown passes."""
+        md_file = tmp_path / "valid.md"
+        md_file.write_text(
+            "# Title\n\n"
+            "## Table of Contents\n\n"
+            "---\n\n"
+            "## Section One\n\n"
+            "Some text here.\n\n"
+            "```mermaid\ngraph TD\nA --> B\n```\n\n\n"
+            "---\n\n"
+            "## Section Two\n"
+        )
+        errors = check_and_fix_file(md_file, fix=False)
+        assert len(errors) == 0
+
+    def test_mermaid_insufficient_blank_lines(self, tmp_path):
+        """Test that mermaid fence without 2 trailing blanks fails and can be fixed."""
+        md_file = tmp_path / "mermaid_bad.md"
+        md_file.write_text(
+            "# Title\n\n"
+            "---\n\n"
+            "## Diagrams\n\n"
+            "```mermaid\ngraph TD\nA --> B\n```\n"
+            "Next paragraph without blank lines.\n"
+        )
+        errors = check_and_fix_file(md_file, fix=False)
+        assert len(errors) == 1
+        assert "Mermaid diagram fence must be followed by at least 2 blank lines" in errors[0]
+
+        # Fix and re-check
+        check_and_fix_file(md_file, fix=True)
+        errors_after = check_and_fix_file(md_file, fix=False)
+        assert len(errors_after) == 0
+        content = md_file.read_text()
+        assert "```\n\n\nNext paragraph" in content
+
+    def test_section_heading_without_separator(self, tmp_path):
+        """Test that level 2 heading without --- separator fails and can be fixed."""
+        md_file = tmp_path / "heading_bad.md"
+        md_file.write_text(
+            "# Title\n\n"
+            "## Section Without Rule\n\n"
+            "Some content.\n"
+        )
+        errors = check_and_fix_file(md_file, fix=False)
+        assert len(errors) == 1
+        assert "must be preceded by '---' horizontal rule" in errors[0]
+
+        # Fix and re-check
+        check_and_fix_file(md_file, fix=True)
+        errors_after = check_and_fix_file(md_file, fix=False)
+        assert len(errors_after) == 0
+        content = md_file.read_text()
+        assert "---\n\n## Section Without Rule" in content
+
+    def test_typst_skip_blocks_ignored(self, tmp_path):
+        """Test that headings inside typst-skip blocks are not flagged."""
+        md_file = tmp_path / "skipped.md"
+        md_file.write_text(
+            "# Title\n\n"
+            "<!-- typst-skip-start -->\n"
+            "## Skipped Heading\n"
+            "<!-- typst-skip-end -->\n"
+        )
+        errors = check_and_fix_file(md_file, fix=False)
+        assert len(errors) == 0

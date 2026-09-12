@@ -2,6 +2,8 @@
 
 Automated validators for enforceable rules in the Bollinger project.
 
+---
+
 ## Overview
 
 These validators enforce consistency across the codebase by checking:
@@ -12,6 +14,9 @@ These validators enforce consistency across the codebase by checking:
 4. **metrics_logging.py** - Agent metrics logging format
 5. **design_system.py** - Frontend compliance with `artefacts/design/design-system.md` (CSS only, colours, Heroicons barrel, spacing scale)
 6. **adapter_drift.py** - Synchronization between canonical context/ and runtime adapter projections
+7. **verify_typst_formatting.py** - Typst-friendly Markdown formatting (mermaid diagram double spacing and horizontal rule section dividers)
+
+---
 
 ## Installation
 
@@ -22,6 +27,8 @@ uv add --dev pre-commit
 uv run pre-commit install
 uv run pre-commit install --hook-type commit-msg
 ```
+
+---
 
 ## Usage
 
@@ -75,6 +82,8 @@ Design-system validator (run from repo root, no file args):
 ```bash
 uv run python context/scripts/validators/design_system.py
 ```
+
+---
 
 ## Validator Details
 
@@ -252,12 +261,35 @@ uv run python context/scripts/generators/generate_adapters.py
 
 **Target files:** Any change to `context/` or any generated adapter projection file triggers the hook.
 
+### Typst Formatting (`verify_typst_formatting.py`)
+
+Validates and enforces Typst-friendly Markdown formatting rules across the codebase:
+- **Mermaid Spacing**: At least 2 blank lines following ````mermaid` diagram blocks.
+- **Section Separators**: Major section headings (`## `) must be preceded by a `---` horizontal rule (excluding table of contents and headings inside `<!-- typst-skip -->` blocks).
+
+```bash
+# Check all tracked markdown files
+uv run python context/scripts/validators/verify_typst_formatting.py
+
+# Check only git staged markdown files
+uv run python context/scripts/validators/verify_typst_formatting.py --staged
+
+# Automatically remediate formatting violations
+uv run python context/scripts/validators/verify_typst_formatting.py --fix
+```
+
+**Target files:** All `.md` files across the repository.
+
+---
+
 ## Exit Codes
 
 All validators follow the same exit code convention:
 
 - `0` - Validation passed
 - `1` - Validation failed (with error messages)
+
+---
 
 ## Configuration
 
@@ -268,6 +300,8 @@ To skip pre-commit hooks temporarily:
 ```bash
 git commit --no-verify -m "message"
 ```
+
+---
 
 ## Development
 
@@ -298,6 +332,8 @@ echo '{"ts":"2025-01-28T09:00:00Z","task":"T-001","agent":"coder","event":"start
 uv run python scripts/validators/metrics_logging.py /tmp/metrics/test.jsonl
 ```
 
+---
+
 ## Troubleshooting
 
 ### Pre-commit hook not running
@@ -316,6 +352,8 @@ Check rule definition in `context/rules/*.mdc` and update validator logic if rul
 ### Too many false positives
 
 Consider adjusting validator patterns or adding exclusions to `.pre-commit-config.yaml`.
+
+---
 
 ## References
 

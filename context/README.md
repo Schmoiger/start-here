@@ -99,7 +99,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 **Scripts** (`scripts/`):
 
 - `prepare-commit-msg.py` / `.sh`: Git hook — extracts and injects session token usage across Claude Code, Google Antigravity, GitHub Copilot, and Codex into the Agent-Session commit trailer
-- Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary, framework docs staleness)
+- Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary, framework docs staleness, Typst formatting)
 - Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
 - Tests (`tests/`): Test suite for validators, runtime adapters, and telemetry extractors
 
@@ -217,6 +217,7 @@ graph LR
     UBranch <== "git subrepo pull / push" ==> DContext
     UBuild -. "Strictly Isolated" .- DBuild
 ```
+
 
 ### 1. Prerequisites
 
