@@ -3,27 +3,41 @@ name: git-subrepo
 description: Procedural instructions and operational guidance for managing canonical context and upstream/downstream synchronisation using git-subrepo.
 globs: ["**/.gitrepo", "context/**"]
 ---
+
 # Git Subrepo Skill
+
 Manage external repositories nested within the codebase as standard files. Bypass native Git submodules complexity.
+
 **Architecture**: Framework maintains canonical context in `start-here` (`main` branch), isolated onto upstream `standards` branch. Downstream projects consume as subrepo under `context/`.
+
 **Core Commands**:
+
 - Clone: `git subrepo clone <repository-url> <subdirectory> -b <branch>`
 - Pull: `git subrepo pull <subdirectory>` (requires clean working tree)
 - Push: `git subrepo push <subdirectory>` (requires clean working tree)
+
 **Invariants & Rules**:
+
 1. **Tool Dependency**: `git-subrepo` is 3rd-party (`brew install git-subrepo`). Escalate if missing. Don't use native Git submodule commands.
 2. **State Tracking**: NEVER hand-edit `.gitrepo`. It tracks URL, branch, last synced commit.
 3. **Clean Working Tree Required**: `git status` must be clean before pull/push. (Use `git stash` if needed).
 4. **History Handling**: Assume upstream commits are squashed.
 5. **Prerequisites**: git 2.30+, bash 4.0+.
+
 **Downstream Workflows**:
+
 - Initial Adoption: `git subrepo clone https://github.com/Schmoiger/start-here.git context -b standards` -> `uv run python context/scripts/generators/generate_adapters.py` -> `uv run python context/scripts/validators/adapter_drift.py` -> commit.
 - Pull Updates: Ensure clean -> `git subrepo pull context` -> generate adapters -> validate drift -> commit.
 - Push Improvements: Validate drift & tests -> `git subrepo push context` -> Create PR in upstream.
+
 **Upstream Workflows (`start-here`)**:
+
 - Automated: `.github/workflows/sync-standards.yml` extracts `context/` changes on merges to `main` and pushes to `origin/standards`.
 - Manual: Clean -> `git subrepo branch context -f` -> `git push origin subrepo/context:standards`.
+
 **Troubleshooting**:
+
 - *Unstaged changes*: Stash, pull, pop.
 - *Merge Conflict*: Resolve in editor, `git add`, `git commit -m "merge..."`, `git subrepo clean context`.
 - *Out-of-Sync/Corrupted*: `git subrepo status context`, `git subrepo pull context --force`.
+
