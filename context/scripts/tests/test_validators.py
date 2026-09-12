@@ -413,3 +413,21 @@ class TestTypstFormatting:
         )
         errors = check_and_fix_file(md_file, fix=False)
         assert len(errors) == 0
+
+    def test_headings_in_code_blocks_ignored(self, tmp_path):
+        """Test that headings inside code blocks are not flagged."""
+        md_file = tmp_path / "code_block.md"
+        md_file.write_text(
+            "# Title\n\n"
+            "---\n\n"
+            "## Real Heading\n\n"
+            "```yaml\n"
+            "## Heading In Code\n"
+            "key: value\n"
+            "```\n\n\n"
+            "---\n\n"
+            "## Another Heading\n"
+        )
+        errors = check_and_fix_file(md_file, fix=False)
+        assert len(errors) == 0
+

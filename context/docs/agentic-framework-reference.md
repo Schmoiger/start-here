@@ -1,8 +1,8 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft  
-**Version**: 0.4.0  
-**Last Updated**: 10 September 2026  
+**Version**: 0.5.0  
+**Last Updated**: 12 September 2026  
 **Word Count**: ~8,400 words  
 **Reading Time**: ~35 minutes
 
@@ -18,10 +18,11 @@
 4. [Root-Level Framework Files](#root-level-framework-files)
 5. [Standards](#standards)
 6. [Rules](#rules)
-7. [Agents](#agents)
+7. [Skills](#skills)
+8. [Agents](#agents)
    - [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter)
    - [Writing Personas](#writing-personas)
-8. [Workflows](#workflows)
+9. [Workflows](#workflows)
    - [Design (`design.yaml`)](#design-designyaml)
    - [Build (`build.yaml`)](#build-buildyaml)
    - [Prototype (`prototype.yaml`)](#prototype-prototypeyaml)
@@ -72,12 +73,13 @@ The framework is organised as a layered directory structure inside `context/`. T
 | Agents | `context/agents/` | Define *who*: specialised roles with frontmatter linking rules and standards | Every agent spawn |
 | Templates | `context/templates/` | Define *what shape*: standardised formats for reviews, tasks, handoffs, design docs | Every output |
 | Standards | `context/standards/` | Explain *why* and *how*: engineering rationale for coding, testing, security, documentation | On demand |
+| Skills | `context/skills/` | Provide *procedural guidance*: step-by-step instructions for specific workflows or unusual tech boundaries | On demand |
 | Scripts | `context/scripts/` | Enforce *everything above*: validators, generators, git hooks | Every commit |
 | Workflows | `context/workflows/` | Define *when*: phase order, dependencies, gates, outputs, recovery | Once per task |
 | Docs | `context/docs/` | Provide *further reading*: design rationale, strategic context, orchestration patterns, workflow guides | Human reference |
 | Personas | `context/persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only |
 
-The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. Nothing bleeds across boundaries unless explicitly designed to.
+The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. To add procedural steps for complex tools, add a skill. Nothing bleeds across boundaries unless explicitly designed to.
 
 The design pattern is consistent throughout:
 
@@ -94,7 +96,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Role |
 |------|----------|------|
-| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
+| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
 | Derived projection | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
 | Operator guidance | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
 | Enforcement | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
@@ -157,7 +159,7 @@ Standards are detailed reference material stored in `context/standards/`. They a
 
 Each agent definition lists the standards it depends on in its frontmatter. When the orchestrator spawns an agent, it includes the standard references in the spawn prompt. The agent reads the relevant standards before starting work. Standards are loaded on demand rather than injected wholesale, because a single standard can run to 2,000-5,000 tokens and loading all of them would overwhelm the context window.
 
-### The Rules-Standards Split
+### The Rules, Standards, and Skills Split
 
 Rules and standards serve different purposes, and the separation is the framework's most consequential structural decision.
 
@@ -165,7 +167,9 @@ Rules are under 200 tokens each. They state what must happen: "use `uv run pytes
 
 Standards run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume.
 
-An agent executing a straightforward Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight.
+Skills provide procedural JIT (Just-In-Time) guidance for unusual or complex technology boundaries (like `git-subrepo` or `uv` environments). While standards explain the philosophy and rules enforce binary constraints, skills act as the operational runbook. They are compiled from `context/skills/` into runtime-native formats (e.g., `.agents/skills/`) and can be bound to agents via their frontmatter.
+
+An agent executing a straightforward Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight, while relying on skills to guide the agent when executing complex commands.
 
 ### Standards Catalogue
 
@@ -580,6 +584,7 @@ flowchart TD
     build_yaml --> deploy_yaml["deploy.yaml when needed"]
 ```
 
+
 #### When to use design and build
 
 Use design then build for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
@@ -637,6 +642,7 @@ flowchart TD
     classDef optionalStyle fill:#e9ecef,stroke:#868e96,stroke-dasharray: 5 5
     class validate optionalStyle
 ```
+
 
 #### Prototype rules
 
@@ -744,6 +750,7 @@ flowchart TD
 
     class tech_review optionalStyle
 ```
+
 
 #### Phases
 
@@ -1283,5 +1290,6 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 | 0.1.0   | 2026-04-13 | Initial   | Standalone framework reference: topology, source-of-truth tiers, standards, rules, agents (including personas and tool surfaces), workflows (one subsection per shipped YAML), templates, scripts and hooks, portability, orchestration patterns, reading paths; material from removed standalone docs absorbed here. |
 | 0.2.0   | 2026-04-13 | Editorial | Document metadata and revision history aligned with `context/standards/doc-standards.md` section 8.2; prose emphasis normalised outside fenced examples (fence-safe). |
 | 0.3.0   | 2026-04-13 | Editorial | Versioning policy: `MAJOR.MINOR.PATCH` per [Semantic Versioning 2.0.0](https://semver.org/) (section 8.2); draft documents stay on major version `0`; revision table uses three-part versions. |
+| 0.5.0   | 2026-09-12 | Editorial | Document skills layer in framework topology, source-of-truth tiers, and rules/standards/skills split. |
 
 <!-- typst-skip-end -->
