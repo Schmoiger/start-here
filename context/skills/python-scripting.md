@@ -3,171 +3,40 @@ name: python-scripting
 description: Procedural guidance and JIT best practices for authoring, running, and testing Python scripts with uv, PEP 723 inline metadata, and the --with pattern.
 globs: ["**/*.py", "**/pyproject.toml", "context/scripts/**/*", "scripts/**/*"]
 ---
-
 # Python Scripting Skill
-
-Just-in-time procedural instructions, constraints, and standard patterns for executing, writing, and maintaining Python scripts within the repository and framework.
-
----
-
-## Strict Invariant: Zero-Tolerance Fail-Fast
-
-**NEVER fall back to bare `python`, `python3`, `pip`, or ad-hoc `PYTHONPATH` modifications if `uv` fails.**
-
-- Silent tool substitution (e.g. running `python3 script.py` because `uv` threw an error) masks defects, creates untracked environment drift, and violates determinism.
-- Any failure in `uv` execution is an environment defect to diagnose or escalate—never an invitation to bypass `uv`.
-- If sandboxing prevents `uv` from finding runtime interpreters, request explicit sandbox elevation (`BypassSandbox: true`) or supply the explicit interpreter path. Do not drop `uv`.
-
----
-
-## The Ephemeral `--with` Pattern (Ad-Hoc Dependencies)
-
-When executing scripts, running tests, or invoking tooling where dependencies are not pre-installed in the current working directory's virtual environment (or when the repository root lacks a `pyproject.toml`), **use `uv run --with <package>`**.
-
-Agents commonly forget the `--with` pattern and fail or mistakenly attempt global package installations.
-
-### Common `--with` Scenarios
-
-| Need | Command |
-|------|---------|
-| Run `pytest` without project install | `uv run --with pytest pytest <path-to-tests>` |
-| Run `pytest` with plugins | `uv run --with pytest --with pytest-mock pytest <path-to-tests>` |
-| Run script needing PyYAML | `uv run --with pyyaml python script.py` |
-| Run script with multiple libraries | `uv run --with pyyaml --with rich python script.py` |
-| Run linter on ad-hoc script | `uv run --with ruff ruff check --fix script.py` |
-| Run formatter on ad-hoc script | `uv run --with ruff ruff format script.py` |
-
-> [!TIP]
-> Use `--with` whenever you need an isolated, ephemeral dependency without permanently altering the project's `pyproject.toml`.
-
----
-
-## Standalone Scripts with PEP 723 Metadata
-
-For portable, self-contained automation scripts (such as repository hooks, validators, or generators), declare dependencies directly within the script header using **PEP 723 inline script metadata**.
-
-### PEP 723 Header Format
-
+**Invariant: Zero-Tolerance Fail-Fast**: NEVER fallback to bare `python`, `python3`, `pip`, or ad-hoc `PYTHONPATH` if `uv` fails. Escalate or fix.
+**The Ephemeral `--with` Pattern**: Use `uv run --with <pkg>` for ad-hoc dependencies.
+- Pytest: `uv run --with pytest pytest <path>`
+- Script w/ PyYAML: `uv run --with pyyaml python script.py`
+- Linter: `uv run --with ruff ruff check --fix script.py`
+- Formatter: `uv run --with ruff ruff format script.py`
+**Standalone Scripts (PEP 723)**: For self-contained scripts, use inline metadata:
 ```python
 # /// script
-# dependencies = [
-#   "pyyaml>=6.0",
-#   "rich>=13.0.0",
-# ]
+# dependencies = ["pyyaml>=6.0", "rich>=13.0.0"]
 # ///
 #!/usr/bin/env python3
 from __future__ import annotations
-
 import sys
 from pathlib import Path
-import yaml
-from rich.console import Console
-
-def main() -> None:
-    console = Console()
-    console.print("[green]Running standalone script with PEP 723 metadata[/green]")
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": sys.exit(main())
 ```
-
-### Running PEP 723 Scripts
-
-When inline metadata is present, `uv run` automatically constructs an isolated, cached virtual environment containing the declared dependencies:
-
-```bash
-uv run python path/to/script.py
-```
-
----
-
-## Monorepo & Service Execution Patterns
-
-When interacting with specific sub-packages or services (e.g., in a monorepo structure where services have dedicated `pyproject.toml` files):
-
-1. **Target the Project Explicitly**:
-   ```bash
-   uv run --project services/data-service python -m service.main
-   uv run --project tests/context-unit-tests pytest
-   ```
-
-2. **Add Dependencies to a Project**:
-   ```bash
-   uv add --project services/data-service pydantic
-   ```
-
-3. **Synchronise Environment**:
-   ```bash
-   uv sync --project services/data-service
-   ```
-
-4. **One-Off CLI Tool Execution**:
-   For standalone CLI tools that are published executables (not Python modules requiring repository imports), use `uvx`:
-   ```bash
-   uvx ruff check .
-   uvx ruff format .
-   ```
-
----
-
-## Script Authoring Standards
-
-All Python scripts authored in this repository must comply with the following standards:
-
-1. **Future Annotations**: Always place `from __future__ import annotations` as the first non-comment import to support modern union types (`|`) and postponed evaluation.
-2. **Type Hints**: Annotate all function parameters, return types, and module-level constants.
-3. **Robust CLI Parsing**:
-   - Use `argparse` for command-line arguments.
-   - Include standard flags where relevant: `--dry-run`, `--verbose`, `--quiet`, and `--fix`.
-4. **Reliable Path Resolution**:
-   - Never use `os.path` string manipulation or hardcoded relative paths that depend on the invocation directory.
-   - Discover the repository root or script location reliably:
-     ```python
-     _SCRIPT_DIR = Path(__file__).resolve().parent
-     _REPO_ROOT = _SCRIPT_DIR.parent.parent  # Or via git rev-parse --show-toplevel
-     ```
-   - Use `pathlib.Path` objects exclusively for filesystem operations.
-5. **Deterministic Exit Codes**:
-   - Return explicit integer exit codes (`0` for success, non-zero for failures).
-   - Use `sys.exit(main())` in the entry point guard.
-6. **No Destructive Imports**:
-   - Wrap execution logic inside `def main()` and guard with `if __name__ == "__main__":`.
-   - Never execute network or filesystem mutations upon module import.
-7. **No Interactive / Quoted Inline Bash Strings**:
-   - Do NOT run multiline inline scripts like `uv run python -c "..."` containing complex strings or comments, as shell quoting rules frequently introduce escaping errors.
-   - Write scratch code to a temporary file (`scratch/temp_script.py`) and invoke it cleanly via `uv run python scratch/temp_script.py`.
-
----
-
-## Quality Verification & Formatting
-
-Before committing or completing tasks on Python scripts, run the standard verification pipeline:
-
-```bash
-# 1. Validate syntax and bytecode compilation
-uv run python -m py_compile context/scripts/my_script.py
-
-# 2. Check and fix lint issues
-uv run --with ruff ruff check --fix context/scripts/my_script.py
-
-# 3. Format code
-uv run --with ruff ruff format context/scripts/my_script.py
-
-# 4. Execute test suite
-uv run --with pytest pytest context/scripts/tests/ -v
-```
-
----
-
-## JIT Decision Matrix
-
-| Task / Scenario | Recommended Command | Key Rule / Note |
-|-----------------|---------------------|-----------------|
-| Run standalone script with dependencies | `uv run python script.py` | Add PEP 723 `# /// script` block |
-| Run ad-hoc tests (no root venv) | `uv run --with pytest pytest <tests>` | Use `--with` pattern; never bare `pytest` |
-| Run tests with specific plugin | `uv run --with pytest --with pytest-mock pytest` | Chain multiple `--with` flags |
-| Run script requiring package | `uv run --with <pkg> python script.py` | Ephemeral; does not modify `pyproject.toml` |
-| Execute command inside service | `uv run --project <path> python -m <mod>` | Always specify `--project` outside root |
-| Run one-off standalone tool | `uvx <tool>` (e.g. `uvx ruff check .`) | For tools with console entrypoints |
-| Verify script syntax | `uv run python -m py_compile script.py` | Fast check for compilation errors |
-| Format and lint | `uv run --with ruff ruff check --fix <file>` | Enforce consistent repo style |
+Run via: `uv run python script.py`.
+**Monorepo/Service Execution**:
+- Target project: `uv run --project services/<name> python -m service.main`
+- Add dep: `uv add --project services/<name> pydantic`
+- Sync: `uv sync --project services/<name>`
+- CLI Tool: `uvx <tool>` (e.g., `uvx ruff check .`)
+**Authoring Standards**:
+1. `from __future__ import annotations` first.
+2. Use Type Hints.
+3. CLI Parsing: `argparse` (include `--dry-run`, `--verbose`, `--quiet`, `--fix`).
+4. Path Resolution: Use `pathlib.Path` relative to `__file__`. No `os.path`.
+5. Deterministic Exit: `0` success, non-zero failure.
+6. No destructive imports: use `if __name__ == "__main__": main()`.
+7. No multiline inline bash strings for Python scripts; use temporary files instead.
+**Quality Verification**:
+1. Syntax: `uv run python -m py_compile <file>`
+2. Lint: `uv run --with ruff ruff check --fix <file>`
+3. Format: `uv run --with ruff ruff format <file>`
+4. Test: `uv run --with pytest pytest <path> -v`
