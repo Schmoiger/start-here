@@ -68,7 +68,12 @@ repos:
         files: ^(artefacts/|frontend/|services/|packages/).*\.md$
         exclude: ^(node_modules|\.git|venv|\.venv)/
 
-
+      - id: typst-formatting
+        name: Verify Typst-friendly Markdown formatting
+        entry: uv run python context/scripts/validators/verify_typst_formatting.py
+        language: python
+        files: \.md$
+        exclude: ^(node_modules|\.git|venv|\.venv)/
 
       - id: framework-docs-staleness
         name: Check framework docs updated with context/ changes
