@@ -84,6 +84,7 @@ def check_and_fix_file(path: Path, fix: bool = False) -> list[str]:
     modified = False
 
     in_mermaid = False
+    in_code_block = False
     i = 0
     total_lines = len(lines)
 
@@ -102,12 +103,14 @@ def check_and_fix_file(path: Path, fix: bool = False) -> list[str]:
         # Detect mermaid fence start/end
         if stripped == "```mermaid":
             in_mermaid = True
+            in_code_block = True
             new_lines.append(line)
             i += 1
             continue
 
         if in_mermaid and stripped == "```":
             in_mermaid = False
+            in_code_block = False
             new_lines.append(line)
 
             # Count following blank lines
@@ -129,9 +132,15 @@ def check_and_fix_file(path: Path, fix: bool = False) -> list[str]:
             i += 1
             continue
 
+        if stripped.startswith("```"):
+            in_code_block = not in_code_block
+            new_lines.append(line)
+            i += 1
+            continue
+
         # Check section separation for level 2 headings '## '
-        # (Exclude '# Title', '## Table of Contents', and headings inside typst-skip)
-        if stripped.startswith("## ") and not in_typst_skip and not in_mermaid:
+        # (Exclude '# Title', '## Table of Contents', and headings inside typst-skip or code blocks)
+        if stripped.startswith("## ") and not in_typst_skip and not in_mermaid and not in_code_block:
             heading_title = stripped[3:].strip()
             if heading_title.lower() != "table of contents":
                 # Check previous non-blank line in new_lines

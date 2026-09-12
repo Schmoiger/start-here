@@ -1,8 +1,8 @@
 # Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery
 
 **Document Status**: Draft  
-**Version**: 0.3.0  
-**Last Updated**: 10 September 2026  
+**Version**: 0.4.0  
+**Last Updated**: 12 September 2026  
 **Word Count**: ~3,500 words  
 **Reading Time**: ~15 minutes
 
@@ -44,7 +44,7 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **Context durability has higher leverage than code quality.** Code quality is downstream of context quality. An agent that receives a clear handoff, a focused task, and the correct rules will produce better code than a capable agent operating blind. The critical path is usually context plus workflow, not model capability; a better model with poor context loses to a weaker model with strong context. The framework treats documentation, tasks, and handoffs as first-class deliverables, not optional support material.
 
-**Policy and explanation serve different purposes.** Rules are short, binary, and cheap to inject into agent prompts. Standards are rich, contextual, and expensive to load. Merging them would force a choice between token-efficient prompts and comprehensive reference material. Separating them serves both needs without compromise. (The token cost analysis appears in [The Rules-Standards Split](#the-rules-standards-split) below.)
+**Policy and explanation serve different purposes.** Rules are short, binary, and cheap to inject into agent prompts. Standards are rich, contextual, and expensive to load. Merging them would force a choice between token-efficient prompts and comprehensive reference material. Separating them serves both needs without compromise. (The token cost analysis appears in [The Rules, Standards, and Skills Split](#the-rules-standards-and-skills-split) below.)
 
 **Specialist agents outperform generalists at the cost of coordination overhead.** A single large prompt that covers all responsibilities tends toward diluted output. Eighteen focused agents, each with a bounded responsibility, a curated rule set, and a defined workflow position, produce more reliable work and cleaner handoffs. The trade-off is real: 18 agents means 18 handoff boundaries and 18 prompt injections. For production-quality work, the improved output quality and accountability justify this cost.
 
@@ -72,12 +72,13 @@ The framework is organised as a context hierarchy: a layered directory structure
 | Agents | `context/agents/` | Define *who*: specialised roles with frontmatter linking rules and standards | Every agent spawn: orchestrator reads the definition to resolve rules, standards, and file scope |
 | Templates | `context/templates/` | Define *what shape*: standardised formats for reviews, tasks, handoffs, design docs | Every output: agents consult templates when producing artefacts |
 | Standards | `context/standards/` | Explain *why* and *how*: engineering rationale for coding, testing, security, documentation | On demand: agents load a standard when deeper reference is needed |
+| Skills | `context/skills/` | Provide *procedural guidance*: step-by-step instructions for specific workflows or unusual tech boundaries | On demand: agents load or trigger skills to navigate complex boundaries (e.g. git-subrepo) |
 | Scripts | `context/scripts/` | Enforce *everything above*: validators, generators, git hooks | Every commit: pre-commit validators check output against rules |
 | Workflows | `context/workflows/` | Define *when*: phase order, dependencies, gates, outputs, recovery | Once per task: orchestrator reads at the start to plan the work |
 | Docs | `context/docs/` | Provide *further reading*: design rationale, strategic context, orchestration patterns, workflow guides, portability how-tos | Human reference: guides and design documents for contributors and operators, not consumed by agents |
 | Personas | `context/persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only: applied when writing human-facing material |
 
-The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. Nothing bleeds across boundaries unless explicitly designed to.
+The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. To add procedural steps for complex tools, add a skill. Nothing bleeds across boundaries unless explicitly designed to.
 
 ---
 
@@ -101,6 +102,7 @@ flowchart TD
     I --> J[Next agent or next session resumes cleanly]
 ```
 
+
 1. The **orchestrator** selects a workflow based on the task type (e.g. `build.yaml` for feature work, `bugfix.yaml` for defect resolution).
 2. The workflow defines the phase sequence: plan, then write failing tests, then implement, then refactor, then review.
 3. For each phase, the orchestrator reads the agent definition, resolves which rules apply by glob-matching the task's files against each rule's scope, and injects them into the spawn prompt.
@@ -118,7 +120,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Action |
 |------|----------|--------|
-| **Authoritative** | `context/workflows/*.yaml`, `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md`, `context/models.yaml` | Edit these to change framework behaviour |
+| **Authoritative** | `context/workflows/*.yaml`, `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/models.yaml` | Edit these to change framework behaviour |
 | **Derived** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | Read for orientation; never hand-edit. Regenerate from source. |
 | **Operator guidance** | `context/docs/*.md`, `README.md`, this document | Use to understand and apply the framework |
 | **Enforcement** | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | Use to keep the repository aligned with the design |
@@ -127,7 +129,7 @@ The principle: change the authoritative source, let derived projections follow.
 
 ---
 
-## The Rules-Standards Split
+## The Rules, Standards, and Skills Split
 
 This is the most consequential design decision in the framework.
 
@@ -135,7 +137,9 @@ This is the most consequential design decision in the framework.
 
 **Standards** run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume. They are reference material, consulted on demand.
 
-The split is driven by the operating triangle: execution time, token cost, and autonomy horizon. Specifically the token cost axis. A typical agent spawn injects 5-8 rules at ~100-200 tokens each, plus the agent definition at ~500-1,000 tokens, totalling roughly 1,500-2,500 tokens of framework overhead. Loading a single full standard would add 2,000-5,000 tokens, doubling or tripling the injection cost for material the agent may not need. The split keeps the execution path lean and the reference path comprehensive.
+**Skills** provide procedural JIT (Just-In-Time) guidance for unusual or complex technology boundaries (like `git-subrepo` or `uv` environments). While standards explain the philosophy and rules enforce binary constraints, skills act as the operational runbook. They are compiled from `context/skills/` into runtime-native formats (e.g., `.agents/skills/`) and can be bound to agents via their frontmatter.
+
+The split is driven by the operating triangle: execution time, token cost, and autonomy horizon. Specifically the token cost axis. A typical agent spawn injects 5-8 rules at ~100-200 tokens each, plus the agent definition at ~500-1,000 tokens, totalling roughly 1,500-2,500 tokens of framework overhead. Loading a single full standard would add 2,000-5,000 tokens, doubling or tripling the injection cost for material the agent may not need. The split keeps the execution path lean, the reference path comprehensive, and the procedural path available JIT via skills.
 
 An agent executing a simple Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight.
 

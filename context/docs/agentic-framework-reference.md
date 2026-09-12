@@ -1,8 +1,8 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft  
-**Version**: 0.4.0  
-**Last Updated**: 10 September 2026  
+**Version**: 0.5.0  
+**Last Updated**: 12 September 2026  
 **Word Count**: ~8,400 words  
 **Reading Time**: ~35 minutes
 
@@ -18,10 +18,11 @@
 4. [Root-Level Framework Files](#root-level-framework-files)
 5. [Standards](#standards)
 6. [Rules](#rules)
-7. [Agents](#agents)
+7. [Skills](#skills)
+8. [Agents](#agents)
    - [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter)
    - [Writing Personas](#writing-personas)
-8. [Workflows](#workflows)
+9. [Workflows](#workflows)
    - [Design (`design.yaml`)](#design-designyaml)
    - [Build (`build.yaml`)](#build-buildyaml)
    - [Prototype (`prototype.yaml`)](#prototype-prototypeyaml)
@@ -31,18 +32,17 @@
    - [Content (`content.yaml`)](#content-contentyaml)
    - [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml)
    - [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml)
-   - [Other workflows](#other-workflows)
-9. [Orchestration Patterns](#orchestration-patterns)
-10. [Templates](#templates)
-11. [Scripts and Automation](#scripts-and-automation)
-12. [Portability and Framework Adapters](#portability-and-framework-adapters)
-13. [How the Parts Connect](#how-the-parts-connect)
-14. [Reading Paths](#reading-paths)
-15. [Revision History](#revision-history)
+10. [Orchestration Patterns](#orchestration-patterns)
+11. [Templates](#templates)
+12. [Scripts and Automation](#scripts-and-automation)
+13. [Portability and Framework Adapters](#portability-and-framework-adapters)
+14. [How the Parts Connect](#how-the-parts-connect)
+15. [Reading Paths](#reading-paths)
+16. [Revision History](#revision-history)
 
 ---
 
-## Agentic Framework Reference
+## How To Use This Reference
 
 The companion technical paper explains why the framework exists and the design principles behind it. This reference explains what the framework contains and how each part works. It is structured so that either document can be read first, or independently.
 
@@ -72,12 +72,13 @@ The framework is organised as a layered directory structure inside `context/`. T
 | Agents | `context/agents/` | Define *who*: specialised roles with frontmatter linking rules and standards | Every agent spawn |
 | Templates | `context/templates/` | Define *what shape*: standardised formats for reviews, tasks, handoffs, design docs | Every output |
 | Standards | `context/standards/` | Explain *why* and *how*: engineering rationale for coding, testing, security, documentation | On demand |
+| Skills | `context/skills/` | Provide *procedural guidance*: step-by-step instructions for specific workflows or unusual tech boundaries | On demand |
 | Scripts | `context/scripts/` | Enforce *everything above*: validators, generators, git hooks | Every commit |
 | Workflows | `context/workflows/` | Define *when*: phase order, dependencies, gates, outputs, recovery | Once per task |
 | Docs | `context/docs/` | Provide *further reading*: design rationale, strategic context, orchestration patterns, workflow guides | Human reference |
 | Personas | `context/persona/` | Provide *voice*: writing style for human-facing content only | Content workflows only |
 
-The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. Nothing bleeds across boundaries unless explicitly designed to.
+The layering determines where changes should be made. To change what agents do, edit a workflow. To change how they do it, edit a standard or rule. To change who does it, edit an agent definition. To change what the output looks like, edit a template. To add procedural steps for complex tools, add a skill. Nothing bleeds across boundaries unless explicitly designed to.
 
 The design pattern is consistent throughout:
 
@@ -94,7 +95,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Role |
 |------|----------|------|
-| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
+| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
 | Derived projection | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
 | Operator guidance | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
 | Enforcement | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
@@ -157,7 +158,7 @@ Standards are detailed reference material stored in `context/standards/`. They a
 
 Each agent definition lists the standards it depends on in its frontmatter. When the orchestrator spawns an agent, it includes the standard references in the spawn prompt. The agent reads the relevant standards before starting work. Standards are loaded on demand rather than injected wholesale, because a single standard can run to 2,000-5,000 tokens and loading all of them would overwhelm the context window.
 
-### The Rules-Standards Split
+### The Rules, Standards, and Skills Split
 
 Rules and standards serve different purposes, and the separation is the framework's most consequential structural decision.
 
@@ -165,7 +166,9 @@ Rules are under 200 tokens each. They state what must happen: "use `uv run pytes
 
 Standards run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume.
 
-An agent executing a straightforward Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight.
+Skills provide procedural JIT (Just-In-Time) guidance for unusual or complex technology boundaries (like `git-subrepo` or `uv` environments). While standards explain the philosophy and rules enforce binary constraints, skills act as the operational runbook. They are compiled from `context/skills/` into runtime-native formats (e.g., `.agents/skills/`) and can be bound to agents via their frontmatter.
+
+An agent executing a straightforward Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight, while relying on skills to guide the agent when executing complex commands.
 
 ### Standards Catalogue
 
@@ -227,7 +230,7 @@ The body of the rule is concise instruction text, typically structured as a tabl
 
 ### Example: Python Environment Rule
 
-```
+```markdown
 | Action          | Correct               | Wrong                         |
 |-----------------|-----------------------|-------------------------------|
 | Run tests       | uv run pytest         | pytest                        |
@@ -291,6 +294,22 @@ A candidate for a new rule should pass three tests:
 3. Is it actionable? Can you give clear DO/DON'T commands?
 
 If all three are true, create a rule in `rules/*.mdc` and keep it under 200 tokens. If the topic requires nuance, explanation, or judgement, it belongs in a standard, not a rule.
+
+---
+
+## Skills
+
+Skills are procedural guidance documents stored in `context/skills/` as `.md` files. They provide step-by-step operational instructions and best practices for specific workflows or unusual technology boundaries (for example, `git-subrepo` context synchronisation or `uv` script execution with PEP 723 metadata).
+
+### How Skills Work
+
+Skills differ from rules and standards:
+
+- **Rules** are short (<200 tokens) binary constraints injected into spawn prompts.
+- **Standards** explain the foundational engineering principles and rationale on demand.
+- **Skills** provide operational runbooks and procedural steps for complex tools.
+
+Canonical skills in `context/skills/` are compiled into runtime projections (such as `.agents/skills/` for Antigravity) via `context/scripts/generators/generate_adapters.py`. Agents declare dependencies on skills via the `skills:` list in their frontmatter, and available skills are indexed in `AGENTS.md`.
 
 ---
 
@@ -442,7 +461,7 @@ The framework defines 19 specialised agents, organised by kind of judgement.
 
 Personas are stored in `context/persona/` and provide voice guidance for human-facing content. They are used by the `documentation` agent when writing blogs, technical papers, user guides, and marketing materials. They are explicitly *not* used for technical handoffs, API documentation, architecture documents, or internal artefacts.
 
-For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Content (`content.yaml`)](#human-facing-content-workflow) under Workflows.
+For the phased pipeline (research through publish) used for blogs, papers, and similar content, see [Content (`content.yaml`)](#content-contentyaml) under Workflows.
 
 #### When to Use a Persona
 
@@ -509,9 +528,6 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 | continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
 | retrospective | `retrospective.yaml` | Standalone process review and pattern identification |
 
-<a id="design-designyaml"></a>
-<a id="the-default-workflow"></a>
-
 ### Design (`design.yaml`)
 
 Purpose: Discovery through design review; run before `build.yaml`.
@@ -528,8 +544,6 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 
 Design gate (`design-review`): zero architecture blockers; zero design security issues; complex components need a design doc per `design_doc_standard` in the workflow file.
 
-<a id="build-buildyaml"></a>
-
 ### Build (`build.yaml`)
 
 Purpose: Primary TDD implementation pipeline after design approval.
@@ -538,7 +552,7 @@ Pattern: Subtask-driven TDD with automated coverage gate, per-sprint review, loc
 
 Sixteen phases (plus a sprint loop that repeats for each sprint in `subtask-plan.yaml`). High-level shape:
 
-```
+```text
 task-planning → tasks-review (gate) → schema-migration →
   [ per sprint: tdd-red → test-plan-review → tdd-green → coverage-gate (gate) →
     tdd-blue → sprint-review ] →
@@ -570,6 +584,7 @@ Build gates (see `quality_gates` in `build.yaml`): `tasks-review` (approval), `c
 Subtask execution: RED, GREEN, and BLUE run as orchestrated subtasks per stream (Python and TypeScript can progress in parallel with disjoint `file_scope`). Recovery uses `HANDOFF.md`, `artefacts/build/dispatch.md`, and `subtask-plan.yaml` status fields (see `state_recovery` in `build.yaml`).
 
 ![Build Workflow](diagrams/build-workflow.png)
+
 ```mermaid
 ---
 title: Default delivery (high level)
@@ -580,14 +595,12 @@ flowchart TD
     build_yaml --> deploy_yaml["deploy.yaml when needed"]
 ```
 
+
 #### When to use design and build
 
 Use design then build for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
-Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#the-prototype-workflow) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) when you want process or framework follow-up; they are not phases inside `build.yaml`.
-
-<a id="prototype-prototypeyaml"></a>
-<a id="the-prototype-workflow"></a>
+Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#prototype-prototypeyaml) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) when you want process or framework follow-up; they are not phases inside `build.yaml`.
 
 ### Prototype (`prototype.yaml`)
 
@@ -597,11 +610,12 @@ Use for: POCs, experiments, spikes, throwaway code.
 
 The prototype workflow trades rigour for speed: 4 phases, no quality gates, 5 agents.
 
-```
+```text
 quick-plan → sketch-design → build → validate (optional)
 ```
 
 ![Prototype Workflow](diagrams/prototype-workflow.png)
+
 ```mermaid
 ---
 title: Prototype Workflow
@@ -638,6 +652,7 @@ flowchart TD
     class validate optionalStyle
 ```
 
+
 #### Prototype rules
 
 - Speed over quality. Technical debt is acceptable.
@@ -657,8 +672,6 @@ If a prototype validates its hypothesis and should become production code:
 
 Cleaning up a prototype takes longer than rewriting it properly. The technical debt in prototype code is architectural, not superficial.
 
-<a id="deploy-deployyaml"></a>
-
 ### Deploy (`deploy.yaml`)
 
 Purpose: GCP cloud deployment and deployment review after `build.yaml` has completed local deployment and verification.
@@ -670,8 +683,6 @@ Purpose: GCP cloud deployment and deployment review after `build.yaml` has compl
 
 `quality_gates` in the YAML require tech-lead approval on `deployment-review`. Criteria include deployment success and coverage sign-off as defined in the file (see `deploy.yaml` for thresholds and notes).
 
-<a id="bugfix-bugfixyaml"></a>
-
 ### Bugfix (`bugfix.yaml`)
 
 Purpose: Reproduce, fix, and verify defects with empirical evidence (browser screenshots and file-cited causal chains), not feature-sized planning.
@@ -680,8 +691,6 @@ Shape: `reproduce` (gated; `ui-tester` and `functional-tester` in parallel) → 
 
 Quality gates: Evidence gates on `reproduce` and `verify`—tests passing alone is not sufficient; see YAML for gate metrics and workflow rules (TDD on the fix, commit body records causal chain).
 
-<a id="full-test-full-testyaml"></a>
-
 ### Full-test (`full-test.yaml`)
 
 Purpose: Full-suite testing across all modules—release confidence, not the per-feature changed-scope regressions in `build.yaml`.
@@ -689,9 +698,6 @@ Purpose: Full-suite testing across all modules—release confidence, not the per
 Phases (sequential): `full-unit-test` → `full-integration-test` → `full-e2e-test` → `quality-check` (tech-lead gate). Reports under `artefacts/test-results/`. No code changes in this workflow—failures are reported for follow-up elsewhere.
 
 When to run: Before merging a long-running branch to main, after large refactors, or on demand for health checks (see YAML `workflow_rules`).
-
-<a id="content-contentyaml"></a>
-<a id="human-facing-content-workflow"></a>
 
 ### Content (`content.yaml`)
 
@@ -702,11 +708,12 @@ Do not use for: Technical handoffs, API or architecture reference, internal task
 
 Five phases, no quality gates (YAML `quality_gates: []`); typical wall time about 2–4 hours. Shape, validation strings, and `workflow_rules` live in `content.yaml`; this subsection is a digest only.
 
-```
+```text
 research → draft → review → technical-review (optional) → finalize
 ```
 
 ![Content Workflow](diagrams/content-workflow.png)
+
 ```mermaid
 ---
 title: Human-Facing Content Workflow
@@ -745,6 +752,7 @@ flowchart TD
     class tech_review optionalStyle
 ```
 
+
 #### Phases
 
 | Phase | Agent | Persona / role | Primary output |
@@ -758,8 +766,6 @@ flowchart TD
 Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in `context/rules/no-ai-slop.mdc`). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
 
 ### Continuous improvement (`continuous-improvement.yaml`)
-
-<a id="measuring-effectiveness"></a>
 
 Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `workflow-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
 
@@ -836,8 +842,6 @@ These are examples of fixable gaps, not a separate scoring methodology:
 - Tooling drift: repeated bash-for-files or wrong package managers; tighten prompts or rules.
 - Integration cost: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
 - Parallel misuse: duplicated context without time savings; narrow parallel phases to truly independent work.
-
-<a id="retrospective-retrospectiveyaml"></a>
 
 ### Retrospective (`retrospective.yaml`)
 
@@ -956,7 +960,7 @@ The task prompt template deserves particular attention. It carries rule resoluti
 
 Scripts are stored in `context/scripts/` and form the automation layer that turns the framework from a collection of ideas into an operating system with enforcement.
 
-Layout on disk: `generators/` holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); `validators/` holds pre-commit Python checks; `tests/` exercises validators and generators against fixtures; `prepare-commit-msg.*` (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to `Agent-Session:` lines for [Continuous improvement](#measuring-effectiveness) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
+Layout on disk: `generators/` holds workflow and registry generators (today the main entry point is `generate_agents_md.py`); `validators/` holds pre-commit Python checks; `tests/` exercises validators and generators against fixtures; `prepare-commit-msg.*` (see [below](#prepare-commit-msg-hook-agent-tokens-on-commits)) appends token deltas to `Agent-Session:` lines for [Continuous improvement](#continuous-improvement-continuous-improvementyaml) telemetry. Anything invoked from git hooks or CI should stay small, deterministic, and safe to run on every commit.
 
 ### Generators
 
@@ -1017,8 +1021,6 @@ Not wired into pre-commit; run manually. Validates every `.md` file in `context/
 
 ### `prepare-commit-msg` hook (agent tokens on commits)
 
-<a id="prepare-commit-msg-hook-agent-tokens-on-commits"></a>
-
 Files: `context/scripts/prepare-commit-msg.sh` (wrapper that runs `uv run python …/prepare-commit-msg.py`) and `context/scripts/prepare-commit-msg.py` (implementation).
 
 Git calls `prepare-commit-msg` with the path to the commit message draft. The Python script only augments commits that already contain an `Agent-Session:` line (see `context/templates/commit-message-template.md`); if that trailer is absent, it assumes a human-only commit and exits without writing.
@@ -1045,11 +1047,12 @@ The scripts directory includes its own test suite in `context/scripts/tests/`. T
 
 The framework is designed to survive changes in agent runtime or orchestration platform. It uses a **Hexagonal (Ports and Adapters) Architecture**. Agent definitions, workflows, rules, and standards serve as the framework-agnostic "domain logic." They are written in standard Markdown and YAML, and maintained in the `context/` directory.
 
-To run these on specific platforms, the `generate_adapters.py` CLI compiles these canonical sources into native runtime projections. 
+To run these on specific platforms, the `generate_adapters.py` CLI compiles these canonical sources into native runtime projections.
 
 ### Supported Runtime Adapters
 
 The framework ships with deterministic compiler support for four runtimes:
+
 - **Google Antigravity/Gemini**: Generates structured `.agents/skills/` directories, complete with `SKILL.md` frontmatter, and `GEMINI.md`.
 - **Claude Code**: Projects context into `CLAUDE.md` and `.claude/`.
 - **GitHub Copilot**: Projects instructions into `.github/copilot-instructions.md` and custom prompts into `.github/prompts/`.
@@ -1063,7 +1066,7 @@ To prevent the generated projections from drifting out of sync with the canonica
 
 ### Model Tiering (`models.yaml`)
 
-Agent definitions do not hardcode vendor model names (e.g., `claude-3-opus-20240229`). Instead, they declare abstract capability tiers (`small`, `medium`, `large`). 
+Agent definitions do not hardcode vendor model names (e.g., `claude-3-opus-20240229`). Instead, they declare abstract capability tiers (`small`, `medium`, `large`).
 
 The `context/models.yaml` file maps these abstract tiers to concrete vendor models per runtime adapter. When `generate_adapters.py` runs, it resolves the tier declared in an agent's frontmatter into the appropriate vendor string for the target platform.
 
@@ -1253,13 +1256,13 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 ### Evaluating Workflow Health
 
 1. `context/workflows/continuous-improvement.yaml`
-2. [Continuous improvement (`continuous-improvement.yaml`)](#measuring-effectiveness) (this document — effectiveness and incident handling)
+2. [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) (this document — effectiveness and incident handling)
 3. `context/agents/workflow-analyst.md`
 4. `context/standards/workflow-standards.md`
 
 ### Writing Human-Facing Content (Blogs, Papers, Guides)
 
-1. [Content (`content.yaml`)](#human-facing-content-workflow) (this document)
+1. [Content (`content.yaml`)](#content-contentyaml) (this document)
 2. [Writing Personas](#writing-personas) (this document)
 3. `context/workflows/content.yaml`
 4. `context/rules/no-ai-slop.mdc`
@@ -1283,5 +1286,6 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 | 0.1.0   | 2026-04-13 | Initial   | Standalone framework reference: topology, source-of-truth tiers, standards, rules, agents (including personas and tool surfaces), workflows (one subsection per shipped YAML), templates, scripts and hooks, portability, orchestration patterns, reading paths; material from removed standalone docs absorbed here. |
 | 0.2.0   | 2026-04-13 | Editorial | Document metadata and revision history aligned with `context/standards/doc-standards.md` section 8.2; prose emphasis normalised outside fenced examples (fence-safe). |
 | 0.3.0   | 2026-04-13 | Editorial | Versioning policy: `MAJOR.MINOR.PATCH` per [Semantic Versioning 2.0.0](https://semver.org/) (section 8.2); draft documents stay on major version `0`; revision table uses three-part versions. |
+| 0.5.0   | 2026-09-12 | Editorial | Document skills layer in framework topology, source-of-truth tiers, and rules/standards/skills split. |
 
 <!-- typst-skip-end -->

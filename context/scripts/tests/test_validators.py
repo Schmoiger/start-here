@@ -4,14 +4,17 @@ import pytest
 from pathlib import Path
 import sys
 
-# Add parent directory to path so we can import validators
-sys.path.insert(0, str(Path(__file__).parent.parent / 'validators'))
-
-from conventional_commits import validate_commit_message
-from ears_notation import validate_requirements_file, is_ears_requirement
-from british_english import validate_british_english
-from metrics_logging import validate_metrics_file, validate_metrics_entry
-from verify_typst_formatting import check_and_fix_file
+from context.scripts.validators.british_english import validate_british_english
+from context.scripts.validators.conventional_commits import validate_commit_message
+from context.scripts.validators.ears_notation import (
+    is_ears_requirement,
+    validate_requirements_file,
+)
+from context.scripts.validators.metrics_logging import (
+    validate_metrics_entry,
+    validate_metrics_file,
+)
+from context.scripts.validators.verify_typst_formatting import check_and_fix_file
 
 
 class TestConventionalCommits:
@@ -413,3 +416,21 @@ class TestTypstFormatting:
         )
         errors = check_and_fix_file(md_file, fix=False)
         assert len(errors) == 0
+
+    def test_headings_in_code_blocks_ignored(self, tmp_path):
+        """Test that headings inside code blocks are not flagged."""
+        md_file = tmp_path / "code_block.md"
+        md_file.write_text(
+            "# Title\n\n"
+            "---\n\n"
+            "## Real Heading\n\n"
+            "```yaml\n"
+            "## Heading In Code\n"
+            "key: value\n"
+            "```\n\n\n"
+            "---\n\n"
+            "## Another Heading\n"
+        )
+        errors = check_and_fix_file(md_file, fix=False)
+        assert len(errors) == 0
+
