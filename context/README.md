@@ -50,6 +50,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Self-contained, actionable, binary (followed or not)
 - Agents load these via frontmatter
 - Examples: `uv run pytest` works, bare `pytest` fails; `/secrets/*.json` works, `.env` leaks
+- **On Add / Edit / Delete**: Create or edit with frontmatter (`description`, `globs`, `alwaysApply`). When adding or deleting, update applicable `agents/*.md` under `rules:`, then recompile adapters (`uv run python context/scripts/generators/generate_adapters.py`) and verify with `uv run python context/scripts/validators/adapter_drift.py`.
 
 **Standards** (`standards/*.md`):
 
@@ -57,13 +58,15 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Comprehensive reference documentation
 - Agents read on-demand (too verbose to preload)
 - Examples: Python patterns, TDD philosophy, architecture decisions
+- **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `## ` headings (Typst rule). Add to `context/README.md` Quick Reference and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
 
 **Agents** (`agents/*.md`):
 
 - Specialised agent definitions (who does what)
-- Frontmatter lists applicable `rules`, `standards`, and `model`
+- Frontmatter lists applicable `rules`, `standards`, `skills`, and `model`
 - `orchestrator.md` defines orchestrator behaviour — read at session start
 - Orchestrator spawns with Task tool; see AGENTS.md for the complete registry
+- **On Add / Edit / Delete**: Create from `agents/TEMPLATE.md` with required frontmatter (`name`, `model`, `rules`, `standards`, `skills`). Validate via `uv run python context/scripts/validate_agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to project to `AGENTS.md`, `CLAUDE.md`, `.claude/prompts/`, and `.agents/skills/`. Verify with `adapter_drift.py`.
 
 **Model Profiles & Runtime Telemetry LUT** (`models.yaml`):
 
@@ -71,12 +74,14 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Defines abstract intent tiers (`small`, `medium`, `large`) mapped to model families
 - Delegates precise model resolution to runtime adapters / environment configurations
 - Catalogues multi-platform telemetry locations (Git trailers, Claude JSONL & Managed Agents Dreams, Antigravity transcripts)
+- **On Add / Edit / Delete**: Update provider model names or aliases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update model mappings in `GEMINI.md` and `CLAUDE.md`. Verify with `adapter_drift.py`.
 
 **Workflows** (`workflows/*.yaml`):
 
 - Phase definitions, dependencies, quality gates
-- Each phase lists agents, outputs, validation
+- Each phase lists agents, outputs, validation, and skills
 - Source of truth for phase ordering
+- **On Add / Edit / Delete**: Create or edit phase DAG. All referenced agents must exist in `context/agents/`. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to refresh workflow tables in `AGENTS.md` and `CLAUDE.md`. Verify with `adapter_drift.py`.
 
 **Framework reference** (`docs/agentic-framework-reference.md`):
 
@@ -84,23 +89,27 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Orchestration patterns (single, chain, hive, loop — see `docs/agentic-framework-reference.md`; swarm is vision-level only)
 - Writing personas, portability adapters, effectiveness measurement
 - Standards, rules, agents, templates, and scripts at operational depth
+- **On Add / Edit / Delete**: Update architectural documentation. Verify documentation freshness with `uv run python context/scripts/validators/framework_docs_staleness.py`.
 
 **Templates** (`templates/`):
 
 - Output formats for artefacts, handoffs, reviews, git, and agent definitions
 - The orchestrator selects the appropriate template when constructing a task prompt; agents use whichever template the task prompt specifies
 - See `templates/README.md` for the full index
+- **On Add / Edit / Delete**: Create or edit template files. Update `templates/README.md` index. No adapter recompilation needed.
 
 **Skills** (`skills/*.md`):
 
 - Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
 - Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
+- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `## ` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md`. Verify with `adapter_drift.py`.
 
 **Personas** (`persona/*.md`):
 
 - Writing voice/style for human-facing content (blogs, papers, marketing)
 - NOT for technical handoffs (README, API docs, architecture)
 - See `docs/agentic-framework-reference.md` (Writing Personas) for when and how to use them
+- **On Add / Edit / Delete**: Create or edit persona file (`name`, `description`, `traits`). No adapter recompilation needed.
 
 **Scripts** (`scripts/`):
 
@@ -108,6 +117,30 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary, framework docs staleness, Typst formatting)
 - Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
 - Tests (`tests/`): Test suite for validators, runtime adapters, and telemetry extractors
+- **On Add / Edit / Delete**: For standalone scripts, declare dependencies via PEP 723 inline metadata (`# /// script`). Add accompanying tests in `context/scripts/tests/`. Run test suite: `uv run --with pytest pytest context/scripts/tests/ -v`. If generator logic was altered, run `generate_adapters.py` and `adapter_drift.py`.
+
+---
+
+### Summary: When to Recompile Adapters
+
+Whenever you add, edit, or delete canonical context files, recompile projections and verify zero drift:
+
+| Changed Directory | Recompile Required? | Generated Projections | Command |
+|---|---|---|---|
+| `context/skills/` | **Yes** | `AGENTS.md`, `.agents/skills/<name>/SKILL.md` | `uv run python context/scripts/generators/generate_adapters.py` |
+| `context/agents/` | **Yes** | `AGENTS.md`, `CLAUDE.md`, `.claude/prompts/`, `.agents/skills/` | `uv run python context/scripts/generators/generate_adapters.py` |
+| `context/workflows/` | **Yes** | `AGENTS.md`, `CLAUDE.md` (workflow tables) | `uv run python context/scripts/generators/generate_adapters.py` |
+| `context/models.yaml` | **Yes** | `GEMINI.md`, `CLAUDE.md` (model mappings) | `uv run python context/scripts/generators/generate_adapters.py` |
+| `context/rules/` | Only if `agents/*.md` changed | Rule bindings in agent projections | Recompile if agent frontmatter changed |
+| `context/standards/` | Only if `agents/*.md` changed | Standard bindings in agent projections | Recompile if agent frontmatter changed |
+| `context/templates/` | No | None (direct file reference) | Update `templates/README.md` |
+| `context/persona/` | No | None (direct file reference) | None |
+| `context/scripts/` | If generators changed | All projections | `generate_adapters.py` + `pytest context/scripts/tests/` |
+
+Always verify zero drift after recompiling:
+```bash
+uv run python context/scripts/validators/adapter_drift.py
+```
 
 
 ### DRY Between Rules & Standards
