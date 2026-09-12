@@ -14,6 +14,14 @@ class CanonicalStandard:
 
 
 @dataclass
+class CanonicalSkill:
+    name: str
+    description: str
+    globs: list[str] = field(default_factory=list)
+    body: str = ""
+
+
+@dataclass
 class CanonicalAgent:
     name: str
     description: str
@@ -21,6 +29,7 @@ class CanonicalAgent:
     mcp_tools: list[str] = field(default_factory=list)
     standards: list[str] = field(default_factory=list)
     rules: list[str] = field(default_factory=list)
+    skills: list[str] = field(default_factory=list)
 
 
 @dataclass

@@ -5,6 +5,7 @@ import yaml
 
 from context.scripts.generators.adapters.core.models import (
     CanonicalAgent,
+    CanonicalSkill,
     Phase,
     WorkflowDAG,
 )
@@ -29,6 +30,7 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
 
     agents: dict[str, CanonicalAgent] = {}
     workflows: dict[str, WorkflowDAG] = {}
+    skills: dict[str, CanonicalSkill] = {}
 
     # Parse agents
     agents_dir = context_path / "agents"
@@ -44,6 +46,21 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
                     mcp_tools=frontmatter.get("mcp_tools", []),
                     standards=frontmatter.get("standards", []),
                     rules=frontmatter.get("rules", []),
+                    skills=frontmatter.get("skills", []),
+                )
+
+    # Parse skills
+    skills_dir = context_path / "skills"
+    if skills_dir.exists():
+        for file_path in sorted(skills_dir.glob("*.md")):
+            content = file_path.read_text()
+            frontmatter, body = extract_frontmatter(content)
+            if "name" in frontmatter:
+                skills[frontmatter["name"]] = CanonicalSkill(
+                    name=frontmatter["name"],
+                    description=frontmatter.get("description", ""),
+                    globs=frontmatter.get("globs", []),
+                    body=body.strip(),
                 )
 
     # Parse workflows
@@ -75,4 +92,4 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
                     phases=phases,
                 )
 
-    return {"agents": agents, "workflows": workflows}
+    return {"agents": agents, "workflows": workflows, "skills": skills}

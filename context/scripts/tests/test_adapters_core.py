@@ -10,6 +10,7 @@ from context.scripts.generators.adapters.core.loader import load_canonical_conte
 # These imports will fail initially because the modules don't exist yet
 from context.scripts.generators.adapters.core.models import (
     CanonicalAgent,
+    CanonicalSkill,
     Phase,
     WorkflowDAG,
 )
@@ -29,6 +30,18 @@ class TestAdaptersCoreModels(unittest.TestCase):
         self.assertEqual(agent.name, "test-agent")
         self.assertEqual(agent.model, "sonnet")
         self.assertIn("tool1", agent.mcp_tools)
+
+    def test_canonical_skill_dataclass(self):
+        skill = CanonicalSkill(
+            name="test-skill",
+            description="A test skill",
+            globs=["**/*.py"],
+            body="Skill instructions",
+        )
+        self.assertEqual(skill.name, "test-skill")
+        self.assertEqual(skill.description, "A test skill")
+        self.assertEqual(skill.globs, ["**/*.py"])
+        self.assertEqual(skill.body, "Skill instructions")
 
 
 import tempfile
