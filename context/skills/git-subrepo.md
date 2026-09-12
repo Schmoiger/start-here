@@ -103,6 +103,7 @@ git subrepo push context
 ### Automated Synchronisation
 
 In `start-here`, the GitHub Actions workflow `.github/workflows/sync-standards.yml` automatically extracts `context/` changes on merges to `main`:
+
 1. Runs `git subrepo branch context -f`.
 2. Pushes the isolated context branch directly to `origin/standards`.
 
@@ -128,7 +129,9 @@ git push origin subrepo/context:standards
 ### Issue: "Working tree has unstaged changes"
 
 **Cause**: `git-subrepo` requires a clean working directory before executing pulls or pushes.
+
 **Resolution**:
+
 ```bash
 git stash push -m "temp-subrepo-stash"
 git subrepo pull context
@@ -138,7 +141,9 @@ git stash pop
 ### Issue: Merge Conflict During `git subrepo pull`
 
 **Cause**: Divergent changes exist in both local `context/` files and upstream commits.
+
 **Resolution**:
+
 1. Inspect conflicting files indicated in git output.
 2. Resolve conflict markers manually in your editor.
 3. Mark files as resolved: `git add <resolved-files>`.
@@ -148,7 +153,9 @@ git stash pop
 ### Issue: Out-of-Sync Tracking or Corrupted Branch Anchor
 
 **Cause**: Upstream branch was force-pushed or history diverged unexpectedly.
+
 **Resolution**:
+
 ```bash
 # Check subrepo diagnostic status
 git subrepo status context

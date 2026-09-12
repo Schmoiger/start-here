@@ -32,14 +32,15 @@
    - [Content (`content.yaml`)](#content-contentyaml)
    - [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml)
    - [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml)
-   - [Other workflows](#other-workflows)
-9. [Orchestration Patterns](#orchestration-patterns)
-10. [Templates](#templates)
-11. [Scripts and Automation](#scripts-and-automation)
-12. [Portability and Framework Adapters](#portability-and-framework-adapters)
-13. [How the Parts Connect](#how-the-parts-connect)
-14. [Reading Paths](#reading-paths)
-15. [Revision History](#revision-history)
+10. [Orchestration Patterns](#orchestration-patterns)
+11. [Templates](#templates)
+12. [Scripts and Automation](#scripts-and-automation)
+13. [Portability and Framework Adapters](#portability-and-framework-adapters)
+14. [How the Parts Connect](#how-the-parts-connect)
+15. [Reading Paths](#reading-paths)
+16. [Revision History](#revision-history)
+
+<a id="how-to-use-this-reference"></a>
 
 ---
 
@@ -231,7 +232,7 @@ The body of the rule is concise instruction text, typically structured as a tabl
 
 ### Example: Python Environment Rule
 
-```
+```markdown
 | Action          | Correct               | Wrong                         |
 |-----------------|-----------------------|-------------------------------|
 | Run tests       | uv run pytest         | pytest                        |
@@ -295,6 +296,22 @@ A candidate for a new rule should pass three tests:
 3. Is it actionable? Can you give clear DO/DON'T commands?
 
 If all three are true, create a rule in `rules/*.mdc` and keep it under 200 tokens. If the topic requires nuance, explanation, or judgement, it belongs in a standard, not a rule.
+
+---
+
+## Skills
+
+Skills are procedural guidance documents stored in `context/skills/` as `.md` files. They provide step-by-step operational instructions and best practices for specific workflows or unusual technology boundaries (for example, `git-subrepo` context synchronisation or `uv` script execution with PEP 723 metadata).
+
+### How Skills Work
+
+Skills differ from rules and standards:
+
+- **Rules** are short (<200 tokens) binary constraints injected into spawn prompts.
+- **Standards** explain the foundational engineering principles and rationale on demand.
+- **Skills** provide operational runbooks and procedural steps for complex tools.
+
+Canonical skills in `context/skills/` are compiled into runtime projections (such as `.agents/skills/` for Antigravity) via `context/scripts/generators/generate_adapters.py`. Agents declare dependencies on skills via the `skills:` list in their frontmatter, and available skills are indexed in `AGENTS.md`.
 
 ---
 
@@ -542,7 +559,7 @@ Pattern: Subtask-driven TDD with automated coverage gate, per-sprint review, loc
 
 Sixteen phases (plus a sprint loop that repeats for each sprint in `subtask-plan.yaml`). High-level shape:
 
-```
+```text
 task-planning → tasks-review (gate) → schema-migration →
   [ per sprint: tdd-red → test-plan-review → tdd-green → coverage-gate (gate) →
     tdd-blue → sprint-review ] →
@@ -574,6 +591,7 @@ Build gates (see `quality_gates` in `build.yaml`): `tasks-review` (approval), `c
 Subtask execution: RED, GREEN, and BLUE run as orchestrated subtasks per stream (Python and TypeScript can progress in parallel with disjoint `file_scope`). Recovery uses `HANDOFF.md`, `artefacts/build/dispatch.md`, and `subtask-plan.yaml` status fields (see `state_recovery` in `build.yaml`).
 
 ![Build Workflow](diagrams/build-workflow.png)
+
 ```mermaid
 ---
 title: Default delivery (high level)
@@ -602,11 +620,12 @@ Use for: POCs, experiments, spikes, throwaway code.
 
 The prototype workflow trades rigour for speed: 4 phases, no quality gates, 5 agents.
 
-```
+```text
 quick-plan → sketch-design → build → validate (optional)
 ```
 
 ![Prototype Workflow](diagrams/prototype-workflow.png)
+
 ```mermaid
 ---
 title: Prototype Workflow
@@ -708,11 +727,12 @@ Do not use for: Technical handoffs, API or architecture reference, internal task
 
 Five phases, no quality gates (YAML `quality_gates: []`); typical wall time about 2–4 hours. Shape, validation strings, and `workflow_rules` live in `content.yaml`; this subsection is a digest only.
 
-```
+```text
 research → draft → review → technical-review (optional) → finalize
 ```
 
 ![Content Workflow](diagrams/content-workflow.png)
+
 ```mermaid
 ---
 title: Human-Facing Content Workflow
@@ -1052,11 +1072,12 @@ The scripts directory includes its own test suite in `context/scripts/tests/`. T
 
 The framework is designed to survive changes in agent runtime or orchestration platform. It uses a **Hexagonal (Ports and Adapters) Architecture**. Agent definitions, workflows, rules, and standards serve as the framework-agnostic "domain logic." They are written in standard Markdown and YAML, and maintained in the `context/` directory.
 
-To run these on specific platforms, the `generate_adapters.py` CLI compiles these canonical sources into native runtime projections. 
+To run these on specific platforms, the `generate_adapters.py` CLI compiles these canonical sources into native runtime projections.
 
 ### Supported Runtime Adapters
 
 The framework ships with deterministic compiler support for four runtimes:
+
 - **Google Antigravity/Gemini**: Generates structured `.agents/skills/` directories, complete with `SKILL.md` frontmatter, and `GEMINI.md`.
 - **Claude Code**: Projects context into `CLAUDE.md` and `.claude/`.
 - **GitHub Copilot**: Projects instructions into `.github/copilot-instructions.md` and custom prompts into `.github/prompts/`.
@@ -1070,7 +1091,7 @@ To prevent the generated projections from drifting out of sync with the canonica
 
 ### Model Tiering (`models.yaml`)
 
-Agent definitions do not hardcode vendor model names (e.g., `claude-3-opus-20240229`). Instead, they declare abstract capability tiers (`small`, `medium`, `large`). 
+Agent definitions do not hardcode vendor model names (e.g., `claude-3-opus-20240229`). Instead, they declare abstract capability tiers (`small`, `medium`, `large`).
 
 The `context/models.yaml` file maps these abstract tiers to concrete vendor models per runtime adapter. When `generate_adapters.py` runs, it resolves the tier declared in an agent's frontmatter into the appropriate vendor string for the target platform.
 

@@ -58,7 +58,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Comprehensive reference documentation
 - Agents read on-demand (too verbose to preload)
 - Examples: Python patterns, TDD philosophy, architecture decisions
-- **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `## ` headings (Typst rule). Add to `context/README.md` Quick Reference and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
+- **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `##` headings (Typst rule). Add to `context/README.md` Quick Reference and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
 
 **Agents** (`agents/*.md`):
 
@@ -102,7 +102,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 - Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
 - Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
-- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `## ` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md`. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `##` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md`. Verify with `adapter_drift.py`.
 
 **Personas** (`persona/*.md`):
 
@@ -138,6 +138,7 @@ Whenever you add, edit, or delete canonical context files, recompile projections
 | `context/scripts/` | If generators changed | All projections | `generate_adapters.py` + `pytest context/scripts/tests/` |
 
 Always verify zero drift after recompiling:
+
 ```bash
 uv run python context/scripts/validators/adapter_drift.py
 ```
@@ -190,7 +191,7 @@ See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.y
 
 ## Directory Structure
 
-```
+```text
 context/
 ├── README.md                      # This file
 ├── standards/                     # Reference docs (how to do things well)
@@ -263,13 +264,17 @@ graph LR
 ### 1. Prerequisites
 
 Downstream workstations and CI runners require:
+
 1. **Git** (version 2.30+)
 2. **`git-subrepo`**:
+
    ```bash
    brew install git-subrepo
    ```
+
    *Note: Ensure Bash 4+ is available in your PATH (`brew install bash`).*
 3. **`uv`**:
+
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
@@ -279,6 +284,7 @@ Downstream workstations and CI runners require:
 To adopt the framework in a new or existing repository:
 
 #### Step 1: Import Canonical Context
+
 Run `git subrepo clone` targeting the upstream `standards` branch:
 
 ```bash
@@ -288,6 +294,7 @@ git subrepo clone git@github.com:Schmoiger/start-here.git context -b standards
 This creates a local `context/` directory with its own `.gitrepo` tracking file. To developers on your team, `context/` appears as regular files in git—no detached `HEAD` states or recursive submodule commands are needed.
 
 #### Step 2: Configure Pre-Commit Hooks
+
 Add the adapter drift validator to your downstream `.pre-commit-config.yaml`:
 
 ```yaml
@@ -302,11 +309,13 @@ repos:
 ```
 
 Install the pre-commit hook:
+
 ```bash
 uv run pre-commit install
 ```
 
 #### Step 3: Compile Runtime Projections
+
 Run the adapter generator to produce runtime projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.):
 
 ```bash
@@ -314,6 +323,7 @@ uv run python context/scripts/generators/generate_adapters.py
 ```
 
 Commit the generated projections:
+
 ```bash
 git add .
 git commit -m "chore(infra): import standards via git-subrepo and compile projections"
@@ -322,6 +332,7 @@ git commit -m "chore(infra): import standards via git-subrepo and compile projec
 ### 3. Ongoing Synchronisation Workflows
 
 #### Pulling Upstream Updates
+
 When standards, rules, or agent definitions are updated in `start-here`, pull changes into your downstream repository:
 
 ```bash
@@ -340,6 +351,7 @@ git commit -m "chore(standards): update canonical context and regenerate adapter
 ```
 
 #### Pushing Improvements Back Upstream
+
 If your project enhances or fixes a standard, rule, or agent prompt inside `context/`, you can push the improvement back to the upstream `standards` branch:
 
 ```bash
@@ -366,7 +378,9 @@ uv run pytest context/scripts/tests -v
 The `start-here` repository automatically maintains the upstream `standards` distribution branch using the GitHub Actions workflow in `.github/workflows/sync-standards.yml`:
 
 #### Automated Synchronisation
+
 Whenever pull requests touching `context/**` are merged into `master`, the `sync-standards` workflow:
+
 1. Checks out the repository with complete commit history (`fetch-depth: 0`).
 2. Installs `git-subrepo`.
 3. Runs `git subrepo branch context -f` to isolate `context/` commits into a clean distribution branch.
@@ -375,6 +389,7 @@ Whenever pull requests touching `context/**` are merged into `master`, the `sync
 This ensures downstream projects always receive the latest approved standards via `git subrepo pull context` without requiring manual extraction by maintainers.
 
 #### Manual Fallback
+
 Maintainers can also manually extract and push the `standards` distribution branch locally:
 
 ```bash
@@ -413,9 +428,11 @@ The framework tracks cumulative token consumption directly from the underlying A
    - **Copilot & Claude**: Watermark stores the file byte offset and `seek()`s directly to newly appended lines.
 3. **Transparent Error Surfacing over Silent Failure**:
    - If an agent commit trailer (`Agent-Session:`) is present but telemetry extraction fails (e.g., unexpected schema change or missing session), the hook injects:
+
      ```text
      Agent-Session: tool=antigravity model=gemini-flash ... tokens=error(schema_drift)
      ```
+
    - Diagnostic warnings are written to `stderr`, and the commit is allowed to succeed with exit code 0.
 4. **Brittleness & Maintenance**:
    - Neither Antigravity nor Copilot provides a public, frozen API for local telemetry; extraction relies on internal storage patterns.
