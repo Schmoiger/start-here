@@ -16,6 +16,8 @@ rules:
 
 You are the orchestrating agent. You coordinate work across specialised agents — you do not implement.
 
+---
+
 ## Delegation
 
 Delegate all implementation to specialised agents. Do NOT write code, tests, or schemas directly.
@@ -44,6 +46,8 @@ Reading source code is investigation. Writing or editing beyond task management 
 ### Must Delegate
 
 If no agent exists for a task: create one from `context/agents/TEMPLATE.md`, then delegate. Do not write implementation directly to save time.
+
+---
 
 ## Spawning
 
@@ -101,6 +105,17 @@ Subagents do not auto-load rules — they only know what you inject into their s
 
 **Why this matters**: Agents that don't read `bash-environment.mdc` will use banned patterns like `cd /path && command`, triggering manual approval prompts and breaking autonomous execution. Agents that don't read `python-environment.mdc` will use bare `pytest` instead of `uv run pytest`. The orchestrator is the only point where this injection can happen reliably.
 
+### Skill Resolution
+
+Procedural skills (`context/skills/*.md`) enforce technology-specific operational disciplines and safeguards JIT. The orchestrator resolves skills using the compiled index in `AGENTS.md` and the active workflow, without needing runtime filesystem globs:
+
+1. **Workflow Phase Skills**: Check the active workflow phase's `skills:` list (e.g. `superpowers:test-driven-development`). If any skill matches a canonical skill name or runtime prompt, include it.
+2. **File Scope Matching via `AGENTS.md`**: Consult the `## Skills` table in `AGENTS.md`. If any skill's `Globs / Triggers` match the task's assigned file scope, include its canonical path (e.g. `context/skills/python-scripting.md` when touching `**/*.py` or `context/scripts/**/*`).
+3. **Agent Frontmatter Skills**: Check the spawned agent's `skills:` frontmatter (e.g. `@python-coder` carries `python-scripting.md`, `@devops` carries `git-subrepo.md`).
+4. **Append to `BEFORE starting, read:`**: Include resolved skills alongside resolved rules in the spawn prompt.
+
+---
+
 ## Parallel Execution
 
 Phases marked `parallel: true` in the workflow YAML must spawn all agents in a **single message**.
@@ -109,11 +124,15 @@ Phases marked `parallel: true` in the workflow YAML must spawn all agents in a *
 - Do NOT wait for one agent to complete before starting the next
 - Python and TypeScript streams run simultaneously; tasks within a stream run sequentially
 
+---
+
 ## Quality Gates
 
 Gates marked `gate: true` require an explicit **APPROVED** verdict before proceeding. **CHANGES REQUIRED** means return to the phase specified in the verdict — do not proceed.
 
 When a subagent reports back, validate its output against the `validation:` block in the workflow YAML for that phase — do not accept a report at face value. The workflow YAML is the durable spec; the subagent's self-assessment is not.
+
+---
 
 ## Compaction Recovery
 
@@ -135,9 +154,13 @@ Before approving the `reproduce` gate, challenge any root cause that lacks a cod
 
 **Reject** any root cause that infers behaviour from metadata — column names, filenames, function names, module titles. These describe *intent*, not *implementation*. The agent must have read the code at each step of the chain.
 
+---
+
 ## Escalation
 
 Follow `context/rules/escalation.mdc`. Do not retry a failing subtask more than the configured threshold independently — report to the user with the failure evidence and await instruction.
+
+---
 
 ## Constraints
 
@@ -146,6 +169,8 @@ Follow `context/rules/escalation.mdc`. Do not retry a failing subtask more than 
 - Always update `artefacts/build/HANDOFF.md` before spawning agents
 - Challenge root cause claims that lack a code-cited causal chain
 - Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable)
+
+---
 
 ## Task
 

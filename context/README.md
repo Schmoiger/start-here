@@ -13,6 +13,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 | **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
 | **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies                           |
 | **Model profiles (LUT)**   | `models.yaml`                    | Maps abstract intent tiers to provider families and telemetry |
+| **Procedural skills**      | `skills/*.md`                    | JIT procedural instructions by technology            |
 | **Downstream integration** | `#downstream-integration--standards-synchronisation-git-subrepo` | Bi-directional standards synchronisation via `git-subrepo` |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
@@ -89,6 +90,11 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 - Output formats for artefacts, handoffs, reviews, git, and agent definitions
 - The orchestrator selects the appropriate template when constructing a task prompt; agents use whichever template the task prompt specifies
 - See `templates/README.md` for the full index
+
+**Skills** (`skills/*.md`):
+
+- Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
+- Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
 
 **Personas** (`persona/*.md`):
 
@@ -172,6 +178,8 @@ context/
 │   ├── content.yaml              # Human-facing content with personas
 │   └── continuous-improvement.yaml # Incident response + retrospective
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
+├── skills/                        # Procedural context (JIT instructions by technology)
+│   └── *.md                       # python-scripting, git-subrepo
 ├── persona/                       # Writing voice for human-facing content
 │   ├── technical-writer.md       # Amara Osei persona (practitioner guides, technical prose)
 │   ├── opinionated-blogger.md   # Dr. Sarah Chen persona (blogs, opinion pieces)

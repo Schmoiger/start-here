@@ -21,6 +21,10 @@ BEFORE starting, read:
   - context/standards/testing-standards.md      (test tasks)
   - context/standards/doc-standards.md          (documentation tasks)
   - context/templates/README.md                 (tasks that produce a templated artefact)}
+{resolved-skills — orchestrator: resolve using Skill Resolution in orchestrator.md.
+ List matching procedural skills from the ## Skills index in AGENTS.md, e.g.:
+  5. context/skills/python-scripting.md         (tasks touching Python files or scripts)
+  6. context/skills/git-subrepo.md              (tasks touching context/ or .gitrepo)}
 
 ESCALATION (MANDATORY):
 Log to `artefacts/build/agent-interruptions.md` under the current sprint section
