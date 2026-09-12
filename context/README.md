@@ -235,7 +235,7 @@ context/
 
 ## Downstream Integration & Standards Synchronisation (`git-subrepo`)
 
-**Golden source**: `start-here` repository (`main` branch)
+**Golden source**: `agents-framework` repository (`main` branch)
 
 The framework distributes canonical context as a self-contained directory (`context/`). Downstream repositories import standards, workflows, and agents without inheriting project-specific tracking state (`artefacts/build/`, `artefacts/product/`, or application code).
 
@@ -288,7 +288,7 @@ To adopt the framework in a new or existing repository:
 Run `git subrepo clone` targeting the upstream `standards` branch:
 
 ```bash
-git subrepo clone git@github.com:Schmoiger/start-here.git context -b standards
+git subrepo clone https://github.com/Schmoiger/agents-framework.git context -b main
 ```
 
 This creates a local `context/` directory with its own `.gitrepo` tracking file. To developers on your team, `context/` appears as regular files in git—no detached `HEAD` states or recursive submodule commands are needed.
@@ -333,7 +333,7 @@ git commit -m "chore(infra): import standards via git-subrepo and compile projec
 
 #### Pulling Upstream Updates
 
-When standards, rules, or agent definitions are updated in `start-here`, pull changes into your downstream repository:
+When standards, rules, or agent definitions are updated in `agents-framework`, pull changes into your downstream repository:
 
 ```bash
 # 1. Pull upstream changes into context/
@@ -363,7 +363,7 @@ uv run pytest context/scripts/tests -v
 git subrepo push context
 ```
 
-Once pushed, open a Pull Request in `start-here` from the `standards` branch to `main` for review.
+Once pushed, changes are committed upstream to `agents-framework` `main`.
 
 ### 4. Testing Downstream Standards
 

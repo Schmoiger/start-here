@@ -5,7 +5,8 @@
 ;
 [subrepo]
 	remote = https://github.com/Schmoiger/start-here.git
-	branch = standards
-	commit = 71a38a44d8691651d1106f00c47e079b5817636a
+	branch = main
+	commit = 824082b3381aae07e09d9db7b703bf1f6b31490d
 	method = merge
 	cmdver = 0.4.9
+	parent = 0dae346d18074af79197adaae34f0d648628e701
