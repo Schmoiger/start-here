@@ -1,0 +1,170 @@
+---
+name: git-subrepo
+description: Procedural instructions and operational guidance for managing canonical context and upstream/downstream synchronisation using git-subrepo.
+globs: ["**/.gitrepo", "context/**"]
+---
+
+# Git Subrepo Skill
+
+Just-in-time procedural instructions, commands, and operational safeguards for synchronising the canonical `context/` directory across repositories using `git-subrepo`.
+
+---
+
+## Core Architecture & Principles
+
+The framework maintains canonical standards, rules, agents, and workflows in `start-here` (`main` branch) and isolates them onto an upstream `standards` distribution branch. Downstream projects consume this canonical context as a subrepo under the `context/` directory.
+
+### Key Conceptual Differences
+
+| Subrepo Characteristic | How It Works | Advantage over Git Submodules |
+|------------------------|--------------|--------------------------------|
+| **Native Filesystem Presence** | Files under `context/` exist as regular git objects in the host repository. | Cloners don't need `--recurse-submodules` or `git submodule init`. |
+| **Commit Tracking** | Subrepo history is tracked inside a single metadata file (`context/.gitrepo`). | No detached `HEAD` states or accidental pointer desynchronisation. |
+| **Bi-Directional Sync** | Downstream repositories can pull upstream updates or push improvements back. | Framework improvements made during application development can be upstreamed. |
+
+---
+
+## Strict Invariants
+
+1. **NEVER Hand-Edit `.gitrepo`**:
+   The `context/.gitrepo` file is machine-maintained by the `git-subrepo` command. Manual edits risk corrupting tracking state, commit hashes, and upstream merge anchors.
+2. **Clean Working Tree Required**:
+   `git subrepo pull` and `git subrepo push` create temporary commit trees and will refuse to execute if the working tree has uncommitted or staged changes. Always verify `git status` before running subrepo commands.
+3. **Prerequisites in Environment**:
+   - `git` version 2.30+
+   - `git-subrepo` (installed via `brew install git-subrepo`)
+   - `bash` version 4.0+ available in PATH (`brew install bash`)
+
+---
+
+## Downstream Workflows (Consuming Repositories)
+
+### 1. Initial Project Adoption
+
+To import the framework into a new or existing repository:
+
+```bash
+# Clone the standards distribution branch into context/
+git subrepo clone https://github.com/Schmoiger/start-here.git context -b standards
+
+# Compile native runtime adapter projections
+uv run python context/scripts/generators/generate_adapters.py
+
+# Verify zero drift
+uv run python context/scripts/validators/adapter_drift.py
+
+# Commit initial context and generated projections
+git add -A
+git commit -m "chore(infra): import standards via git-subrepo and compile projections"
+```
+
+### 2. Pulling Upstream Updates
+
+When the upstream framework introduces improvements or fixes:
+
+```bash
+# Step 1: Ensure local working tree is clean
+git status
+
+# Step 2: Pull latest updates from the upstream standards branch
+git subrepo pull context
+
+# Step 3: Re-compile runtime adapter projections
+uv run python context/scripts/generators/generate_adapters.py
+
+# Step 4: Verify zero drift
+uv run python context/scripts/validators/adapter_drift.py
+
+# Step 5: Commit updated projections and synchronized context
+git add -A
+git commit -m "chore(standards): update canonical context and regenerate adapters"
+```
+
+### 3. Pushing Improvements Back Upstream
+
+When you improve a rule, agent prompt, or workflow in `context/` during downstream development:
+
+```bash
+# Step 1: Verify tests and adapter drift pass locally
+uv run python context/scripts/validators/adapter_drift.py
+uv run --with pytest pytest context/scripts/tests/ -v
+
+# Step 2: Push context/ changes directly upstream to the standards branch
+git subrepo push context
+
+# Step 3: Create a Pull Request in the upstream repository
+# Open a PR from the 'standards' branch to 'main' in start-here for review.
+```
+
+---
+
+## Upstream Workflows (`start-here` Maintainers)
+
+### Automated Synchronisation
+
+In `start-here`, the GitHub Actions workflow `.github/workflows/sync-standards.yml` automatically extracts `context/` changes on merges to `main`:
+1. Runs `git subrepo branch context -f`.
+2. Pushes the isolated context branch directly to `origin/standards`.
+
+### Manual Extraction Fallback
+
+If automated upstream synchronisation needs to be triggered manually:
+
+```bash
+# Step 1: Verify working tree is clean
+git status
+
+# Step 2: Extract context/ into the local subrepo branch (requires Bash 4+)
+git subrepo branch context -f
+
+# Step 3: Push the subrepo branch to origin standards
+git push origin subrepo/context:standards
+```
+
+---
+
+## Troubleshooting & Common Pitfalls
+
+### Issue: "Working tree has unstaged changes"
+
+**Cause**: `git-subrepo` requires a clean working directory before executing pulls or pushes.
+**Resolution**:
+```bash
+git stash push -m "temp-subrepo-stash"
+git subrepo pull context
+git stash pop
+```
+
+### Issue: Merge Conflict During `git subrepo pull`
+
+**Cause**: Divergent changes exist in both local `context/` files and upstream commits.
+**Resolution**:
+1. Inspect conflicting files indicated in git output.
+2. Resolve conflict markers manually in your editor.
+3. Mark files as resolved: `git add <resolved-files>`.
+4. Finalise merge: `git commit -m "merge(context): resolve subrepo conflicts"`.
+5. Run `git subrepo clean context` if temporary tracking branches persist.
+
+### Issue: Out-of-Sync Tracking or Corrupted Branch Anchor
+
+**Cause**: Upstream branch was force-pushed or history diverged unexpectedly.
+**Resolution**:
+```bash
+# Check subrepo diagnostic status
+git subrepo status context
+
+# Force pull upstream commit tree if required
+git subrepo pull context --force
+```
+
+---
+
+## JIT Operational Matrix
+
+| Scenario | Primary Command | Pre-flight Check | Post-flight Verification |
+|----------|-----------------|------------------|--------------------------|
+| Initial setup | `git subrepo clone <url> context -b standards` | Clean git status | `generate_adapters.py` + `git status` |
+| Pull updates | `git subrepo pull context` | `git status` clean | `generate_adapters.py` + `adapter_drift.py` |
+| Push changes | `git subrepo push context` | `adapter_drift.py` + unit tests pass | Upstream PR created from `standards` |
+| Diagnostic check | `git subrepo status context` | None | Verify remote, branch, and commit match `.gitrepo` |
+| Cleanup temp branches | `git subrepo clean context` | Unfinished subrepo op | Temporary refs removed |
