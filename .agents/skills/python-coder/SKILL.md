@@ -17,16 +17,12 @@ Writes production Python code with testing in mind. Use when you need to create 
 - doc-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- python-environment.mdc
-- secrets-management.mdc
-- supabase.mdc
-- tdd-workflow.mdc
-- type-safety.mdc
-- output-locations.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- python-environment.md
+- secrets.md
+- supabase.md
+- tech-writing.md
+- testing.md
+- workspace-conventions.md
 

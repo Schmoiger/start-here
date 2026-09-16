@@ -17,8 +17,8 @@ Reviews designs and implementations against LESS Engineering Principles (Lean, E
 - context-framework.md
 
 ## Rules
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 

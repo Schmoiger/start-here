@@ -10,10 +10,8 @@ Coordinates workflow execution, delegates implementation to specialised agents, 
 - @context/standards/workflow-standards.md
 
 ## Rules
-- @context/rules/bash-environment.mdc
-- @context/rules/escalation.mdc
-- @context/rules/git-commits.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/output-locations.mdc
-- @context/rules/british-english.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

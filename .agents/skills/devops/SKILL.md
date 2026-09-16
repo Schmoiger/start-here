@@ -15,11 +15,10 @@ Deploys and validates infrastructure. Two modes — (1) Supabase local/staging: 
 - build-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- supabase.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- secrets.md
+- supabase.md
+- tech-writing.md
+- workspace-conventions.md
 

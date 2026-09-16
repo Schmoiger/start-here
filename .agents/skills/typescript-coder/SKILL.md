@@ -18,18 +18,12 @@ Builds frontend or backend TypeScript, integrating with Python APIs. Use when cr
 - doc-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- typescript-environment.mdc
-- secrets-management.mdc
-- tdd-workflow.mdc
-- type-safety.mdc
-- output-locations.mdc
-- bash-environment.mdc
-- browser-automation.mdc
-- ui-component-reuse.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
-- visual-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- secrets.md
+- tech-writing.md
+- testing.md
+- typescript-environment.md
+- ui-dev.md
+- workspace-conventions.md
 

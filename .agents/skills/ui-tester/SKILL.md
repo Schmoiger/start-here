@@ -16,11 +16,9 @@ Tests UI behaviour using Chrome DevTools and browser automation. Use for end-to-
 - context-framework.md
 
 ## Rules
-- british-english.mdc
-- bash-environment.mdc
-- browser-automation.mdc
-- ui-component-reuse.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- visual-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- ui-testing.md
+- workspace-conventions.md
 

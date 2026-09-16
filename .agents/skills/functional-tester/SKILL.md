@@ -17,16 +17,12 @@ Writes and runs tests for Python and TypeScript code using Detroit-school TDD (i
 - doc-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- python-environment.mdc
-- supabase.mdc
-- typescript-environment.mdc
-- tdd-workflow.mdc
-- output-locations.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- quality-gates.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- python-environment.md
+- supabase.md
+- tech-writing.md
+- testing.md
+- typescript-environment.md
+- workspace-conventions.md
 

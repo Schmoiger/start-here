@@ -14,9 +14,8 @@ Transforms vague user requests into structured requirements and user stories. Us
 - doc-standards.md
 
 ## Rules
-- EARS-notation-requirements.mdc
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 

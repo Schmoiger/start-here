@@ -14,7 +14,8 @@ Analyzes workflow efficiency by examining handoffs, tasks, git history, token us
 - @context/standards/tech-standards.md
 
 ## Rules
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

@@ -13,13 +13,11 @@ Reviews code for architecture compliance, consistency, and engineering standards
 - @context/standards/context-framework.md
 
 ## Rules
-- @context/rules/git-commits.mdc
-- @context/rules/british-english.mdc
-- @context/rules/EARS-notation-requirements.mdc
-- @context/rules/supabase.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/quality-gates.mdc
-- @context/rules/escalation.mdc
-- @context/rules/architecture-fidelity.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/secrets.md
+- @context/rules/supabase.md
+- @context/rules/tech-writing.md
+- @context/rules/testing.md
+- @context/rules/workspace-conventions.md
 

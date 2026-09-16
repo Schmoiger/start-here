@@ -15,8 +15,9 @@ Identifies security vulnerabilities using threat modelling and code analysis. Us
 - context-framework.md
 
 ## Rules
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- secrets.md
+- tech-writing.md
+- workspace-conventions.md
 

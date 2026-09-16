@@ -18,13 +18,11 @@ Reviews code for architecture compliance, consistency, and engineering standards
 - context-framework.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- EARS-notation-requirements.mdc
-- supabase.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- quality-gates.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- secrets.md
+- supabase.md
+- tech-writing.md
+- testing.md
+- workspace-conventions.md
 

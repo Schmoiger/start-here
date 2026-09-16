@@ -16,10 +16,9 @@ Designs user interfaces, component layouts, design systems, and visual assets. U
 - tech-standards.md
 
 ## Rules
-- british-english.mdc
-- bash-environment.mdc
-- ui-component-reuse.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- visual-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- ui-dev.md
+- workspace-conventions.md
 

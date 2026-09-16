@@ -13,18 +13,12 @@ Builds frontend or backend TypeScript, integrating with Python APIs. Use when cr
 - @context/standards/doc-standards.md
 
 ## Rules
-- @context/rules/git-commits.mdc
-- @context/rules/british-english.mdc
-- @context/rules/typescript-environment.mdc
-- @context/rules/secrets-management.mdc
-- @context/rules/tdd-workflow.mdc
-- @context/rules/type-safety.mdc
-- @context/rules/output-locations.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/browser-automation.mdc
-- @context/rules/ui-component-reuse.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
-- @context/rules/architecture-fidelity.mdc
-- @context/rules/visual-fidelity.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/secrets.md
+- @context/rules/tech-writing.md
+- @context/rules/testing.md
+- @context/rules/typescript-environment.md
+- @context/rules/ui-dev.md
+- @context/rules/workspace-conventions.md
 

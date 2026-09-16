@@ -9,9 +9,8 @@ Transforms vague user requests into structured requirements and user stories. Us
 - @context/standards/doc-standards.md
 
 ## Rules
-- @context/rules/EARS-notation-requirements.mdc
-- @context/rules/british-english.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

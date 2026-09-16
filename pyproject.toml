@@ -54,6 +54,10 @@ select = [
     "F",  # pyflakes
     "I",  # isort
 ]
+ignore = [
+    "E402",  # Module level import not at top of file
+    "E501",  # Line too long
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

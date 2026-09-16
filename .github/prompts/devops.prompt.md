@@ -10,11 +10,10 @@ Deploys and validates infrastructure. Two modes — (1) Supabase local/staging: 
 - @context/standards/build-standards.md
 
 ## Rules
-- @context/rules/git-commits.mdc
-- @context/rules/british-english.mdc
-- @context/rules/supabase.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
-- @context/rules/architecture-fidelity.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/secrets.md
+- @context/rules/supabase.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

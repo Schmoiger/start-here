@@ -10,9 +10,8 @@ Performs detailed PR-style code review focusing on bugs, edge cases, and maintai
 - @context/standards/context-framework.md
 
 ## Rules
-- @context/rules/british-english.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/quality-gates.mdc
-- @context/rules/escalation.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

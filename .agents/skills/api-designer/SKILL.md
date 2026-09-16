@@ -16,10 +16,8 @@ Designs RESTful and GraphQL APIs with OpenAPI specifications. Use when defining 
 - security-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 

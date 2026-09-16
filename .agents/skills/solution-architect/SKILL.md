@@ -15,10 +15,8 @@ Designs system architecture, component boundaries, and data flow. Use after requ
 - coding-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 

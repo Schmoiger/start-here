@@ -15,10 +15,8 @@ Coordinates workflow execution, delegates implementation to specialised agents, 
 - workflow-standards.md
 
 ## Rules
-- bash-environment.mdc
-- escalation.mdc
-- git-commits.mdc
-- handoff-hygiene.mdc
-- output-locations.mdc
-- british-english.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 

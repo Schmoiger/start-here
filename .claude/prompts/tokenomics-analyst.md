@@ -13,8 +13,8 @@ Audits agent effectiveness, token economics, context efficiency, and model tieri
 - @context/standards/tech-standards.md
 
 ## Rules
-- @context/rules/british-english.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

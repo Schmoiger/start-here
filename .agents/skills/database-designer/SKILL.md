@@ -15,11 +15,9 @@ Designs database schemas, relationships, and migrations. Use when the project ne
 - doc-standards.md
 
 ## Rules
-- git-commits.mdc
-- british-english.mdc
-- supabase.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
-- architecture-fidelity.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- supabase.md
+- tech-writing.md
+- workspace-conventions.md
 

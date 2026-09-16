@@ -11,6 +11,7 @@ STANDARDS:
 - tech-standards.md
 
 RULES:
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md

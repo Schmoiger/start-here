@@ -15,9 +15,8 @@ Performs detailed PR-style code review focusing on bugs, edge cases, and maintai
 - context-framework.md
 
 ## Rules
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- quality-gates.mdc
-- escalation.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 

@@ -11,10 +11,8 @@ Designs RESTful and GraphQL APIs with OpenAPI specifications. Use when defining 
 - @context/standards/security-standards.md
 
 ## Rules
-- @context/rules/git-commits.mdc
-- @context/rules/british-english.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
-- @context/rules/architecture-fidelity.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

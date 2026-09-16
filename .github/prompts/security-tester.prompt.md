@@ -10,8 +10,9 @@ Identifies security vulnerabilities using threat modelling and code analysis. Us
 - @context/standards/context-framework.md
 
 ## Rules
-- @context/rules/british-english.mdc
-- @context/rules/bash-environment.mdc
-- @context/rules/handoff-hygiene.mdc
-- @context/rules/escalation.mdc
+- @context/rules/bash-environment.md
+- @context/rules/multi-agent-collaboration.md
+- @context/rules/secrets.md
+- @context/rules/tech-writing.md
+- @context/rules/workspace-conventions.md
 

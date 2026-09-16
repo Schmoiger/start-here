@@ -14,8 +14,8 @@ Helps elucidate vague ideas into clearer requirements through conversation. Use 
 - doc-standards.md
 
 ## Rules
-- british-english.mdc
-- bash-environment.mdc
-- handoff-hygiene.mdc
-- escalation.mdc
+- bash-environment.md
+- multi-agent-collaboration.md
+- tech-writing.md
+- workspace-conventions.md
 
