@@ -220,24 +220,30 @@ The overhead is real: pre-spawn handoff writes, `state_recovery` blocks in every
 
 ## Templates and Validators
 
-The framework ships 14 output templates and 8 pre-commit validators.
+The framework ships 14 output templates, 8 rule-mapped pre-commit validators, and repository utility validators.
 
 **Templates** standardise recurring artefacts: requirements, tasks, bugs, reviews, handoffs, design docs, commit messages, PR descriptions, and agent definitions. Standardised shapes reduce cognitive load for both producing and consuming agents, and make downstream automation reliable.
 
 **Validators** enforce rules at commit time. A rule without a validator is a suggestion that we trust agents will follow. A rule with a validator is an enforceable standard.
 
-| Validator | How it works |
-|-----------|-------------|
-| `conventional_commits.py` | Reads `.git/COMMIT_EDITMSG`. Regex-checks the subject line against `type(scope): description` format, validates max 72 chars, imperative mood heuristic, and `Agent-Session:` trailer format if present. Runs at `commit-msg` stage. |
-| `british_english.py` | Receives file paths from pre-commit. Scans lines outside code blocks for American spellings (`color`, `behavior`, `organize`, `center`, `license`). Brittle: the word list is hardcoded — new pairs need adding manually. |
-| `ears_notation.py` | Receives file paths. Matches lines containing "shall" against six EARS patterns (`THE x SHALL`, `WHEN y, THE x SHALL`, etc.). Only triggers on files under `artefacts/product/`. |
-| `design_system.py` | Scans `frontend/src/` for CSS violations: multiple CSS files, Tailwind concrete colour classes, direct `@heroicons` imports outside the barrel, and off-scale spacing tokens. Hardcoded to `frontend/src/` relative to repo root. |
-| `metrics_logging.py` | Receives JSONL file paths. Validates each line has required fields (`ts`, `task`, `agent`, `event`, `tokens`), valid event types, and correct token source annotations. |
-| `supabase_boundary.py` | Receives file paths. Regex-checks for `import supabase` or `from supabase import` outside the database service. |
-| `framework_docs_staleness.py` | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. `[docs-ok]` in the commit message bypasses the check (auditable via `git log --grep='docs-ok'`). Only hardcoded exclusion: the two framework docs themselves, to avoid circular triggering. |
-| `adapter_drift.py` | Receives staged file paths under `context/`. Regenerates all adapter projections in-memory and compares against on-disk files. Fails if any projection is out of sync. All generated projections (`.agents/skills/`, `.claude/prompts/`, `.github/prompts/`, `.github/instructions/`, `.github/copilot-instructions.md`, `.openai/prompts/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) are gitignored — they live on disk for IDE discovery but are never committed. Runs at `pre-commit` stage. |
+| Validator | Rule / Purpose | How it works |
+|-----------|----------------|-------------|
+| `workspace_conventions.py` | `workspace-conventions.md` | Reads `.git/COMMIT_EDITMSG` to validate conventional commit format, imperative mood, and `Agent-Session:` trailers with co-author. Validates `metrics/*.jsonl` event schemas and output file paths. |
+| `tech_writing.py` | `tech-writing.md` | Scans files for American spellings (`color`, `behavior`, `organize`, `center`, `license`, `artifact`) and enforces British English. Validates EARS syntax in requirements files. |
+| `ui_dev.py` | `ui-dev.md` | Scans frontend code to prohibit `!important`, raw hex colours, multiple CSS files, and off-barrel Heroicon imports; enforces DaisyUI semantic tokens and spacing scales. |
+| `supabase.py` | `supabase.md` | Scans imports to prohibit `import supabase` outside database services/stores. Verifies SQL migrations insert audit records into `schema_migrations`. |
+| `testing.py` | `testing.md` | Enforces Detroit-school outcome-based testing by prohibiting interaction assertions (`mock.assert_called_once_with`) on internal collaborators unless marked with `# io-boundary`. |
+| `typescript_environment.py` | `typescript-environment.md` | Prohibits `package-lock.json` (enforces Yarn Berry), validates strict compiler flags in `tsconfig.json`, and verifies workspace declarations. |
+| `ui_testing.py` | `ui-testing.md` | Prohibits full `puppeteer`, `playwright`, and `cypress` in UI package dependencies, requiring lightweight `puppeteer-core`. |
+| `secrets.py` | `secrets.md` | Scans files for private key blocks, committed API keys, and credentialed `.env` files. |
+| `framework_docs_staleness.py` | Utility | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. Bypassed with `[docs-ok]`. |
+| `agent_definitions.py` | Utility | Validates agent definition frontmatter, required fields, and verifies that all referenced standards, rules, and skills exist. |
+| `adapter_drift.py` | Utility | Regenerates all adapter projections in-memory and compares against on-disk files to detect drift. |
+| `verify_typst_formatting.py` | Utility | Validates and formats Markdown files according to Typst typesetting rules. |
 
 Consistency compounds. Drift taxes. The templates and validators exist to keep that equation favourable over time.
+
+Validators are activated in host repositories during project bootstrap (`bootstrap-workflow.md`) by copying `context/scripts/pre-commit-config-template.yaml` to `.pre-commit-config.yaml` and running `uv run pre-commit install && uv run pre-commit install --hook-type commit-msg`. Each hook uses regex file matching to run differentially only when relevant files are staged, skipping irrelevant validators with zero overhead.
 
 ---
 

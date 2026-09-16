@@ -6,43 +6,59 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 
 ## Test Coverage
 
-### Validators (38 tests)
+### Validators (61 tests in `test_validators.py`)
 
-**conventional_commits.py** (11 tests)
-- Valid commit format
-- Invalid formats: no scope, too long, past tense
-- Agent session metadata validation
-- Co-Authored-By format
+**workspace_conventions.py**
+- Valid commit format and type checking
+- Invalid formats: no scope, too long, past tense heuristic
+- Agent session metadata trailer validation
+- Co-Authored-By format enforcement
 - Merge commit handling
+- Metrics JSONL schema validation (required fields, timestamps, token sources)
+- Handoff/escalate event requirements and recipient validation
+- Output file path and naming conventions
 
-**ears_notation.py** (10 tests)
+**tech_writing.py**
 - All EARS patterns: ubiquitous, event, state, optional, forbidden, complex
 - Valid/invalid requirements files
-- Code block exclusion
-- Pattern recognition
-
-**british_english.py** (7 tests)
-- Valid British English
-- American spelling detection: color, behavior, organize, center, license
 - Code block and inline code exclusion
+- British English spelling validation (`-ise`, `-our`, `-re`, `licence`, `artefact`)
+- American spelling detection: `color`, `behavior`, `organize`, `center`, `license`
 
-**metrics_logging.py** (10 tests)
-- Valid JSONL format
-- Required fields validation
-- Timestamp, event, token source validation
-- Handoff/escalate event requirements
-- Empty files and invalid JSON handling
+**ui_dev.py**
+- `!important` detection in styles
+- Raw hex colour code flagging
+- Single `index.css` enforcement
 
-### Agent Validator (12 tests)
+**supabase.py**
+- Supabase import boundary checks (restricted to database service / stores)
+- `schema_migrations` audit row insert check in SQL migration files
 
-**validate_agent_definitions.py**
+**testing.py**
+- Detroit-school outcome-based assertion enforcement
+- Internal collaborator mock interaction assertion flagging (`mock.assert_called_once_with`)
+- `# io-boundary` exemption handling
+
+**typescript_environment.py**
+- `package-lock.json` prohibition (requires `yarn.lock`)
+- `tsconfig.json` strict mode compiler flags (`strict`, `noImplicitAny`, `strictNullChecks`)
+- Root `package.json` workspaces consistency
+
+**ui_testing.py**
+- Full `puppeteer` prohibition (requires `puppeteer-core`)
+- Prohibiting `playwright` and `cypress` in UI package dependencies
+
+**secrets.py**
+- Detection of private key blocks (`BEGIN PRIVATE KEY`)
+- Detection of raw API keys and tokens in source files
+
+### Agent Validator (12 tests in `test_agent_validator.py`)
+
+**agent_definitions.py**
 - YAML frontmatter validation
-- Required fields: name, model, allowed_tools
-- Hardcoded path detection
-- Relative path flagging
-- Critical reminders attribution
-- {project-root} placeholder support
-- Referenced standards/rules existence checks
+- Required fields: name, model
+- Hardcoded absolute path detection (`/Users/`, `/home/`)
+- Referenced standards, rules, and skills existence checks
 
 ### Generator & Adapter Projections (27 tests)
 
@@ -134,7 +150,7 @@ Installed via root `pyproject.toml` dev dependencies or managed via `uv run`.
 tests/
 ├── README.md                 # This file
 ├── conftest.py               # Pytest configuration and fixtures
-├── test_validators.py        # Rule validator tests (conventional commits, EARS, British English, metrics)
+├── test_validators.py        # Rule validator tests (rule-mapped validators)
 ├── test_agent_validator.py   # Agent definition validator tests
 ├── test_adapters_core.py     # Canonical IR loader and registry tests
 ├── test_gemini_adapter.py    # Antigravity/Gemini adapter tests

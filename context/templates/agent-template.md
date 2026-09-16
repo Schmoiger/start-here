@@ -10,10 +10,12 @@ standards:
   - relevant-standards.md
 rules:
   - relevant-rule.md
-  - british-english.md
   - bash-environment.md
-  - handoff-hygiene.md
-  - escalation.md
+  - multi-agent-collaboration.md
+  - tech-writing.md
+  - workspace-conventions.md
+skills:
+  - relevant-skill.md
 ---
 
 You are a {role description}. Your job is to {primary responsibility}.

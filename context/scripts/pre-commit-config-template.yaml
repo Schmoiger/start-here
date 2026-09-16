@@ -45,28 +45,72 @@ repos:
         files: ^(frontend|packages)/.*\.(ts|tsx|js|jsx)$
         pass_filenames: false
 
-  # Custom validation hooks
+  # Rule-mapped validation hooks (context/rules/*.md)
   - repo: local
     hooks:
-      - id: conventional-commits
-        name: Validate conventional commit message
-        entry: uv run python context/scripts/validators/conventional_commits.py
+      - id: workspace-conventions-commit
+        name: Validate conventional commit message (workspace-conventions.md)
+        entry: uv run python context/scripts/validators/workspace_conventions.py commit-msg
         language: python
         stages: [commit-msg]
         always_run: true
 
-      - id: ears-notation
-        name: Validate EARS notation in requirements
-        entry: uv run python context/scripts/validators/ears_notation.py
+      - id: workspace-conventions-metrics
+        name: Validate agent metrics logging (workspace-conventions.md)
+        entry: uv run python context/scripts/validators/workspace_conventions.py metrics
+        language: python
+        files: ^metrics/.*\.jsonl$
+
+      - id: tech-writing-ears
+        name: Validate EARS notation in requirements (tech-writing.md)
+        entry: uv run python context/scripts/validators/tech_writing.py ears
         language: python
         files: ^artefacts/product/(requirements|user-stories)\.md$
 
-      - id: british-english
-        name: Validate British English spelling
-        entry: uv run python context/scripts/validators/british_english.py
+      - id: tech-writing-spelling
+        name: Validate British English spelling (tech-writing.md)
+        entry: uv run python context/scripts/validators/tech_writing.py spelling
         language: python
         files: ^(artefacts/|frontend/|services/|packages/).*\.md$
         exclude: ^(node_modules|\.git|venv|\.venv)/
+
+      - id: ui-dev
+        name: Validate UI development invariants (ui-dev.md)
+        entry: uv run python context/scripts/validators/ui_dev.py
+        language: python
+        files: ^frontend/.*\.(tsx|jsx|css|scss)$
+        pass_filenames: true
+
+      - id: supabase
+        name: Validate Supabase invariants (supabase.md)
+        entry: uv run python context/scripts/validators/supabase.py
+        language: python
+        files: (\.py|\.ts|\.tsx|\.sql)$
+
+      - id: testing-invariants
+        name: Validate testing invariants (testing.md)
+        entry: uv run python context/scripts/validators/testing.py
+        language: python
+        files: (\.test\.|\.spec\.|/tests/)
+
+      - id: typescript-environment
+        name: Validate TypeScript environment (typescript-environment.md)
+        entry: uv run python context/scripts/validators/typescript_environment.py
+        language: python
+        files: (tsconfig.*\.json|package\.json|package-lock\.json)$
+
+      - id: ui-testing
+        name: Validate UI testing dependencies (ui-testing.md)
+        entry: uv run python context/scripts/validators/ui_testing.py
+        language: python
+        files: package\.json$
+
+      - id: secrets
+        name: Scan for committed secrets (secrets.md)
+        entry: uv run python context/scripts/validators/secrets.py
+        language: python
+        files: (\.py|\.ts|\.tsx|\.js|\.json|\.env.*)$
+        exclude: ^(\.git|tests/|fixtures/|__tests__/)
 
       - id: typst-formatting
         name: Verify Typst-friendly Markdown formatting
@@ -88,6 +132,12 @@ repos:
         language: python
         files: ^(context/|AGENTS\.md|GEMINI\.md|CLAUDE\.md|\.claude/|\.github/|\.openai/|\.agents/skills/)
         pass_filenames: false
+
+      - id: agent-definitions
+        name: Validate agent definition schema
+        entry: uv run python context/scripts/validators/agent_definitions.py
+        language: python
+        files: ^context/agents/.*\.md$
 
       # Runtime adapter regeneration - run manually when needed:
       # uv run python context/scripts/generators/generate_adapters.py

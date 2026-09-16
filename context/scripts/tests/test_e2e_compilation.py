@@ -16,7 +16,9 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     context_dir = repo_root / "context"
 
     # Copy context/ into sandbox tmp_path
-    shutil.copytree(context_dir, tmp_path / "context")
+    shutil.copytree(
+        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
+    )
 
     # Run full compilation across all targets
     result = run_generation(
@@ -85,7 +87,9 @@ def test_e2e_deterministic_reproducibility(tmp_path: Path):
     """Verify that repeated compilation produces byte-for-byte identical output."""
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
-    shutil.copytree(context_dir, tmp_path / "context")
+    shutil.copytree(
+        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
+    )
 
     # Run 1
     run_generation(
@@ -116,7 +120,9 @@ def test_e2e_deterministic_reproducibility(tmp_path: Path):
     assert first_run_hashes.keys() == second_run_hashes.keys()
     for rel_path, content1 in first_run_hashes.items():
         content2 = second_run_hashes[rel_path]
-        assert content1 == content2, f"File {rel_path} differed between compilation runs"
+        assert content1 == content2, (
+            f"File {rel_path} differed between compilation runs"
+        )
 
 
 def test_e2e_synthetic_context_compilation(tmp_path: Path):

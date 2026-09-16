@@ -4,12 +4,7 @@ import pytest
 from pathlib import Path
 import sys
 
-# Add parent directory to path so we can import validator
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-# Import the validator script - it's in context/scripts/ not a subdirectory
-import validate_agent_definitions
-validate_agent_definition = validate_agent_definitions.validate_agent_definition
+from context.scripts.validators.agent_definitions import validate_agent_definition
 
 
 class TestAgentValidator:

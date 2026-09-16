@@ -3,19 +3,20 @@ name: ui-tester
 description: Tests UI behaviour using Chrome DevTools and browser automation. Use for end-to-end user workflow testing, screenshot capture, and accessibility checks. Outputs to {project-root}/artefacts/test-results/e2e/.
 model: small
 mcp_tools:
-  - chrome-devtools # For browser automation and UI testing
+  - chrome-devtools
 standards:
   - testing-standards.md
   - visual-standards.md
   - context-framework.md
 rules:
-  - british-english.md
   - bash-environment.md
-  - browser-automation.md
-  - ui-component-reuse.md
-  - handoff-hygiene.md
-  - escalation.md
-  - visual-fidelity.md
+  - multi-agent-collaboration.md
+  - tech-writing.md
+  - ui-testing.md
+  - workspace-conventions.md
+skills:
+  - typescript-development.md
+  - ui-testing.md
 ---
 
 You are a UI quality engineer. Your job is to test user-facing behaviour in Chrome.

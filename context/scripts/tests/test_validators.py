@@ -1,18 +1,40 @@
 """Tests for validation scripts."""
 
-import pytest
 from pathlib import Path
-import sys
 
-from context.scripts.validators.british_english import validate_british_english
-from context.scripts.validators.conventional_commits import validate_commit_message
-from context.scripts.validators.ears_notation import (
+from context.scripts.validators.workspace_conventions import (
+    validate_commit_message,
+    validate_metrics_entry,
+    validate_metrics_file,
+    validate_output_paths,
+)
+from context.scripts.validators.tech_writing import (
+    validate_british_english,
     is_ears_requirement,
     validate_requirements_file,
 )
-from context.scripts.validators.metrics_logging import (
-    validate_metrics_entry,
-    validate_metrics_file,
+from context.scripts.validators.ui_dev import (
+    check_important,
+    check_raw_hex,
+    check_css_files,
+)
+from context.scripts.validators.supabase import (
+    check_supabase_imports,
+    check_migration_audit,
+)
+from context.scripts.validators.testing import (
+    check_forbidden_mocks,
+)
+from context.scripts.validators.typescript_environment import (
+    check_package_lock,
+    check_tsconfig_strictness,
+    check_workspaces,
+)
+from context.scripts.validators.ui_testing import (
+    check_forbidden_ui_test_deps,
+)
+from context.scripts.validators.secrets import (
+    scan_file_for_secrets,
 )
 from context.scripts.validators.verify_typst_formatting import check_and_fix_file
 
@@ -433,4 +455,208 @@ class TestTypstFormatting:
         )
         errors = check_and_fix_file(md_file, fix=False)
         assert len(errors) == 0
+
+
+class TestWorkspaceOutputLocations:
+    """Tests for workspace output locations validator."""
+
+    def test_valid_output_paths(self):
+        """Test valid directory structure and file naming."""
+        paths = [
+            "artefacts/build/tasks.md",
+            "artefacts/architecture/architecture.md",
+            "artefacts/test-results/v2-001-results.txt",
+            "services/auth/tests/test_auth.py",
+        ]
+        errors = validate_output_paths(paths)
+        assert len(errors) == 0
+
+    def test_invalid_artefact_subdir(self):
+        """Test invalid artefact subdirectory."""
+        paths = ["artefacts/invalid_sub/tasks.md"]
+        errors = validate_output_paths(paths)
+        assert len(errors) > 0
+        assert "Invalid artefact subdirectory" in errors[0]
+
+    def test_invalid_test_result_name(self):
+        """Test test result not following convention."""
+        paths = ["artefacts/test-results/bad_results.md"]
+        errors = validate_output_paths(paths)
+        assert len(errors) > 0
+        assert "v2-{task-id}-results.txt" in errors[0]
+
+
+class TestUIDev:
+    """Tests for UI development invariants validator."""
+
+    def test_important_forbidden(self, tmp_path):
+        """Test that !important is flagged."""
+        p = tmp_path / "Component.tsx"
+        content = "const styles = { color: 'red !important' };"
+        violations = check_important(p, content)
+        assert len(violations) > 0
+        assert "!important" in violations[0][1]
+
+    def test_raw_hex_forbidden(self, tmp_path):
+        """Test that raw hex colours are flagged."""
+        p = tmp_path / "Button.tsx"
+        content = "<button className=\"bg-[#1a2b3c]\">Click</button>"
+        violations = check_raw_hex(p, content)
+        assert len(violations) > 0
+        assert "raw hex colour" in violations[0][1]
+
+    def test_css_files_restriction(self, tmp_path):
+        """Test that multiple/scoped CSS files are flagged."""
+        css_dir = tmp_path / "frontend" / "src"
+        css_dir.mkdir(parents=True)
+        (css_dir / "index.css").write_text("/* main */")
+        (css_dir / "Button.css").write_text("/* scoped */")
+        violations = check_css_files(css_dir)
+        assert len(violations) == 1
+        assert "component-scoped CSS/SCSS" in violations[0]
+
+
+class TestSupabase:
+    """Tests for Supabase invariants validator."""
+
+    def test_supabase_import_outside_database_service(self, tmp_path):
+        """Test that importing supabase in app code is flagged."""
+        app_file = tmp_path / "services" / "billing" / "charge.py"
+        app_file.parent.mkdir(parents=True)
+        app_file.write_text("import supabase\nclient = supabase.create_client()")
+        violations = check_supabase_imports([app_file])
+        assert len(violations) == 1
+        assert "imported outside database service" in violations[0]
+
+    def test_supabase_import_inside_database_service_allowed(self, tmp_path):
+        """Test that importing supabase inside database service is allowed."""
+        db_file = tmp_path / "services" / "database_service" / "client.py"
+        db_file.parent.mkdir(parents=True)
+        db_file.write_text("import supabase\nclient = supabase.create_client()")
+        violations = check_supabase_imports([db_file])
+        assert len(violations) == 0
+
+    def test_migration_audit_row_required(self, tmp_path):
+        """Test that migration SQL requires audit row insert."""
+        migration_file = tmp_path / "supabase" / "migrations" / "20260915_init.sql"
+        migration_file.parent.mkdir(parents=True)
+        migration_file.write_text("CREATE TABLE users (id serial primary key);")
+        violations = check_migration_audit([migration_file])
+        assert len(violations) == 1
+        assert "schema_migrations" in violations[0]
+
+        # Add audit row
+        migration_file.write_text(
+            "CREATE TABLE users (id serial primary key);\n"
+            "INSERT INTO schema_migrations (migration_file, applied_at) VALUES ('20260915_init.sql', now());"
+        )
+        violations_after = check_migration_audit([migration_file])
+        assert len(violations_after) == 0
+
+
+class TestTestingInvariants:
+    """Tests for testing invariants validator."""
+
+    def test_forbidden_interaction_mock(self, tmp_path):
+        """Test that interaction assertions on internal collaborators are flagged."""
+        test_file = tmp_path / "test_service.py"
+        content = "mock_service.assert_called_once_with('data')"
+        violations = check_forbidden_mocks(test_file, content)
+        assert len(violations) == 1
+        assert "interaction-based assertion prohibited" in violations[0][1]
+
+    def test_exempt_interaction_mock(self, tmp_path):
+        """Test that mocks with # io-boundary marker are exempt."""
+        test_file = tmp_path / "test_service.py"
+        content = "mock_network.assert_called_once_with('url')  # io-boundary"
+        violations = check_forbidden_mocks(test_file, content)
+        assert len(violations) == 0
+
+
+class TestTypeScriptEnvironment:
+    """Tests for TypeScript environment invariants validator."""
+
+    def test_package_lock_flagged(self, tmp_path):
+        """Test that package-lock.json is flagged."""
+        lock = tmp_path / "package-lock.json"
+        lock.write_text("{}")
+        violations = check_package_lock(tmp_path)
+        assert len(violations) == 1
+        assert "package-lock.json is strictly forbidden" in violations[0]
+
+    def test_tsconfig_strictness(self, tmp_path):
+        """Test that strict compiler options are enforced."""
+        tsconfig = tmp_path / "tsconfig.json"
+        tsconfig.write_text("""{
+            "compilerOptions": {
+                "strict": false,
+                "noImplicitAny": true
+            }
+        }""")
+        violations = check_tsconfig_strictness(tsconfig)
+        assert any("compilerOptions.strict" in v for v in violations)
+        assert any("compilerOptions.strictNullChecks" in v for v in violations)
+
+    def test_workspaces_validation(self, tmp_path):
+        """Test that subprojects are registered in root package.json."""
+        root_pkg = tmp_path / "package.json"
+        root_pkg.write_text("""{
+            "workspaces": ["frontend"]
+        }""")
+        sub_pkg = tmp_path / "packages" / "common" / "package.json"
+        sub_pkg.parent.mkdir(parents=True)
+        sub_pkg.write_text("{}")
+        violations = check_workspaces(tmp_path)
+        assert len(violations) == 1
+        assert "must be listed in root package.json workspaces" in violations[0]
+
+
+class TestUITesting:
+    """Tests for UI testing invariants validator."""
+
+    def test_banned_dependencies_flagged(self, tmp_path):
+        """Test that full puppeteer, playwright, and cypress are banned."""
+        pkg = tmp_path / "package.json"
+        pkg.write_text("""{
+            "devDependencies": {
+                "puppeteer": "^22.0.0",
+                "playwright": "^1.40.0"
+            }
+        }""")
+        violations = check_forbidden_ui_test_deps(pkg)
+        assert len(violations) == 2
+        assert any("puppeteer is banned" in v for v in violations)
+        assert any("playwright is banned" in v for v in violations)
+
+    def test_puppeteer_core_allowed(self, tmp_path):
+        """Test that puppeteer-core is permitted."""
+        pkg = tmp_path / "package.json"
+        pkg.write_text("""{
+            "devDependencies": {
+                "puppeteer-core": "^22.0.0"
+            }
+        }""")
+        violations = check_forbidden_ui_test_deps(pkg)
+        assert len(violations) == 0
+
+
+class TestSecrets:
+    """Tests for secrets invariants validator."""
+
+    def test_private_key_flagged(self, tmp_path):
+        """Test that private key block is flagged."""
+        key_file = tmp_path / "key.pem"
+        key_file.write_text("-----BEGIN RSA PRIVATE KEY-----\nMIIE...\n-----END RSA PRIVATE KEY-----")
+        violations = scan_file_for_secrets(key_file)
+        assert len(violations) == 1
+        assert "Private key block" in violations[0]
+
+    def test_env_file_with_secret_flagged(self, tmp_path):
+        """Test that .env file with secrets is flagged."""
+        env_file = tmp_path / ".env"
+        env_file.write_text("API_SECRET_KEY='supersecret123456789012345'")
+        violations = scan_file_for_secrets(env_file)
+        assert len(violations) == 1
+        assert ".env files with credentials are strictly forbidden" in violations[0]
+
 

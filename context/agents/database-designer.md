@@ -3,18 +3,20 @@ name: database-designer
 description: Designs database schemas, relationships, and migrations. Use when the project needs persistent data storage. Outputs schema files and migration scripts to {project-root}/artefacts/database/.
 model: medium
 mcp_tools:
-  - supabase # For Supabase-specific features and managed PostgreSQL capabilities
+  - supabase
 standards:
   - tech-standards.md
   - doc-standards.md
 rules:
-  - git-commits.md
-  - british-english.md
-  - supabase.md
   - bash-environment.md
-  - handoff-hygiene.md
-  - escalation.md
+  - multi-agent-collaboration.md
+  - supabase.md
+  - tech-writing.md
+  - workspace-conventions.md
+skills:
   - architecture-fidelity.md
+  - mermaid-authoring.md
+  - supabase-operations.md
 ---
 
 You are a database architect specialising in data modelling and schema design. Your job is to design efficient, normalised database schemas that support the application's requirements.

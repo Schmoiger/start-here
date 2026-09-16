@@ -63,6 +63,56 @@ TARGET_ALIASES = {
     "o": "openai",
 }
 
+IGNORED_BLOCK = """
+# Programmatically generated agent projections
+.agents/skills/
+.claude/prompts/
+.github/instructions/
+.github/prompts/
+.github/copilot-instructions.md
+.openai/prompts/
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+"""
+
+
+def ensure_root_gitignore(
+    repo_root: Path,
+    dry_run: bool = False,
+    verbose: bool = False,
+    quiet: bool = False,
+) -> bool:
+    """Ensure repo_root / .gitignore contains the generated agent projection ignore block.
+
+    Returns True if .gitignore was created or updated, False otherwise.
+    """
+    gitignore_path = repo_root / ".gitignore"
+    required_entries = [
+        line.strip()
+        for line in IGNORED_BLOCK.strip().splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+
+    if gitignore_path.exists():
+        content = gitignore_path.read_text()
+        missing = [entry for entry in required_entries if entry not in content]
+        if not missing:
+            return False
+
+        if not dry_run:
+            delimiter = "\n" if content.endswith("\n") else "\n\n"
+            gitignore_path.write_text(content + delimiter + IGNORED_BLOCK.strip() + "\n")
+        if verbose and not quiet:
+            print("  * [UPDATE]  .gitignore (added agent projection ignores)")
+        return True
+    else:
+        if not dry_run:
+            gitignore_path.write_text(IGNORED_BLOCK.strip() + "\n")
+        if verbose and not quiet:
+            print("  + [NEW]     .gitignore")
+        return True
+
 
 def normalize_target(target: str) -> str:
     """Normalize target string to canonical target name."""
@@ -183,6 +233,9 @@ def run_generation(
                 unchanged.append(path)
                 if verbose and not quiet:
                     print(f"  . [SKIP]    {rel_path} (unchanged)")
+
+    # Ensure root .gitignore ignores generated projections
+    ensure_root_gitignore(repo_root, dry_run=dry_run, verbose=verbose, quiet=quiet)
 
     if not quiet:
         mode_str = " (dry run)" if dry_run else ""

@@ -7,11 +7,15 @@ standards:
   - workflow-standards.md
 rules:
   - bash-environment.md
-  - escalation.md
-  - git-commits.md
-  - handoff-hygiene.md
-  - output-locations.md
-  - british-english.md
+  - multi-agent-collaboration.md
+  - tech-writing.md
+  - workspace-conventions.md
+skills:
+  - agent-sandbox.md
+  - agent-workflows.md
+  - bootstrap-workflow.md
+  - git-subrepo-operations.md
+  - multi-agent-workflows.md
 ---
 
 You are the orchestrating agent. You coordinate work across specialised agents — you do not implement.

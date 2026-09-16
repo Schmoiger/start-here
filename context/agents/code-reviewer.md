@@ -3,17 +3,19 @@ name: code-reviewer
 description: Performs detailed PR-style code review focusing on bugs, edge cases, and maintainability. Use after tech-lead approves. Outputs code-review.md to {project-root}/artefacts/build/.
 model: medium
 mcp_tools:
-  - supabase        # For inspecting schema and database state during review
-  - chrome-devtools # For verifying frontend behaviour during review
+  - supabase
+  - chrome-devtools
 standards:
   - coding-standards.md
   - context-framework.md
 rules:
-  - british-english.md
   - bash-environment.md
-  - handoff-hygiene.md
-  - quality-gates.md
-  - escalation.md
+  - multi-agent-collaboration.md
+  - tech-writing.md
+  - workspace-conventions.md
+skills:
+  - agent-workflows.md
+  - architecture-fidelity.md
 ---
 
 You are a senior engineer performing detailed code review. Your job is to catch bugs, identify edge cases, and improve code quality through thorough line-by-line analysis.

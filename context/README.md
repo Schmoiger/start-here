@@ -8,8 +8,7 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 | What                       | Where                            | When                                                 |
 | -------------------------- | -------------------------------- | ---------------------------------------------------- |
-| What                       | Where                            | When                                                 |
-| -------------------------- | -------------------------------- | ---------------------------------------------------- |
+| **Framework docs**         | `docs/*.md`                      | Architecture companion, reference manual, delivery rhythm |
 | **Non-negotiable rules**   | `rules/*.md`                     | Invariant boundaries; verified by scripts/linters    |
 | **Reference docs**         | `standards/*.md`                 | Reference manuals; benchmarks used by review rubrics |
 | **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
@@ -24,35 +23,27 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 ---
 
-## The Control Flow: Forward Orchestration
-
-The system strictly executes from **intent down to governed execution**:
-
-1. **Workflows (`workflows/`)**: Orchestrate the sequence of phases and assign specialised **Agents** to the work based on human intent.
-2. **Agents (`agents/`)**: Execute specific roles within a workflow phase (e.g. `@python-coder`, `@tech-author`).
-3. **Rules (`rules/`)**: Set the non-negotiable invariant boundaries and constraints that govern the agent during execution.
-4. **Skills (`skills/`)**: JIT procedural runbooks and craft recipes loaded on-demand by agents.
-5. **Verifiers (`scripts/validators/` & reviewer agents)**: Validate that the agent's work adhered to rules (via deterministic code) and standards/skills (via LLM-as-a-judge).
-
----
-
 ## For Agents
 
-**Quick scan** - Read these when spawned:
+**Rules**: [bash-env](rules/bash-environment.md) · [multi-agent](rules/multi-agent-collaboration.md) · [python-env](rules/python-environment.md) · [secrets](rules/secrets.md) · [supabase](rules/supabase.md) · [tech-writing](rules/tech-writing.md) · [testing](rules/testing.md) · [ts-env](rules/typescript-environment.md) · [ui-dev](rules/ui-dev.md) · [ui-testing](rules/ui-testing.md) · [workspace](rules/workspace-conventions.md)
 
-**Rules** (non-negotiable): [python-env](rules/python-environment.md) · [ts-env](rules/typescript-environment.md) · [secrets](rules/secrets-management.md) · [tdd](rules/tdd-workflow.md) · [types](rules/type-safety.md) · [outputs](rules/output-locations.md) · [commits](rules/git-commits.md) · [spelling](rules/british-english.md) · [EARS](rules/EARS-notation-requirements.md) · [bash](rules/bash-environment.md) · [handoff](rules/handoff-hygiene.md) · [escalation](rules/escalation.md) · [arch-fidelity](rules/architecture-fidelity.md) · [ui-reuse](rules/ui-component-reuse.md) · [visual](rules/visual-fidelity.md) · [quality-gates](rules/quality-gates.md) · [browser](rules/browser-automation.md) · [git-subrepo](rules/git-subrepo.md)
+**Standards**: [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [build](standards/build-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [agent](standards/agent-standards.md) · [visual](standards/visual-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [mobile](standards/tech-mobile-standards.md) · [index](standards/README.md)
 
-**Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
+**Skills**: [agent-sandbox](skills/agent-sandbox.md) · [agent-workflows](skills/agent-workflows.md) · [arch-fidelity](skills/architecture-fidelity.md) · [bootstrap-workflow](skills/bootstrap-workflow.md) · [git-subrepo](skills/git-subrepo-operations.md) · [intent-fidelity](skills/intent-fidelity.md) · [mermaid](skills/mermaid-authoring.md) · [multi-agent](skills/multi-agent-workflows.md) · [python-scripting](skills/python-scripting.md) · [supabase](skills/supabase-operations.md) · [tdd](skills/tdd-workflow.md) · [tech-authoring](skills/technical-authoring.md) · [ts-dev](skills/typescript-development.md) · [typst-pipeline](skills/typst-pipeline.md) · [ui-dev](skills/ui-development.md) · [ui-testing](skills/ui-testing.md)
 
-**Skills** (procedural JIT): [python-scripting](skills/python-scripting.md) · [technical-authoring](skills/technical-authoring.md)
+**Agents**: [orchestrator](agents/orchestrator.md) · [inventory](agents/README.md)
 
-**Model Profiles (LUT)**: [models](models.yaml) — Abstract model intent tiers (`small`, `medium`, `large`), provider mapping, and telemetry locations.
+**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) · [retrospective](workflows/retrospective.yaml)
 
-**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml)
+**Templates**: [index](templates/README.md) · [agent](templates/agent-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
 
-**Downstream integration**: [downstream-subrepo](#downstream-integration--standards-synchronisation-git-subrepo)
+**Personas**: [author](persona/author.md) · [technical-writer](persona/technical-writer.md) · [opinionated-blogger](persona/opinionated-blogger.md) · [editor](persona/editor.md) · [expert-reviewer](persona/expert-reviewer.md)
 
-**Templates**: [index](templates/README.md)
+**Framework Docs**: [reference](docs/agentic-framework-reference.md) · [framework](docs/agentic-framework.md) · [rhythm](docs/rhythm-of-delivery.md)
+
+**Scripts**: [validators](scripts/validators/README.md) · [generators](scripts/generators/generate_adapters.py) · [commit-msg](scripts/prepare-commit-msg.py) · [tests](scripts/tests/README.md)
+
+**Model Profiles**: [models](models.yaml)
 
 ---
 
@@ -103,7 +94,7 @@ Our architecture enforces a strict physical split between `rules/`, `skills/`, a
 - Frontmatter lists applicable `rules`, `standards`, `skills`, and `model`
 - `orchestrator.md` defines orchestrator behaviour — read at session start
 - Orchestrator spawns with Task tool; see AGENTS.md for the complete registry
-- **On Add / Edit / Delete**: Create from `agents/TEMPLATE.md` with required frontmatter (`name`, `model`, `rules`, `standards`, `skills`). Validate via `uv run python context/scripts/validate_agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to project to `AGENTS.md`, `CLAUDE.md`, `.claude/prompts/`, and `.agents/skills/`. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create from `templates/agent-template.md` with required frontmatter (`name`, `model`, `rules`, `standards`, `skills`). Validate via `uv run python context/scripts/validators/agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to project to `AGENTS.md`, `CLAUDE.md`, `.claude/prompts/`, and `.agents/skills/`. Verify with `adapter_drift.py`.
 
 **Model Profiles & Runtime Telemetry LUT** (`models.yaml`):
 
@@ -120,12 +111,11 @@ Our architecture enforces a strict physical split between `rules/`, `skills/`, a
 - Source of truth for phase ordering
 - **On Add / Edit / Delete**: Create or edit phase DAG. All referenced agents must exist in `context/agents/`. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to refresh workflow tables in `AGENTS.md` and `CLAUDE.md`. Verify with `adapter_drift.py`.
 
-**Framework reference** (`docs/agentic-framework-reference.md`):
+**Framework docs** (`docs/*.md`):
 
-- Default and prototype workflows (phase-by-phase, diagrams)
-- Orchestration patterns (single, chain, hive, loop — see `docs/agentic-framework-reference.md`; swarm is vision-level only)
-- Writing personas, portability adapters, effectiveness measurement
-- Standards, rules, agents, templates, and scripts at operational depth
+- Architectural companion paper (`docs/agentic-framework.md`): core concepts, verification split, and invariants
+- Reference manual (`docs/agentic-framework-reference.md`): phase-by-phase workflows, orchestration patterns, agent catalogue, telemetry
+- Delivery cadence (`docs/rhythm-of-delivery.md`): iteration rhythm, shipping cadence, and delivery loops
 - **On Add / Edit / Delete**: Update architectural documentation. Verify documentation freshness with `uv run python context/scripts/validators/framework_docs_staleness.py`.
 
 **Templates** (`templates/`):
@@ -151,7 +141,7 @@ Our architecture enforces a strict physical split between `rules/`, `skills/`, a
 **Scripts** (`scripts/`):
 
 - `prepare-commit-msg.py` / `.sh`: Git hook — extracts and injects session token usage across Claude Code, Google Antigravity, GitHub Copilot, and Codex into the Agent-Session commit trailer
-- Validators (`validators/`): Pre-commit hooks for rule enforcement (conventional commits, British English, EARS notation, design system, API docs, Supabase boundary, framework docs staleness, Typst formatting)
+- Validators (`validators/`): Pre-commit hooks mapping to canonical rules in `context/rules/*.md` (workspace conventions, tech writing, UI development, Supabase, testing, TypeScript environment, UI testing, secrets) plus repository integrity utilities (adapter drift, Typst formatting, framework docs staleness)
 - Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
 - Tests (`tests/`): Test suite for validators, runtime adapters, and telemetry extractors
 - **On Add / Edit / Delete**: For standalone scripts, declare dependencies via PEP 723 inline metadata (`# /// script`). Add accompanying tests in `context/scripts/tests/`. Run test suite: `uv run --with pytest pytest context/scripts/tests/ -v`. If generator logic was altered, run `generate_adapters.py` and `adapter_drift.py`.
@@ -198,7 +188,7 @@ The orchestrator (main Claude session) coordinates work but delegates implementa
 
 **Core rule**: Delegate all implementation to specialised agents. The orchestrator writing code directly silently bypasses the environment rules those agents carry.
 
-**When no agent exists for a task**: create one from `agents/TEMPLATE.md`, then delegate. Do not write implementation directly.
+**When no agent exists for a task**: create one from `templates/agent-template.md`, then delegate. Do not write implementation directly.
 
 ---
 
@@ -222,6 +212,8 @@ See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.y
 
 **continuous-improvement** — Framework improvement: reactive (human reports incident) or proactive (review interruptions, incidents, and git log metrics).
 
+**retrospective** — Proactive framework review: analyse accumulated handoffs, task metrics, and git logs to suggest improvements, fix and record.
+
 **Orchestration patterns**: Single Agent, Sequential Chain, Hive, Iterative Loop (see `docs/agentic-framework-reference.md`; exploration “swarm” is out of scope for shipped YAML — `docs/vision.md`)
 
 ---
@@ -231,12 +223,18 @@ See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.y
 ```text
 context/
 ├── README.md                      # This file
+├── models.yaml                    # Model profile LUT (abstract tiers -> provider families)
+├── docs/                          # Framework and architectural documentation
+│   ├── agentic-framework.md      # Companion paper: core concepts, verification split, rationale
+│   ├── agentic-framework-reference.md # Reference manual: workflows, agents, telemetry
+│   └── rhythm-of-delivery.md     # Delivery cadence, iteration loops, and shipping rhythm
 ├── standards/                     # Reference docs (how to do things well)
-│   └── *.md                      # coding, testing, tech, doc, workflow, security, 12-factor, LESS, visual
-├── rules/                         # Non-negotiables (break if ignored)
-│   └── *.mdc                     # python-env, ts-env, secrets, tdd, types, outputs, commits, etc.
+│   ├── README.md                 # Standards index and routing guide
+│   └── *.md                      # coding, testing, tech, doc, workflow, security, agent, visual, etc.
+├── rules/                         # Non-negotiable invariants (enforced by code / linters / AST)
+│   └── *.md                      # bash-env, multi-agent, python-env, secrets, supabase, tech-writing, etc.
 ├── agents/                        # Agent definitions (who does what)
-│   ├── TEMPLATE.md               # Template for new agents
+│   ├── README.md                 # Agent inventory and model tiers
 │   ├── orchestrator.md           # Orchestrator behaviour (read at session start)
 │   └── *.md                      # Specialised agents (see AGENTS.md for registry)
 ├── workflows/                     # Workflow patterns (phase dependencies)
@@ -247,22 +245,25 @@ context/
 │   ├── bugfix.yaml               # Bug reproduction, fix, verification
 │   ├── full-test.yaml            # Full regression suite
 │   ├── content.yaml              # Human-facing content with personas
-│   └── continuous-improvement.yaml # Incident response + retrospective
+│   ├── continuous-improvement.yaml # Incident response + reactive improvement
+│   └── retrospective.yaml        # Proactive framework and data review
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
-├── skills/                        # Procedural context (JIT instructions by technology)
-│   └── *.md                       # python-scripting, technical-authoring
+│   ├── README.md                 # Template catalog and usage guide
+│   ├── agent-template.md         # Template for new agent definitions
+│   └── *.md / *.json / *.yaml    # Task prompts, handoffs, reviews, PRs, etc.
+├── skills/                        # Procedural skills (JIT instructions by technology/workflow)
+│   └── *.md                      # python-scripting, typst-pipeline, tdd-workflow, git-subrepo, etc.
 ├── persona/                       # Writing voice for human-facing content
 │   ├── author.md                 # AS persona (books, foundational thought leadership, punchy & dense)
 │   ├── technical-writer.md       # Amara Osei persona (practitioner guides, technical prose)
 │   ├── opinionated-blogger.md   # Dr. Sarah Chen persona (blogs, opinion pieces)
 │   ├── editor.md                 # Editorial voice
 │   └── expert-reviewer.md        # Review voice
-├── mcp/                          # MCP server configuration
-│   └── mcp.json                  # Template config
 └── scripts/                      # Portable tools
-    ├── prepare-commit-msg.py    # Hook: inject token metrics into commits
-    ├── prepare-commit-msg.sh    # Shell wrapper (symlinked from .git/hooks/)
-    ├── validators/               # Rule validators (pre-commit hooks, incl. adapter_drift.py)
+    ├── prepare-commit-msg.py     # Hook: inject token metrics into commits
+    ├── prepare-commit-msg.sh     # Shell wrapper (symlinked from .git/hooks/)
+    ├── hooks/                    # Git hook templates (pre-commit)
+    ├── validators/               # Rule validators & integrity checks (pre-commit hooks)
     ├── generators/               # Runtime adapter generators
     │   ├── generate_adapters.py  # Unified CLI dispatcher
     │   └── adapters/             # Platform adapters (core, gemini, claude, github, openai)
@@ -489,7 +490,7 @@ When something keeps failing because agents don't follow it:
 2. **Does it break things?** Not just style—actual failures?
 3. **Is it actionable?** Can you give clear DO/DON'T commands?
 
-If yes to all three, create a rule in `rules/*.mdc` (keep under 200 tokens).
+If yes to all three, create a rule in `rules/*.md` (keep under 200 tokens).
 
 ---
 
@@ -497,7 +498,7 @@ If yes to all three, create a rule in `rules/*.mdc` (keep under 200 tokens).
 
 When a task domain needs repeated specialised work:
 
-1. Copy `agents/TEMPLATE.md`
+1. Copy `templates/agent-template.md`
 2. Set `name`, `description`, `model` in frontmatter
 3. List applicable `rules` and `standards` in frontmatter
 4. Write concise body with rules summary and workflow

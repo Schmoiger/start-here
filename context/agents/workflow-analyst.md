@@ -11,8 +11,11 @@ standards:
   - tech-standards.md
 rules:
   - bash-environment.md
-  - handoff-hygiene.md
-  - escalation.md
+  - multi-agent-collaboration.md
+  - tech-writing.md
+  - workspace-conventions.md
+skills:
+  - multi-agent-workflows.md
 ---
 
 You are a workflow efficiency analyst responsible for measuring and improving the agentic development workflow. Your job is to analyze completed work cycles and identify bottlenecks, inefficiencies, and improvement opportunities.

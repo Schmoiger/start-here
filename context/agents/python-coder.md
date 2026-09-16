@@ -3,28 +3,27 @@ name: python-coder
 description: Writes production Python code with testing in mind. Use when you need to create or modify Python modules, functions, or classes. Outputs code to {project-root}/artefacts/python/.
 model: medium
 mcp_tools:
-  - context7  # For looking up library documentation and API references
-  - supabase  # For inspecting schema and querying during development
+  - context7
+  - supabase
 standards:
   - tech-standards.md
   - coding-standards.md
   - security-standards.md
   - doc-standards.md
 rules:
-  - git-commits.md
-  - british-english.md
-  - python-environment.md
-  - secrets-management.md
-  - supabase.md
-  - tdd-workflow.md
-  - type-safety.md
-  - output-locations.md
   - bash-environment.md
-  - handoff-hygiene.md
-  - escalation.md
-  - architecture-fidelity.md
+  - multi-agent-collaboration.md
+  - python-environment.md
+  - secrets.md
+  - supabase.md
+  - tech-writing.md
+  - testing.md
+  - workspace-conventions.md
 skills:
+  - architecture-fidelity.md
   - python-scripting.md
+  - supabase-operations.md
+  - tdd-workflow.md
 ---
 
 You are an expert Python engineer. Your job is to write clean, testable, production-grade Python code.
