@@ -1,10 +1,22 @@
-name: PR Checks
+name: PR Subrepo Checks
 
 on:
   pull_request:
     branches: [main, master]
+    paths:
+      - "context/**"
+      - "typst/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pr-subrepo-checks.yml"
   push:
     branches: [main, master]
+    paths:
+      - "context/**"
+      - "typst/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pr-subrepo-checks.yml"
   workflow_dispatch:
 
 concurrency:
@@ -16,8 +28,8 @@ permissions:
   pull-requests: read
 
 jobs:
-  pr-checks:
-    name: PR Checks
+  subrepo-checks:
+    name: Subrepo Checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -47,17 +59,3 @@ jobs:
 
       - name: Verify Typst Formatting Rules
         run: uv run python context/scripts/validators/verify_typst_formatting.py typst/
-
-      - name: Set up Node.js
-        if: ${{ hashFiles('package.json') != '' }}
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Run TypeScript Tests
-        if: ${{ hashFiles('package.json') != '' }}
-        run: |
-          corepack enable
-          yarn install --immutable
-          yarn test --if-present
