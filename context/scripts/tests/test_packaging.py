@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
-import pytest
-
-from context.scripts.generators.generate_adapters import build_parser as build_generator_parser, main as generator_main
+from context.scripts.generators.generate_adapters import build_parser as build_generator_parser
 from context.scripts.validators.adapter_drift import check_adapter_drift
 
 

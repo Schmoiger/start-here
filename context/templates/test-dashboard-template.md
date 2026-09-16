@@ -3,6 +3,8 @@
 **Last Updated**: {ISO_8601_TIMESTAMP}
 **Phase**: {PHASE} (Prototype | Development | Pre-deployment)
 
+---
+
 ## Coverage Summary
 
 | Metric | Target | Actual | Status |
@@ -11,6 +13,8 @@
 | Effective Coverage | - | {EFFECTIVE_COV}% | ℹ️ |
 | Pass Rate | ≥{THRESHOLD}% | {PASS_RATE}% | {STATUS} |
 | Fail Rate | 0% | {FAIL_RATE}% | {STATUS} |
+
+---
 
 ## Test Results by Type
 
@@ -42,6 +46,8 @@
 - **Low Issues**: {SECURITY_LOW}
 - **Status**: {SECURITY_STATUS}
 
+---
+
 ## Concessioned Tests
 
 | ID | Type | Reason | Ticket | Age (days) |
@@ -49,6 +55,8 @@
 | {TEST_ID} | {TYPE} | {REASON} | #{TICKET} | {AGE} |
 
 _No concessioned tests_ (if empty)
+
+---
 
 ## Failed Tests
 
@@ -58,6 +66,8 @@ _No concessioned tests_ (if empty)
 
 _No failed tests_ ✅ (if empty)
 
+---
+
 ## Trends (Last 7 Days)
 
 - **Coverage**: {COVERAGE_7D_AGO}% → {COVERAGE_NOW}% ({COVERAGE_DELTA})
@@ -65,11 +75,15 @@ _No failed tests_ ✅ (if empty)
 - **Test Count**: {TEST_COUNT_7D_AGO} → {TEST_COUNT_NOW} ({TEST_COUNT_DELTA})
 - **E2E Scenarios**: {E2E_COUNT_7D_AGO} → {E2E_COUNT_NOW} ({E2E_COUNT_DELTA})
 
+---
+
 ## Recent Test Runs
 
 | Date | Phase | Coverage | Pass Rate | Duration | Status |
 |------|-------|----------|-----------|----------|--------|
 | {DATE} | {PHASE} | {COV}% | {PASS}% | {DUR}s | {STATUS} |
+
+---
 
 ## Notes
 

@@ -1,8 +1,12 @@
 # Build & Deployment Standards
 
+---
+
 ## Overview
 
 This document outlines the standards for preparing projects for CI/CD deployment within the monorepo. Our system uses a hybrid, template-based architecture powered by Google Cloud Build.
+
+---
 
 ## Core Concepts
 
@@ -20,6 +24,8 @@ A single `cloudbuild.yaml` at the root of the repository acts as a dynamic dispa
 ### 3. Pre-flight Validation (Fail Fast)
 
 Validation is a key part of the dispatcher pipeline. Before executing a template, the dispatcher MUST validate the application's manifest to ensure all required substitutions are present for the chosen template. This saves time and compute resources by failing fast.
+
+---
 
 ## CI/CD Configuration
 
@@ -44,6 +50,8 @@ Secrets MUST be managed in GCP Secret Manager.
 
 - The Cloud Build service account requires the "Secret Manager Secret Accessor" role.
 - Templates access secrets securely at build time using the `secretEnv` property within the `cloudbuild.yaml` template. Secrets are never hardcoded.
+
+---
 
 ## Service Identity & Authentication
 
@@ -96,6 +104,8 @@ Backend services MUST NOT be publicly accessible. Use the following ingress conf
 
 - Direct public internet access
 
+---
+
 ## Frontend-to-Backend Routing (Firebase Hosting Rewrites)
 
 Frontend applications deployed to Firebase Hosting access backend Cloud Run services through Firebase Hosting rewrites. This eliminates CORS issues and keeps backends secure.
@@ -116,6 +126,7 @@ flowchart TB
     Browser["Browser"] --> Firebase
     Rewrite -->|"Internal Google Network"| Backend
 ```
+
 
 ### Configuration
 
@@ -203,6 +214,8 @@ For one service to call another (e.g., chat-api calling llm-orchestrator):
    });
   ```
 
+---
+
 ## Source-based Deployment
 
 Preferred for most deployments. This approach involves deploying the source code directly and letting the cloud provider (e.g., Google Cloud Run) handle the containerisation using buildpacks. This method is equally applicable to Python and TypeScript backend services.
@@ -269,6 +282,8 @@ web: uvicorn main:app --host 0.0.0.0 --port $PORT
 | **Env Vars**     | Loaded from `.env`                     | Set in Cloud Run config |
 
 
+---
+
 ## Container-based Deployment
 
 User for specialised components e.g. LLM model deployment. This approach involves deploying the source code into a Docker container and letting the container provider (e.g. Google Cloud Build) handle deployment.
@@ -276,6 +291,8 @@ User for specialised components e.g. LLM model deployment. This approach involve
 ### Deployment Startup Script (`start.sh`)
 
 **Purpose**: Initialises and runs the application in the container.
+
+---
 
 ## Local Development
 
@@ -289,4 +306,3 @@ User for specialised components e.g. LLM model deployment. This approach involve
 - Must handle environment variable loading from a local `.env` file.
 - Should provide clear startup status and accessibility information.
 - Must handle proper signal handling for a clean shutdown.
-

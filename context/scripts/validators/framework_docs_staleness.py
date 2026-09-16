@@ -15,7 +15,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 REFERENCE_DOC = "context/docs/agentic-framework-reference.md"
 BRIEF_DOC = "context/docs/agentic-framework.md"
 FRAMEWORK_DOCS = {REFERENCE_DOC, BRIEF_DOC}
@@ -27,6 +26,7 @@ def get_staged_files() -> list[str]:
         ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"],
         capture_output=True,
         text=True,
+        check=False,
     )
     return [f for f in result.stdout.strip().splitlines() if f]
 
@@ -41,9 +41,7 @@ def get_commit_message() -> str:
 def is_context_change(path: str) -> bool:
     if not path.startswith("context/"):
         return False
-    if path in FRAMEWORK_DOCS:
-        return False
-    return True
+    return path not in FRAMEWORK_DOCS
 
 
 def main() -> None:

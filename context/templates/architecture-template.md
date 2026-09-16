@@ -49,6 +49,7 @@ flowchart TB
     System --> ExtB
 ```
 
+
 | Actor / External System | Interaction | Protocol |
 |------------------------|-------------|----------|
 | {User/Actor} | {What they do with the system} | {HTTP, gRPC, UI, etc.} |
@@ -79,6 +80,7 @@ flowchart TB
     B --> DB
     B --> Ext
 ```
+
 
 ### Container Details
 
@@ -145,6 +147,7 @@ erDiagram
     {ENTITY_B} ||--o{ {ENTITY_C} : "{relationship}"
 ```
 
+
 | Table / Collection | Layer / Domain | Purpose | Key Characteristics |
 |-------------------|---------------|---------|---------------------|
 | {table_name} | {e.g. Bronze, User, Config} | {What this table stores} | {e.g. TimescaleDB hypertable, soft-delete} |
@@ -158,6 +161,7 @@ flowchart LR
     Layer1 --> Layer2["{Layer 2}\n{transform description}"]
     Layer2 --> Layer3["{Layer 3}\n{transform description}"]
 ```
+
 
 {1-2 sentences describing the pipeline stages and what each transformation accomplishes.}
 <!-- End data pipeline section -->
@@ -185,6 +189,7 @@ flowchart TB
     Client --> RunA
     RunA --> Store
 ```
+
 
 | Container | Compute | Region | Scaling | Notes |
 |-----------|---------|--------|---------|-------|

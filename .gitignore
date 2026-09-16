@@ -211,6 +211,13 @@ __marimo__/
 context/mcp/mcp.json
 bollinger-context
 
-# Claude Code local configuration
-.claude/settings.local.json
-.claude/settings.local.json.backup*
+# Programmatically generated agent skills
+.agents/skills/
+.claude/prompts/
+.github/instructions/
+.github/prompts/
+.github/copilot-instructions.md
+.openai/prompts/
+CLAUDE.md
+GEMINI.md
+AGENTS.md

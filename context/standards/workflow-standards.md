@@ -1,8 +1,12 @@
 # Technology Development Workflow
 
+---
+
 ## Overview
 
 The developer workflow follows a structured approach to ensure quality and consistency across all projects.
+
+---
 
 ## 1. Create Git Branch
 
@@ -20,6 +24,8 @@ git checkout -b feature/feature-name
 git push -u origin feature/feature-name
 ```
 
+---
+
 ## 2. Project Setup
 
 Set up project folder with blank files according to documentation standards.
@@ -30,6 +36,8 @@ Set up project folder with blank files according to documentation standards.
 - `/artefacts/architecture.md` - Architecture and design specification (system-wide)
 - `{service}/artefacts/tasks.md` - Task breakdown (service-specific)
 - README.md and other project files as per standards
+
+---
 
 ## 3. Write Specifications
 
@@ -45,6 +53,8 @@ Write the specs documents in this order:
   - Outline technical architecture and design decisions
   - Define data models, APIs, and service interactions
 
+---
+
 ## 4. Check Specs Against Standards
 
 Validate all specifications against the following standards:
@@ -56,6 +66,8 @@ Validate all specifications against the following standards:
   - Confirm technical decisions align with approved patterns
   - Validate architectural choices
 
+---
+
 ## 5. Write Tasks
 
 Break down the specifications into actionable development tasks in `{service}/artefacts/tasks.md` (service-specific).
@@ -66,6 +78,8 @@ Break down the specifications into actionable development tasks in `{service}/ar
 - Estimated effort and dependencies
 - Acceptance criteria
 - References to relevant specification sections
+
+---
 
 ## 6. Check Tasks Against Rules
 
@@ -80,6 +94,8 @@ Validate tasks against the established rules and guidelines:
   - Integration testing requirements
   - Code review criteria
   - Deployment readiness checklists
+
+---
 
 ## 7. Update Documentation
 
@@ -97,11 +113,13 @@ Update both project and monorepo-level documentation to reflect completed work.
 - `/artefacts/` - Update system-wide artefacts (architecture, API contracts, requirements)
 
 
+---
+
 ## Assumption Handling Protocol
 
 ### Escalation and Assumptions
 
-See `context/rules/escalation.mdc` for the authoritative escalation model:
+See `context/rules/escalation.md` for the authoritative escalation model:
 
 - **Decision matrix**: impact × confidence → assume / flag / escalate
 - **Impact classification**: distinguishes scope deferrals (low) from operational deferrals (high)
@@ -109,6 +127,8 @@ See `context/rules/escalation.mdc` for the authoritative escalation model:
 - **Logging**: escalations are logged to `artefacts/build/agent-interruptions.md`
 
 Document assumptions in handoff with decision, confidence, rationale, and impact if wrong.
+
+---
 
 ## Continuous Improvement
 
@@ -118,6 +138,8 @@ Framework improvement uses the `continuous-improvement` workflow with two modes:
 - **Retrospective mode**: review `agent-interruptions.md`, `agent-incidents.md`, and git log `Agent-Session` metrics → identify patterns → discuss with human → fix → record
 
 See `context/workflows/continuous-improvement.yaml` for the full phase definitions.
+
+---
 
 ## Communication Style
 
@@ -129,6 +151,8 @@ When working with users, adopt an expert engineer teaching a novice:
 - Provide rationale for decisions
 - Offer learning opportunities
 
+---
+
 ## 8. Orchestrator Agent Invocation
 
 Use `context/templates/task-prompt-template.md` when spawning subagents. The template ensures Rule Resolution and File Scope Assignment are included.
@@ -137,7 +161,7 @@ Use `context/templates/task-prompt-template.md` when spawning subagents. The tem
 - Agents do not commit — they lint, write a commit message to `/tmp/{task-id}_commit_msg.txt`, and report back with file list + message path
 - The orchestrator commits and pushes on their behalf (format → stage → commit → push, one at a time to protect from accidental deletion)
 - The orchestrator adds `duration=`, `dispatch=`, `interactions=`, `approvals=` to the Agent-Session line; `tokens=` is injected by the `prepare-commit-msg` hook
-- The orchestrator verifies the Agent-Session line is present before committing — see `context/rules/git-commits.mdc` Orchestrator Commit Procedure
+- The orchestrator verifies the Agent-Session line is present before committing — see `context/skills/agent-workflows.md` for the Commit Procedure
 - See `context/agents/orchestrator.md` for Rule Resolution, File Scope, and Context Budget Test
 
 ### Token Metrics
@@ -165,9 +189,9 @@ Agent-Session: tool=claude-code model=opus agents=python-coder duration=32m disp
                agent-authored (or orchestrator-appended)        orchestrator at commit time                                    injected by hook
 ```
 
-**Interaction tracking**: `interactions` and `approvals` measure the total human cost for the task — the orchestrator sums its own human touchpoints plus the subagent's. See `context/rules/git-commits.mdc` for the full counting rule and `context/templates/pr-description-template.md` for PR-level autonomy metrics.
+**Interaction tracking**: `interactions` and `approvals` measure the total human cost for the task — the orchestrator sums its own human touchpoints plus the subagent's. See `context/rules/git-commits.md` for the full counting rule and `context/templates/pr-description-template.md` for PR-level autonomy metrics.
 
-**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`. No separate metrics file is maintained.
+**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`, alongside the structured events in `metrics/session-log.jsonl`.
 
 ---
 

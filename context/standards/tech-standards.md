@@ -1,8 +1,12 @@
 # Technology Standards
 
+---
+
 ## Overview
 
 This document describes preferred technology patterns and architectural decisions. Projects should follow these patterns unless there is a compelling reason to deviate.
+
+---
 
 ## Architecture Preferences
 
@@ -27,6 +31,8 @@ This document describes preferred technology patterns and architectural decision
 - **Backend**: Internal-only (Google Cloud VPC or equivalent)
 - **Data Flow**: APIs → Backend → Frontend/Mobile → Users
 
+---
+
 ## Preferred Technology Stack
 
 ### Backend Services
@@ -41,6 +47,7 @@ databases: Cloud SQL (PostgreSQL 18) with pgvector (future), BigQuery
 secrets: Google Cloud Secret Manager (env vars only)
 migrations: Alembic (pre-deployment)
 ```
+
 
 ### Database Migrations
 
@@ -70,14 +77,6 @@ migrations: Alembic (pre-deployment)
 | Pre-deployment | Production-ready migrations  | Alembic (required)     |
 
 **Tool: Alembic** (SQLAlchemy-based migrations for Python + PostgreSQL)
-
-**Setup:**
-
-```bash
-cd backend/{service-name}
-uv add alembic
-alembic init alembic
-```
 
 **Naming convention:**
 
@@ -189,16 +188,7 @@ testing:
 
 - **Puppeteer** (puppeteer-core): Automates Chrome via DevTools Protocol, captures screenshots as evidence
 
-**Installation:**
-
-```bash
-# Frontend
-yarn add -D vitest @testing-library/react @testing-library/user-event puppeteer-core
-
-# Backend
-cd backend/{service-name}
-uv add --dev pytest pytest-cov
-```
+---
 
 ## Static Analysis & Code Quality
 
@@ -215,14 +205,6 @@ uv add --dev pytest pytest-cov
 - **Config**: `.husky/pre-commit` with `biome check --apply`
 - **Hooks**: Biome (format + lint), TypeScript compiler check
 - **Enforcement**: Husky triggers on git commit
-- **Installation**:
-  
-  ```bash
-  yarn add -D @biomejs/biome husky
-  npx husky init
-  echo "npx biome check --apply src/" > .husky/pre-commit
-  echo "npx tsc --noEmit" >> .husky/pre-commit
-  ```
 
 ### Language-Specific Tools
 
@@ -236,6 +218,8 @@ uv add --dev pytest pytest-cov
 - **Test Coverage**: Phase-based thresholds (90% prototype, 94% development, 97% pre-deployment) - see [testing-standards.md §Coverage Requirements](testing-standards.md#coverage-requirements)
 - **Linting**: Zero tolerance - all auto-fixable issues resolved automatically
 
+---
+
 ## Development Environment Setup
 
 ### Prerequisites
@@ -246,45 +230,7 @@ uv add --dev pytest pytest-cov
 - Google Cloud SDK
 - Firebase CLI (for frontend deployment)
 
-### Yarn Berry Setup
-
-**Installation:**
-
-```bash
-# Enable Corepack (ships with Node.js 16.10+)
-corepack enable
-
-# In your project
-yarn init -2              # New project
-yarn set version stable   # Existing project
-```
-
-Corepack downloads the Yarn version specified in `package.json` (`"packageManager": "yarn@4.1.0"`).
-
-**One-off tools:** Use `yarn dlx` (not `npx`).
-
-**Exception — MCP servers:** Model Context Protocol server configs (e.g. in `context/mcp/mcp.json`) may use `npx` because the MCP host (e.g. Cursor) often runs outside the project environment and may not have the project's Yarn on PATH.
-
-**Common issues:**
-
-- "yarn: command not found" → `corepack enable`
-- Homebrew conflict → `brew uninstall yarn`
-
 ### Local Development
-
-```bash
-# Install dependencies
-yarn install
-cd backend/{service-name} && uv sync
-# iOS dependencies: pod install (from mobile/{app-name}/)
-
-# Environment variables (see .env.example files)
-# Google Cloud service account key file required for local development
-
-# Run tests
-uv run pytest                    # Python tests
-yarn test                        # TypeScript tests
-```
 
 **Test Commands:**
 
@@ -297,13 +243,15 @@ yarn test                        # TypeScript tests
 - **Local Development**: `.env` files with development secrets
 - **Production**: Environment variables injected by Cloud Run/Firebase
 
-**TODO**: Expand this section with complete guidance from [rules/secrets-management.mdc](../rules/secrets-management.mdc) including:
+**TODO**: Expand this section with complete guidance from [rules/secrets-management.md](../rules/secrets-management.md) including:
 
 - `/secrets/` directory structure
 - Secret rotation policies
 - Workload Identity vs shared secrets
 - Secret Manager integration patterns
 - Never commit secrets to version control
+
+---
 
 ## Preferred Repository Structure
 
@@ -346,17 +294,25 @@ yarn test                        # TypeScript tests
     └── {workflow-name}/        # Example: Data processing pipelines
 ```
 
+---
+
 ## Development Workflows
 
 See [workflow-standards.md](workflow-standards.md) for complete development processes, quality gates, and deployment pipelines.
+
+---
 
 ## Coding Standards
 
 See [coding-standards.md](coding-standards.md) for complete coding patterns, naming conventions, and implementation standards.
 
+---
+
 ## Testing Standards
 
 See [testing-standards.md](testing-standards.md) for comprehensive testing guidelines, TDD practices, and testing tools/frameworks.
+
+---
 
 ## Performance Considerations
 
@@ -379,6 +335,8 @@ See [testing-standards.md](testing-standards.md) for comprehensive testing guide
 - **Platform-specific builds** (single architecture)
 - **Asset optimisation** (compressed images, WebP)
 - **Offline-first** design where applicable
+
+---
 
 ## Monitoring & Observability
 
@@ -478,6 +436,8 @@ let enableFeature = RemoteConfig.remoteConfig()["enable_new_portfolio_view"].boo
 - Document flag lifecycle in ticket
 - Don't let flags rot in codebase
 
+---
+
 ## Key Decision Records
 
 ### Tech Stack Choices
@@ -505,6 +465,8 @@ Applied as:
 - **Offline-capable**: Core functionality works without network
 - **Privacy-by-design**: Minimise data collection and retention
 
+---
+
 ## Getting Help
 
 ### Documentation Sources
@@ -520,11 +482,15 @@ Applied as:
 - **Node**: `node --version; yarn --version`
 - **Xcode**: `xcodebuild -version`
 
+---
+
 ## Deployment & Build Pipeline
 
 See [build-standards.md](build-standards.md) for complete build configuration, templates, and deployment patterns.
 
 Reference this document when making architectural decisions or introducing new patterns. These are preferred patterns; document deviations and rationale when choosing alternatives.
+
+---
 
 ## 12-Factor App Principles
 
@@ -543,6 +509,8 @@ For building software-as-a-service applications with portability and resilience:
 11. **Logs**: Produce logs as event streams, let execution environment aggregate
 12. **Admin Processes**: Admin tasks in source control, packaged with application
 
+---
+
 ## Context7 Integration
 
 Always use Context7 when needing:
@@ -553,20 +521,5 @@ Always use Context7 when needing:
 
 Automatically use Context7 MCP tools to resolve library ID and get library docs without explicit request.
 
-## Package Installation
+---
 
-Install packages at the project root folder, not at the monorepo root. This ensures proper dependency isolation and allows each project to manage its own dependencies independently.
-
-**Python projects:**
-
-```bash
-cd {project-root}
-uv add package-name
-```
-
-**Node.js projects:**
-
-```bash
-cd {project-root}
-yarn add package-name
-```

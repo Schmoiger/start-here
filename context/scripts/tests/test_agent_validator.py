@@ -4,12 +4,7 @@ import pytest
 from pathlib import Path
 import sys
 
-# Add parent directory to path so we can import validator
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-# Import the validator script - it's in context/scripts/ not a subdirectory
-import validate_agent_definitions
-validate_agent_definition = validate_agent_definitions.validate_agent_definition
+from context.scripts.validators.agent_definitions import validate_agent_definition
 
 
 class TestAgentValidator:
@@ -150,7 +145,7 @@ Test agent
 1. context/standards/tech-standards.md - Lines 1-50
 
 ## Required Rules (Must Follow!)
-1. context/rules/conventional-commits.mdc
+1. context/rules/conventional-commits.md
 
 ## Critical Reminders (from standards above)
 
@@ -223,7 +218,7 @@ None
         bad_agent.write_text("""---
 name: test-agent
 model: sonnet
-rules: [nonexistent-rule.mdc]
+rules: [nonexistent-rule.md]
 ---
 
 ## Role
@@ -233,7 +228,7 @@ Test agent
 None
 
 ## Required Rules (Must Follow!)
-1. context/rules/nonexistent-rule.mdc
+1. context/rules/nonexistent-rule.md
 """)
         errors = validate_agent_definition(bad_agent)
         assert len(errors) > 0

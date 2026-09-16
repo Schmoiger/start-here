@@ -6,6 +6,8 @@ read-when: Navigating standards, understanding what to read
 
 # Standards Index
 
+---
+
 ## Standards Map
 
 | Standard | Purpose | Read when | Not for |
@@ -23,9 +25,13 @@ read-when: Navigating standards, understanding what to read
 | [12-factor-principles](12-factor-principles.md) | SaaS application patterns | Designing services | Frontend, mobile |
 | [tech-mobile-standards](tech-mobile-standards.md) | Mobile tech stack (deferred) | Mobile development | Web, backend |
 
+---
+
 ## DRY Principle
 
 Each topic lives in **one** authoritative place. Other standards cross-reference rather than duplicate. If you find the same guidance in two places, the standard listed in the "Purpose" column above is the authority.
+
+---
 
 ## Frontmatter Convention
 

@@ -12,6 +12,8 @@ related: [tech-standards, coding-standards, testing-standards]
 
 For shared patterns (auth, secrets, monitoring principles), see [tech-standards.md](tech-standards.md).
 
+---
+
 ## iOS Platform
 
 ```yaml
@@ -24,12 +26,16 @@ testing_targets:
   supported_os_range: iOS 17.0+
 ```
 
+---
+
 ## Android Platform (Future)
 
 ```yaml
 languages: Kotlin (planned)
 deployment: Play Store (future)
 ```
+
+---
 
 ## Build Tools
 
@@ -38,6 +44,8 @@ deployment: Play Store (future)
 - **Formatting**: SwiftFormat
 - Run via root pre-commit or SPM plugins so versions are locked across the team.
 
+---
+
 ## Testing
 
 - **Unit**: XCTest
@@ -45,10 +53,14 @@ deployment: Play Store (future)
 
 For testing methodology and coverage thresholds, see [testing-standards.md](testing-standards.md).
 
+---
+
 ## Monitoring & Error Tracking
 
 - **Analytics**: Firebase Analytics
 - **Crash reporting**: Firebase Crashlytics (crash dumps, stack traces, device context)
+
+---
 
 ## Optimisation
 
@@ -56,12 +68,16 @@ For testing methodology and coverage thresholds, see [testing-standards.md](test
 - Asset optimisation (compressed images, WebP)
 - Offline-first design where applicable
 
+---
+
 ## Feature Flags
 
 | Phase | Tool | Usage |
 |-------|------|-------|
 | Prototype/Dev | Environment variables | Simple on/off |
 | Pre-deployment | Firebase Remote Config | `RemoteConfig.remoteConfig()["feature"].boolValue` |
+
+---
 
 ## SwiftUI/iOS Coding Patterns
 
@@ -86,6 +102,8 @@ For testing methodology and coverage thresholds, see [testing-standards.md](test
 - XCTest + XCUITest
 - Support dark mode, dynamic type
 - Keychain for secrets, certificate pinning
+
+---
 
 ## React Native for Web
 

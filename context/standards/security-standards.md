@@ -4,6 +4,8 @@
 
 **Mental shortcut**: For any security decision, ask: *if a mistake happens here, does it fail closed, loudly, and recoverably?* If yes, you're in good shape.
 
+---
+
 ## Phase-Proportionate Security
 
 Not every phase needs the same rigour. Match security investment to risk:
@@ -18,6 +20,8 @@ Not every phase needs the same rigour. Match security investment to risk:
 | HTTPS | Optional locally | Enforced everywhere |
 
 **Rule of thumb**: If you wouldn't deploy it to users, you can defer hardening. But never defer: secrets hygiene, input validation at boundaries, and dependency pinning.
+
+---
 
 ## Boundaries
 
@@ -35,6 +39,8 @@ Every boundary is hostile until proven otherwise: HTTP requests, environment var
 
 **Key principle**: Rely on platform security where it exists. Don't rewrite what your cloud provider already enforces. Document which security guarantees come from infrastructure vs application code.
 
+---
+
 ## Input Validation
 
 Validate at system boundaries. Trust internal code and framework guarantees. Types stop developers; schemas stop attackers — compile-time types aren't enough for runtime safety.
@@ -46,6 +52,8 @@ Validate at system boundaries. Trust internal code and framework guarantees. Typ
 - Never trust client-side validation alone
 
 **Anti-pattern**: Validating data that has already been validated upstream, or adding defensive checks inside trusted internal functions.
+
+---
 
 ## Authentication & Authorisation
 
@@ -69,6 +77,8 @@ Validate at system boundaries. Trust internal code and framework guarantees. Typ
 - Prefer platform identity (workload identity, service accounts) over shared secrets for service-to-service auth
 - Machines should borrow credentials briefly, not store them
 - Third-party API credentials: Use secrets management, rotate on schedule
+
+---
 
 ## API Security
 
@@ -109,6 +119,8 @@ LLM APIs have a distinct threat profile — token cost and prompt injection matt
 - Validate LLM output against expected schemas before acting on it
 - Log prompts and completions for audit (redact PII)
 
+---
+
 ## Safe Failure
 
 **See [coding-standards.md §Error Handling & Safe Failure](coding-standards.md#error-handling--safe-failure) for implementation patterns.**
@@ -120,6 +132,8 @@ Core principle: Errors must fail closed, loudly, and recoverably — without lea
 - Rate limit error responses to prevent enumeration attacks
 - Sanitise all error messages at API boundaries — treat user-facing messages as untrusted output
 - Default to denial: if anything unexpected happens, deny access rather than falling through to a permissive state
+
+---
 
 ## Logging & Monitoring as Security
 
@@ -139,6 +153,8 @@ Logging is a security tool, not just an ops concern. Attackers are noisy; you ju
 **Never log**: passwords, tokens, PII, or request bodies containing sensitive data.
 
 See [coding-standards.md §Logging Standards](coding-standards.md#logging-standards) for structured format and [tech-standards.md §Monitoring & Observability](tech-standards.md#monitoring--observability) for platform tooling.
+
+---
 
 ## Data Security
 
@@ -166,13 +182,15 @@ Know what you're handling and protect accordingly:
 
 Building custom encryption, hashing, or anonymisation when the platform or a well-maintained library already provides it.
 
+---
+
 ## Dependency Security
 
 Prefer well-maintained libraries over custom security code. A mature library with thousands of users has been battle-tested in ways your custom code never will be.
 
 **Principles**:
 - Pin dependency versions and use lockfiles for reproducible builds
-- Audit regularly: `yarn audit`, `uv run pip-audit`, or equivalent
+- Audit regularly for known CVEs
 - Prefer libraries with active maintenance, security policies, and timely CVE responses
 - Remove unused dependencies — they're attack surface with zero value
 - Update dependencies on a regular cadence (monthly for non-critical, immediately for security patches)
@@ -182,18 +200,39 @@ Dependencies are a supply chain, not free candy. Treat them accordingly.
 
 **Anti-pattern**: Writing custom input sanitisation, crypto wrappers, or auth flows when a well-maintained library exists.
 
+---
+
 ## Secrets Management
 
-See [rules/secrets-management.mdc](../rules/secrets-management.mdc) for loading patterns and file locations.
+See [rules/secrets.md](../rules/secrets.md) for strict location matrices and constraints.
 
 **Key points**:
-- Single source of truth in `/secrets/` (local) or Secret Manager (production)
+- **Single source of truth**: Secrets exist in ONE place (`/secrets/` locally or Secret Manager in production). No duplication, no drift, easy rotation, clear audit trail.
 - Never commit secrets to version control
 - Never duplicate secrets across locations
 - Rotate credentials on a schedule
 - Use environment variables as transport, not storage — the real source is the secret manager
 - Prefer identity-based auth (workload identity, OIDC) over shared secrets where the platform supports it
 - Short-lived credentials over long-lived ones: machines should borrow credentials briefly and return them
+
+### Loading Secrets Pattern
+
+```python
+# Python - correct
+from pathlib import Path
+import json
+
+secrets_path = Path(__file__).parent.parent.parent / 'secrets' / 'supabase.json'
+with open(secrets_path) as f:
+    creds = json.load(f)
+```
+
+```typescript
+// TypeScript - correct
+import secrets from '../../../secrets/firebase.json';
+```
+
+---
 
 ## Testing Security
 
@@ -204,6 +243,8 @@ Automate your paranoia. Security tests age well because attack vectors don't go 
 - **"Evil user" tests**: Intentionally try the wrong thing — expired tokens, missing headers, oversized payloads, SQL in query params
 - **Boundary fuzzing**: Fuzz inputs at API boundaries with unexpected types, lengths, and encodings
 - **Threat modelling**: Even informal — ask "what happens if this endpoint is abused?" for every new API. The act of asking is more valuable than the diagram.
+
+---
 
 ## Anti-Patterns
 
@@ -220,6 +261,8 @@ Common security mistakes to avoid:
 | Validating only on the client | Trivially bypassed | Always validate server-side |
 | Ignoring dependency audits | Known CVEs in your supply chain | Regular audits, automated alerts |
 | Over-engineering security for prototypes | Wasted effort, slows iteration | Match rigour to phase (see table above) |
+
+---
 
 ## Deployment Safety
 <!-- applyTo: "**/{firestore.rules,firebase.json,*.config.*,package.json,pyproject.toml,lib/**,app/api/**}" -->

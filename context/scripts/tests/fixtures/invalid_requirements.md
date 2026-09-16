@@ -1,5 +1,7 @@
 # Requirements
 
+---
+
 ## Functional Requirements
 
 The system shall fetch data from Yahoo Finance.

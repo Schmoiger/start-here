@@ -1,5 +1,7 @@
 # Commit Message Template
 
+---
+
 ## Format
 
 ```
@@ -12,6 +14,8 @@ Agent-Session: tool=<tool> model=<model> agents=<agent-ids> duration=<time>
 
 Co-Authored-By: <tool-or-identifier> <<email>>
 ```
+
+---
 
 ## Components
 
@@ -78,6 +82,8 @@ Co-Authored-By: GitHub Copilot <copilot@github.com>
 
 Match the tool (and optionally model) to what is in Agent-Session. Do not use a fixed co-author; use the actual tool/model that was used.
 
+---
+
 ## Examples
 
 ### Simple Feature
@@ -127,6 +133,8 @@ Tasks: DOC-001
 ```
 
 No Agent-Session or Co-Authored-By for human-only commits.
+
+---
 
 ## Parsing
 

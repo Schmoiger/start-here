@@ -2,6 +2,8 @@
 
 **Core Principle**: Design for clarity, accessibility, and user comprehension. Every visual element should serve a purpose.
 
+---
+
 ## Design Principles
 
 These principles guide all design decisions. When specific rules in this document don't cover a situation, fall back to these.
@@ -23,6 +25,8 @@ These principles guide all design decisions. When specific rules in this documen
 - Before adding a UI element, ask: does this serve one of these principles or violate one?
 - When two principles conflict (e.g. discoverability vs simplicity), favour the one that reduces user effort
 - These principles apply to all agents: designers decide layout, coders preserve intent, testers verify compliance
+
+---
 
 ## Visual Hierarchy
 
@@ -91,6 +95,8 @@ Design layouts to match how users actually scan screens:
 - Users scan headings and first words — front-load meaning in every label and heading
 - Break the scanning pattern deliberately only when you need to draw attention to something critical
 
+---
+
 ## Colour & Accessibility
 
 **WCAG 2.1 AA Requirements** (Mandatory):
@@ -120,6 +126,8 @@ Design layouts to match how users actually scan screens:
 - Don't rely on colour alone to convey information
 - Use shapes, patterns, or labels alongside colour
 - Test with colour blindness simulators
+
+---
 
 ## Data Visualisation
 
@@ -163,6 +171,8 @@ Design layouts to match how users actually scan screens:
 - Gridlines subtle (10-20% opacity)
 - Markers/indicators at points of interest, not spanning entire chart
 
+---
+
 ## Tooltips
 
 **Content Rules**:
@@ -188,6 +198,8 @@ Design layouts to match how users actually scan screens:
 - Screen reader compatible (aria-describedby)
 - Sufficient contrast for tooltip text
 
+---
+
 ## Interactive States
 
 **Required States for Interactive Elements**:
@@ -208,6 +220,8 @@ Design layouts to match how users actually scan screens:
 - Use `outline-offset` for better aesthetics
 - Ensure 3:1 contrast against background
 
+---
+
 ## Responsive Design
 
 **Breakpoints** (Mobile-first):
@@ -224,6 +238,8 @@ Design layouts to match how users actually scan screens:
 - Minimum 44×44px for touch devices
 - 8px minimum spacing between targets
 - Larger targets for primary actions
+
+---
 
 ## Layout System
 
@@ -254,6 +270,8 @@ Design layouts to match how users actually scan screens:
 - Sidebar navigation should collapse to a hamburger menu below tablet breakpoint
 - Content areas must have consistent padding at each breakpoint
 
+---
+
 ## Spacing Scale
 
 **Base Unit**: 4px. All spacing must use multiples of the base unit.
@@ -276,6 +294,8 @@ Design layouts to match how users actually scan screens:
 - Between page sections: use space-12 to space-16
 - Never use arbitrary values — always use the scale
 - Vertical rhythm should feel consistent; if in doubt, use more space, not less
+
+---
 
 ## Overflow Rules
 
@@ -307,6 +327,8 @@ Design layouts to match how users actually scan screens:
 | `overflow: hidden` to hide layout bugs | Masks the problem, content is lost |
 | Horizontal scroll on non-tabular content | Poor mobile experience |
 | Unbounded text without max-width | Unreadable lines on wide screens |
+
+---
 
 ## Page Layout Patterns
 
@@ -340,6 +362,8 @@ Design layouts to match how users actually scan screens:
 - Status/alerts: top of content area, full width of container
 - Floating actions (FAB): bottom-right, only one per page
 
+---
+
 ## Z-index / Layering Strategy
 
 **Named Scale** (must use these values, never arbitrary z-index):
@@ -361,6 +385,8 @@ Design layouts to match how users actually scan screens:
 - Tooltips must render above all other layers
 - Sticky elements must not obscure modal or toast content
 - When stacking within a layer, use increments of 1 (e.g. 31, 32)
+
+---
 
 ## Empty, Loading & Error States
 
@@ -398,6 +424,8 @@ Design layouts to match how users actually scan screens:
 - Error messages must be actionable — include a retry button or next step
 - Preserve page structure during loading — no layout shift when data arrives
 
+---
+
 ## Dark Mode
 
 **Strategy**: Use CSS custom properties and semantic colour tokens. Define surfaces, text, and borders as abstract tokens that resolve differently per theme.
@@ -429,6 +457,8 @@ Design layouts to match how users actually scan screens:
 | Forget to style shadows/borders | Looks broken in dark mode |
 | Use transparent overlays without testing both modes | Overlay may be invisible in one mode |
 
+---
+
 ## Typography
 
 **Scale** (Consistent rhythm):
@@ -448,6 +478,8 @@ lg: 18px    xl: 20px    2xl: 24px
 - Left-align body text (avoid justified)
 - Sufficient paragraph spacing (1em minimum)
 
+---
+
 ## Animation & Motion
 
 **Principles**:
@@ -466,6 +498,8 @@ lg: 18px    xl: 20px    2xl: 24px
 - Critical error messages (show immediately)
 - High-frequency updates (avoid visual noise)
 - User-initiated navigation (keep fast)
+
+---
 
 ## Component Patterns
 
@@ -487,6 +521,8 @@ lg: 18px    xl: 20px    2xl: 24px
 - Sortable columns: clear indicator of sort state
 - Responsive: horizontal scroll or card layout on mobile
 
+---
+
 ## Anti-Patterns (Forbidden)
 
 | Don't | Why |
@@ -499,6 +535,8 @@ lg: 18px    xl: 20px    2xl: 24px
 | Infinite scroll without position indicator | User loses context |
 | Auto-playing animations/videos | Disruptive, accessibility issue |
 | Small touch targets on mobile | Frustrating, unusable |
+
+---
 
 ## Tools & Validation
 
@@ -514,6 +552,8 @@ lg: 18px    xl: 20px    2xl: 24px
 **Design Token Management**:
 - Tokens Studio (Figma)
 - Style Dictionary (code export)
+
+---
 
 ## Sources
 

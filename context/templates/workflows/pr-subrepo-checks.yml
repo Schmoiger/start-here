@@ -1,0 +1,61 @@
+name: PR Subrepo Checks
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "context/**"
+      - "typst/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pr-subrepo-checks.yml"
+  push:
+    branches: [main, master]
+    paths:
+      - "context/**"
+      - "typst/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pr-subrepo-checks.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  subrepo-checks:
+    name: Subrepo Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up uv & Python 3.14
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          python-version: "3.14"
+
+      - name: Run Ruff Linter
+        if: ${{ hashFiles('context/scripts/validators/**/*.py') != '' }}
+        run: uv run --with ruff ruff check context/scripts/validators/
+
+      - name: Generate Runtime Projections
+        run: uv run python context/scripts/generators/generate_adapters.py
+
+      - name: Run Automated Test Suite
+        run: uv run pytest -v
+
+      - name: Check Adapter Drift
+        run: uv run python context/scripts/validators/adapter_drift.py
+
+      - name: Validate Agent Definitions
+        run: uv run python context/scripts/validators/agent_definitions.py
+
+      - name: Verify Typst Formatting Rules
+        run: uv run python context/scripts/validators/verify_typst_formatting.py typst/

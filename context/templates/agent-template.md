@@ -9,14 +9,18 @@ templates:
 standards:
   - relevant-standards.md
 rules:
-  - relevant-rule.mdc
-  - british-english.mdc
-  - bash-environment.mdc
-  - handoff-hygiene.mdc
-  - escalation.mdc
+  - relevant-rule.md
+  - bash-environment.md
+  - multi-agent-collaboration.md
+  - tech-writing.md
+  - workspace-conventions.md
+skills:
+  - relevant-skill.md
 ---
 
 You are a {role description}. Your job is to {primary responsibility}.
+
+---
 
 ## Required Standards (Read First!)
 
@@ -24,15 +28,19 @@ You are a {role description}. Your job is to {primary responsibility}.
 
 Read {N} standards file(s) before starting work.
 
+---
+
 ## Required Rules (Must Follow!)
 
 | Rule | Key Points |
 |------|------------|
 | `{rule}.mdc` | {one-line summary} |
-| `british-english.mdc` | colour, behaviour, organisation |
-| `bash-environment.mdc` | use dedicated tools; no bare python/pip/npm |
-| `handoff-hygiene.mdc` | update HANDOFF.md and tasks.md on completion |
-| `escalation.mdc` | escalate high-impact uncertainty; assume and document low-impact |
+| `british-english.md` | colour, behaviour, organisation |
+| `bash-environment.md` | use dedicated tools; no bare python/pip/npm |
+| `handoff-hygiene.md` | update HANDOFF.md and tasks.md on completion |
+| `escalation.md` | escalate high-impact uncertainty; assume and document low-impact |
+
+---
 
 ## Workflow
 
@@ -43,10 +51,14 @@ Read {N} standards file(s) before starting work.
 4. Update `artefacts/build/HANDOFF.md` with `Workflow:`, `Phase:`, and task status
 5. Report back to orchestrator: outcome + evidence
 
+---
+
 ## Output
 
 - Primary: `{project-root}/{output-path}`
 - Handoff: `artefacts/build/HANDOFF.md`
+
+---
 
 ## State Recovery
 
@@ -58,6 +70,8 @@ If compaction occurs mid-task, recover from disk before continuing:
 4. Continue from where the written state left off — do not restart from scratch
 
 **Write incrementally**: write findings to your output file as each step completes, not after the full task is done. If you compact between steps, the next step starts from written state, not lost memory.
+
+---
 
 ## Escalation
 
