@@ -25,8 +25,12 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from context.scripts.generators.adapters.core.loader import load_canonical_context
+from context.scripts.generators.adapters.claude.generator import (
+    generate_claude_md,
+    generate_subagent_prompts,
+)
 from context.scripts.generators.adapters.core.agents_md import generate_agents_md
+from context.scripts.generators.adapters.core.loader import load_canonical_context
 from context.scripts.generators.adapters.gemini.generator import (
     generate_gemini_md,
     generate_skills,
@@ -35,15 +39,12 @@ from context.scripts.generators.adapters.github.generator import (
     generate_copilot_instructions,
     generate_prompts,
     generate_scoped_instructions,
+    generate_workflows,
 )
 from context.scripts.generators.adapters.openai.generator import (
     generate_runner_harness,
     generate_system_prompts,
     generate_tool_schemas,
-)
-from context.scripts.generators.adapters.claude.generator import (
-    generate_claude_md,
-    generate_subagent_prompts,
 )
 
 SUPPORTED_TARGETS = {"all", "gemini", "claude", "github", "copilot", "codex", "openai"}
@@ -163,6 +164,7 @@ def get_adapter_projections(
         projections.update(generate_copilot_instructions(context, repo_root, dry_run=True))
         projections.update(generate_prompts(context, repo_root, dry_run=True))
         projections.update(generate_scoped_instructions(repo_root, dry_run=True))
+        projections.update(generate_workflows(repo_root, dry_run=True))
 
     if "openai" in active_targets:
         projections.update(generate_system_prompts(context, repo_root, dry_run=True))

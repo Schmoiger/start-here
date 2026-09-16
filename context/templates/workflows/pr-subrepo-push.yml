@@ -1,0 +1,121 @@
+name: PR Subrepo Push
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "context/**"
+      - "typst/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  detect-subrepos:
+    name: Check Subrepo Modifications
+    runs-on: ubuntu-latest
+    outputs:
+      context_changed: ${{ steps.filter.outputs.context }}
+      typst_changed: ${{ steps.filter.outputs.typst }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Check changed paths
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            context:
+              - 'context/**'
+            typst:
+              - 'typst/**'
+
+  sync-subrepos:
+    name: Subrepo Upstream Sync
+    needs: detect-subrepos
+    if: ${{ needs.detect-subrepos.outputs.context_changed == 'true' || needs.detect-subrepos.outputs.typst_changed == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_PUSH_TOKEN || github.token }}
+          persist-credentials: false
+
+      - name: Evaluate Push Authentication
+        id: auth-check
+        run: |
+          if [ -n "${{ secrets.UPSTREAM_PUSH_TOKEN }}" ]; then
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure Git identity
+        if: steps.auth-check.outputs.has_token == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install git-subrepo
+        if: steps.auth-check.outputs.has_token == 'true'
+        run: |
+          git clone https://github.com/git-commands/git-subrepo.git /tmp/git-subrepo
+          echo "/tmp/git-subrepo/lib" >> $GITHUB_PATH
+          echo "MANPATH=/tmp/git-subrepo/man:$MANPATH" >> $GITHUB_ENV
+
+      - name: Sync Subrepos to Upstream
+        if: steps.auth-check.outputs.has_token == 'true'
+        env:
+          PUSH_TOKEN: ${{ secrets.UPSTREAM_PUSH_TOKEN }}
+        run: |
+          echo "Configuring subrepo credentials..."
+          # Unset local extraheader written by actions/checkout so it cannot override the PAT
+          git config --local --unset-all "http.https://github.com/.extraheader" || true
+          git config --global url."https://x-access-token:${PUSH_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+          if [ "${{ needs.detect-subrepos.outputs.context_changed }}" == "true" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "Pushing context/ upstream..."
+            git subrepo push context
+          fi
+
+          if [ "${{ needs.detect-subrepos.outputs.typst_changed }}" == "true" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "Pushing typst/ upstream..."
+            git subrepo push typst
+          fi
+
+          # Push updated .gitrepo tracking commits back to main
+          echo "Pushing updated subrepo tracking commits back..."
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Generate Subrepo Push Summary
+        run: |
+          cat << 'EOF' >> $GITHUB_STEP_SUMMARY
+          ### 📦 Subrepo Status Summary
+
+          | Subrepo | Modified in Merge | Upstream Sync Status |
+          |---|---|---|
+          | `context/` | ${{ needs.detect-subrepos.outputs.context_changed == 'true' && '✅ Yes' || '➖ No' }} | ${{ steps.auth-check.outputs.has_token == 'true' && (needs.detect-subrepos.outputs.context_changed == 'true' && '🚀 Pushed Upstream' || '➖ Up to date') || (needs.detect-subrepos.outputs.context_changed == 'true' && '⚠️ Pending Manual Push (`UPSTREAM_PUSH_TOKEN` not configured)' || '➖ Up to date') }} |
+          | `typst/` | ${{ needs.detect-subrepos.outputs.typst_changed == 'true' && '✅ Yes' || '➖ No' }} | ${{ steps.auth-check.outputs.has_token == 'true' && (needs.detect-subrepos.outputs.typst_changed == 'true' && '🚀 Pushed Upstream' || '➖ Up to date') || (needs.detect-subrepos.outputs.typst_changed == 'true' && '⚠️ Pending Manual Push (`UPSTREAM_PUSH_TOKEN` not configured)' || '➖ Up to date') }} |
+
+          EOF
+          if [ "${{ steps.auth-check.outputs.has_token }}" != "true" ] && ([ "${{ needs.detect-subrepos.outputs.context_changed }}" == "true" ] || [ "${{ needs.detect-subrepos.outputs.typst_changed }}" == "true" ]); then
+            cat << 'EOF' >> $GITHUB_STEP_SUMMARY
+          > 💡 **Tip**: To enable automatic upstream pushing on merge, add a GitHub repository secret named `UPSTREAM_PUSH_TOKEN` with write access to `Schmoiger/agents-framework` and `Schmoiger/typst-engine`.
+          > Alternatively, run locally:
+          > ```bash
+          > git checkout main && git pull
+          > git subrepo push context
+          > git subrepo push typst
+          > ```
+          EOF
+          fi

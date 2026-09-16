@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from context.scripts.generators.adapters.core.models import CanonicalAgent
@@ -6,17 +5,18 @@ from context.scripts.generators.adapters.github.generator import (
     generate_copilot_instructions,
     generate_prompts,
     generate_scoped_instructions,
+    generate_workflows,
 )
 
 
 def test_generate_copilot_instructions(tmp_path: Path):
     context = {}
     generate_copilot_instructions(context, tmp_path)
-    
+
     file_path = tmp_path / ".github" / "copilot-instructions.md"
     assert file_path.exists()
     content = file_path.read_text()
-    
+
     assert "GitHub Copilot Instructions" in content
     assert "Auto-generated" in content
     assert "British English" in content
@@ -35,11 +35,11 @@ def test_generate_prompts(tmp_path: Path):
         }
     }
     generate_prompts(context, tmp_path)
-    
+
     prompt_path = tmp_path / ".github" / "prompts" / "test-agent.prompt.md"
     assert prompt_path.exists()
     content = prompt_path.read_text()
-    
+
     assert "# Test Agent" in content
     assert "Test description" in content
     assert "Standard 1" in content
@@ -50,7 +50,7 @@ def test_generate_scoped_instructions(tmp_path: Path):
     # Setup dummy standards dir
     standards_dir = tmp_path / "context" / "standards"
     standards_dir.mkdir(parents=True)
-    
+
     standard_file = standards_dir / "test-standard.md"
     standard_file.write_text(
         "## Deployment Safety\n"
@@ -58,13 +58,13 @@ def test_generate_scoped_instructions(tmp_path: Path):
         "- Safety rule 1\n"
         "- Safety rule 2\n"
     )
-    
+
     generate_scoped_instructions(tmp_path)
-    
+
     instr_file = tmp_path / ".github" / "instructions" / "test-standard-deployment-safety.instructions.md"
     assert instr_file.exists()
     content = instr_file.read_text()
-    
+
     assert 'applyTo: "**/*.py"' in content
     assert "excludeAgent" not in content
     assert "Auto-generated" in content
@@ -75,7 +75,7 @@ def test_generate_scoped_instructions(tmp_path: Path):
 def test_generate_scoped_instructions_with_exclude_agent(tmp_path: Path):
     standards_dir = tmp_path / "context" / "standards"
     standards_dir.mkdir(parents=True)
-    
+
     standard_file = standards_dir / "test-standard.md"
     standard_file.write_text(
         "## Deployment Safety\n"
@@ -83,13 +83,30 @@ def test_generate_scoped_instructions_with_exclude_agent(tmp_path: Path):
         "<!-- excludeAgent: \"cloud-agent\" -->\n"
         "- Safety rule 1\n"
     )
-    
+
     generate_scoped_instructions(tmp_path)
-    
+
     instr_file = tmp_path / ".github" / "instructions" / "test-standard-deployment-safety.instructions.md"
     assert instr_file.exists()
     content = instr_file.read_text()
-    
+
     assert 'applyTo: "**/*.py"' in content
     assert 'excludeAgent: "cloud-agent"' in content
     assert "Safety rule 1" in content
+
+
+def test_generate_workflows(tmp_path: Path):
+    workflows_dir = tmp_path / "context" / "templates" / "workflows"
+    workflows_dir.mkdir(parents=True)
+
+    template_file = workflows_dir / "sample-workflow.yml"
+    template_content = "name: Sample\non: [push]\njobs:\n  sample:\n    runs-on: ubuntu-latest\n"
+    template_file.write_text(template_content)
+
+    results = generate_workflows(tmp_path)
+
+    target_file = tmp_path / ".github" / "workflows" / "sample-workflow.yml"
+    assert target_file.exists()
+    assert target_file.read_text() == template_content
+    assert target_file in results
+
