@@ -1,5 +1,7 @@
 # Tasks: {Feature Name}
 
+---
+
 ## Header
 
 Every task file begins with structured metadata:

@@ -13,9 +13,9 @@ BEFORE starting, read:
 1. context/agents/{agent-name}.md
 {resolved-rules — orchestrator: resolve using Rule Resolution in orchestrator.md.
  List each rule as a numbered item with its full path, e.g.:
-  2. context/rules/bash-environment.mdc
-  3. context/rules/python-environment.mdc
-  4. context/rules/escalation.mdc
+  2. context/rules/bash-environment.md
+  3. context/rules/python-environment.md
+  4. context/rules/escalation.md
  Also add relevant standards:
   - context/standards/coding-standards.md       (implementation tasks)
   - context/standards/testing-standards.md      (test tasks)
@@ -24,7 +24,7 @@ BEFORE starting, read:
 {resolved-skills — orchestrator: resolve using Skill Resolution in orchestrator.md.
  List matching procedural skills from the ## Skills index in AGENTS.md, e.g.:
   5. context/skills/python-scripting.md         (tasks touching Python files or scripts)
-  6. context/skills/git-subrepo.md              (tasks touching context/ or .gitrepo)}
+  6. context/skills/technical-authoring.md      (tasks involving human-facing documentation)}
 
 ESCALATION (MANDATORY):
 Log to `artefacts/build/agent-interruptions.md` under the current sprint section

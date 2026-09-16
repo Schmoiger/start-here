@@ -2,6 +2,8 @@
 
 **Languages**: Python (backend), TypeScript (frontend)
 
+---
+
 ## File Organisation
 
 ```
@@ -23,6 +25,8 @@ frontend/
 └── tests/              # Test directory
 ```
 
+---
+
 ## Naming Conventions
 
 ```typescript
@@ -32,9 +36,13 @@ frontend/
 // Event handlers: handleXxx (handleSubmit)
 ```
 
+---
+
 ## Virtual Environment
 
 A virtual environment shall be initialised at the project root.
+
+---
 
 ## Component Structure
 
@@ -63,6 +71,8 @@ export const ComponentName: FunctionalComponent<Props> = ({ prop }) => {
 };
 ```
 
+---
+
 ## Import Organisation
 
 ```typescript
@@ -78,6 +88,8 @@ import { apiClient } from '@/lib/api-client';
 // 4. Type imports
 import type { User } from '@/types/user';
 ```
+
+---
 
 ## Python/FastAPI Patterns
 
@@ -107,6 +119,8 @@ async def get_user_data(
     return ResponseModel(**data)
 ```
 
+---
+
 ## Error Handling & Safe Failure
 
 **Principle**: Errors must fail closed, loudly, and recoverably — without leaking secrets, stack traces, or internal structure.
@@ -124,11 +138,15 @@ async def get_user_data(
 
 See [security-standards.md §Safe Failure](security-standards.md#safe-failure) for security-specific concerns.
 
+---
+
 ## Security
 
 See standards for security implementation:
 - [tech-standards.md §Authentication Architecture](tech-standards.md#authentication-architecture) - Firebase Auth, workload identity, token flows
 - [security-standards.md](security-standards.md) - Input validation, API security, data protection, safe failure principles
+
+---
 
 ## Lean Code (Token-Efficient by Design)
 
@@ -159,6 +177,8 @@ Lean code and token-efficient code are the same thing: eliminate waste so both h
 - Self-documenting code over verbose comments
 - Docstrings on public APIs only; skip obvious ones
 
+---
+
 ## Performance Patterns
 
 ```typescript
@@ -175,6 +195,8 @@ user_data, health_data = await asyncio.gather(
 )
 ```
 
+---
+
 ## Logging Standards
 
 **Format**: Use structured logging (JSON) with consistent fields: event type, timestamp, correlation ID, context (user_id, request_id, etc.).
@@ -182,6 +204,8 @@ user_data, health_data = await asyncio.gather(
 **What to log**: See [security-standards.md §Logging & Monitoring as Security](security-standards.md#logging--monitoring-as-security) for security events (auth attempts, permission denials, validation failures) and what never to log (passwords, tokens, PII).
 
 **Tools**: See [tech-standards.md §Monitoring & Observability](tech-standards.md#monitoring--observability) for platform choices.
+
+---
 
 ## Code Quality Requirements
 
@@ -203,6 +227,8 @@ def process_data(user_id: str, data: Dict[str, Any]) -> Optional[Result]:
 
 **Linting**: Biome (TS), black + isort (Python) - auto-fix all issues before commits
 
+---
+
 ## Commit Protocol
 
 **Every task completion requires a commit.** This ensures fine-grained history, easy reverts, and clear audit trails.
@@ -221,7 +247,7 @@ Co-Authored-By: Claude {Model} <{model}@anthropic.com>
 ```
 
 **Note**:
-- Agent-Session line tracks metrics for session analysis — see `context/rules/git-commits.mdc` for full field reference
+- Agent-Session line tracks metrics for session analysis — see `context/skills/agent-workflows.md` for full field reference
 - `tokens=` is appended automatically by the `prepare-commit-msg` hook — never include it manually
 - `duration`, `dispatch`, `interactions`, `approvals` are added by the orchestrator at commit time
 - Tasks line references task IDs from tasks.md
@@ -290,6 +316,8 @@ docs: update API documentation
 refactor: simplify data service logic
 ```
 
+
+---
 
 ## Framework-Specific Best Practices
 
@@ -399,6 +427,8 @@ Use DaisyUI semantic classes for all standard components.
    - Fast refresh for all platforms
    - Shared dev tools and debugging
 
+---
+
 ## API Design Standards
 
 ### RESTful Principles
@@ -493,6 +523,8 @@ Accept: application/vnd.api+json; version=1
   }
 }
 ```
+
+---
 
 ## Deployment Safety
 

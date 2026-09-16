@@ -1,10 +1,14 @@
 # Bugs: {Service}
 
+---
+
 ## Format
 
 ```
 [STATUS] | #ID | {actual} INSTEAD {expected} | {location} | {learnings} |
 ```
+
+---
 
 ## Tracker
 
@@ -19,6 +23,8 @@
 [ts#data-003]: troubleshooting-data-service.md#data-003
 [ts#data-007]: troubleshooting-data-service.md#data-007
 
+---
+
 ## Summary
 
 | Status | Count |
@@ -26,6 +32,8 @@
 | TODO | 2 |
 | DOING | 2 |
 | DONE | 1 |
+
+---
 
 ## Notes
 

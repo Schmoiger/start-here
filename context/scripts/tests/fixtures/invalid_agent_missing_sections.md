@@ -7,6 +7,8 @@ model: sonnet
 
 This agent is missing required sections.
 
+---
+
 ## Workflow
 
 1. Do something

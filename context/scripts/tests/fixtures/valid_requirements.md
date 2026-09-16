@@ -1,5 +1,7 @@
 # Requirements
 
+---
+
 ## Functional Requirements
 
 ### Data Fetching
@@ -17,6 +19,8 @@ THE system SHALL NOT store user credentials in plain text.
 ### Complex Requirements
 
 WHEN the user submits a request, IF the cache is stale, THE system SHALL fetch fresh data from the API.
+
+---
 
 ## Non-Functional Requirements
 

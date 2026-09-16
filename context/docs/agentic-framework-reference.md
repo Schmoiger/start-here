@@ -1,9 +1,9 @@
 # Hive Mind: Framework Reference
 
 **Document Status**: Draft  
-**Version**: 0.5.0  
-**Last Updated**: 12 September 2026  
-**Word Count**: ~8,400 words  
+**Version**: 0.6.0  
+**Last Updated**: 15 September 2026  
+**Word Count**: ~8,500 words  
 **Reading Time**: ~35 minutes
 
 **Companion**: *Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery* (`context/docs/agentic-framework.md`)
@@ -117,14 +117,14 @@ The source of truth hierarchy above governs files inside the repository. But age
 
 Anything at precedence 1 or 2 that contradicts precedence 3 or 4 wins — and the framework has no mechanism to detect or prevent it.
 
-**Why this breaks the framework.** The framework's design assumes that `context/` is the authoritative operating model and that derived projections (`AGENTS.md`, `CLAUDE.md`) faithfully represent it at runtime. Personal settings and memories violate that assumption. A contributor whose agent runtime has memorised "always use `pip install`" will have that memory override the framework's `python-environment.mdc` rule requiring `uv add`. A user-level `CLAUDE.md` that says "keep responses concise" can override the framework's handoff requirements. These overrides are invisible to other contributors, to review agents, and to the framework's validators — the pre-commit hooks check committed files, not what was in the agent's context window.
+**Why this breaks the framework.** The framework's design assumes that `context/` is the authoritative operating model and that derived projections (`AGENTS.md`, `CLAUDE.md`) faithfully represent it at runtime. Personal settings and memories violate that assumption. A contributor whose agent runtime has memorised "always use `pip install`" will have that memory override the framework's `python-environment.md` rule requiring `uv add`. A user-level `CLAUDE.md` that says "keep responses concise" can override the framework's handoff requirements. These overrides are invisible to other contributors, to review agents, and to the framework's validators — the pre-commit hooks check committed files, not what was in the agent's context window.
 
 **Symptoms.** Inconsistent agent behaviour across contributors working on the same repository. Rules that are correctly defined and injected but not followed. Agents that produce output in a style or format that does not match any framework standard. Validators passing at commit time on rules that were violated during execution (because the violation was in approach, not in the committed artefact). Debugging these failures is difficult because the cause lives outside the repository.
 
 **Mitigations.**
 
 - **Disable agent memories** for repositories governed by this framework. In Claude Code: do not use `/memory` and clear any existing memories that overlap with framework concerns. The framework's durable context (handoffs, task files, standards) replaces what memories are meant to provide, with the advantage of being versioned, shared, and inspectable.
-- **Avoid user-level configuration that overlaps with framework concerns.** If `context/rules/python-environment.mdc` governs Python tooling, do not also set Python tooling preferences in `~/.claude/CLAUDE.md` or `~/.cursor/rules/`. User-level configuration should be limited to genuinely personal, project-independent preferences (editor keybindings, display settings) that do not intersect with anything the framework manages.
+- **Avoid user-level configuration that overlaps with framework concerns.** If `context/rules/python-environment.md` governs Python tooling, do not also set Python tooling preferences in `~/.claude/CLAUDE.md` or `~/.cursor/rules/`. User-level configuration should be limited to genuinely personal, project-independent preferences (editor keybindings, display settings) that do not intersect with anything the framework manages.
 - **Audit when behaviour diverges.** If an agent ignores a correctly injected rule, check user-level configuration and memories before assuming the rule is broken or the model is non-compliant. The most common cause is a higher-precedence instruction contradicting the rule.
 - **Document the requirement.** Onboarding instructions for contributors should explicitly state that personal agent configuration must not overlap with framework-managed concerns, and that agent memories should be disabled or cleared.
 
@@ -160,15 +160,19 @@ Each agent definition lists the standards it depends on in its frontmatter. When
 
 ### The Rules, Standards, and Skills Split
 
-Rules and standards serve different purposes, and the separation is the framework's most consequential structural decision.
+The separation is enforced by **verification mechanism** and **runtime projection** — not by length or topic.
 
-Rules are under 200 tokens each. They state what must happen: "use `uv run pytest`, not bare `pytest`"; "agents do not commit; the orchestrator commits on their behalf." They are designed for repeated injection into spawn prompts without significant context window cost. A typical agent spawn injects 5-8 rules at ~100-200 tokens each, plus the agent definition at ~500-1,000 tokens, totalling roughly 1,500-2,500 tokens of framework overhead.
+**Rules** are deterministic invariants. Binary: followed or not. Verified at **zero token cost** by code (pre-commit hooks, linters, AST parsers). *If it requires an LLM to verify, it is not a rule.*
 
-Standards run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume.
+- `alwaysApply: true`: injected into every spawn. Must be aggressively succinct. Currently ~1,300 tokens total — less than 1% of a 128k–200k context window, under 0.1% on 1M+ models. Only the most critical global invariants belong here.
+- `alwaysApply: false`: injected JIT by glob match. Still succinct; domain-specific.
+- **Content**: pure constraints. No tutorials, no explanations.
 
-Skills provide procedural JIT (Just-In-Time) guidance for unusual or complex technology boundaries (like `git-subrepo` or `uv` environments). While standards explain the philosophy and rules enforce binary constraints, skills act as the operational runbook. They are compiled from `context/skills/` into runtime-native formats (e.g., `.agents/skills/`) and can be bound to agents via their frontmatter.
+**Skills** are procedural runbooks. "How to accomplish X." Verified by **LLM-as-a-judge**: an agent executes the skill; a reviewer agent checks the outcome. Injected JIT when an agent matches globs or needs to navigate a specific complex boundary. **Content**: step-by-step instructions, tool commands, code snippets.
 
-An agent executing a straightforward Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight, while relying on skills to guide the agent when executing complex commands.
+**Standards** are the reference canon and benchmark rubrics. "What good looks like and why." Used as the **evaluation rubric** against which LLM judges assess skill execution. Loaded JIT by any agent that needs them — design and dev agents when they need deep context on a decision, reviewer agents (`@tech-lead`, `@code-reviewer`) when evaluating output. **Content**: architectural patterns, design philosophy, trade-offs, and detailed rationale.
+
+An agent executing a simple Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating test sufficiency needs the full testing standard. A coder navigating a `uv` PEP 723 inline script needs the `python-scripting` skill. The framework serves all three without forcing any to carry the others' weight.
 
 ### Standards Catalogue
 
@@ -248,42 +252,41 @@ Only a subset of rules currently have matching Python validators under `context/
 
 | Rule | Purpose |
 |------|---------|
-| `python-environment.mdc` | Enforces `uv` for all Python commands |
-| `typescript-environment.mdc` | Enforces `yarn` for package management, `yarn dlx` for one-off tools |
-| `bash-environment.mdc` | Prevents unsafe or inconsistent shell usage; pushes work toward approved tools |
-| `mermaid-environment.mdc` | Constrains Mermaid diagram syntax, layout direction, and node label conventions |
-| `supabase.mdc` | Defines constraints around Supabase-related usage |
+| `python-environment.md` | Enforces `uv` for all Python commands |
+| `typescript-environment.md` | Enforces `yarn` for package management, `yarn dlx` for one-off tools |
+| `bash-environment.md` | Prevents unsafe or inconsistent shell usage; pushes work toward approved tools |
+| `mermaid-environment.md` | Constrains Mermaid diagram syntax, layout direction, and node label conventions |
+| `supabase.md` | Defines constraints around Supabase-related usage |
 
 #### Quality and Process
 
 | Rule | Purpose |
 |------|---------|
-| `tdd-workflow.mdc` | Enforces RED then GREEN then BLUE discipline |
-| `quality-gates.mdc` | Encodes non-negotiable review and release criteria |
-| `output-locations.mdc` | Keeps artefacts in the correct directories |
-| `handoff-hygiene.mdc` | Enforces durable, useful handoffs |
-| `escalation.mdc` | Defines when agents may assume, flag, or escalate |
-| `git-commits.mdc` | Standardises commit structure and agent session metadata |
-| `metrics-logging.mdc` | Constrains how workflow and performance signals are recorded |
-| `no-ai-slop.mdc` | Eliminates AI-generated writing tics from persona-driven documentation |
+| `tdd-workflow.md` | Enforces RED then GREEN then BLUE discipline |
+| `quality-gates.md` | Encodes non-negotiable review and release criteria |
+| `output-locations.md` | Keeps artefacts in the correct directories |
+| `handoff-hygiene.md` | Enforces durable, useful handoffs |
+| `escalation.md` | Defines when agents may assume, flag, or escalate |
+| `git-commits.md` | Standardises commit structure and agent session metadata |
+| `metrics-logging.md` | Constrains how workflow and performance signals are recorded |
+| `no-ai-slop.md` | Eliminates AI-generated writing tics from persona-driven documentation |
 
 #### Architecture, Design, and Safety
 
 | Rule | Purpose |
 |------|---------|
-| `architecture-fidelity.mdc` | Prevents implementation drift from approved architecture |
-| `visual-fidelity.mdc` | Prevents drift from approved UI and visual design |
-| `ui-component-reuse.mdc` | Encourages reuse and discourages needless UI duplication |
-| `type-safety.mdc` | Protects typed contracts and discourages unsafe shortcuts |
-| `browser-automation.mdc` | Constrains browser-based test and automation behaviour |
-| `secrets-management.mdc` | Prevents unsafe handling of secrets and credentials |
+| `architecture-fidelity.md` | Prevents implementation drift from approved architecture |
+| `visual-fidelity.md` | Prevents drift from approved UI and visual design |
+| `ui-component-reuse.md` | Encourages reuse and discourages needless UI duplication |
+| `type-safety.md` | Protects typed contracts and discourages unsafe shortcuts |
+| `browser-automation.md` | Constrains browser-based test and automation behaviour |
+| `secrets-management.md` | Prevents unsafe handling of secrets and credentials |
 
 #### Language and Requirements Hygiene
 
 | Rule | Purpose |
 |------|---------|
-| `british-english.mdc` | Enforces consistent spelling in framework outputs |
-| `EARS-notation-requirements.mdc` | Enforces the chosen requirements notation |
+| `tech-writing.md` | Enforces British English spelling and EARS notation for requirements — consolidated from the former `british-english.md` and `EARS-notation-requirements.md` rules |
 
 ### Writing New Rules
 
@@ -293,23 +296,63 @@ A candidate for a new rule should pass three tests:
 2. Does it break things? Not just a style preference; actual failures result from ignoring it.
 3. Is it actionable? Can you give clear DO/DON'T commands?
 
-If all three are true, create a rule in `rules/*.mdc` and keep it under 200 tokens. If the topic requires nuance, explanation, or judgement, it belongs in a standard, not a rule.
+If all three are true, create a rule in `rules/*.md` and keep it under 200 tokens. If the topic requires nuance, explanation, or judgement, it belongs in a standard, not a rule. If it requires step-by-step procedural guidance to execute, it belongs in a skill.
 
 ---
 
 ## Skills
 
-Skills are procedural guidance documents stored in `context/skills/` as `.md` files. They provide step-by-step operational instructions and best practices for specific workflows or unusual technology boundaries (for example, `git-subrepo` context synchronisation or `uv` script execution with PEP 723 metadata).
+Skills are procedural runbooks stored in `context/skills/` as `.md` files. Each skill answers "how do I accomplish X?" — step-by-step instructions, tool commands, and code snippets for a specific workflow or complex technology boundary.
 
 ### How Skills Work
 
-Skills differ from rules and standards:
+The physical split from rules and standards is enforced by verification mechanism:
 
-- **Rules** are short (<200 tokens) binary constraints injected into spawn prompts.
-- **Standards** explain the foundational engineering principles and rationale on demand.
-- **Skills** provide operational runbooks and procedural steps for complex tools.
+| Layer | Verified by | Injected |
+|-------|-------------|----------|
+| Rules | Code (pre-commit hooks, linters) — zero token cost | Glob-matched at every spawn |
+| Skills | LLM-as-a-judge — an agent runs it, a reviewer checks the outcome | JIT on glob match or explicit agent request |
+| Standards | LLM-as-a-judge — used as the evaluation rubric | JIT by any agent that needs them (dev, design, reviewer) |
 
-Canonical skills in `context/skills/` are compiled into runtime projections (such as `.agents/skills/` for Antigravity) via `context/scripts/generators/generate_adapters.py`. Agents declare dependencies on skills via the `skills:` list in their frontmatter, and available skills are indexed in `AGENTS.md`.
+Canonical skills in `context/skills/` are compiled into runtime projections (e.g. `.agents/skills/` for Antigravity, `.openai/prompts/` for OpenAI) via `context/scripts/generators/generate_adapters.py`. All generated projections are gitignored — they stay on disk for IDE discovery but are never committed. Agents declare skill dependencies via the `skills:` list in their frontmatter.
+
+### Skills Catalogue
+
+| Skill | Purpose |
+|-------|---------|
+| `agent-sandbox.md` | Procedural constraints for running terminal commands inside agent sandboxes without triggering security blocks |
+| `agent-workflows.md` | Agent git commits, pull requests, and metrics logging patterns |
+| `api-designer.md` | RESTful and GraphQL API design with OpenAPI specifications |
+| `architecture-fidelity.md` | Adherence to architecture docs and API contracts during implementation |
+| `bootstrap-workflow.md` | Agent context setup and git-subrepo initialisation (including Homebrew PATH) |
+| `code-reviewer.md` | PR-style code review focusing on bugs, edge cases, and maintainability |
+| `database-designer.md` | Database schema design, relationships, and migrations |
+| `documentation.md` | User-facing documentation, API references, and guide generation |
+| `functional-tester.md` | Detroit-school TDD: intent-first, tests before implementation |
+| `git-subrepo-operations.md` | Constraints for managing canonical context using git-subrepo |
+| `intent-fidelity.md` | Ensures business intent is faithfully captured in requirements, TDD, and tests |
+| `mermaid-authoring.md` | Mermaid diagram syntax, layout constraints, and semantic guidance |
+| `multi-agent-workflows.md` | Orchestrator triage and handoff archival |
+| `orchestrator.md` | Workflow execution coordination, agent delegation, and quality gate management |
+| `principles-reviewer.md` | Review against LESS Engineering Principles |
+| `product-expert.md` | Eliciting clear requirements from vague ideas |
+| `product-owner.md` | Transforming vague requests into structured requirements and user stories |
+| `python-coder.md` | Production Python code with testing in mind |
+| `python-scripting.md` | `uv`, PEP 723 inline metadata, and the `--with` pattern |
+| `security-tester.md` | Threat modelling, OWASP assessment, and vulnerability scanning |
+| `solution-architect.md` | System architecture, component boundaries, and data flow design |
+| `supabase-operations.md` | Supabase migrations, queries, and maintenance via MCP |
+| `tdd-workflow.md` | Strict RED–GREEN–REFACTOR TDD cycle |
+| `tech-lead.md` | Architecture compliance, consistency, and engineering standards review |
+| `technical-authoring.md` | Technical whitepapers, architecture roadmaps, and book chapters using the AS persona |
+| `tokenomics-analyst.md` | Agent effectiveness, token economics, and context efficiency auditing |
+| `typescript-coder.md` | Frontend/backend TypeScript integrating with Python APIs |
+| `typescript-development.md` | TypeScript/JavaScript projects using Yarn Berry workspaces |
+| `ui-designer.md` | UI components, layouts, design systems, and visual assets |
+| `ui-development.md` | UI component and layout authoring |
+| `ui-tester.md` | End-to-end user workflow testing, screenshots, and accessibility checks |
+| `ui-testing.md` | UI testing and browser automation |
+| `workflow-analyst.md` | Workflow efficiency analysis across handoffs, git history, and token usage |
 
 ---
 
@@ -334,10 +377,10 @@ standards:
   - security-standards.md
   - doc-standards.md
 rules:
-  - python-environment.mdc
-  - tdd-workflow.mdc
-  - type-safety.mdc
-  - git-commits.mdc
+  - python-environment.md
+  - tdd-workflow.md
+  - type-safety.md
+  - git-commits.md
   # ... additional rules
 # Optional — see "Tool and MCP surfaces" below
 # mcp_tools:
@@ -471,6 +514,14 @@ Do not use a persona for: technical handoffs (README, HANDOFF.md, build notes), 
 
 #### Available Personas
 
+##### Author
+
+File: `context/persona/author.md`
+Character: AS. Technologist, engineering leader, systems thinker with over 25 years of platform and enterprise delivery experience.
+Use for: Books, foundational thought leadership, whitepapers, high-impact technical essays.
+
+Key traits: punch over preamble, zero dense technical jargon, maximum information density per sentence, echoing core ideas across different operational contexts without repetition, the "so what?" economic lens, wry realism, empirical humility.
+
 ##### Technical Writer
 
 File: `context/persona/technical-writer.md`
@@ -501,6 +552,7 @@ Use for: Reviewing technical accuracy and completeness of human-facing content.
 
 The selection depends on audience and content type:
 
+- Writing books, foundational essays, or core thought leadership? Author.
 - Writing a practitioner guide with code examples? Technical writer.
 - Writing a blog post or opinion piece? Opinionated blogger.
 - Writing for a non-technical audience about high-level concepts? Opinionated blogger.
@@ -763,7 +815,7 @@ flowchart TD
 | `technical-review` | `documentation` | `expert-reviewer` (optional — skip for non-technical pieces) | `artefacts/content/drafts/{title}-tech-reviewed.md` |
 | `finalize` | `documentation` | Publication formatting per task | `artefacts/content/published/{title}.md` |
 
-Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in `context/rules/no-ai-slop.mdc`). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
+Draft and review phases list concrete checks in YAML (persona voice, British English, opening hook, concrete examples; editorial pass strips patterns covered in `context/rules/no-ai-slop.md`). Spawn each phase with `context/templates/task-prompt-template.md`, the persona path, and file scope — long copy-paste invoke blocks belong in the task prompt, not in this reference.
 
 ### Continuous improvement (`continuous-improvement.yaml`)
 
@@ -1265,7 +1317,7 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 1. [Content (`content.yaml`)](#content-contentyaml) (this document)
 2. [Writing Personas](#writing-personas) (this document)
 3. `context/workflows/content.yaml`
-4. `context/rules/no-ai-slop.mdc`
+4. `context/rules/no-ai-slop.md`
 
 ---
 
@@ -1287,5 +1339,6 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 | 0.2.0   | 2026-04-13 | Editorial | Document metadata and revision history aligned with `context/standards/doc-standards.md` section 8.2; prose emphasis normalised outside fenced examples (fence-safe). |
 | 0.3.0   | 2026-04-13 | Editorial | Versioning policy: `MAJOR.MINOR.PATCH` per [Semantic Versioning 2.0.0](https://semver.org/) (section 8.2); draft documents stay on major version `0`; revision table uses three-part versions. |
 | 0.5.0   | 2026-09-12 | Editorial | Document skills layer in framework topology, source-of-truth tiers, and rules/standards/skills split. |
+| 0.6.0   | 2026-09-15 | AS        | Restate rules/skills/standards split by verification mechanism and runtime projection: rules verified at zero token cost by code; skills verified by LLM-as-a-judge; standards serve as judge rubrics. Update rule overhead to ~1,300 tokens (<1% of 128k–200k windows). Consolidate `british-english.md` + `EARS-notation-requirements.md` into `tech-writing.md`. Add skills catalogue with `bootstrap-workflow.md` and `intent-fidelity.md`. Document that all generated adapter projections are now gitignored. |
 
 <!-- typst-skip-end -->

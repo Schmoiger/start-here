@@ -2,6 +2,8 @@
 
 Comprehensive tests for validation and generation scripts in `context/scripts/`.
 
+---
+
 ## Test Coverage
 
 ### Validators (38 tests)
@@ -86,6 +88,8 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Deterministic byte-for-byte reproducibility across repeated forced compilations
 - Minimal synthetic context compilation verifying end-to-end pipeline
 
+---
+
 ## Running Tests
 
 ```bash
@@ -101,6 +105,8 @@ uv run pytest context/scripts/tests/test_e2e_compilation.py -v
 uv run pytest context/scripts/tests/ --cov=context/scripts --cov-report=html
 ```
 
+---
+
 ## Test Fixtures
 
 Located in `fixtures/`:
@@ -111,12 +117,16 @@ Located in `fixtures/`:
 - Workflow YAML
 - Agent definitions (valid/invalid variants)
 
+---
+
 ## Dependencies
 
 - pytest >= 7.4.0
 - pyyaml >= 6.0
 
 Installed via root `pyproject.toml` dev dependencies or managed via `uv run`.
+
+---
 
 ## Test Organisation
 

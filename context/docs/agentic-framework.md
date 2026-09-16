@@ -1,8 +1,8 @@
 # Hive Mind: Designing an Orchestration Framework for Multi-Agent Software Delivery
 
 **Document Status**: Draft  
-**Version**: 0.4.0  
-**Last Updated**: 12 September 2026  
+**Version**: 0.5.0  
+**Last Updated**: 15 September 2026  
 **Word Count**: ~3,500 words  
 **Reading Time**: ~15 minutes
 
@@ -72,7 +72,7 @@ The framework is organised as a context hierarchy: a layered directory structure
 | Agents | `context/agents/` | Define *who*: specialised roles with frontmatter linking rules and standards | Every agent spawn: orchestrator reads the definition to resolve rules, standards, and file scope |
 | Templates | `context/templates/` | Define *what shape*: standardised formats for reviews, tasks, handoffs, design docs | Every output: agents consult templates when producing artefacts |
 | Standards | `context/standards/` | Explain *why* and *how*: engineering rationale for coding, testing, security, documentation | On demand: agents load a standard when deeper reference is needed |
-| Skills | `context/skills/` | Provide *procedural guidance*: step-by-step instructions for specific workflows or unusual tech boundaries | On demand: agents load or trigger skills to navigate complex boundaries (e.g. git-subrepo) |
+| Skills | `context/skills/` | Provide *procedural guidance*: step-by-step instructions for specific workflows or unusual tech boundaries | On demand: agents load or trigger skills to navigate complex boundaries (e.g. technical-authoring) |
 | Scripts | `context/scripts/` | Enforce *everything above*: validators, generators, git hooks | Every commit: pre-commit validators check output against rules |
 | Workflows | `context/workflows/` | Define *when*: phase order, dependencies, gates, outputs, recovery | Once per task: orchestrator reads at the start to plan the work |
 | Docs | `context/docs/` | Provide *further reading*: design rationale, strategic context, orchestration patterns, workflow guides, portability how-tos | Human reference: guides and design documents for contributors and operators, not consumed by agents |
@@ -131,17 +131,21 @@ The principle: change the authoritative source, let derived projections follow.
 
 ## The Rules, Standards, and Skills Split
 
-This is the most consequential design decision in the framework.
+This is the most consequential design decision in the framework. The separation is enforced by **verification mechanism** and **runtime projection** — not by length or topic.
 
-**Rules** are under 200 tokens each. Examples: "use `uv run pytest`, not bare `pytest`"; "agents do not commit; the orchestrator commits on their behalf." They are designed for repeated injection into spawn prompts without significant context window cost.
+**Rules** are deterministic invariants. Binary: followed or not. Verified at **zero token cost** by code (pre-commit hooks, linters, AST parsers). *If it requires an LLM to verify, it is not a rule.* They split into two projection modes:
+- `alwaysApply: true`: injected into every agent spawn. Must be aggressively succinct. Currently ~1,300 tokens total — less than 1% of a 128k–200k context window, under 0.1% on 1M+ models.
+- `alwaysApply: false`: injected JIT by glob match. Still succinct; domain-specific.
 
-**Standards** run to hundreds of lines. They explain *why* the framework uses `uv`, how TDD phases relate to each other, what constitutes a good handoff, and when to escalate versus assume. They are reference material, consulted on demand.
+Content is pure constraints: no tutorials, no explanations.
 
-**Skills** provide procedural JIT (Just-In-Time) guidance for unusual or complex technology boundaries (like `git-subrepo` or `uv` environments). While standards explain the philosophy and rules enforce binary constraints, skills act as the operational runbook. They are compiled from `context/skills/` into runtime-native formats (e.g., `.agents/skills/`) and can be bound to agents via their frontmatter.
+**Skills** are procedural runbooks. "How to accomplish X." Verified by **LLM-as-a-judge**: an agent executes the skill; a reviewer agent checks the outcome. Injected JIT when an agent matches globs or needs to navigate a complex boundary. Step-by-step instructions, tool commands, code snippets.
 
-The split is driven by the operating triangle: execution time, token cost, and autonomy horizon. Specifically the token cost axis. A typical agent spawn injects 5-8 rules at ~100-200 tokens each, plus the agent definition at ~500-1,000 tokens, totalling roughly 1,500-2,500 tokens of framework overhead. Loading a single full standard would add 2,000-5,000 tokens, doubling or tripling the injection cost for material the agent may not need. The split keeps the execution path lean, the reference path comprehensive, and the procedural path available JIT via skills.
+**Standards** are the reference canon and benchmark rubrics. "What good looks like and why." Used as the **evaluation rubric** against which LLM judges assess skill execution. Loaded JIT by any agent that needs them — design and dev agents when they need deep context on a decision, reviewer agents when evaluating output. Architectural patterns, design philosophy, trade-offs, detailed rationale.
 
-An agent executing a simple Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating whether the tests are sufficient needs the full testing standard. The framework serves both without forcing either to carry the other's weight.
+The split is driven by the operating triangle: execution time, token cost, and autonomy horizon. A typical agent spawn injects 5–8 rules at ~100–200 tokens each, plus the agent definition at ~500–1,000 tokens — roughly 1,500–2,500 tokens of framework overhead. Loading a single full standard would add 2,000–5,000 tokens. The split keeps the execution path lean, the reference path comprehensive, and the procedural path available JIT via skills.
+
+An agent executing a simple Python task needs the 15-token rule that says "run tests with `uv run pytest`." A reviewer evaluating test sufficiency needs the full testing standard. A coder navigating a `uv` PEP 723 inline script needs the `python-scripting` skill. The framework serves all three without forcing any to carry the others' weight.
 
 ---
 
@@ -231,7 +235,7 @@ The framework ships 14 output templates and 8 pre-commit validators.
 | `metrics_logging.py` | Receives JSONL file paths. Validates each line has required fields (`ts`, `task`, `agent`, `event`, `tokens`), valid event types, and correct token source annotations. |
 | `supabase_boundary.py` | Receives file paths. Regex-checks for `import supabase` or `from supabase import` outside the database service. |
 | `framework_docs_staleness.py` | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. `[docs-ok]` in the commit message bypasses the check (auditable via `git log --grep='docs-ok'`). Only hardcoded exclusion: the two framework docs themselves, to avoid circular triggering. |
-| `adapter_drift.py` | Receives staged file paths under `context/`, `AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.claude/`, `.github/`, `.openai/`, `.agents/skills/`. Regenerates all adapter projections in-memory and compares against committed files. Fails if any projection is missing, modified, or orphaned. Runs at `pre-commit` stage. |
+| `adapter_drift.py` | Receives staged file paths under `context/`. Regenerates all adapter projections in-memory and compares against on-disk files. Fails if any projection is out of sync. All generated projections (`.agents/skills/`, `.claude/prompts/`, `.github/prompts/`, `.github/instructions/`, `.github/copilot-instructions.md`, `.openai/prompts/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) are gitignored — they live on disk for IDE discovery but are never committed. Runs at `pre-commit` stage. |
 
 Consistency compounds. Drift taxes. The templates and validators exist to keep that equation favourable over time.
 
@@ -296,5 +300,15 @@ The framework's design principles are not novel; they adapt ideas from distribut
 - `context/docs/agentic-framework-reference.md`: workflows, coordination patterns, portability adapters
 - `context/standards/context-framework.md`: context theory
 - `context/agents/orchestrator.md`: orchestrator behaviour
+
+---
+
+## Revision History
+
+| Version | Date       | Author    | Changes |
+| ------- | ---------- | --------- | ------- |
+| 0.1.0   | 2026-04-13 | Initial   | First publication: coordination problem framing, design principles, layer model, execution model, source-of-truth hierarchy, rules/standards/skills split, agent roster, workflow architecture, templates and validators, limitations, further reading. |
+| 0.4.0   | 2026-09-12 | Editorial | Document skills layer in design principles, layer model, source-of-truth hierarchy, and the rules/standards/skills split section. |
+| 0.5.0   | 2026-09-15 | AS        | Restate rules/skills/standards split by verification mechanism: rules verified at zero token cost by code; skills verified by LLM-as-a-judge; standards serve as judge rubrics. Update rule overhead to ~1,300 tokens (<1% of 128k–200k windows). Add `python-scripting` skill as third-agent example. Update `adapter_drift.py` description to reflect that all generated projections are gitignored. |
 
 <!-- typst-skip-end -->

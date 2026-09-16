@@ -12,6 +12,8 @@
 - **Integration Tests (20%)**: Component interactions with real services
 - **E2E Tests (10%)**: Complete user workflows with real browsers
 
+---
+
 ## TDD Cycle
 
 **Red**: Write failing test first for each requirement/behaviour.
@@ -19,6 +21,8 @@
 **Green**: Implement minimal code to pass test.
 
 **Refactor**: Clean up code while maintaining passing tests.
+
+---
 
 ## Test Types
 
@@ -75,6 +79,8 @@
 - @functional-tester: Writes automated test code (unit, API integration, component integration)
 - @ui-tester: Executes browser-based E2E scenario testing with evidence capture
 
+---
+
 ## Phase Workflow
 
 **Requirements**: Write failing acceptance tests first. Get approval. Commit.
@@ -94,6 +100,8 @@ feat: implement user authentication
 - E2E: Login/logout flow
 ```
 
+---
+
 ## Test Organisation
 
 ```
@@ -103,12 +111,16 @@ tests/
 └── e2e/test_{journey}.py       # User journey tests
 ```
 
+---
+
 ## Data & Mocking
 
 - Use factories for consistent test data
 - Mock external services in unit tests
 - Real services for integration tests
 - Independent test isolation
+
+---
 
 ## Visual Testing
 
@@ -148,6 +160,8 @@ test('dashboard layout matches design', async ({ page }) => {
 3. **Manual Review**: Team reviews and approves or rejects changes
 4. **Update Baselines**: Approved changes become new baseline
 
+---
+
 ## Testing Tools & Frameworks
 
 ### Backend (Python)
@@ -170,6 +184,8 @@ test('dashboard layout matches design', async ({ page }) => {
 - **GitHub Actions**: Automated test execution on PRs
 - **Quality Gates**: 100% of tests must pass before merge
 - **Warnings**: Bugs to be raised for all warnings
+
+---
 
 ## Coverage Requirements
 
@@ -261,6 +277,8 @@ pytest --cov=src --cov-report=term-missing --cov-fail-under=94
 # Strict enforcement - blocks merge
 pytest --cov=src --cov-report=term-missing --cov-fail-under=97 --strict-markers
 ```
+
+---
 
 ## UI Test Coverage
 
@@ -447,6 +465,8 @@ While markdown scripts are valid for scenario definition and evidence tracking, 
 
 **Recommendation**: Continue with markdown scripts in prototype/development phases. Consider automation only in pre-deployment phase if scenario count >100.
 
+---
+
 ## Anti-Patterns (Forbidden)
 
 These practices undermine test quality and are explicitly prohibited:
@@ -518,6 +538,8 @@ def test_processes_api_response(mock_fetch):
     mock_fetch.assert_called_once()
 ```
 
+
+---
 
 ## Test-Driven Development (TDD)
 

@@ -1,12 +1,14 @@
 ---
-description: Implementation must follow architecture docs and API contracts
+name: architecture-fidelity
+description: Procedural guidance for adhering to architecture docs and API contracts during implementation.
 globs: ["**/*.py", "**/*.ts", "**/*.tsx"]
-alwaysApply: false
 ---
 
-# Architecture Fidelity
+# Architecture Fidelity Skill
 
 **Applies to**: All code implementation
+
+---
 
 ## Before Writing Code
 
@@ -15,6 +17,8 @@ Read these architecture artefacts:
 1. `{project-root}/artefacts/architecture/architecture.md` — service boundaries
 2. `{project-root}/artefacts/architecture/api-catalogue.md` — port allocations
 3. `{project-root}/artefacts/architecture/openapi.yaml` — API contracts
+
+---
 
 ## Service Layer Rules
 
@@ -25,9 +29,13 @@ Read these architecture artefacts:
 | API shape | Match openapi.yaml schema | Invent ad-hoc response format |
 | New endpoint | Add to openapi.yaml first, then implement | Implement then document |
 
+---
+
 ## Why
 
 Skipping the service layer creates tight coupling to the database, makes testing harder, and creates tech debt. Port and API contract violations break service discovery and frontend integration.
+
+---
 
 ## Forbidden
 

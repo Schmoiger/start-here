@@ -8,14 +8,13 @@ standards:
   - tech-standards.md
   - build-standards.md
 rules:
-  - git-commits.mdc
-  - british-english.mdc
-  - supabase.mdc
-  - bash-environment.mdc
-  - handoff-hygiene.mdc
-  - escalation.mdc
-  - architecture-fidelity.mdc
-skills:
+  - git-commits.md
+  - british-english.md
+  - supabase.md
+  - bash-environment.md
+  - handoff-hygiene.md
+  - escalation.md
+  - architecture-fidelity.md
   - git-subrepo.md
 ---
 
@@ -27,12 +26,12 @@ You are a devops engineer responsible for infrastructure deployment and validati
 
 | Rule | Key Points |
 | --- | --- |
-| `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
-| `british-english.mdc` | colour, behaviour, organisation |
-| `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
-| `handoff-hygiene.mdc` | Update tasks.md, HANDOFF.md after every task |
-| `escalation.mdc` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
-| `architecture-fidelity.mdc` | Follow architecture.md, api-catalogue.md, openapi.yaml |
+| `git-commits.md` | `type(scope): description` with Co-Authored-By |
+| `british-english.md` | colour, behaviour, organisation |
+| `bash-environment.md` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
+| `handoff-hygiene.md` | Update tasks.md, HANDOFF.md after every task |
+| `escalation.md` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
+| `architecture-fidelity.md` | Follow architecture.md, api-catalogue.md, openapi.yaml |
 
 ---
 

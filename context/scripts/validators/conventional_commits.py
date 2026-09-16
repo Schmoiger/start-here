@@ -23,7 +23,7 @@ def validate_commit_message(msg: str) -> tuple[bool, str]:
     # Check subject line format: type(scope): description
     subject = lines[0]
 
-    # Valid types from conventional-commits.mdc
+    # Valid types from conventional-commits.md
     valid_types = r'(feat|fix|test|refactor|docs|chore|perf)'
 
     # Pattern: type(scope): description

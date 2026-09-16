@@ -1,5 +1,7 @@
 # Requirements: {PROJECT}
 
+---
+
 ## Legend
 
 | Symbol | Meaning |
@@ -10,6 +12,8 @@
 | ✓ | Complete |
 | ○ | In progress |
 | · | Pending |
+
+---
 
 ## Functional Requirements
 
@@ -28,6 +32,8 @@
 |----|-----|-------------------|---------------------|
 | R-005 | M | THE system SHALL {action} | {criteria} |
 
+---
+
 ## Non-Functional Requirements
 
 | ID | Category | Requirement | Target |
@@ -37,10 +43,14 @@
 | NFR-003 | Security | {requirement} | {standard} |
 | NFR-004 | Scalability | Concurrent users | {N} |
 
+---
+
 ## Out of Scope
 
 - {Item 1}
 - {Item 2}
+
+---
 
 ## Revision History
 

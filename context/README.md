@@ -8,12 +8,14 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 | What                       | Where                            | When                                                 |
 | -------------------------- | -------------------------------- | ---------------------------------------------------- |
-| **Non-negotiable rules**   | `rules/*.mdc`                    | Agent frontmatter lists applicable rules             |
-| **Reference docs**         | `standards/*.md`                 | Read when agent needs guidance                       |
+| What                       | Where                            | When                                                 |
+| -------------------------- | -------------------------------- | ---------------------------------------------------- |
+| **Non-negotiable rules**   | `rules/*.md`                     | Invariant boundaries; verified by scripts/linters    |
+| **Reference docs**         | `standards/*.md`                 | Reference manuals; benchmarks used by review rubrics |
 | **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
-| **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies                           |
+| **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies and agent assignments     |
 | **Model profiles (LUT)**   | `models.yaml`                    | Maps abstract intent tiers to provider families and telemetry |
-| **Procedural skills**      | `skills/*.md`                    | JIT procedural instructions by technology            |
+| **Procedural skills**      | `skills/*.md`                    | JIT workflows; evaluated by LLM-as-a-judge rubrics   |
 | **Downstream integration** | `#downstream-integration--standards-synchronisation-git-subrepo` | Bi-directional standards synchronisation via `git-subrepo` |
 | **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
 | **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
@@ -22,13 +24,27 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 ---
 
+## The Control Flow: Forward Orchestration
+
+The system strictly executes from **intent down to governed execution**:
+
+1. **Workflows (`workflows/`)**: Orchestrate the sequence of phases and assign specialised **Agents** to the work based on human intent.
+2. **Agents (`agents/`)**: Execute specific roles within a workflow phase (e.g. `@python-coder`, `@tech-author`).
+3. **Rules (`rules/`)**: Set the non-negotiable invariant boundaries and constraints that govern the agent during execution.
+4. **Skills (`skills/`)**: JIT procedural runbooks and craft recipes loaded on-demand by agents.
+5. **Verifiers (`scripts/validators/` & reviewer agents)**: Validate that the agent's work adhered to rules (via deterministic code) and standards/skills (via LLM-as-a-judge).
+
+---
+
 ## For Agents
 
 **Quick scan** - Read these when spawned:
 
-**Rules** (non-negotiable): [python-env](rules/python-environment.mdc) · [ts-env](rules/typescript-environment.mdc) · [secrets](rules/secrets-management.mdc) · [tdd](rules/tdd-workflow.mdc) · [types](rules/type-safety.mdc) · [outputs](rules/output-locations.mdc) · [commits](rules/git-commits.mdc) · [spelling](rules/british-english.mdc) · [EARS](rules/EARS-notation-requirements.mdc) · [bash](rules/bash-environment.mdc) · [handoff](rules/handoff-hygiene.mdc) · [escalation](rules/escalation.mdc) · [arch-fidelity](rules/architecture-fidelity.mdc) · [ui-reuse](rules/ui-component-reuse.mdc) · [visual](rules/visual-fidelity.mdc) · [quality-gates](rules/quality-gates.mdc) · [browser](rules/browser-automation.mdc)
+**Rules** (non-negotiable): [python-env](rules/python-environment.md) · [ts-env](rules/typescript-environment.md) · [secrets](rules/secrets-management.md) · [tdd](rules/tdd-workflow.md) · [types](rules/type-safety.md) · [outputs](rules/output-locations.md) · [commits](rules/git-commits.md) · [spelling](rules/british-english.md) · [EARS](rules/EARS-notation-requirements.md) · [bash](rules/bash-environment.md) · [handoff](rules/handoff-hygiene.md) · [escalation](rules/escalation.md) · [arch-fidelity](rules/architecture-fidelity.md) · [ui-reuse](rules/ui-component-reuse.md) · [visual](rules/visual-fidelity.md) · [quality-gates](rules/quality-gates.md) · [browser](rules/browser-automation.md) · [git-subrepo](rules/git-subrepo.md)
 
 **Standards** (reference): [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [visual](standards/visual-standards.md)
+
+**Skills** (procedural JIT): [python-scripting](skills/python-scripting.md) · [technical-authoring](skills/technical-authoring.md)
 
 **Model Profiles (LUT)**: [models](models.yaml) — Abstract model intent tiers (`small`, `medium`, `large`), provider mapping, and telemetry locations.
 
@@ -42,22 +58,43 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 ## For Humans
 
+### The Rules vs. Skills Separation (The Verification Test)
+
+Our architecture enforces a strict physical split between `rules/`, `skills/`, and `standards/` based on **Verification Mechanism** and **Runtime Projection**.
+
+- **Rules (`rules/*.md`)**: Deterministic invariants. "Thou shalt" and "Thou shalt not".
+  - **Verification**: **0 token cost**. Evaluated by code (pre-commit hooks, linters, AST parsers). *If it requires an LLM to verify, it is not a rule.*
+  - **Projection**:
+    - `alwaysApply: true`: Injected into the global system prompt. Must be aggressively succinct to minimise overhead. Currently consumes ~1,300 tokens, representing < 1% of a standard 128k–200k context window (and < 0.1% on 1M+ models). Only the most critical global invariants (e.g. environment constraints, universal conventions) should be global.
+    - `alwaysApply: false`: Injected JIT based on globs. Still succinct, but domain-specific.
+  - **Content**: Pure constraints. No tutorials, no explanations.
+
+- **Skills (`skills/*.md`)**: Procedural runbooks, craft, and workflows. "How to accomplish X".
+  - **Verification**: **LLM-as-a-judge**. An agent executes the skill, and a reviewer agent verifies the outcome.
+  - **Projection**: Injected JIT when an agent matches globs or needs to perform a specific task.
+  - **Content**: Step-by-step instructions, code snippets, tool commands.
+
+- **Standards (`standards/*.md`)**: The reference canon and rubrics. "What good looks like and why".
+  - **Verification**: Used as the **benchmark rubric** against which LLM judges evaluate skills.
+  - **Projection**: Read JIT by any agent that needs them. Design and dev agents load them for deep context on a decision; reviewer agents (`@tech-lead`, `@code-reviewer`) load them when evaluating output.
+  - **Content**: Architectural patterns, design philosophy, trade-offs, and detailed explanations.
+
 ### File Type Overview
 
-**Rules** (`rules/*.mdc`):
+**Rules** (`rules/*.md`):
 
-- Things that **break** if not followed (not style preferences)
+- Invariant boundaries and constraints that **break** if not followed
 - Self-contained, actionable, binary (followed or not)
-- Agents load these via frontmatter
-- Examples: `uv run pytest` works, bare `pytest` fails; `/secrets/*.json` works, `.env` leaks
-- **On Add / Edit / Delete**: Create or edit with frontmatter (`description`, `globs`, `alwaysApply`). When adding or deleting, update applicable `agents/*.md` under `rules:`, then recompile adapters (`uv run python context/scripts/generators/generate_adapters.py`) and verify with `uv run python context/scripts/validators/adapter_drift.py`.
+- Pre-commit hooks enforce these locally before any commit is recorded
+- **On Add / Edit / Delete**: Create or edit with frontmatter (`description`, `globs`, `alwaysApply`). When adding or deleting, update applicable `agents/*.md` under `rules:`, then recompile adapters (`uv run python context/scripts/generators/generate_adapters.py`) and verify with `adapter_drift.py`.
 
 **Standards** (`standards/*.md`):
 
-- **How** to do things well (context, rationale, examples)
-- Comprehensive reference documentation
+- **How** to do things well (context, rationale, architectural benchmarks)
+- Comprehensive reference documentation used by human and LLM reviewers
 - Agents read on-demand (too verbose to preload)
 - Examples: Python patterns, TDD philosophy, architecture decisions
+
 - **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `##` headings (Typst rule). Add to `context/README.md` Quick Reference and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
 
 **Agents** (`agents/*.md`):
@@ -213,8 +250,9 @@ context/
 │   └── continuous-improvement.yaml # Incident response + retrospective
 ├── templates/                     # Output templates (flat — see templates/README.md for index)
 ├── skills/                        # Procedural context (JIT instructions by technology)
-│   └── *.md                       # python-scripting, git-subrepo
+│   └── *.md                       # python-scripting, technical-authoring
 ├── persona/                       # Writing voice for human-facing content
+│   ├── author.md                 # AS persona (books, foundational thought leadership, punchy & dense)
 │   ├── technical-writer.md       # Amara Osei persona (practitioner guides, technical prose)
 │   ├── opinionated-blogger.md   # Dr. Sarah Chen persona (blogs, opinion pieces)
 │   ├── editor.md                 # Editorial voice

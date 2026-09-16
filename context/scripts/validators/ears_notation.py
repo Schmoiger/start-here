@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 
-# EARS patterns from EARS-notation-requirements.mdc
+# EARS patterns from EARS-notation-requirements.md
 EARS_PATTERNS = {
     'ubiquitous': r'THE\s+\S+\s+SHALL\s+',
     'event': r'WHEN\s+.+?,\s+THE\s+\S+\s+SHALL\s+',

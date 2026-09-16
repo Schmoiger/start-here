@@ -25,7 +25,7 @@ class TestAdaptersCoreModels(unittest.TestCase):
             model="sonnet",
             mcp_tools=["tool1"],
             standards=["std1.md"],
-            rules=["rule1.mdc"],
+            rules=["rule1.md"],
         )
         self.assertEqual(agent.name, "test-agent")
         self.assertEqual(agent.model, "sonnet")
@@ -67,7 +67,7 @@ mcp_tools:
 standards:
   - test-standard.md
 rules:
-  - test-rule.mdc
+  - test-rule.md
 ---
 
 This is the body of the markdown.
@@ -95,7 +95,7 @@ This is the body of the markdown.
         # Create rules directory
         rules_dir = self.context_path / "rules"
         rules_dir.mkdir(parents=True)
-        (rules_dir / "test-rule.mdc").write_text(
+        (rules_dir / "test-rule.md").write_text(
             "---\nname: test-rule\nkey_points: some rule\n---"
         )
 
@@ -116,7 +116,7 @@ This is the body of the markdown.
         self.assertIsInstance(agent, CanonicalAgent)
         self.assertEqual(agent.name, "test-agent")
         self.assertEqual(agent.description, "A mock agent")
-        self.assertEqual(agent.rules, ["test-rule.mdc"])
+        self.assertEqual(agent.rules, ["test-rule.md"])
 
         # Verify workflows
         self.assertIn("workflows", context_data)

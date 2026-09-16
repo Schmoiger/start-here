@@ -11,18 +11,18 @@ standards:
   - security-standards.md
   - doc-standards.md
 rules:
-  - git-commits.mdc
-  - british-english.mdc
-  - python-environment.mdc
-  - secrets-management.mdc
-  - supabase.mdc
-  - tdd-workflow.mdc
-  - type-safety.mdc
-  - output-locations.mdc
-  - bash-environment.mdc
-  - handoff-hygiene.mdc
-  - escalation.mdc
-  - architecture-fidelity.mdc
+  - git-commits.md
+  - british-english.md
+  - python-environment.md
+  - secrets-management.md
+  - supabase.md
+  - tdd-workflow.md
+  - type-safety.md
+  - output-locations.md
+  - bash-environment.md
+  - handoff-hygiene.md
+  - escalation.md
+  - architecture-fidelity.md
 skills:
   - python-scripting.md
 ---
@@ -46,17 +46,17 @@ Read all 4 standards files before starting work.
 
 | Rule | Key Points |
 |------|------------|
-| `python-environment.mdc` | `uv run python`, `uv run pytest`, `uv add` - NEVER bare python/pip |
-| `secrets-management.mdc` | Load from `/secrets/*.json` - NEVER create .env with credentials |
-| `tdd-workflow.mdc` | GREEN phase: pass tests, NEVER modify test files |
-| `type-safety.mdc` | Type hints on ALL functions |
-| `output-locations.mdc` | Outputs to `artefacts/` (British spelling) |
-| `git-commits.mdc` | `type(scope): description` with Co-Authored-By |
-| `british-english.mdc` | colour, behaviour, organisation (not American spelling) |
-| `bash-environment.mdc` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
-| `handoff-hygiene.mdc` | Update tasks.md, bugs.md, HANDOFF.md after every task |
-| `escalation.mdc` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
-| `architecture-fidelity.mdc` | Follow architecture.md, api-catalogue.md, openapi.yaml |
+| `python-environment.md` | `uv run python`, `uv run pytest`, `uv add` - NEVER bare python/pip |
+| `secrets-management.md` | Load from `/secrets/*.json` - NEVER create .env with credentials |
+| `tdd-workflow.md` | GREEN phase: pass tests, NEVER modify test files |
+| `type-safety.md` | Type hints on ALL functions |
+| `output-locations.md` | Outputs to `artefacts/` (British spelling) |
+| `git-commits.md` | `type(scope): description` with Co-Authored-By |
+| `british-english.md` | colour, behaviour, organisation (not American spelling) |
+| `bash-environment.md` | Write/Edit/Glob/Grep tools for files - NEVER bash echo/cat/sed/grep/find |
+| `handoff-hygiene.md` | Update tasks.md, bugs.md, HANDOFF.md after every task |
+| `escalation.md` | Escalate high-impact uncertainty to orchestrator - NEVER guess |
+| `architecture-fidelity.md` | Follow architecture.md, api-catalogue.md, openapi.yaml |
 
 ---
 

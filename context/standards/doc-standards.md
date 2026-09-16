@@ -1,8 +1,12 @@
 # Documentation Standards
 
+---
+
 ## 1. Introduction
 
 This document outlines the standards for documentation across the software projects in this monorepo. Its purpose is to ensure consistent, discoverable, and useful documentation for all developers and AI agents.
+
+---
 
 ## 2. Project Context
 
@@ -32,7 +36,7 @@ For example:
 │   │   ├── doc-standards.md
 │   │   └── testing-standards.md
 │   └── rules/
-│       └── EARS-notation-requirements.mdc
+│       └── EARS-notation-requirements.md
 │
 ├── artefacts/                       # OUTPUT: System-wide
 │   ├── product/                     # Product & requirements
@@ -303,6 +307,8 @@ The system shall maintain a `README.md` file in the root of each project. The `R
 -   A list of other projects or services that this project depends on
 -   Location of project artefacts (e.g., "See `artefacts/` for bugs, tasks, and test results")
 
+---
+
 ## 3. Common Context Resources
 
 The system maintains shared standards and rules in `/context/` for use across all projects.
@@ -319,7 +325,7 @@ The system maintains shared standards and rules in `/context/` for use across al
 │   │   ├── testing-standards.md
 │   │   └── workflow-standards.md
 │   └── rules/              # Development rules
-│       └── EARS-notation-requirements.mdc
+│       └── EARS-notation-requirements.md
 └── services/               # Projects reference context/
 ```
 
@@ -338,6 +344,8 @@ All project context files shall be reviewed from the perspective of an expert co
 *   **Human-Friendly**: Easily understandable by humans without requiring specialised knowledge, avoiding unnecessary technical jargon
 *   **Non-Verbose**: Concise and focused, avoiding redundancy
 *   **Actionable**: Provides clear, specific guidance that enables effective decision-making and implementation
+
+---
 
 ## 4. System-Wide Artefacts
 
@@ -399,6 +407,8 @@ Automated test execution outputs organized by test type:
 *   **`fixtures/`**: Test data used by multiple services (e.g., `AAPL_1y.json`)
 *   **`mocks/`**: Mock implementations for cross-service testing
 
+---
+
 ## 5. Decision Criteria
 
 When creating a new artefact, apply these rules:
@@ -418,6 +428,9 @@ When creating a new artefact, apply these rules:
 **Q4**: Is this a standard/rule for developers to follow?
 - ✅ YES → Put in `/context/standards/` or `/context/rules/`
 - ❌ NO → It's an output, use artefacts per Q1-Q3
+
+---
+
 ## 6. Diagram Standards
 
 ### 6.1. Prefer Mermaid
@@ -442,10 +455,13 @@ flowchart TD
     B -->|No| D[Other]
 ```
 
+
 **Exceptions:**
 - Inline code where ASCII is the code itself
 - Terminal output representations
 - Simple one-liners: `A → B → C`
+
+---
 
 ## 7. Writing Quality Standards
 
@@ -472,6 +488,8 @@ flowchart TD
 - Specific examples, not vague claims
 
 **Core Test:** Human writing has intent behind every choice. If removing a sentence loses nothing, remove it.
+
+---
 
 ## 8. Documentation Maintenance
 

@@ -1,5 +1,7 @@
 # PR Description Template
 
+---
+
 ## Format
 
 ```markdown
@@ -43,6 +45,8 @@
 ---
 Generated with [Claude Code](https://claude.ai/code)
 ```
+
+---
 
 ## Section Details
 
@@ -134,6 +138,8 @@ Always link to task details:
 Generated with [Claude Code](https://claude.ai/code)
 ```
 
+---
+
 ## Complete Example
 
 ```markdown
@@ -184,6 +190,8 @@ when downstream services are temporarily unavailable.
 ---
 Generated with [Claude Code](https://claude.ai/code)
 ```
+
+---
 
 ## Human-Only PRs
 

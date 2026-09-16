@@ -140,7 +140,7 @@ def test_e2e_synthetic_context_compilation(tmp_path: Path):
         "standards:\n"
         "  - custom-standards.md\n"
         "rules:\n"
-        "  - custom-rule.mdc\n"
+        "  - custom-rule.md\n"
         "---\n\n"
         "# Custom Bot\n\nCustom bot body.\n"
     )
@@ -163,7 +163,7 @@ def test_e2e_synthetic_context_compilation(tmp_path: Path):
     )
 
     # 1 synthetic rule
-    (rules_dir / "custom-rule.mdc").write_text("# Custom Rule\n\nRule details.\n")
+    (rules_dir / "custom-rule.md").write_text("# Custom Rule\n\nRule details.\n")
 
     # Run compilation on synthetic context
     output_dir = tmp_path / "output"

@@ -4,6 +4,8 @@
 
 **Principle**: Context is the primary output of agents. Code is a side effect. If an agent produces good code but poor context, the next agent (or human) wastes effort rediscovering what was already known.
 
+---
+
 ## Context Types
 
 All context falls into two categories based on whether it drives action.
@@ -35,6 +37,8 @@ Information that requires someone to do something. It changes during execution a
 | Handoff notes | `artefacts/build/*-handoff.md` | What the next agent needs |
 
 **Characteristics**: Mutable. Created and consumed during execution. Needs priority, status, and ownership to be useful.
+
+---
 
 ## Sharing Formats
 
@@ -80,6 +84,8 @@ Some handoffs serve both audiences — an agent needs the structured data, and a
 
 Don't try to make one format serve both purposes. JSON with embedded prose is hard to parse. Markdown with embedded JSON is hard to read.
 
+---
+
 ## Prioritisation Framework
 
 All actionable context needs prioritisation. The same four levels apply everywhere, but their meaning shifts depending on the consumer.
@@ -122,6 +128,8 @@ Priority and severity determine whether work blocks phase progression.
 | Code Review | Review tasks complete | Zero critical/high bugs |
 | Verification | Test tasks complete | Zero critical bugs; medium/low documented |
 | Deployment | All critical/high tasks complete | Zero critical bugs; medium/low accepted or deferred |
+
+---
 
 ## Work Item Types
 
@@ -206,6 +214,8 @@ TODOs are implementation notes within code. They exist to help the current agent
 - `// TODO: maybe refactor?` — vague; create a task or delete it
 - TODOs surviving multiple commits — should have been converted
 
+---
+
 ## Terse Formats
 
 Actionable context should be as compact as possible while remaining sufficient for the consuming agent or human to act. Token cost matters — verbose context wastes agent budget and human attention.
@@ -227,6 +237,8 @@ Yes, if two conditions are met:
 A task line like `Implement login endpoint (REQ-005)` is sufficient because the agent reads `REQ-005` from `requirements.md` and reads the failing tests from `tests/`. The task line tells it *what to do and where to look* — not *how to do it*.
 
 A bug line like `Login returns 500 INSTEAD 200 with token` tells the fixing agent the symptom, the expectation, and where to start. It doesn't need a reproduction script in the table — the agent reads the test or endpoint.
+
+---
 
 ## Context Quality
 
@@ -252,6 +264,8 @@ Good context is scannable, actionable, and doesn't waste the reader's attention.
 | Missing "decisions needed" section | Human doesn't know what's blocked on them | Explicitly flag items requiring human input |
 | Verbose multi-line task descriptions | Wastes tokens, buries the signal | One line per item; reference context by ID |
 
+---
+
 ## External Blockers
 
 Items blocked by external dependencies (user input, third-party API, infra provisioning) are not tasks or bugs — they're **context items shared with humans**. The human needs to know what's waiting on them.
@@ -260,9 +274,13 @@ Track external blockers as TODOs in the agent-to-human report's "Decisions Neede
 
 If an external blocker prevents a task from proceeding, mark the task as `blocked` and note the reason. The orchestrator surfaces it to the human.
 
+---
+
 ## Templates
 
 Handoff templates (JSON for agent-to-agent, MD for agent-to-human) live in `context/templates/` alongside the task prompt template. This document defines the principles; the templates provide the concrete format.
+
+---
 
 ## Superseded Documents
 

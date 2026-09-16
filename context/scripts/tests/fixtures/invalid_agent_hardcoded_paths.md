@@ -7,6 +7,8 @@ model: sonnet
 
 This agent uses hardcoded paths.
 
+---
+
 ## Workflow
 
 1. Read requirements from /Users/john/project/artefacts/requirements.md

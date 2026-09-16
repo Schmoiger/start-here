@@ -1,6 +1,6 @@
 # Rule Validators
 
-Automated validators for enforceable rules in the Bollinger project.
+Automated validators for enforceable rules.
 
 ---
 
@@ -8,13 +8,24 @@ Automated validators for enforceable rules in the Bollinger project.
 
 These validators enforce consistency across the codebase by checking:
 
+### Built
+
 1. **conventional_commits.py** - Commit message format compliance
-2. **ears_notation.py** - Requirements using EARS notation syntax
-3. **british_english.py** - British English spelling conventions
-4. **metrics_logging.py** - Agent metrics logging format
-5. **design_system.py** - Frontend compliance with `artefacts/design/design-system.md` (CSS only, colours, Heroicons barrel, spacing scale)
-6. **adapter_drift.py** - Synchronization between canonical context/ and runtime adapter projections
-7. **verify_typst_formatting.py** - Typst-friendly Markdown formatting (mermaid diagram double spacing and horizontal rule section dividers)
+2. **ears_notation.py** - Requirements using EARS notation syntax (`context/rules/tech-writing.md`)
+3. **british_english.py** - British English spelling conventions (`context/rules/tech-writing.md`)
+4. **metrics_logging.py** - Agent metrics logging format (`context/rules/workspace-conventions.md`)
+5. **design_system.py** - Frontend compliance with `artefacts/design/design-system.md` — CSS structure, colour tokens, Heroicons barrel, spacing scale (`context/rules/ui-dev.md`)
+6. **supabase_boundary.py** - Supabase import boundary enforcement (`context/rules/supabase.md`)
+7. **adapter_drift.py** - Synchronisation between canonical `context/` and on-disk runtime adapter projections
+8. **verify_typst_formatting.py** - Typst-friendly Markdown formatting: mermaid spacing and `##` section dividers
+
+### TODO
+
+9. **tsconfig_strictness.py** - TODO: Scan `tsconfig.json` files for `strict: true`, `noImplicitAny: true`, `strictNullChecks: true`; flag `package-lock.json` presence; verify workspace is declared in root `package.json` (`context/rules/typescript-environment.md`)
+10. **forbidden_test_mocks.py** - TODO: Scan Python test files for interaction-based assertions (`assert_called_once_with`, `assert_called_with`) on non-I/O collaborators (`context/rules/testing.md`)
+11. **secrets_scan.py** - TODO: Scan staged files for committed secrets — API keys, tokens, private key headers, `.env` content, hardcoded passwords (`context/rules/secrets.md`)
+12. **forbidden_test_deps.py** - TODO: Scan `package.json` files for banned test dependencies: `puppeteer` (full, not `-core`), `playwright`, `cypress` (`context/rules/ui-testing.md`)
+13. **output_locations.py** - TODO: Verify build artefacts land in declared directories (`artefacts/`, `services/{name}/tests/`); flag files written to ad-hoc paths (`context/rules/workspace-conventions.md`)
 
 ---
 
@@ -89,9 +100,10 @@ uv run python context/scripts/validators/design_system.py
 
 ### Conventional Commits (`conventional_commits.py`)
 
-Validates commit messages against the format specified in `context/rules/conventional-commits.mdc`.
+Validates commit messages against the format specified in `context/rules/conventional-commits.md`.
 
 **Format:**
+
 ```
 {type}({scope}): {description}
 
@@ -106,6 +118,7 @@ Co-Authored-By: Claude {Model} <{model}@anthropic.com>
 **Valid types:** feat, fix, test, refactor, docs, chore, perf
 
 **Constraints:**
+
 - Max 72 characters for subject line
 - Scope: lowercase, alphanumeric with hyphens
 - Description: imperative mood (e.g., "add" not "added")
@@ -114,6 +127,7 @@ Co-Authored-By: Claude {Model} <{model}@anthropic.com>
 **Examples:**
 
 Valid:
+
 ```
 feat(validation): add rule validators
 fix(data-service): correct bollinger band calculation
@@ -121,6 +135,7 @@ test(llm-service): improve coverage for prompt templates
 ```
 
 Invalid:
+
 ```
 added validation          # Missing type and scope
 feat: add validation      # Missing scope
@@ -130,7 +145,7 @@ feat(Validation): add     # Scope not lowercase
 
 ### EARS Notation (`ears_notation.py`)
 
-Validates requirements files use EARS (Easy Approach to Requirements Syntax) notation as specified in `context/rules/EARS-notation-requirements.mdc`.
+Validates requirements files use EARS (Easy Approach to Requirements Syntax) notation as specified in `context/rules/EARS-notation-requirements.md`.
 
 **Patterns:**
 
@@ -144,12 +159,14 @@ Validates requirements files use EARS (Easy Approach to Requirements Syntax) not
 | Complex | WHEN {trigger}, IF {condition}, THE {system} SHALL {action} | WHEN user clicks Print, IF printer offline, THE system SHALL show error |
 
 **Target files:**
+
 - `artefacts/product/requirements.md`
 - `artefacts/product/user-stories.md`
 
 **Examples:**
 
 Valid:
+
 ```
 THE system SHALL validate all user inputs before processing
 WHEN user submits form, THE system SHALL display confirmation message
@@ -157,6 +174,7 @@ IF user is authenticated, THE system SHALL show dashboard
 ```
 
 Invalid:
+
 ```
 System must validate inputs              # No "shall"
 The system should validate               # "should" not "shall"
@@ -165,7 +183,7 @@ System shall be validated                # Wrong structure (missing "THE")
 
 ### British English (`british_english.py`)
 
-Validates British English spelling as specified in `context/rules/british-english.mdc`.
+Validates British English spelling as specified in `context/rules/british-english.md`.
 
 **Common corrections:**
 
@@ -186,12 +204,14 @@ Validates British English spelling as specified in `context/rules/british-englis
 **Examples:**
 
 Valid:
+
 ```
 The system uses colour schemes for visualisation
 Users can organise their data by category
 ```
 
 Invalid:
+
 ```
 The system uses color schemes              # American spelling
 Users can organize their data              # American spelling
@@ -199,9 +219,10 @@ Users can organize their data              # American spelling
 
 ### Metrics Logging (`metrics_logging.py`)
 
-Validates agent metrics log entries as specified in `context/rules/metrics-logging.mdc`.
+Validates agent metrics log entries as specified in `context/rules/metrics-logging.md`.
 
 **Schema:**
+
 ```json
 {
   "ts": "ISO8601 timestamp",
@@ -223,12 +244,14 @@ Validates agent metrics log entries as specified in `context/rules/metrics-loggi
 **Examples:**
 
 Valid:
+
 ```jsonl
 {"ts":"2025-01-28T09:00:00Z","task":"AUTH-001","agent":"auth-coder","event":"start","tokens":{"in":0,"out":0,"source":"unavailable"}}
 {"ts":"2025-01-28T09:45:00Z","task":"AUTH-001","agent":"auth-coder","event":"complete","tokens":{"in":2340,"out":1890,"source":"api_response"},"to":"auth-orchestrator"}
 ```
 
 Invalid:
+
 ```jsonl
 {"ts":"2025-01-28","task":"AUTH-001"}                    # Missing required fields
 {"ts":"2025-01-28T09:00:00Z","task":"AUTH-001","event":"invalid"}  # Invalid event type
@@ -264,8 +287,9 @@ uv run python context/scripts/generators/generate_adapters.py
 ### Typst Formatting (`verify_typst_formatting.py`)
 
 Validates and enforces Typst-friendly Markdown formatting rules across the codebase:
+
 - **Mermaid Spacing**: At least 2 blank lines following ````mermaid` diagram blocks.
-- **Section Separators**: Major section headings (`## `) must be preceded by a `---` horizontal rule (excluding table of contents and headings inside `<!-- typst-skip -->` blocks).
+- **Section Separators**: Major section headings (`##`) must be preceded by a `---` horizontal rule (excluding table of contents and headings inside `<!-- typst-skip -->` blocks).
 
 ```bash
 # Check all tracked markdown files
@@ -358,6 +382,6 @@ Consider adjusting validator patterns or adding exclusions to `.pre-commit-confi
 ## References
 
 - Rule definitions: `context/rules/*.mdc`
-- Pre-commit documentation: https://pre-commit.com/
-- Conventional Commits: https://www.conventionalcommits.org/
-- EARS notation: https://www.researchgate.net/publication/224079253_Easy_Approach_to_Requirements_Syntax_EARS
+- Pre-commit documentation: <https://pre-commit.com/>
+- Conventional Commits: <https://www.conventionalcommits.org/>
+- EARS notation: <https://www.researchgate.net/publication/224079253_Easy_Approach_to_Requirements_Syntax_EARS>

@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 
-# Common American → British spelling pairs from british-english.mdc
+# Common American → British spelling pairs from british-english.md
 SPELLING_RULES = {
     r'\bcolou?r\b': ('color', 'colour'),
     r'\bfavou?r\b': ('favor', 'favour'),

@@ -1,13 +1,27 @@
 ---
-description: Use EARS notation for requirements
-globs: ["**/requirements.md", "**/user-stories.md"]
+description: Strict invariants for technical writing and requirements
+globs: ["**/*.md"]
+alwaysApply: false
 ---
 
-# EARS Notation
+# Technical Writing Invariants
 
-Structured requirement syntax. All requirements MUST use EARS patterns.
+These are the strict, zero-token verifiable rules for all documentation and requirement writing.
 
-## Patterns
+---
+
+## 1. British English
+
+- All documentation MUST use British English spelling (e.g., `-ise` instead of `-ize`, `-our` instead of `-or`, `-re` instead of `-er`, `licence` (noun), `artefact`).
+- Date format MUST be DD/MM/YYYY.
+
+---
+
+## 2. EARS Notation (Requirements)
+
+Structured requirement syntax. All requirements (in `**/requirements.md`, `**/user-stories.md`) MUST use EARS patterns.
+
+### Patterns
 
 | Type | Syntax | Example |
 |------|--------|---------|
@@ -17,7 +31,7 @@ Structured requirement syntax. All requirements MUST use EARS patterns.
 | Optional | IF {condition}, THE {system} SHALL {action} | IF user is admin, THE system SHALL show admin menu |
 | Forbidden | THE {system} SHALL NOT {action} | THE system SHALL NOT log passwords |
 
-## Combining
+### Combining
 
 Chain clauses for complex requirements:
 

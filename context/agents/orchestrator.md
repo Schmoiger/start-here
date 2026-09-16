@@ -6,12 +6,12 @@ standards:
   - agent-standards.md
   - workflow-standards.md
 rules:
-  - bash-environment.mdc
-  - escalation.mdc
-  - git-commits.mdc
-  - handoff-hygiene.mdc
-  - output-locations.mdc
-  - british-english.mdc
+  - bash-environment.md
+  - escalation.md
+  - git-commits.md
+  - handoff-hygiene.md
+  - output-locations.md
+  - british-english.md
 ---
 
 You are the orchestrating agent. You coordinate work across specialised agents — you do not implement.
@@ -51,7 +51,7 @@ If no agent exists for a task: create one from `context/agents/TEMPLATE.md`, the
 
 ## Spawning
 
-Always use `context/templates/task-prompt-template.md` when spawning agents. The template ensures Rule Resolution and File Scope Assignment are included in every spawn prompt — without them, subagents miss critical rules (like `bash-environment.mdc`) and interrupt with permission prompts.
+Always use `context/templates/task-prompt-template.md` when spawning agents. The template ensures Rule Resolution and File Scope Assignment are included in every spawn prompt — without them, subagents miss critical rules (like `bash-environment.md`) and interrupt with permission prompts.
 
 When the task produces an artefact, consult `context/templates/README.md` to identify the appropriate template for the expected output and reference it explicitly in the task prompt's IMPLEMENTATION or ACCEPTANCE section. Agents do not select templates independently.
 
@@ -74,11 +74,11 @@ Include the scope in the spawn prompt's `FILE SCOPE` section.
 Subagents do not auto-load rules — they only know what you inject into their spawn prompt. Before spawning, resolve which rules the agent must read:
 
 1. **Always-apply rules** — include these for every agent, regardless of its `rules:` frontmatter:
-   - `bash-environment.mdc` — tool substitution, banned bash patterns
-   - `git-commits.mdc` — commit message format, agents don't commit
-   - `escalation.mdc` — escalate uncertainty to orchestrator
-   - `output-locations.mdc` — output directory conventions
-   - `british-english.mdc` — spelling conventions
+   - `bash-environment.md` — tool substitution, banned bash patterns
+   - `git-commits.md` — commit message format, agents don't commit
+   - `escalation.md` — escalate uncertainty to orchestrator
+   - `output-locations.md` — output directory conventions
+   - `british-english.md` — spelling conventions
 
 2. **Agent-specific rules** — read the agent's `rules:` frontmatter from `context/agents/{agent-name}.md`. From that pool, select by glob match:
 
@@ -92,8 +92,8 @@ Subagents do not auto-load rules — they only know what you inject into their s
    ```text
    BEFORE starting, read:
    1. context/agents/{agent-name}.md
-   2. context/rules/bash-environment.mdc
-   3. context/rules/python-environment.mdc
+   2. context/rules/bash-environment.md
+   3. context/rules/python-environment.md
    ```
 
 **Example**: Spawning `@functional-tester` for a Python service task touching `services/bronze-service/src/**/*.py`:
@@ -103,7 +103,7 @@ Subagents do not auto-load rules — they only know what you inject into their s
 - `globs` match `**/*.py` → python-environment, architecture-fidelity, quality-gates, tdd-workflow — **include matches**
 - `globs` match `**/*.ts` only → typescript-environment — **omit** (no `.ts` files in this task)
 
-**Why this matters**: Agents that don't read `bash-environment.mdc` will use banned patterns like `cd /path && command`, triggering manual approval prompts and breaking autonomous execution. Agents that don't read `python-environment.mdc` will use bare `pytest` instead of `uv run pytest`. The orchestrator is the only point where this injection can happen reliably.
+**Why this matters**: Agents that don't read `bash-environment.md` will use banned patterns like `cd /path && command`, triggering manual approval prompts and breaking autonomous execution. Agents that don't read `python-environment.md` will use bare `pytest` instead of `uv run pytest`. The orchestrator is the only point where this injection can happen reliably.
 
 ### Skill Resolution
 
@@ -111,7 +111,7 @@ Procedural skills (`context/skills/*.md`) enforce technology-specific operationa
 
 1. **Workflow Phase Skills**: Check the active workflow phase's `skills:` list (e.g. `superpowers:test-driven-development`). If any skill matches a canonical skill name or runtime prompt, include it.
 2. **File Scope Matching via `AGENTS.md`**: Consult the `## Skills` table in `AGENTS.md`. If any skill's `Globs / Triggers` match the task's assigned file scope, include its canonical path (e.g. `context/skills/python-scripting.md` when touching `**/*.py` or `context/scripts/**/*`).
-3. **Agent Frontmatter Skills**: Check the spawned agent's `skills:` frontmatter (e.g. `@python-coder` carries `python-scripting.md`, `@devops` carries `git-subrepo.md`).
+3. **Agent Frontmatter Skills**: Check the spawned agent's `skills:` frontmatter (e.g. `@python-coder` carries `python-scripting.md`, `@documentation` carries `technical-authoring.md`).
 4. **Append to `BEFORE starting, read:`**: Include resolved skills alongside resolved rules in the spawn prompt.
 
 ---
@@ -158,7 +158,7 @@ Before approving the `reproduce` gate, challenge any root cause that lacks a cod
 
 ## Escalation
 
-Follow `context/rules/escalation.mdc`. Do not retry a failing subtask more than the configured threshold independently — report to the user with the failure evidence and await instruction.
+Follow `context/rules/escalation.md`. Do not retry a failing subtask more than the configured threshold independently — report to the user with the failure evidence and await instruction.
 
 ---
 
