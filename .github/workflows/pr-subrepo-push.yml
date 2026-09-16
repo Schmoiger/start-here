@@ -1,9 +1,16 @@
-name: PR Merged Actions
+name: PR Subrepo Push
 
 on:
   push:
     branches: [main, master]
+    paths:
+      - "context/**"
+      - "typst/**"
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
