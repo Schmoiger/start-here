@@ -35,14 +35,22 @@ def get_repo_root() -> Path:
         return Path(__file__).resolve().parent.parent.parent
 
 
+TYPST_DIRS = ("typst", "docs/drafts")
+
+
+def is_typst_doc(rel_path: str) -> bool:
+    """Return True if rel_path is inside a designated Typst document directory."""
+    return any(rel_path == d or rel_path.startswith(f"{d}/") for d in TYPST_DIRS)
+
+
 def get_staged_markdown_files(repo_root: Path) -> list[Path]:
-    """Return list of staged markdown files across repository."""
+    """Return list of staged markdown files in Typst document directories."""
     cmd = ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM"]
     res = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True, check=False)
     files: list[Path] = []
     for line in res.stdout.splitlines():
         rel = line.strip()
-        if not rel or not rel.endswith(".md"):
+        if not rel or not rel.endswith(".md") or not is_typst_doc(rel):
             continue
         p = (repo_root / rel).resolve()
         if p.exists() and p.is_file():
@@ -51,17 +59,12 @@ def get_staged_markdown_files(repo_root: Path) -> list[Path]:
 
 
 def get_tracked_markdown_files(repo_root: Path) -> list[Path]:
-    """Return list of all tracked markdown files respecting gitignore."""
-    cmd = ["git", "ls-files", "*.md"]
-    res = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True, check=False)
+    """Return list of tracked markdown files in Typst document directories."""
     files: list[Path] = []
-    for line in res.stdout.splitlines():
-        rel = line.strip()
-        if not rel:
-            continue
-        p = (repo_root / rel).resolve()
-        if p.exists() and p.is_file():
-            files.append(p)
+    for d in TYPST_DIRS:
+        dir_path = repo_root / d
+        if dir_path.is_dir():
+            files.extend(sorted(dir_path.rglob("*.md")))
     return files
 
 
@@ -189,7 +192,14 @@ def main() -> int:
         if not target_files:
             return 0
     elif args.files:
-        target_files = [f.resolve() for f in args.files]
+        for f in args.files:
+            p = f.resolve()
+            if p.is_dir():
+                target_files.extend(sorted(p.rglob("*.md")))
+            elif p.is_file() and p.suffix == ".md":
+                target_files.append(p)
+            elif not p.exists():
+                continue
     else:
         target_files = get_tracked_markdown_files(repo_root)
 

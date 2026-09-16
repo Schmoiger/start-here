@@ -125,7 +125,7 @@ jobs:
         run: uv run python context/scripts/validators/agent_definitions.py
 
       - name: Verify Typst Formatting Rules
-        run: uv run python context/scripts/validators/verify_typst_formatting.py
+        run: uv run python context/scripts/validators/verify_typst_formatting.py typst/
 
   pr-checks-passed:
     name: All PR Checks Passed
