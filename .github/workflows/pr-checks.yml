@@ -1,0 +1,154 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      typescript: ${{ steps.filter.outputs.typescript }}
+      context: ${{ steps.filter.outputs.context }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - 'pyproject.toml'
+              - 'uv.lock'
+            typescript:
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.js'
+              - '**/*.jsx'
+              - 'package.json'
+              - 'yarn.lock'
+              - 'tsconfig*.json'
+            context:
+              - 'context/**'
+              - 'typst/**'
+              - 'AGENTS.md'
+              - 'CLAUDE.md'
+              - 'GEMINI.md'
+              - '.claude/**'
+              - '.agents/**'
+              - '.github/workflows/pr-checks.yml'
+
+  python-checks:
+    name: Python Lint & Tests
+    needs: changes
+    if: ${{ needs.changes.outputs.python == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Run Ruff Linter
+        run: uv run ruff check context/scripts/validators/
+
+      - name: Generate Adapter Projections
+        run: uv run python context/scripts/generators/generate_adapters.py
+
+      - name: Run Automated Test Suite
+        run: uv run pytest -v
+
+  typescript-checks:
+    name: TypeScript Checks & Tests
+    needs: changes
+    if: ${{ needs.changes.outputs.typescript == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run TypeScript Tests
+        run: yarn test --if-present
+
+  context-integrity:
+    name: Context Integrity & Drift
+    needs: changes
+    if: ${{ needs.changes.outputs.context == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Generate Adapter Projections
+        run: uv run python context/scripts/generators/generate_adapters.py
+
+      - name: Check Adapter Drift
+        run: uv run python context/scripts/validators/adapter_drift.py
+
+      - name: Validate Agent Definitions
+        run: uv run python context/scripts/validators/agent_definitions.py
+
+      - name: Verify Typst Formatting Rules
+        run: uv run python context/scripts/validators/verify_typst_formatting.py
+
+  pr-checks-passed:
+    name: All PR Checks Passed
+    needs: [changes, python-checks, typescript-checks, context-integrity]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate Check Statuses
+        run: |
+          echo "Evaluating status of required checks..."
+          python_status="${{ needs.python-checks.result }}"
+          ts_status="${{ needs.typescript-checks.result }}"
+          context_status="${{ needs.context-integrity.result }}"
+
+          echo "python-checks: $python_status"
+          echo "typescript-checks: $ts_status"
+          echo "context-integrity: $context_status"
+
+          for status in "$python_status" "$ts_status" "$context_status"; do
+            if [[ "$status" == "failure" || "$status" == "cancelled" ]]; then
+              echo "❌ One or more required checks failed or were cancelled."
+              exit 1
+            fi
+          done
+
+          echo "✅ All required PR checks passed or were cleanly skipped."
