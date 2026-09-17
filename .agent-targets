@@ -1,2 +1,2 @@
 # Target AI coding runtimes configured by init.sh
-all
+gemini,github
