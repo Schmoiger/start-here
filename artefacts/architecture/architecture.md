@@ -116,6 +116,7 @@ flowchart TB
     CD -->|Deploys services and infrastructure| GCP
 ```
 
+
 The harness operates at **development time**: it coordinates agents that produce code, tests, and artefacts. It does not deploy anything. CI validates adapter drift and runs the test suite. CD deploys to GCP.
 
 | Actor / External System | Interaction | Protocol |
@@ -179,6 +180,7 @@ flowchart TB
     Subagents -->|Produces artefacts| ArtefactStore
     Hooks -->|Appends token telemetry| State
 ```
+
 
 ### Container Details
 
@@ -304,6 +306,7 @@ flowchart TB
     CI -->|PR merge| CD
     CD --> GCP
 ```
+
 
 | Component | Compute | Boundary | Notes |
 | ----------- | --------- | ---------- | ------- |

@@ -105,3 +105,31 @@ def test_adapter_drift_detects_orphaned_file(tmp_path: Path):
     assert any(
         "ORPHANED" in issue and "deprecated-agent.md" in issue for issue in drift_issues
     )
+
+
+def test_adapter_drift_with_agent_targets_file(tmp_path: Path):
+    """Verify that .agent-targets restricts drift checking to specified targets."""
+    repo_root = Path(__file__).resolve().parent.parent.parent.parent
+    context_dir = repo_root / "context"
+
+    shutil.copytree(
+        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
+    )
+
+    from context.scripts.generators.generate_adapters import run_generation
+
+    # Write .agent-targets with only claude
+    (tmp_path / ".agent-targets").write_text("claude\n")
+
+    # Generate only claude projections
+    run_generation(
+        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"}
+    )
+
+    # Check drift without specifying targets argument -> should pick up .agent-targets
+    is_synced, drift_issues = check_adapter_drift(
+        repo_root=tmp_path,
+        context_dir=tmp_path / "context",
+    )
+
+    assert is_synced, f"Expected drift check to pass with .agent-targets, got: {drift_issues}"

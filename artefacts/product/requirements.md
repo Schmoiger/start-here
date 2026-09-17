@@ -2,11 +2,15 @@
 
 THIS SECTION IS POPULATED AS AN EXAMPLE. THESE ARE THE PRODUCT REQUIREMENTS FOR THE AGENTIC HARNESS AND SHOULD BE REPLACED BY THE PRODUCT REQUIREMENTS FOR YOUR PROJECT.
 
+---
+
 ## Overview
 
 The Agentic Orchestration Harness is a vendor-neutral, portable framework designed to coordinate teams of specialised AI agents across heterogeneous development runtimes (Claude Code, GitHub Copilot, Codex/OpenAI, and Gemini/Antigravity). The system enforces a strict architectural separation between a portable, authoritative **Core Harness** (canonical agents, rules, standards, workflows, and templates) and **Runtime Adapters** (compilation targets projecting canonical assets into platform-specific instructions, skills, hooks, and tool schemas).
 
 The framework answers five coordination questions: **who** does work (agents), **how** work should be done (standards and rules), **when** work happens (workflows), **what** gets produced (templates), and **how quality is maintained** (review gates, validators, and telemetry).
+
+---
 
 ## Legend
 
@@ -15,6 +19,8 @@ The framework answers five coordination questions: **who** does work (agents), *
 | **M** | MVP (P0) — Must have for baseline cross-platform release |
 | **P** | Post-MVP (P1) — Next iteration (enhanced automation and broad ecosystem) |
 | **F** | Future (P2) — Backlog (autonomous adapter synthesis) |
+
+---
 
 ## Functional Requirements
 
@@ -113,6 +119,8 @@ The Distribution subsystem enables downstream projects to adopt the framework an
 | REQ-DST-002 | P | THE distribution-system SHALL manage the `context/` directory boilerplate via a stateful templating tool (e.g. `cruft`) enabling automated 3-way git merges for upstream updates. | Downstream repositories receive upstream improvements while preserving project-specific rule overrides. |
 | REQ-DST-003 | F | THE distribution-system SHALL support automated adapter synthesis, generating adapter plugins for new runtimes from canonical asset schemas without manual plugin authorship. | New runtime targets can be onboarded by describing their configuration format rather than writing a bespoke generator. |
 
+---
+
 ## Non-Functional Requirements
 
 The three foundational quality axes for the framework are **autonomy** (maximising uninterrupted agent execution), **token efficiency** (minimising context overhead per spawn), and **intent preservation** (ensuring the human operator's design intent survives delegation to agents and persists across context compaction).
@@ -128,6 +136,8 @@ The three foundational quality axes for the framework are **autonomy** (maximisi
 | NFR-007 | Intent Preservation | Prevention of credentials or API secrets committing to git or leaking into agent prompt payloads | Zero committed secrets; strict rule enforcement |
 | NFR-008 | Token Efficiency | Execution time to regenerate all runtime adapter projections from canonical sources | < 2.0 seconds |
 
+---
+
 ## Out of Scope
 
 - Implementing end-user domain application features (the harness is strictly an agent coordination and governance engine).
@@ -135,6 +145,8 @@ The three foundational quality axes for the framework are **autonomy** (maximisi
 - Graphical drag-and-drop workflow visualiser editor (workflows are authored and reviewed directly as YAML code).
 - Hosting proprietary model endpoints or custom LLM weights (the harness coordinates external runtimes via their native interfaces).
 - Real-time enforcement of agent rule compliance during execution (compliance is enforced post-hoc via validators and review gates; runtime interception is not currently possible).
+
+---
 
 ## Revision History
 

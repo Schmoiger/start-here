@@ -165,3 +165,19 @@ def test_ensure_root_gitignore(tmp_path: Path):
     content_updated = (tmp_path / ".gitignore").read_text()
     assert "existing_rule/" in content_updated
     assert "AGENTS.md" in content_updated
+
+
+def test_load_configured_targets(tmp_path: Path):
+    """Verify loading active targets from .agent-targets file."""
+    from context.scripts.generators.generate_adapters import load_configured_targets
+
+    # Non-existent file returns None
+    assert load_configured_targets(tmp_path) is None
+
+    # File with comments and targets
+    (tmp_path / ".agent-targets").write_text("# Target runtimes\nclaude, gemini\n# other\n")
+    assert load_configured_targets(tmp_path) == {"claude", "gemini"}
+
+    # File with 'all' returns None (meaning all targets)
+    (tmp_path / ".agent-targets").write_text("all\n")
+    assert load_configured_targets(tmp_path) is None

@@ -1,12 +1,42 @@
-# Start Here
+# Agent Harness
 
-Portable multi-agent development context for AI-assisted software engineering.
+Agentic Orchestration Harness runtime adapter generator and drift validator
 
 ---
 
 ## Quick Deployment
 
-### 1. Copy to Your Project
+### 1. One-Step Initialisation & Refresh (`init.sh`)
+
+When seeding a new project from `start-here` or freshening the current repository:
+
+```bash
+./init.sh
+```
+
+`init.sh` interactively:
+- Prompts for project metadata (`pyproject.toml` name/description)
+- Configures target AI coding runtimes (Gemini/Antigravity, Claude Code, GitHub Copilot, OpenAI/Codex) and prunes unselected projections
+- Syncs or clones standard subrepositories (`context/`, and optionally `typst/` for PDF typesetting)
+- Regenerates adapter projections and updates lockfiles (`uv.lock`)
+- Sets up `.pre-commit-config.yaml` and activates git hooks
+
+You can also run non-interactively with CLI flags:
+
+```bash
+# Non-interactive with all defaults
+./init.sh -y
+
+# Configure specific runtimes with Typst
+./init.sh -r claude,gemini -t -y
+
+# View all options
+./init.sh -h
+```
+
+### 2. Manual Setup (Alternative)
+
+If you prefer manual file copying instead of using `init.sh`:
 
 ```bash
 # Copy context directory and orchestration guide
