@@ -5,7 +5,9 @@ from typing import Any
 from context.scripts.generators.adapters.core.models import CanonicalAgent
 
 
-def generate_prompts(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
+def generate_prompts(
+    context: dict[str, Any], output_dir: Path, dry_run: bool = False
+) -> dict[Path, str]:
     """Translates canonical agents into GitHub Copilot custom prompt files."""
     agents: dict[str, CanonicalAgent] = context.get("agents", {})
     prompts_dir = output_dir / ".github" / "prompts"
@@ -39,7 +41,9 @@ def generate_prompts(context: dict[str, Any], output_dir: Path, dry_run: bool = 
     return results
 
 
-def generate_copilot_instructions(context: dict[str, Any], output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
+def generate_copilot_instructions(
+    context: dict[str, Any], output_dir: Path, dry_run: bool = False
+) -> dict[Path, str]:
     """Generates the repository-level .github/copilot-instructions.md file."""
     copilot_instructions_path = output_dir / ".github" / "copilot-instructions.md"
 
@@ -59,7 +63,9 @@ def generate_copilot_instructions(context: dict[str, Any], output_dir: Path, dry
     return {copilot_instructions_path: content}
 
 
-def generate_scoped_instructions(output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
+def generate_scoped_instructions(
+    output_dir: Path, dry_run: bool = False
+) -> dict[Path, str]:
     """Scans standards for applyTo blocks and generates scoped .instructions.md files."""
     standards_dir = output_dir / "context" / "standards"
     instructions_dir = output_dir / ".github" / "instructions"
@@ -68,43 +74,50 @@ def generate_scoped_instructions(output_dir: Path, dry_run: bool = False) -> dic
     if not standards_dir.exists():
         return results
 
-    for standard_file in sorted(standards_dir.glob('*.md')):
+    for standard_file in sorted(standards_dir.glob("*.md")):
         lines = standard_file.read_text().splitlines()
         i = 0
         while i < len(lines):
             line = lines[i]
-            if line.startswith('#'):
+            if line.startswith("#"):
                 apply_to = None
                 exclude_agent = None
                 comment_idx = i + 1
-                while comment_idx < len(lines) and lines[comment_idx].startswith('<!--'):
+                while comment_idx < len(lines) and lines[comment_idx].startswith(
+                    "<!--"
+                ):
                     m_apply = re.search(r'applyTo:\s*"(.*?)"', lines[comment_idx])
                     if m_apply:
                         apply_to = m_apply.group(1)
-                    m_exclude = re.search(r'excludeAgent:\s*"(.*?)"', lines[comment_idx])
+                    m_exclude = re.search(
+                        r'excludeAgent:\s*"(.*?)"', lines[comment_idx]
+                    )
                     if m_exclude:
                         exclude_agent = m_exclude.group(1)
                     comment_idx += 1
 
                 if apply_to:
-                    header_level = len(line) - len(line.lstrip('#'))
-                    title = line.lstrip('#').strip()
+                    header_level = len(line) - len(line.lstrip("#"))
+                    title = line.lstrip("#").strip()
                     content_lines = []
                     j = comment_idx
                     while j < len(lines):
-                        if lines[j].startswith('#'):
-                            curr_level = len(lines[j]) - len(lines[j].lstrip('#'))
+                        if lines[j].startswith("#"):
+                            curr_level = len(lines[j]) - len(lines[j].lstrip("#"))
                             if curr_level <= header_level:
                                 break
                         content_lines.append(lines[j])
                         j += 1
 
                     content = "\n".join(content_lines).strip()
-                    filename = title.lower().replace(' ', '-')
-                    filename = re.sub(r'[^a-z0-9-]', '', filename)
+                    filename = title.lower().replace(" ", "-")
+                    filename = re.sub(r"[^a-z0-9-]", "", filename)
 
                     if filename:
-                        instr_file = instructions_dir / f"{standard_file.stem}-{filename}.instructions.md"
+                        instr_file = (
+                            instructions_dir
+                            / f"{standard_file.stem}-{filename}.instructions.md"
+                        )
                         frontmatter_lines = ["---", f'applyTo: "{apply_to}"']
                         if exclude_agent:
                             frontmatter_lines.append(f'excludeAgent: "{exclude_agent}"')
@@ -128,8 +141,8 @@ def generate_scoped_instructions(output_dir: Path, dry_run: bool = False) -> dic
 
 
 def generate_workflows(output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
-    """Projects canonical workflow templates from context/templates/workflows into .github/workflows."""
-    templates_dir = output_dir / "context" / "templates" / "workflows"
+    """Projects canonical workflow templates from context/templates into .github/workflows."""
+    templates_dir = output_dir / "context" / "templates"
     workflows_dir = output_dir / ".github" / "workflows"
 
     results: dict[Path, str] = {}
@@ -137,17 +150,30 @@ def generate_workflows(output_dir: Path, dry_run: bool = False) -> dict[Path, st
         return results
 
     workflow_files = sorted(
-        [f for f in templates_dir.iterdir() if f.is_file() and f.suffix in {".yml", ".yaml"}]
+        [
+            f
+            for f in templates_dir.iterdir()
+            if f.is_file()
+            and f.suffix in {".yml", ".yaml"}
+            and f.name.startswith("pr-")
+            and "-template" in f.name
+        ]
     )
+
+    header = "# Auto-generated by context/scripts/generators/generate_adapters.py — do not edit manually\n\n"
 
     for template_file in workflow_files:
         target_name = template_file.name.replace("-template", "")
         target_file = workflows_dir / target_name
-        content = template_file.read_text()
+        template_content = template_file.read_text()
+        content = (
+            f"{header}{template_content}"
+            if not template_content.startswith("# Auto-generated by")
+            else template_content
+        )
         results[target_file] = content
         if not dry_run:
             workflows_dir.mkdir(parents=True, exist_ok=True)
             target_file.write_text(content)
 
     return results
-

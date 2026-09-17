@@ -53,6 +53,14 @@ The output displays:
 - **Tracking Branch**: The remote branch being tracked (e.g. `main` or `standards`).
 - **Commit Status**: Indicates whether the local subrepo is up-to-date, ahead of upstream, or behind upstream.
 
+### Automated Freshness Validator
+To programmatically check whether your branch's tracked subrepos have diverged from upstream:
+
+```bash
+uv run python context/scripts/validators/subrepo_freshness.py
+```
+This validator runs automatically in `.github/workflows/pr-subrepo-checks.yml` on pull requests modifying subrepo paths.
+
 ---
 
 ## 4. Pulling Upstream Changes (`pull`)
@@ -127,6 +135,12 @@ PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo push context -b featur
 1. `git-subrepo` calculates all commits in the parent repository touching the subrepo directory since the last sync.
 2. It generates a synthetic branch and pushes those commits to the upstream repository.
 3. It automatically creates a new commit in the parent repository updating `.gitrepo` with the new upstream commit hash (with commit message `git subrepo push <dir>`).
+
+### Automated 3-Way Reconciliation on Merge
+When PRs are merged into `main`, `.github/workflows/pr-subrepo-push.yml` automatically evaluates whether the upstream canonical repository has moved ahead:
+1. If upstream has newer commits, the workflow automatically runs `git subrepo pull <subdir>` first to merge upstream changes cleanly before pushing.
+2. The combined result is pushed upstream to the canonical repository, and updated tracking commits are pushed back to `main`.
+3. If semantic merge conflicts occur, the workflow halts safely and outputs actionable recovery commands to `$GITHUB_STEP_SUMMARY`.
 
 ### Force Pushing
 If upstream history has been rebased or diverged:

@@ -391,10 +391,14 @@ rules:
 You are an expert Python engineer. Your job is to write clean,
 testable, production-grade Python code.
 
+---
+
 ## Required Standards (Read First!)
 1. context/standards/tech-standards.md
 2. context/standards/coding-standards.md
 ...
+
+---
 
 ## Workflow
 1. Read standards

@@ -412,31 +412,51 @@ All validator, adapter, and compilation tests are packaged inside `context/scrip
 uv run pytest context/scripts/tests -v
 ```
 
-### 5. Upstream Maintenance & Automated Distribution (`start-here`)
+### 5. Upstream Maintenance & Automated Distribution (`agents-framework`)
 
-The `start-here` repository automatically maintains the upstream `standards` distribution branch using the GitHub Actions workflow in `.github/workflows/sync-standards.yml`:
+The project automatically maintains synchronisation with upstream canonical subrepos using two coordinated GitHub Actions workflows:
 
-#### Automated Synchronisation
+#### 1. Shift-Left Freshness Checks (`.github/workflows/pr-subrepo-checks.yml`)
 
-Whenever pull requests touching `context/**` are merged into `master`, the `sync-standards` workflow:
+During pull request review, before merging into `main`:
+- The workflow runs `context/scripts/validators/subrepo_freshness.py`.
+- If changes were made to `context/**` or `typst/**`, it queries the canonical upstream remote (`Schmoiger/agents-framework` or `Schmoiger/typst-engine`).
+- If upstream has newer commits that are not yet pulled, the check fails with an actionable warning, requiring the author to run `git subrepo pull <subdir>` on their feature branch prior to merging.
+
+#### 2. Automated Reconciliation & Push (`.github/workflows/pr-subrepo-push.yml`)
+
+Whenever pull requests touching `context/**` or `typst/**` are merged into `main`, the `pr-subrepo-push` workflow:
 
 1. Checks out the repository with complete commit history (`fetch-depth: 0`).
-2. Installs `git-subrepo`.
-3. Runs `git subrepo branch context -f` to isolate `context/` commits into a clean distribution branch.
-4. Pushes the branch directly to `origin/standards` using `GITHUB_TOKEN` with write permissions.
+2. Evaluates `UPSTREAM_PUSH_TOKEN` authentication secrets.
+3. Installs `git-subrepo` (v0.4.9).
+4. **Automated 3-Way Reconciliation**: Fetches the upstream tracking ref. If upstream has advanced ahead of local `.gitrepo`, it automatically performs `git subrepo pull <subdir>` to merge changes cleanly before pushing.
+5. Pushes reconciled changes upstream to canonical repositories (`Schmoiger/agents-framework` and `Schmoiger/typst-engine`).
+6. Pushes updated subrepo `.gitrepo` tracking commits back to `main`.
+7. Generates a structured status report in `$GITHUB_STEP_SUMMARY`.
 
-This ensures downstream projects always receive the latest approved standards via `git subrepo pull context` without requiring manual extraction by maintainers.
+#### 3. Conflict Resolution & Manual Fallback
 
-#### Manual Fallback
-
-Maintainers can also manually extract and push the `standards` distribution branch locally:
+If upstream and local changes conflict semantically and cannot be auto-merged:
+1. The CI workflow flags the conflict in `$GITHUB_STEP_SUMMARY` without corrupting working tree state.
+2. Maintainers resolve the conflict locally:
 
 ```bash
-# 1. Extract context/ commits into subrepo branch (requires Bash 4.0+)
-PATH="/opt/homebrew/bin:$PATH" git subrepo branch context -f
+# 1. Ensure local main is up to date
+git checkout main && git pull
 
-# 2. Push to remote standards branch
-git push origin subrepo/context:standards
+# 2. Pull upstream into the subrepo and resolve conflicts
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo pull context
+
+# 3. Verify tests and commit resolved files
+git add context/
+git commit -m "fix(subrepo): resolve upstream merge conflicts"
+
+# 4. Push cleanly back upstream
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo push context
+
+# 5. Push updated tracking state back to main
+git push origin main
 ```
 
 ---
