@@ -22,7 +22,10 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from context.scripts.generators.adapters.core.loader import load_canonical_context
-from context.scripts.generators.generate_adapters import get_adapter_projections
+from context.scripts.generators.generate_adapters import (
+    get_adapter_projections,
+    load_configured_targets,
+)
 
 
 def check_adapter_drift(
@@ -35,7 +38,7 @@ def check_adapter_drift(
     Args:
         repo_root: Repository root directory (default: auto-detected).
         context_dir: Context directory containing canonical YAML/markdown files.
-        targets: Target runtimes to check (default: all).
+        targets: Target runtimes to check (default: all or from .agent-targets).
 
     Returns:
         Tuple of (is_synced: bool, drift_details: list[str]).
@@ -47,6 +50,9 @@ def check_adapter_drift(
             repo_root = Path(__file__).resolve().parent.parent.parent.parent
     if context_dir is None:
         context_dir = repo_root / "context"
+
+    if targets is None:
+        targets = load_configured_targets(repo_root)
 
     context = load_canonical_context(str(context_dir))
     expected_projections = get_adapter_projections(context, repo_root, targets)
@@ -67,13 +73,20 @@ def check_adapter_drift(
                 )
 
     # 2. Check for orphaned files in managed generation directories
-    managed_dirs = [
-        repo_root / ".agents" / "skills",
-        repo_root / ".claude" / "prompts",
-        repo_root / ".github" / "prompts",
-        repo_root / ".github" / "instructions",
-        repo_root / ".openai",
-    ]
+    target_managed_dirs = {
+        "gemini": [repo_root / ".agents" / "skills"],
+        "claude": [repo_root / ".claude" / "prompts"],
+        "github": [repo_root / ".github" / "prompts", repo_root / ".github" / "instructions"],
+        "openai": [repo_root / ".openai"],
+    }
+    managed_dirs: list[Path] = []
+    if targets is None or "all" in targets:
+        for dirs in target_managed_dirs.values():
+            managed_dirs.extend(dirs)
+    else:
+        for t in targets:
+            if t in target_managed_dirs:
+                managed_dirs.extend(target_managed_dirs[t])
 
     expected_paths_set = set(expected_projections.keys())
     for d in managed_dirs:

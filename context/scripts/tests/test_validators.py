@@ -37,6 +37,14 @@ from context.scripts.validators.secrets import (
     scan_file_for_secrets,
 )
 from context.scripts.validators.verify_typst_formatting import check_and_fix_file
+from context.scripts.validators.subrepo_freshness import (
+    find_subrepos,
+    query_upstream_head,
+    check_subrepo_freshness,
+    main as subrepo_freshness_main,
+)
+from unittest.mock import patch
+import subprocess
 
 
 class TestConventionalCommits:
@@ -658,5 +666,179 @@ class TestSecrets:
         violations = scan_file_for_secrets(env_file)
         assert len(violations) == 1
         assert ".env files with credentials are strictly forbidden" in violations[0]
+
+
+class TestSubrepoFreshness:
+    """Tests for subrepo freshness validator."""
+
+    def test_find_subrepos(self, tmp_path):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        gitrepo_file = subrepo_dir / ".gitrepo"
+        gitrepo_file.write_text(
+            "[subrepo]\n"
+            "remote = https://github.com/example/test-upstream.git\n"
+            "branch = main\n"
+            "commit = a1b2c3d4e5f6\n"
+            "parent = 112233445566\n"
+            "method = merge\n"
+            "cmdver = 0.4.9\n"
+        )
+        subrepos = find_subrepos(tmp_path)
+        assert len(subrepos) == 1
+        config = subrepos[0]
+        assert config.name == "test-subrepo"
+        assert config.remote == "https://github.com/example/test-upstream.git"
+        assert config.branch == "main"
+        assert config.commit == "a1b2c3d4e5f6"
+        assert config.parent == "112233445566"
+
+    def test_query_upstream_head_success(self):
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = subprocess.CompletedProcess(
+                args=["git", "ls-remote"],
+                returncode=0,
+                stdout="a1b2c3d4e5f6refs/heads/main\n",
+                stderr="",
+            )
+            head = query_upstream_head("https://github.com/example/repo.git", "main")
+            assert head == "a1b2c3d4e5f6refs/heads/main"
+
+    def test_query_upstream_head_failure(self):
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = subprocess.CompletedProcess(
+                args=["git", "ls-remote"],
+                returncode=128,
+                stdout="",
+                stderr="fatal: remote not found",
+            )
+            head = query_upstream_head("https://github.com/example/nonexistent.git", "main")
+            assert head is None
+
+    def test_subrepo_fresh_when_commit_matches(self, tmp_path):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        (subrepo_dir / ".gitrepo").write_text(
+            "[subrepo]\nremote = https://github.com/example/repo.git\nbranch = main\ncommit = a1b2c3d4e5f6\n"
+        )
+        with (
+            patch(
+                "context.scripts.validators.subrepo_freshness.query_upstream_head",
+                return_value="a1b2c3d4e5f6",
+            ),
+            patch(
+                "context.scripts.validators.subrepo_freshness.get_modified_files",
+                return_value={"test-subrepo/some_file.py"},
+            ),
+        ):
+            is_fresh, issues = check_subrepo_freshness(repo_root=tmp_path)
+            assert is_fresh is True
+            assert len(issues) == 0
+
+    def test_subrepo_stale_with_changes_fails(self, tmp_path):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        (subrepo_dir / ".gitrepo").write_text(
+            "[subrepo]\nremote = https://github.com/example/repo.git\nbranch = main\ncommit = a1b2c3d4e5f6\n"
+        )
+        with (
+            patch(
+                "context.scripts.validators.subrepo_freshness.query_upstream_head",
+                return_value="different_new_sha_9999",
+            ),
+            patch(
+                "context.scripts.validators.subrepo_freshness.get_modified_files",
+                return_value={"test-subrepo/some_file.py"},
+            ),
+        ):
+            is_fresh, issues = check_subrepo_freshness(repo_root=tmp_path)
+            assert is_fresh is False
+            assert len(issues) == 1
+            assert "out of sync with upstream" in issues[0]
+            assert "git subrepo pull test-subrepo" in issues[0]
+
+    def test_subrepo_stale_without_changes_passes(self, tmp_path):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        (subrepo_dir / ".gitrepo").write_text(
+            "[subrepo]\nremote = https://github.com/example/repo.git\nbranch = main\ncommit = a1b2c3d4e5f6\n"
+        )
+        with (
+            patch(
+                "context.scripts.validators.subrepo_freshness.query_upstream_head",
+                return_value="different_new_sha_9999",
+            ),
+            patch(
+                "context.scripts.validators.subrepo_freshness.get_modified_files",
+                return_value={"other-directory/unrelated.md"},
+            ),
+        ):
+            is_fresh, issues = check_subrepo_freshness(repo_root=tmp_path)
+            assert is_fresh is True
+            assert len(issues) == 0
+
+    def test_subrepo_check_all_forces_stale_detection(self, tmp_path):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        (subrepo_dir / ".gitrepo").write_text(
+            "[subrepo]\nremote = https://github.com/example/repo.git\nbranch = main\ncommit = a1b2c3d4e5f6\n"
+        )
+        with (
+            patch(
+                "context.scripts.validators.subrepo_freshness.query_upstream_head",
+                return_value="different_new_sha_9999",
+            ),
+            patch(
+                "context.scripts.validators.subrepo_freshness.get_modified_files",
+                return_value=set(),
+            ),
+        ):
+            is_fresh, issues = check_subrepo_freshness(repo_root=tmp_path, check_all=True)
+            assert is_fresh is False
+            assert len(issues) == 1
+
+    def test_subrepo_unreachable_network_handling(self, tmp_path):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        (subrepo_dir / ".gitrepo").write_text(
+            "[subrepo]\nremote = https://github.com/example/repo.git\nbranch = main\ncommit = a1b2c3d4e5f6\n"
+        )
+        with (
+            patch(
+                "context.scripts.validators.subrepo_freshness.query_upstream_head",
+                return_value=None,
+            ),
+            patch(
+                "context.scripts.validators.subrepo_freshness.get_modified_files",
+                return_value={"test-subrepo/file.py"},
+            ),
+        ):
+            is_fresh, issues = check_subrepo_freshness(repo_root=tmp_path, allow_offline=False)
+            assert is_fresh is False
+            assert "Unable to reach upstream remote" in issues[0]
+
+            is_fresh, issues = check_subrepo_freshness(repo_root=tmp_path, allow_offline=True)
+            assert is_fresh is True
+
+    def test_main_cli_success(self, tmp_path, monkeypatch):
+        subrepo_dir = tmp_path / "test-subrepo"
+        subrepo_dir.mkdir(parents=True)
+        (subrepo_dir / ".gitrepo").write_text(
+            "[subrepo]\nremote = https://github.com/example/repo.git\nbranch = main\ncommit = a1b2c3d4e5f6\n"
+        )
+        monkeypatch.chdir(tmp_path)
+        with (
+            patch(
+                "context.scripts.validators.subrepo_freshness.query_upstream_head",
+                return_value="a1b2c3d4e5f6",
+            ),
+            patch(
+                "context.scripts.validators.subrepo_freshness.get_modified_files",
+                return_value={"test-subrepo/file.py"},
+            ),
+            patch("sys.argv", ["subrepo_freshness.py"]),
+        ):
+            exit_code = subrepo_freshness_main()
+            assert exit_code == 0
 
 

@@ -124,6 +124,32 @@ def normalize_target(target: str) -> str:
     raise ValueError(f"Unknown target '{target}'. Valid targets: {valid_keys}")
 
 
+def load_configured_targets(repo_root: Path) -> set[str] | None:
+    """Load active targets from .agent-targets file if present.
+
+    Returns a set of normalized target names, or None if file does not exist
+    or specifies 'all'.
+    """
+    targets_file = repo_root / ".agent-targets"
+    if not targets_file.is_file():
+        return None
+
+    raw = targets_file.read_text()
+    targets = set()
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        for item in line.split(","):
+            cleaned = item.strip().lower()
+            if cleaned:
+                targets.add(normalize_target(cleaned))
+
+    if "all" in targets or not targets:
+        return None
+    return targets
+
+
 def get_adapter_projections(
     context: dict[str, Any],
     repo_root: Path,
@@ -386,7 +412,9 @@ def main() -> None:
         selected_targets.add("openai")
 
     if not selected_targets:
-        selected_targets = {"all"}
+        repo_root = args.repo_root or (Path.cwd() if (Path.cwd() / "context").is_dir() else _REPO_ROOT)
+        configured = load_configured_targets(repo_root)
+        selected_targets = configured if configured else {"all"}
 
     force = bool(args.all)
 

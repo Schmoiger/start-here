@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/Schmoiger/agents-framework.git
 	branch = main
-	commit = aff970d4d272fc0227b916abbaeeaf00e4bc925d
+	commit = b1f4face46fda440a235fcd48abc1ce36718f2f7
 	method = merge
 	cmdver = 0.4.9
-	parent = e0414c2ccb4e329af6ded5f7b038328f3989cce3
+	parent = 8ef5aac35fe0418280173eb65dd1db5dcd085727

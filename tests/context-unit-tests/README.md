@@ -4,6 +4,8 @@ Unit tests for validating context documentation consistency, frontmatter, and cr
 
 For tests covering runtime adapters, generators, and pre-commit validators, see [`context/scripts/tests/`](../../context/scripts/tests/README.md).
 
+---
+
 ## Quick Start
 
 ```bash
@@ -18,6 +20,8 @@ uv run pytest . -v
 ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 ```
 
+---
+
 ## Test Files
 
 | File | Description | LLM Required |
@@ -25,6 +29,8 @@ ANTHROPIC_API_KEY=your-key uv run pytest test_llm_consistency.py -v
 | `test_doc_format.py` | Validates YAML frontmatter, required sections, markdown syntax | No |
 | `test_references.py` | Validates cross-references between docs, agent-standards consistency | No |
 | `test_llm_consistency.py` | Semantic consistency checks via LLM call | Yes |
+
+---
 
 ## Running Tests
 
@@ -59,6 +65,8 @@ The LLM test performs a single API call to check for:
 - Standards contradictions
 - Missing cross-references
 
+---
+
 ## What Each Test Validates
 
 ### test_doc_format.py
@@ -86,6 +94,8 @@ The LLM test performs a single API call to check for:
 - File references in standards point to existing files
 - Agents listed in agent-standards.md have definition files
 
+---
+
 ## CI Integration
 
 The GitHub Actions workflow (`.github/workflows/docs-test.yml`) runs:
@@ -97,6 +107,8 @@ To enable LLM tests in CI:
 1. Add `ANTHROPIC_API_KEY` as a repository secret
 2. Set repository variable `RUN_LLM_TESTS=true`
 
+---
+
 ## Adding New Tests
 
 When adding new documentation:
@@ -104,6 +116,8 @@ When adding new documentation:
 2. New standards → Add to skip patterns if using example paths
 3. New rules → Frontmatter optional but recommended
 4. New cross-references → `test_references.py` validates automatically
+
+---
 
 ## Dependencies
 

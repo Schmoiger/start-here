@@ -6,7 +6,7 @@
 [x] When an orchestrator spawns a sub-agent does it give the right context files (rules, standards)? They always seem to forget.
 [WON'TDO] Keep both context and context-compressed folders - don't know which is more effective yet.
 [x] Update the readme
-[x] Change artifact to artefact
+[x] Adopt British English 'artefact' convention
 [x] Workflow should have tasks.md for tracking
 [x] Add persona (e.g. Dr. Sarah Chen from new-dev)
 [x] Formalise the parallel workflow. Solution architect identifies 1) context domains and 2) dependencies between context domains (blocking points). Tasks are written as phases = work between blocking points. Each domain works in parallel up to those blocking points. Within each domain there might be further opportunities for parallel working. At blocking points tech-lead then solution-architect does quality verification. A diagram will help.
