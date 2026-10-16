@@ -1,8 +1,9 @@
-import os
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
+
+import yaml
 
 from context.scripts.generators.adapters.core.models import CanonicalAgent
 from context.scripts.generators.adapters.gemini.generator import (
@@ -43,9 +44,26 @@ class TestGeminiAdapter(unittest.TestCase):
 
         content = skill_file.read_text()
         self.assertTrue(content.startswith("---\n"))
-        self.assertIn("name: test-agent", content)
-        self.assertIn("description: A test agent", content)
+
+        frontmatter = yaml.safe_load(content.split("---", 2)[1])
+        self.assertEqual(frontmatter["name"], "test-agent")
+        self.assertEqual(frontmatter["description"], "A test agent")
         self.assertIn("Auto-generated", content)
+
+    def test_generate_skills_escapes_colon_in_description(self):
+        """Descriptions containing ': ' must stay a single YAML scalar."""
+        self.context["agents"]["test-agent"].description = (
+            "Two modes — (1) staging: deploy; (2) production: validate"
+        )
+
+        generate_skills(self.context, self.output_dir)
+
+        skill_file = self.output_dir / ".agents" / "skills" / "test-agent" / "SKILL.md"
+        frontmatter = yaml.safe_load(skill_file.read_text().split("---", 2)[1])
+        self.assertEqual(
+            frontmatter["description"],
+            "Two modes — (1) staging: deploy; (2) production: validate",
+        )
 
     def test_generate_gemini_md(self):
         generate_gemini_md(self.context, self.output_dir)
