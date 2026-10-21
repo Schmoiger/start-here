@@ -49,7 +49,9 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
-          token: ${{ secrets.UPSTREAM_PUSH_TOKEN || github.token }}
+          # GITHUB_TOKEN (contents: write) authenticates every operation against this repository.
+          # UPSTREAM_PUSH_TOKEN is scoped to the canonical upstream repositories only, so it cannot
+          # read this one; it is applied to the subrepo remotes in "Sync Subrepos to Upstream".
           persist-credentials: false
 
       - name: Evaluate Push Authentication
@@ -60,6 +62,22 @@ jobs:
           else
             echo "has_token=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Verify Upstream Token
+        if: steps.auth-check.outputs.has_token == 'true'
+        env:
+          PUSH_TOKEN: ${{ secrets.UPSTREAM_PUSH_TOKEN }}
+        run: |
+          for subrepo_file in ./*/.gitrepo; do
+            [ -f "$subrepo_file" ] || continue
+            remote=$(git config -f "$subrepo_file" subrepo.remote)
+            header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$PUSH_TOKEN" | base64 | tr -d '\n')"
+            if ! git -c http.https://github.com/.extraheader="$header" ls-remote --heads "$remote" >/dev/null 2>&1; then
+              echo "::error::UPSTREAM_PUSH_TOKEN cannot read $remote — the PAT is invalid, expired, or not scoped to that repository. Rotate it and update the repository secret."
+              exit 1
+            fi
+            echo "Verified token access to $remote"
+          done
 
       - name: Configure Git identity
         if: steps.auth-check.outputs.has_token == 'true'
@@ -79,6 +97,7 @@ jobs:
         if: steps.auth-check.outputs.has_token == 'true'
         env:
           PUSH_TOKEN: ${{ secrets.UPSTREAM_PUSH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           echo "Configuring subrepo credentials..."
           # Unset local extraheader written by actions/checkout so it cannot override the PAT
@@ -142,6 +161,12 @@ jobs:
 
           # Push updated .gitrepo tracking commits back to main
           echo "Pushing updated subrepo tracking commits back..."
+          # The PAT rewrite above covers every github.com URL, origin included, but the PAT is scoped
+          # to the upstream repositories and cannot write here. Drop the rewrite and authenticate
+          # origin with GITHUB_TOKEN (contents: write) instead.
+          git config --global --unset-all "url.https://x-access-token:${PUSH_TOKEN}@github.com/.insteadOf" || true
+          git config --local http.https://github.com/.extraheader \
+            "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 | tr -d '\n')"
           git push origin HEAD:${{ github.ref_name }}
 
           if [ "$SYNC_FAILED" == "true" ]; then
