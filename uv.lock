@@ -7,12 +7,8 @@ name = "agent-harness"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "anyio" },
-    { name = "filelock" },
     { name = "httpx" },
-    { name = "pytest" },
     { name = "pyyaml" },
-    { name = "virtualenv" },
 ]
 
 [package.optional-dependencies]
@@ -28,20 +24,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anyio", specifier = ">=4.14.2" },
-    { name = "filelock", specifier = ">=3.20.3" },
     { name = "httpx", specifier = ">=0.27.0" },
-    { name = "pytest", specifier = ">=9.0.3" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0.0" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=9.0.3" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "virtualenv", specifier = ">=21.7.13" },
 ]
 provides-extras = ["test"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "pre-commit", specifier = ">=4.3.0" },
-    { name = "pytest", specifier = ">=7.0.0" },
+    { name = "pytest", specifier = ">=9.0.3" },
 ]
 
 [[package]]
