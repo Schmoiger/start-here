@@ -7,20 +7,14 @@ name = "agent-harness"
 version = "0.1.0"
 description = "Agentic Orchestration Harness runtime adapter generator and drift validator"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
-    { name = "WithinEve", email = "noreply@withineve.com" }
+    { name = "Info", email = "info@mindrocketnow.com" }
 ]
 keywords = ["agents", "orchestration", "gemini", "claude", "copilot", "codex", "llm"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
@@ -35,13 +29,13 @@ agent-drift = "context.scripts.validators.adapter_drift:main"
 
 [project.optional-dependencies]
 test = [
-    "pytest>=7.0.0",
+    "pytest>=9.0.3",
 ]
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.3.0",
-    "pytest>=7.0.0",
+    "pytest>=9.0.3",
 ]
 
 [tool.ruff]
