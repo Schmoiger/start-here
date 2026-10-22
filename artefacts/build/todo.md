@@ -24,3 +24,6 @@
 [ ] Configure GitHub Actions secrets and variables in repository settings (`ANTHROPIC_API_KEY` in Secrets, `RUN_LLM_TESTS` in Variables) to support CI LLM consistency testing.
 [ ] Extend harness to the Cline runtime (including adding generated files to gitignore, working out how to extract telemetry information)
 [ ] Fix the hard-coded `Co-Authored-By: Claude <noreply@anthropic.com>` trailer — agents write it literally (the one in 160f756 was chosen by hand) while `context/scripts/validators/workspace_conventions.py:77` only validates the shape `^Co-Authored-By: .+ <.+@.+\..+>$`. Derive it from git config or runtime identity instead of hardcoding it.
+[ ] Framework has token bloat for simple tasks. Implement system 1 thinking (Jev) to pre-classify the work: use Jev to pick which workflow to follow. Add system one models to model LUT.
+[ ] Add new workflow for trivial work, uses a general purpose agent. 
+[ ] revise Persona to be formatted the same (as author.md)

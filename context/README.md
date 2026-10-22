@@ -1,29 +1,54 @@
 # Context Directory
 
-Portable standards, rules, and agent definitions for multi-agent development workflows.
+## Table of Contents
 
----
+Hydration index. Read only the section a task needs. Each folder has a readme.md to navigate.
 
-## Quick Reference
-
-| What                       | Where                            | When                                                 |
-| -------------------------- | -------------------------------- | ---------------------------------------------------- |
-| **Framework docs**         | `docs/*.md`                      | Architecture companion, reference manual, delivery rhythm |
-| **Non-negotiable rules**   | `rules/*.md`                     | Invariant boundaries; verified by scripts/linters    |
-| **Reference docs**         | `standards/*.md`                 | Reference manuals; benchmarks used by review rubrics |
-| **Agent definitions**      | `agents/*.md`                    | Orchestrator spawns with Task tool                   |
-| **Workflows**              | `workflows/*.yaml`               | Defines phase dependencies and agent assignments     |
-| **Model profiles (LUT)**   | `models.yaml`                    | Maps abstract intent tiers to provider families and telemetry |
-| **Procedural skills**      | `skills/*.md`                    | JIT workflows; evaluated by LLM-as-a-judge rubrics   |
-| **Downstream integration** | `#downstream-integration--standards-synchronisation-git-subrepo` | Bi-directional standards synchronisation via `git-subrepo` |
-| **Output templates**       | `templates/`                     | Handoff, review, artefact formats                    |
-| **Writing personas**       | `persona/*.md`                   | Voice/style for human-facing content (blogs, papers) |
-| **Validators**             | `scripts/validators/`            | Pre-commit hooks, CI/CD, adapter drift               |
-| **Generators**             | `scripts/generators/`            | Unified runtime adapter CLI (Gemini, Claude, Copilot, Codex) |
+1. [For Agents](#for-agents) — where everything lives, and how to change it safely
+   - [Quick Reference](#quick-reference) — which directory holds what, and when to consult it
+   - [Inventory](#inventory) — direct links to every rule, standard, skill, agent, workflow, template, persona, framework doc, script, and model profile
+   - [File Type Overview](#file-type-overview) — purpose of each file type, with its add/edit/delete checklist
+     - [Agent Definition Files](#agent-definition-files) — agents, personas, model profiles, skills
+     - [Context Definition Files](#context-definition-files) — rules, standards, workflows, framework docs
+     - [Output Definition Files](#output-definition-files) — templates, scripts
+   - [Making Changes](#making-changes) — edit canonical files only, recompile projections, verify zero drift
+     - [Adding New Rules](#adding-new-rules) — the three-question test before creating a rule
+     - [Adding New Agents](#adding-new-agents) — template, frontmatter, and the mandatory recompile
+2. [For Humans](#for-humans) — why the harness is shaped this way
+   - [Harness Design](#harness-design) — the iron triangle, and the criterion-to-design-choice table
+   - [Context Hierarchy](#context-hierarchy) — the invariant layers, and why rules and standards duplicate
+3. [Downstream Synchronisation](#downstream-synchronisation) — distributing `context/` as a `git-subrepo`
+   - [1. Prerequisites](#1-prerequisites) — required tooling
+   - [2. Initial Project Setup](#2-initial-project-setup) — `subrepo clone`, pre-commit hook, projection compile
+   - [3. Ongoing Synchronisation Workflows](#3-ongoing-synchronisation-workflows) — [pulling upstream](#pulling-upstream-updates) and [pushing improvements back](#pushing-improvements-back-upstream)
+   - [4. Testing Downstream Standards](#4-testing-downstream-standards) — running the bundled test suite on a clone
+   - [5. Upstream Maintenance & Automated Distribution (`agents-framework`)](#5-upstream-maintenance--automated-distribution-agents-framework) — CI checks: [freshness](#1-shift-left-freshness-checks-githubworkflowspr-subrepo-checksyml) · [reconciliation](#2-automated-reconciliation--push-githubworkflowspr-subrepo-pushyml) · [conflicts](#3-conflict-resolution--manual-fallback)
+4. [Runtime Telemetry & Session Token Tracking](#runtime-telemetry--session-token-tracking) — how the `Agent-Session:` trailer is populated at commit time
+   - [Multi-Runtime Comparison Matrix](#multi-runtime-comparison-matrix) — telemetry paths and token field names per runtime
+   - [Architectural Principles](#architectural-principles) — container versus model, incremental extraction, error surfacing
 
 ---
 
 ## For Agents
+
+### Quick Reference
+
+| What                       | Where                  | When                                                 |
+| -------------------------- | ---------------------- | ---------------------------------------------------- |
+| **Framework docs**         | `docs/*.md`            | Reference manuals that describes this framework.     |
+| **Non-negotiable rules**   | `rules/*.md`           | Invariant boundaries; verified by scripts/linters    |
+| **Reference docs**         | `standards/*.md`       | Standards and benchmarks used by review rubrics      |
+| **Agent definitions**      | `agents/*.md`          | Orchestrator spawns with Task tool                   |
+| **Workflows**              | `workflows/*.yaml`     | Defines phase dependencies and agent assignments     |
+| **Model profiles (LUT)**   | `models.yaml`          | Maps abstract model parameters to provider specifics |
+| **Procedural skills**      | `skills/*.md`          | JIT workflows; evaluated by LLM-as-a-judge rubrics   |
+| **Output templates**       | `templates/`           | Handoff, review, artefact formats                    |
+| **Writing personas**       | `persona/*.md`         | Voice/style for human-facing content (blogs, papers) |
+| **Validators**             | `scripts/validators/`  | Pre-commit hooks, CI/CD, adapter drift               |
+| **Generators**             | `scripts/generators/`  | Unified runtime adapter CLI                          |
+
+
+### Inventory
 
 **Rules**: [bash-env](rules/bash-environment.md) · [multi-agent](rules/multi-agent-collaboration.md) · [python-env](rules/python-environment.md) · [secrets](rules/secrets.md) · [supabase](rules/supabase.md) · [tech-writing](rules/tech-writing.md) · [testing](rules/testing.md) · [ts-env](rules/typescript-environment.md) · [ui-dev](rules/ui-dev.md) · [ui-testing](rules/ui-testing.md) · [workspace](rules/workspace-conventions.md)
 
@@ -45,32 +70,41 @@ Portable standards, rules, and agent definitions for multi-agent development wor
 
 **Model Profiles**: [models](models.yaml)
 
----
-
-## For Humans
-
-### The Rules vs. Skills Separation (The Verification Test)
-
-Our architecture enforces a strict physical split between `rules/`, `skills/`, and `standards/` based on **Verification Mechanism** and **Runtime Projection**.
-
-- **Rules (`rules/*.md`)**: Deterministic invariants. "Thou shalt" and "Thou shalt not".
-  - **Verification**: **0 token cost**. Evaluated by code (pre-commit hooks, linters, AST parsers). *If it requires an LLM to verify, it is not a rule.*
-  - **Projection**:
-    - `alwaysApply: true`: Injected into the global system prompt. Must be aggressively succinct to minimise overhead. Currently consumes ~1,300 tokens, representing < 1% of a standard 128k–200k context window (and < 0.1% on 1M+ models). Only the most critical global invariants (e.g. environment constraints, universal conventions) should be global.
-    - `alwaysApply: false`: Injected JIT based on globs. Still succinct, but domain-specific.
-  - **Content**: Pure constraints. No tutorials, no explanations.
-
-- **Skills (`skills/*.md`)**: Procedural runbooks, craft, and workflows. "How to accomplish X".
-  - **Verification**: **LLM-as-a-judge**. An agent executes the skill, and a reviewer agent verifies the outcome.
-  - **Projection**: Injected JIT when an agent matches globs or needs to perform a specific task.
-  - **Content**: Step-by-step instructions, code snippets, tool commands.
-
-- **Standards (`standards/*.md`)**: The reference canon and rubrics. "What good looks like and why".
-  - **Verification**: Used as the **benchmark rubric** against which LLM judges evaluate skills.
-  - **Projection**: Read JIT by any agent that needs them. Design and dev agents load them for deep context on a decision; reviewer agents (`@tech-lead`, `@code-reviewer`) load them when evaluating output.
-  - **Content**: Architectural patterns, design philosophy, trade-offs, and detailed explanations.
 
 ### File Type Overview
+
+#### Agent Definition Files
+
+**Agents** (`agents/*.md`):
+
+- Specialised agent definitions (who does what)
+- Specialised `orchestrator.md` defines orchestrator behaviour; this is the first agent to spawn so must read at session start
+- Frontmatter lists: allowed `model`, allowed `tools`, should follow `standards`, must follow `rules`, available `skills`
+- Body lists: what to do before starting work, what to do whilst doing work, where to create deliverables. Orchestrator agent will append specific tasks at invocation.
+- **On Add / Edit / Delete**: Create from `templates/agent-template.md` with required frontmatter. Validate via `uv run python context/scripts/validators/agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to project to `AGENTS.md` and vendor-specific runtimes. Verify with `adapter_drift.py`.
+
+**Personas** (`persona/*.md`):
+
+- Writing voice/style for human-facing content (blogs, papers, marketing)
+- NOT for technical handoffs (README, API docs, architecture)
+- See `docs/agentic-framework-reference.md` (Writing Personas) for when and how to use them
+- **On Add / Edit / Delete**: Create or edit persona file (`name`, `description`, `traits`). No adapter recompilation needed.
+
+**Model Profiles** & Runtime Telemetry LUT (`models.yaml`):
+
+- Decouples agent definitions from vendor-specific model identifiers
+- Defines abstract intent tiers (`small`, `medium`, `large`) mapped to model families
+- Delegates precise model resolution to runtime adapters / environment configurations
+- Catalogues multi-platform telemetry locations (Git trailers, Claude JSONL & Managed Agents Dreams, Antigravity transcripts)
+- **On Add / Edit / Delete**: Update provider model names or aliases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update model mappings in vendor-specific runtimes. Verify with `adapter_drift.py`.
+
+**Skills** (`skills/*.md`):
+
+- Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
+- Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
+- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `##` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md`. Verify with `adapter_drift.py`.
+
+#### Context Definition Files
 
 **Rules** (`rules/*.md`):
 
@@ -88,22 +122,6 @@ Our architecture enforces a strict physical split between `rules/`, `skills/`, a
 
 - **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `##` headings (Typst rule). Add to `context/README.md` Quick Reference and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
 
-**Agents** (`agents/*.md`):
-
-- Specialised agent definitions (who does what)
-- Frontmatter lists applicable `rules`, `standards`, `skills`, and `model`
-- `orchestrator.md` defines orchestrator behaviour — read at session start
-- Orchestrator spawns with Task tool; see AGENTS.md for the complete registry
-- **On Add / Edit / Delete**: Create from `templates/agent-template.md` with required frontmatter (`name`, `model`, `rules`, `standards`, `skills`). Validate via `uv run python context/scripts/validators/agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to project to `AGENTS.md`, `CLAUDE.md`, `.claude/prompts/`, and `.agents/skills/`. Verify with `adapter_drift.py`.
-
-**Model Profiles & Runtime Telemetry LUT** (`models.yaml`):
-
-- Decouples agent definitions from vendor-specific model identifiers
-- Defines abstract intent tiers (`small`, `medium`, `large`) mapped to model families
-- Delegates precise model resolution to runtime adapters / environment configurations
-- Catalogues multi-platform telemetry locations (Git trailers, Claude JSONL & Managed Agents Dreams, Antigravity transcripts)
-- **On Add / Edit / Delete**: Update provider model names or aliases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update model mappings in `GEMINI.md` and `CLAUDE.md`. Verify with `adapter_drift.py`.
-
 **Workflows** (`workflows/*.yaml`):
 
 - Phase definitions, dependencies, quality gates
@@ -118,25 +136,14 @@ Our architecture enforces a strict physical split between `rules/`, `skills/`, a
 - Delivery cadence (`docs/rhythm-of-delivery.md`): iteration rhythm, shipping cadence, and delivery loops
 - **On Add / Edit / Delete**: Update architectural documentation. Verify documentation freshness with `uv run python context/scripts/validators/framework_docs_staleness.py`.
 
+#### Output Definition Files
+
 **Templates** (`templates/`):
 
 - Output formats for artefacts, handoffs, reviews, git, and agent definitions
 - The orchestrator selects the appropriate template when constructing a task prompt; agents use whichever template the task prompt specifies
 - See `templates/README.md` for the full index
 - **On Add / Edit / Delete**: Create or edit template files. Update `templates/README.md` index. No adapter recompilation needed.
-
-**Skills** (`skills/*.md`):
-
-- Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
-- Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
-- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `##` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md`. Verify with `adapter_drift.py`.
-
-**Personas** (`persona/*.md`):
-
-- Writing voice/style for human-facing content (blogs, papers, marketing)
-- NOT for technical handoffs (README, API docs, architecture)
-- See `docs/agentic-framework-reference.md` (Writing Personas) for when and how to use them
-- **On Add / Edit / Delete**: Create or edit persona file (`name`, `description`, `traits`). No adapter recompilation needed.
 
 **Scripts** (`scripts/`):
 
@@ -146,34 +153,102 @@ Our architecture enforces a strict physical split between `rules/`, `skills/`, a
 - Tests (`tests/`): Test suite for validators, runtime adapters, and telemetry extractors
 - **On Add / Edit / Delete**: For standalone scripts, declare dependencies via PEP 723 inline metadata (`# /// script`). Add accompanying tests in `context/scripts/tests/`. Run test suite: `uv run --with pytest pytest context/scripts/tests/ -v`. If generator logic was altered, run `generate_adapters.py` and `adapter_drift.py`.
 
----
+### Making Changes
 
-### Summary: When to Recompile Adapters
-
-Whenever you add, edit, or delete canonical context files, recompile projections and verify zero drift:
-
-| Changed Directory | Recompile Required? | Generated Projections | Command |
-|---|---|---|---|
-| `context/skills/` | **Yes** | `AGENTS.md`, `.agents/skills/<name>/SKILL.md` | `uv run python context/scripts/generators/generate_adapters.py` |
-| `context/agents/` | **Yes** | `AGENTS.md`, `CLAUDE.md`, `.claude/prompts/`, `.agents/skills/` | `uv run python context/scripts/generators/generate_adapters.py` |
-| `context/workflows/` | **Yes** | `AGENTS.md`, `CLAUDE.md` (workflow tables) | `uv run python context/scripts/generators/generate_adapters.py` |
-| `context/models.yaml` | **Yes** | `GEMINI.md`, `CLAUDE.md` (model mappings) | `uv run python context/scripts/generators/generate_adapters.py` |
-| `context/rules/` | Only if `agents/*.md` changed | Rule bindings in agent projections | Recompile if agent frontmatter changed |
-| `context/standards/` | Only if `agents/*.md` changed | Standard bindings in agent projections | Recompile if agent frontmatter changed |
-| `context/templates/` | No | None (direct file reference) | Update `templates/README.md` |
-| `context/persona/` | No | None (direct file reference) | None |
-| `context/scripts/` | If generators changed | All projections | `generate_adapters.py` + `pytest context/scripts/tests/` |
-
-Always verify zero drift after recompiling:
+Do not make changes to vendor-specific runtimes e.g. agent/SKILL.md or CLAUDE.md. Instead, make changes only to the canonical context files, recompile projections and verify zero drift:
 
 ```bash
 uv run python context/scripts/validators/adapter_drift.py
 ```
 
+Check that this readme, and especially the inventory, is still valid.
 
-### DRY Between Rules & Standards
+If any of `model LUT`, `tools`, `standards`, `rules`, `skills` has been added or deleted, you should check the frontmatter for each agent to see if any changes should be made.
 
-Some duplication is **intentional**:
+#### Adding New Rules
+
+When something keeps failing because agents don't follow it:
+
+1. **Is it binary?** Can you definitively say "followed" or "not followed"?
+2. **Does it break things?** Not just style—actual failures?
+3. **Is it actionable?** Can you give clear DO/DON'T commands?
+
+If yes to all three, create a rule in `rules/*.md` (keep under 200 tokens).
+
+#### Adding New Agents
+
+When a task domain needs repeated specialised work:
+
+1. Copy `templates/agent-template.md`
+2. Set `name`, `description`, `model` in frontmatter
+3. List applicable `rules` and `standards` in frontmatter
+4. Write concise body with rules summary and workflow
+5. Add to workflow YAML if part of standard process
+6. Regenerate adapter projections: `uv run python context/scripts/generators/generate_adapters.py`
+
+
+---
+
+## For Humans
+
+```mermaid
+flowchart TB
+  subgraph Agent
+    a1[Agent 
+    Definition]-->a2[Skills] & a3[Models] & a4[Persona] & a5[Tools]
+  end
+  subgraph Context
+    b1[Frameworks]-->b2[Standards] & b3[Workflows] & b4[Rules]
+  end
+  subgraph Output
+    c1[Templates]<-->c2[Scripts]
+  end
+```
+
+
+### Harness Design
+
+This harness maps onto my formulation of the new iron triangle:
+
+- **Autonomy**: The harness should be **flexible** working equally well for multi-agent orchestrated workflows and single-agent vibing sessions. It should be **portable**, its function not contingent on proprietary features. It should be **self-improving**, because it won’t stay optimised because of how fast the domain is moving.
+
+- **Intent**: The harness should preserve the chain of intent by being as deterministic, and so testable, as possible. We do this by architecting clear **separation of concerns**: reasoning vs process, asserted vs evaluated, execution runtime vs workflow.
+
+- **Tokenomics**: Not every token is equal; choice of caching, reasoning, model, output style all impact cost. The harness should be **token-efficient**: make the right trade-off between quality and cost.
+
+
+| Criterion | Design choices |
+| --------- | -------------- |
+| **Flexible** | Agents are focused in purpose (specialist not generalist). |
+|  | There is an agent primitive for an orchestrator agent. |
+|  | The work is organised into workflows. Each workflow is not opinionated as to agent type or other workflows. |
+| **Portable** | Harness is Git-native: a folder that can be copied into each new repo, written in Markdown or YAML. |
+|  | Generator scripts express the harness onto a selected LLM runtime. |
+| **Self-improving** | There are continuous-improvement workflows and agents. |
+|  | Changes should be possible without wholesale rewrites of either context files or repos. |
+|  | Versioning should be supported. |
+| **Separation of concerns** | Context hierarchy; not all context needs to be ingested for every task. |
+|  | Context scoped only to repo (as proxy for project). |
+|  | Reject proprietary context. |
+|  | Abstract runtime specifics from definitions. |
+| **Token-efficient** | Agent definition includes choice of model. |
+|  | Prefer tests over evaluation by agents. |
+|  | Not all of every file needs to be ingested by agents: frontmatter to direct agents to applicable content within the file, terse text for agents, verbose text for humans at the bottom. |
+|  | Files are to be consumed just in time. |
+
+### Context Hierarchy
+
+Each context window with an LLM, and each turn within each window, comprises context and thinking tokens.
+
+A task is context that is actioned. The task is initiated in the prompt, either directly from the user or from the Orchestrator. Task context is by convention in a `artefacts/build/tasks-<git-branch>.md` file. Project context is in subfolders within `artefacts/`. These vary from task-to-task, project-to-project. In contrast, this hierarchy is invariant between projects.
+
+**Specialised agents** do the work. An Orchestrator is a special type of agent that defines and allocates work for other sub-agents. The Documentation agent also uses **Persona** in order to write in the correct tone of voice. Agents are expressed upon an LLM runtime. The mapping of parameters in the agent definition file to a vendor's runtime is in a **Model Profiles Lookup Table** (LUT). Sometimes agents have not been well-trained on specific technologies and are prone to hallucinations. **Skills** give specific instruction in these cases.
+
+**Global contxt** is pulled into each repo on demand as a subrepo. **Rules** break code if not adhered to. They can be written as assertions and so evaluated (in tests, pre-commit hooks, linters, AST parsers). **Standards** give context and rationale to how to do the work. Sections of standards should be loaded into context windwo on demand. They should be used as eval rubrics using a LLM-as-judge pattern. Orchestrators delegate to sub-agents according to the **workflow** they are following. More usefule for humans than agent, the **framework** gives the rationale for the harness and delivery philosophy.
+
+The **output** is defined for consistency, to enable deterministic testing. By forcing agents to deliver work according to **templates** we assure that expected information is delivered. This context hierarchy is expressed as code (markdown, yaml). **Scripts** automate some tasks: projecting onto vendor-specific LLM runtime, testing.
+
+Some duplication is intentional:
 
 - Rules tell agents **what to do** (concise, actionable)
 - Standards explain **why and how** (detailed, contextual)
@@ -182,99 +257,9 @@ An agent following a rule should succeed without reading standards. Standards ex
 
 ---
 
-## Orchestrator Responsibilities
+## Downstream Synchronisation
 
-The orchestrator (main Claude session) coordinates work but delegates implementation. Full behaviour defined in `context/agents/orchestrator.md` — read at session start.
-
-**Core rule**: Delegate all implementation to specialised agents. The orchestrator writing code directly silently bypasses the environment rules those agents carry.
-
-**When no agent exists for a task**: create one from `templates/agent-template.md`, then delegate. Do not write implementation directly.
-
----
-
-## Workflows
-
-See `AGENTS.md` for the workflow index. Full phase definitions in `workflows/*.yaml`.
-
-**build** — Primary development loop: task planning → TDD (red/green/blue) → regression → deployment. Quality gates at tasks-review, coverage, quality-review, final-holistic-review.
-
-**design** — Discovery through design review. Run before `build`. Produces requirements, architecture, API specs, UI designs.
-
-**prototype** — Fast iteration for POCs and experiments. No quality gates. Must rewrite with `build` before production.
-
-**deploy** — GCP cloud deployment. Run after `build` local-deployment phase.
-
-**full-test** — Full regression suite across all modules. Run before merge to master or on demand.
-
-**content** — Human-facing content (blogs, papers, guides) using writing personas.
-
-**bugfix** — Empirical bug reproduction, fix, and verification.
-
-**continuous-improvement** — Framework improvement: reactive (human reports incident) or proactive (review interruptions, incidents, and git log metrics).
-
-**retrospective** — Proactive framework review: analyse accumulated handoffs, task metrics, and git logs to suggest improvements, fix and record.
-
-**Orchestration patterns**: Single Agent, Sequential Chain, Hive, Iterative Loop (see `docs/agentic-framework-reference.md`; exploration “swarm” is out of scope for shipped YAML — `docs/vision.md`)
-
----
-
-## Directory Structure
-
-```text
-context/
-├── README.md                      # This file
-├── models.yaml                    # Model profile LUT (abstract tiers -> provider families)
-├── docs/                          # Framework and architectural documentation
-│   ├── agentic-framework.md      # Companion paper: core concepts, verification split, rationale
-│   ├── agentic-framework-reference.md # Reference manual: workflows, agents, telemetry
-│   └── rhythm-of-delivery.md     # Delivery cadence, iteration loops, and shipping rhythm
-├── standards/                     # Reference docs (how to do things well)
-│   ├── README.md                 # Standards index and routing guide
-│   └── *.md                      # coding, testing, tech, doc, workflow, security, agent, visual, etc.
-├── rules/                         # Non-negotiable invariants (enforced by code / linters / AST)
-│   └── *.md                      # bash-env, multi-agent, python-env, secrets, supabase, tech-writing, etc.
-├── agents/                        # Agent definitions (who does what)
-│   ├── README.md                 # Agent inventory and model tiers
-│   ├── orchestrator.md           # Orchestrator behaviour (read at session start)
-│   └── *.md                      # Specialised agents (see AGENTS.md for registry)
-├── workflows/                     # Workflow patterns (phase dependencies)
-│   ├── build.yaml                # Primary TDD development loop
-│   ├── design.yaml               # Discovery through design review
-│   ├── prototype.yaml            # Fast iteration / POC
-│   ├── deploy.yaml               # GCP cloud deployment
-│   ├── bugfix.yaml               # Bug reproduction, fix, verification
-│   ├── full-test.yaml            # Full regression suite
-│   ├── content.yaml              # Human-facing content with personas
-│   ├── continuous-improvement.yaml # Incident response + reactive improvement
-│   └── retrospective.yaml        # Proactive framework and data review
-├── templates/                     # Output templates (flat — see templates/README.md for index)
-│   ├── README.md                 # Template catalog and usage guide
-│   ├── agent-template.md         # Template for new agent definitions
-│   └── *.md / *.json / *.yaml    # Task prompts, handoffs, reviews, PRs, etc.
-├── skills/                        # Procedural skills (JIT instructions by technology/workflow)
-│   └── *.md                      # python-scripting, typst-pipeline, tdd-workflow, git-subrepo, etc.
-├── persona/                       # Writing voice for human-facing content
-│   ├── author.md                 # AS persona (books, foundational thought leadership, punchy & dense)
-│   ├── technical-writer.md       # Amara Osei persona (practitioner guides, technical prose)
-│   ├── opinionated-blogger.md   # Dr. Sarah Chen persona (blogs, opinion pieces)
-│   ├── editor.md                 # Editorial voice
-│   └── expert-reviewer.md        # Review voice
-└── scripts/                      # Portable tools
-    ├── prepare-commit-msg.py     # Hook: inject token metrics into commits
-    ├── prepare-commit-msg.sh     # Shell wrapper (symlinked from .git/hooks/)
-    ├── hooks/                    # Git hook templates (pre-commit)
-    ├── validators/               # Rule validators & integrity checks (pre-commit hooks)
-    ├── generators/               # Runtime adapter generators
-    │   ├── generate_adapters.py  # Unified CLI dispatcher
-    │   └── adapters/             # Platform adapters (core, gemini, claude, github, openai)
-    └── tests/                    # Test suites (validators, adapters, E2E compilation)
-```
-
----
-
-## Downstream Integration & Standards Synchronisation (`git-subrepo`)
-
-**Golden source**: `agents-framework` repository (`main` branch)
+This context hierachy is distributed as a `git-subrepo`. The source repo is: `agents-framework` (`main` branch).
 
 The framework distributes canonical context as a self-contained directory (`context/`). Downstream repositories import standards, workflows, and agents without inheriting project-specific tracking state (`artefacts/build/`, `artefacts/product/`, or application code).
 
@@ -499,36 +484,3 @@ The framework tracks cumulative token consumption directly from the underlying A
      - **Not installed**: Skipped cleanly.
      - **Installed but idle**: Skipped with diagnostic note (`"Runtime installed but no active sessions found for validation"`).
      - **Installed with active sessions**: Fails immediately if vendor schema changes or data formats drift.
-
----
-
-## Adding New Rules
-
-When something keeps failing because agents don't follow it:
-
-1. **Is it binary?** Can you definitively say "followed" or "not followed"?
-2. **Does it break things?** Not just style—actual failures?
-3. **Is it actionable?** Can you give clear DO/DON'T commands?
-
-If yes to all three, create a rule in `rules/*.md` (keep under 200 tokens).
-
----
-
-## Adding New Agents
-
-When a task domain needs repeated specialised work:
-
-1. Copy `templates/agent-template.md`
-2. Set `name`, `description`, `model` in frontmatter
-3. List applicable `rules` and `standards` in frontmatter
-4. Write concise body with rules summary and workflow
-5. Add to workflow YAML if part of standard process
-6. Regenerate adapter projections: `uv run python context/scripts/generators/generate_adapters.py`
-
----
-
-## See Also
-
-- **AGENTS.md** / **CLAUDE.md** / **GEMINI.md** — auto-generated workflow + agent registries (run `generate_adapters.py` to update)
-- **Root README**: `../README.md` — deployment instructions for context system and runtime adapters
-- **Standards index**: `standards/README.md` — detailed standards catalogue
