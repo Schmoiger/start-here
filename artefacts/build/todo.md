@@ -22,3 +22,5 @@
 [x] Fix `prepare-commit-msg` git hook and telemetry extraction via the runtime adapter layer (install hook symlink, support Claude Code, Antigravity, and Codex session telemetry per `context/models.yaml`).
 [ ] Replace per-repo context in existing repositories (e.g. bollinger) with the canonical standards subrepo (`git subrepo clone git@github.com:Schmoiger/start-here.git context -b standards`).
 [ ] Configure GitHub Actions secrets and variables in repository settings (`ANTHROPIC_API_KEY` in Secrets, `RUN_LLM_TESTS` in Variables) to support CI LLM consistency testing.
+[ ] Extend harness to the Cline runtime (including adding generated files to gitignore, working out how to extract telemetry information)
+[ ] Fix the hard-coded `Co-Authored-By: Claude <noreply@anthropic.com>` trailer — agents write it literally (the one in 160f756 was chosen by hand) while `context/scripts/validators/workspace_conventions.py:77` only validates the shape `^Co-Authored-By: .+ <.+@.+\..+>$`. Derive it from git config or runtime identity instead of hardcoding it.
