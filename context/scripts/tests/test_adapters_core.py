@@ -142,6 +142,48 @@ This is the body of the markdown.
         self.assertIn("references unmapped agent", str(context.exception))
 
 
+class TestToolNormalisation(unittest.TestCase):
+    """The `tools:` frontmatter forms documented in agent-template.md collapse to names."""
+
+    def _load_tools(self, frontmatter: str) -> list[str]:
+        with tempfile.TemporaryDirectory() as tmp:
+            context_path = Path(tmp)
+            agents_dir = context_path / "agents"
+            agents_dir.mkdir(parents=True)
+            (agents_dir / "agent.md").write_text(
+                f"---\nname: agent\nmodel: medium\n{frontmatter}---\n\nbody\n"
+            )
+            return load_canonical_context(str(context_path))["agents"]["agent"].mcp_tools
+
+    def test_annotated_mapping_form(self):
+        """The template form (`- tool-name: purpose`) yields tool names only."""
+        tools = self._load_tools(
+            "tools:\n  - bash: run tests\n  - context7 MCP: library docs\n"
+        )
+        self.assertEqual(tools, ["bash", "context7 MCP"])
+        self.assertTrue(all(isinstance(tool, str) for tool in tools))
+
+    def test_plain_string_form(self):
+        tools = self._load_tools("tools:\n  - context7 MCP\n  - supabase CLI\n")
+        self.assertEqual(tools, ["context7 MCP", "supabase CLI"])
+
+    def test_scalar_string_form(self):
+        tools = self._load_tools("tools: context7 MCP\n")
+        self.assertEqual(tools, ["context7 MCP"])
+
+    def test_top_level_mapping_form(self):
+        tools = self._load_tools("tools:\n  bash: run tests\n  context7 MCP: docs\n")
+        self.assertEqual(tools, ["bash", "context7 MCP"])
+
+    def test_legacy_mcp_tools_key(self):
+        """Older definitions using `mcp_tools:` still load."""
+        tools = self._load_tools("mcp_tools:\n  - context7 MCP\n")
+        self.assertEqual(tools, ["context7 MCP"])
+
+    def test_absent_tools(self):
+        self.assertEqual(self._load_tools(""), [])
+
+
 class TestAdaptersCoreTools(unittest.TestCase):
     def test_capability_registry_extensibility(self):
         registry = CapabilityRegistry()

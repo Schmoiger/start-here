@@ -12,7 +12,10 @@ Checks:
 1. Valid YAML frontmatter with required 'name' and 'model' fields.
 2. Referenced standards, rules, and skills exist on disk.
 3. No hardcoded absolute paths or ./artefacts/ paths.
-4. Presence of 'Required Standards' and 'Required Rules' sections.
+4. Presence of the canonical 'Context Acquisition' body section
+   (see context/templates/agent-template.md). Legacy 'Required Standards' /
+   'Required Rules' body sections are rejected — the frontmatter is the single
+   source of truth and the template defines the body shape.
 5. Critical reminders include source attribution.
 """
 
@@ -28,6 +31,9 @@ CONTEXT_DIR = REPO_ROOT / "context"
 AGENTS_DIR = CONTEXT_DIR / "agents"
 
 SKIPPED_FILES = {"TEMPLATE.md", "README.md", "MODEL-RECOMMENDATIONS.md", "orchestrator.md"}
+
+# Canonical body section defined by context/templates/agent-template.md.
+CONTEXT_ACQUISITION_HEADING = "## Context Acquisition"
 
 
 def validate_agent_definition(
@@ -108,13 +114,16 @@ def validate_agent_definition(
                 if stripped.startswith("- ") and "(" not in stripped:
                     errors.append(f"Reminder missing attribution: {stripped}")
 
-    # Check for Required Standards section
-    if "Required Standards" not in body:
-        errors.append("Missing 'Required Standards' section")
-
-    # Check for Required Rules section
-    if "Required Rules" not in body:
-        errors.append("Missing 'Required Rules' section")
+    # The frontmatter declares which standards, rules and skills apply; the
+    # body's 'Context Acquisition' section instructs the agent to read them.
+    # Both are required, and the heading is exact — context/templates/
+    # agent-template.md is the only source of definition shape, so a body
+    # carrying a legacy heading is drift, not a variant.
+    if CONTEXT_ACQUISITION_HEADING not in body:
+        errors.append(
+            f"Missing '{CONTEXT_ACQUISITION_HEADING}' section "
+            "(copy the body structure from context/templates/agent-template.md)"
+        )
 
     return errors
 
