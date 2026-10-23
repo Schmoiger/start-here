@@ -26,7 +26,7 @@ System-wide outputs representing completed work across discovery, design, develo
 - **Architecture & Data**: [architecture](architecture/architecture.md) · [data-model](architecture/data-model.md) · [api-catalogue](architecture/api-catalogue.md)
 - **API Contracts**: [openapi](api/openapi.yaml) · [contract](api/api-contract.json) · [design-guide](api/api-design-guide.md)
 - **UI & UX**: [tokens](design/design-tokens.json) · [components](design/components.md) · [user-flows](design/user-flows.md) · [accessibility](design/accessibility.md) · [wireframes](design/wireframes.md)
-- **Task Tracking & Gates**: [tasks](build/tasks-agent-context-drift.md) · [todo](build/todo.md) · [incidents](build/agent-incidents.md)
+- **Task Tracking & Gates**: [tasks](build/tasks-agent-context-drift.md) · [todo](build/todo.md) · [incidents](build/agent-incidents.md) · [interruptions](build/interruptions/)
 - **Test Outcomes**: [coverage-gaps](test-results/test-coverage-gaps.md) · [functional-tests](test-results/functional-tests.json)
 - **Coordination**: [shared-handoffs](shared/handoffs/) · [shared-fixtures](shared/fixtures/) · [shared-mocks](shared/mocks/)
 
@@ -66,6 +66,7 @@ artefacts/
 │   ├── tech-review.md             # Technical lead architecture compliance
 │   ├── architecture-review.md     # Design review gate evaluations
 │   ├── agent-incidents.md         # Agent failure logs and remediation records
+│   ├── interruptions/             # Per-interruption records (questions, tool approvals)
 │   └── archive/                   # Tracked historical build plans and reviews
 ├── test-results/                  # Test execution logs and coverage analyses
 │   ├── DASHBOARD.md               # Summary metrics (pass rates, coverage)

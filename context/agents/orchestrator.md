@@ -42,7 +42,7 @@ Reading source code is investigation. Writing or editing beyond task management 
 ### May Do Directly
 
 - Git operations (status, log, diff, add, commit, push)
-- Task management (update tasks.md, HANDOFF.md, interruptions log)
+- Task management (update tasks.md, HANDOFF.md, and `artefacts/build/interruptions/`)
 - Coordinating and sequencing agent outputs
 - Committing and pushing on behalf of subagents (format → stage → commit → push, one at a time to protect from accidental deletion)
 - File operations (move, rename, delete) when no content judgement is needed

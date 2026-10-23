@@ -182,7 +182,7 @@ When a task domain needs repeated specialised work:
 1. Copy `templates/agent-template.md`
 2. Set `name`, `description`, `model` in frontmatter
 3. List applicable `rules` and `standards` in frontmatter
-4. Write concise body with rules summary and workflow
+4. Keep the template's body structure — `## Context Acquisition` is required by the validator — then add your role-specific workflow
 5. Add to workflow YAML if part of standard process
 6. Regenerate adapter projections: `uv run python context/scripts/generators/generate_adapters.py`
 

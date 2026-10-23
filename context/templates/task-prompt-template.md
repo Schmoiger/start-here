@@ -13,7 +13,7 @@ BEFORE starting, read:
 1. Your agent definition: context/agents/{agent-name}.md
 2. Rules you must follow: {resolved-rules — orchestrator: resolve using Rule Resolution in orchestrator.md. List each rule as a numbered item with its full path.}
 3. Relevant skills: {resolved-skills — orchestrator: resolve using Skill Resolution in orchestrator.md. List matching procedural skills as a numbered item with its full path.}
-4. Relevant excepts from standards: {resolved-standards-excerpts — orchestrator: resolve using Standards Resolution in orchestrator.md. List each standard as a numbered item with its full path.}
+4. Relevant excerpts from standards: {resolved-standards-excerpts — orchestrator: resolve using Standards Resolution in orchestrator.md. List each standard as a numbered item with its full path.}
 
 ---
 
@@ -63,6 +63,6 @@ Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf
 ## Execution Reminders
 
 - **State Recovery**: If context compaction occurs, execute your standard recovery protocol from your agent definition using the **Primary Output Path** above. Write findings incrementally.
-- **Escalation**: If blocked or requiring tool approval, log immediately to your designated interruption file (`artefacts/build/interruptions/{agent-name}.md`) following your agent definition schema.
+- **Escalation**: If blocked or requiring tool approval, append a record immediately to `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl` using the schema in your agent definition's Escalation Protocol.
 - **Linting**: Before reporting back, run your designated linter (`ruff` / `biome`) on modified files and fix any errors.
 - **Reporting Back**: Include the files changed, commit message, and status summary so that the orchestrator can commit on your behalf.

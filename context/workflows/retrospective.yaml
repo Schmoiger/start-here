@@ -10,7 +10,7 @@ phases:
       - Summary of findings (reported to orchestrator, not a standalone file)
     notes:
       - Read and analyse all three data sources:
-        - artefacts/build/agent-interruptions.md — blocking moments (questions, approvals, escalations)
+        - artefacts/build/interruptions/*.jsonl — blocking moments (questions, approvals, escalations)
         - artefacts/build/agent-metrics.log — agent invocations and status
         - artefacts/build/agent-incidents.md — framework failures already logged
       - Look for patterns, not individual events:

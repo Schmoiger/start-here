@@ -109,7 +109,7 @@ Collect telemetry from all available runtime sources:
 - **OpenAI Codex**:
   - API run steps and usage metrics (`prompt_tokens`, `completion_tokens`).
 - **Interruption & Incident Artefacts**:
-  - `{project-root}/artefacts/build/agent-interruptions.md` — logged questions and tool approvals.
+  - `{project-root}/artefacts/build/interruptions/*.jsonl` — logged questions and tool approvals (one record per interruption).
   - `{project-root}/artefacts/build/agent-incidents.md` — recorded framework failures.
   - Sprint task definitions (`artefacts/build/tasks*.md`) — token estimates vs actual consumption.
 
@@ -226,7 +226,7 @@ If compaction occurs mid-task, recover state from disk before continuing:
 
 ## Escalation
 
-Log interruptions to `artefacts/build/agent-interruptions.md` under the current sprint/phase heading:
+Append interruptions to `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl` — the schema is defined in `context/templates/agent-template.md` § Escalation Protocol:
 
 **Question** (missing data or ambiguous scope):
 ```

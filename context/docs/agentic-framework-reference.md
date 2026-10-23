@@ -372,6 +372,8 @@ Every agent follows this structure:
 name: python-coder
 description: Writes production Python code with testing in mind.
 model: medium
+tools:
+  - context7 MCP: library documentation
 standards:
   - tech-standards.md
   - coding-standards.md
@@ -383,9 +385,9 @@ rules:
   - type-safety.md
   - git-commits.md
   # ... additional rules
-# Optional — see "Tool and MCP surfaces" below
-# mcp_tools:
-#   - context7
+skills:
+  - tdd-workflow.md
+  - python-scripting.md
 ---
 
 You are an expert Python engineer. Your job is to write clean,
@@ -393,19 +395,20 @@ testable, production-grade Python code.
 
 ---
 
-## Required Standards (Read First!)
-1. context/standards/tech-standards.md
-2. context/standards/coding-standards.md
-...
+## Context Acquisition
+
+Before executing any operations, consume the following required context files in sequence:
+1. Standards: tech-standards.md, coding-standards.md, security-standards.md, doc-standards.md
+2. Rules: python-environment.md, tdd-workflow.md, type-safety.md, git-commits.md
+3. Skills: tdd-workflow.md, python-scripting.md
 
 ---
 
 ## Workflow
-1. Read standards
-2. Read task context
-3. Implement
-4. Run tests
-5. Write handoff
+
+### 1. Intake Validation
+### 2. Execution
+### 3. Output Generation
 ```
 
 `name`: Identifier used in workflow YAML and spawn prompts.
@@ -418,15 +421,17 @@ testable, production-grade Python code.
 
 `rules`: List of rule files that apply to this agent's work. The orchestrator injects these into the spawn prompt.
 
-`mcp_tools` (optional, common on specialists here): MCP server identifiers the author expects the runtime to attach for that role (for example library docs or database inspection). Other products use `allowed_tools` or an equivalent allow-list instead. Neither field executes by itself—it documents intent for whoever configures the runtime.
+`skills`: List of skill files that give the agent procedural guidance for its domain. Like standards, these are loaded on demand rather than injected.
 
-The body below the frontmatter is the agent's system prompt: role definition, workflow steps, output expectations, and any role-specific constraints.
+`tools` (optional, common on specialists here): MCP servers or CLIs the author expects the runtime to attach for that role, annotated with what the agent uses them for (`- context7 MCP: library documentation`). The loader normalises every accepted shape — annotated mapping, plain string, or a top-level mapping — to tool names only, and the legacy `mcp_tools:` key still loads. Other products use `allowed_tools` or an equivalent allow-list instead. No field executes by itself; it documents intent for whoever configures the runtime.
+
+The body below the frontmatter is the agent's system prompt. It must open with `## Context Acquisition` — the section that tells the agent to read the standards, rules and skills declared in the frontmatter — followed by the role's workflow. `context/scripts/validators/agent_definitions.py` rejects any definition without that heading, and `context/scripts/tests/test_agent_validator.py` validates the template itself so the scaffold cannot drift from the validator.
 
 ### Tool and MCP surfaces (runtime vs frontmatter)
 
 Agent YAML declares what a role *should* be able to reach; the orchestrator runtime (Cursor, Claude Code, a headless worker, and so on) still decides which tools and MCP servers actually exist, which paths are writable, and which invocations require human approval. Those layers live outside `context/agents/`—often in workspace or user settings that are not committed. In Cursor, permissions and MCP wiring frequently sit in `.cursor/settings.local.json` (typically git-ignored), so two machines with the same checkout can behave differently.
 
-When frontmatter and local configuration diverge, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a deployment alignment problem: update the local settings (or your organisation’s standard Cursor profile) when you add `mcp_tools:` entries, add a new agent, or enable a new server—and keep frontmatter honest about what is truly required versus optional.
+When frontmatter and local configuration diverge, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a deployment alignment problem: update the local settings (or your organisation’s standard Cursor profile) when you add `tools:` entries, add a new agent, or enable a new server—and keep frontmatter honest about what is truly required versus optional.
 
 Rule injection and file scope (see `context/agents/orchestrator.md`) remain mandatory regardless of tool lists; missing rules cause as much pain as missing MCP entries.
 
@@ -860,7 +865,7 @@ Sequential phases:
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read artefacts/build/agent-interruptions.md (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
+| `review` | `workflow-analyst` | Read artefacts/build/interruptions/*.jsonl (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
 | `discuss` | None (gate: human approval) | Present pattern → root cause → proposed fix; human chooses what to act on |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
 | `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
@@ -875,7 +880,7 @@ Validation highlights: git log parsed for session metrics; interruption and inci
 
 The YAML lists these sources explicitly:
 
-- `artefacts/build/agent-interruptions.md`: blocking moments (questions, approvals, escalations)
+- `artefacts/build/interruptions/*.jsonl`: blocking moments (questions, approvals, escalations), one record per file
 - `artefacts/build/agent-incidents.md`: prior framework failures
 - `git log` with `%H`, subject, body: reconstruct tokens=, duration=, agents=, dispatch=, interactions=, approvals= from commit trailers
 
@@ -906,7 +911,7 @@ Purpose: Standalone proactive review—`workflow-analyst` reviews accumulated op
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read `agent-interruptions.md`, `agent-metrics.log`, `agent-incidents.md`; report patterns with file:line evidence |
+| `review` | `workflow-analyst` | Read `artefacts/build/interruptions/*.jsonl`, `agent-metrics.log`, `agent-incidents.md`; report patterns with file:line evidence |
 | `discuss` | None (human gate) | Human selects which findings to implement |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Approved framework changes |
 | `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
@@ -1005,7 +1010,7 @@ The `commit-message-template.md` is not only for humans formatting commits: it d
 | `requirements-template.md` | Standard requirements structure |
 | `review-template.md` | Standard review finding format |
 | `task-prompt-template.md` | Orchestrator prompt scaffold for spawning agents correctly |
-| `tasks-template.md` | Standard task tracking format |
+| `tasks-doc-template.md` | Standard task tracking format |
 | `test-dashboard-template.md` | Standard structure for test dashboards |
 | `user-stories-template.md` | Standard user story format |
 
@@ -1331,7 +1336,7 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 2. `context/templates/agent-template.md`
 3. `context/agents/orchestrator.md`
 4. The workflow where the new agent should appear
-5. [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter) (this document) — align local runtime settings (for example Cursor `.cursor/settings.local.json`) with any `mcp_tools:` you add
+5. [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter) (this document) — align local runtime settings (for example Cursor `.cursor/settings.local.json`) with any `tools:` you add
 
 ### Porting the Framework to Another Runtime
 

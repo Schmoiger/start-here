@@ -12,7 +12,7 @@ Reusable formats for artefacts produced during development.
 |----------|-------------|-----------------|
 | `requirements-template.md` | EARS-format requirements | `artefacts/product/requirements.md` |
 | `user-stories-template.md` | User stories | `artefacts/product/user-stories.md` |
-| `tasks-template.md` | Task tracking | `artefacts/build/tasks.md` |
+| `tasks-doc-template.md` | Task tracking | `artefacts/build/tasks-{branch}.md` |
 | `bugs-template.md` | Bug tracker | `artefacts/build/bugs.md` |
 | `review-template.md` | Tech or code review | `artefacts/build/{tech,code}-review.md` |
 | `test-dashboard-template.md` | Test results dashboard | `artefacts/test-results/dashboard.md` |

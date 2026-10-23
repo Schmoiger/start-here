@@ -81,32 +81,11 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 
 ## 4. Interruptions Logging
 
-An interruption is any moment that required the user's or orchestrating agent's attention before work could continue. Agents shall log interruptions to `artefacts/build/agent-interruptions.md` under a heading matching the current sprint or phase.
+An interruption is any moment that required the user's or orchestrating agent's attention before work could continue. Agents shall append interruptions to `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl`, one record per interruption, using the schema in `context/templates/agent-template.md` § Escalation Protocol.
 
-**When to log**: append the entry immediately after the interruption is resolved — do not batch at end of sprint.
+**When to log**: append the record immediately after the interruption is resolved — do not batch at end of sprint.
 
-**Format (question / tool approval):**
-
-```
-### [Sprint N — Phase] Short title
-**Agent**: @agent-name
-**Type**: Question | Tool approval
-**Question/Tool**: What did you need to know, or what tool needed approval?
-**Answered by/Approved by**: Orchestrating agent | User
-**Resolution**: What was decided?
-```
-
-**Format (escalation):**
-
-```
-### [Sprint N — Phase] Short title
-**Agent**: @agent-name
-**Type**: Escalation
-**Impact**: High — brief reason (e.g. unbounded data growth, schema change)
-**Escalated to**: Orchestrator | Human
-**Options considered**: What approaches were identified?
-**Resolution**: What was decided, and by whom?
-```
+**Record fields**: the interruption type (`Question`, `Tool approval`, or `Escalation`), the agent, the question or tool needing approval, who answered or approved, and the resolution. `Escalation` records additionally carry impact, escalation target, and options considered.
 
 ---
 

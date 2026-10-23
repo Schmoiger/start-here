@@ -124,7 +124,7 @@ See `context/rules/escalation.md` for the authoritative escalation model:
 - **Decision matrix**: impact × confidence → assume / flag / escalate
 - **Impact classification**: distinguishes scope deferrals (low) from operational deferrals (high)
 - **Two-tier triage**: subagent → orchestrator (resolve or forward) → human
-- **Logging**: escalations are logged to `artefacts/build/agent-interruptions.md`
+- **Logging**: escalations are logged to `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl`
 
 Document assumptions in handoff with decision, confidence, rationale, and impact if wrong.
 
@@ -135,7 +135,7 @@ Document assumptions in handoff with decision, confidence, rationale, and impact
 Framework improvement uses the `continuous-improvement` workflow with two modes:
 
 - **Incident mode**: human reports a specific failure → diagnose root cause → fix → record in `agent-incidents.md` and `tasks-context-framework.md`
-- **Retrospective mode**: review `agent-interruptions.md`, `agent-incidents.md`, and git log `Agent-Session` metrics → identify patterns → discuss with human → fix → record
+- **Retrospective mode**: review `artefacts/build/interruptions/*.jsonl`, `agent-incidents.md`, and git log `Agent-Session` metrics → identify patterns → discuss with human → fix → record
 
 See `context/workflows/continuous-improvement.yaml` for the full phase definitions.
 

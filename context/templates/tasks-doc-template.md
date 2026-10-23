@@ -43,19 +43,25 @@ a task transitions — do not batch status updates.
 **Every task in the index must have a matching specification section** using the exact intake validation headers and defining a primary output path for state recovery:
 
 ```markdown
-### TASK
+## File Scope
+
+- `{path}` — {what the agent may write here}
+
+## Task
 
 {TASK-ID}: {task-description}
 
-### ACCEPTANCE CRITERIA
+### Acceptance Criteria
 
 - {Criterion 1}
 - {Criterion 2}
 
-### PRIMARY OUTPUT PATH 
+### Primary Output Path
 
 `{project-root}/{output-path}`
 ```
+
+The headings must match `context/templates/agent-template.md` § Intake Validation exactly — heading level and case. An agent halts execution when any of `## File Scope`, `## Task`, `### Acceptance Criteria`, or `### Primary Output Path` is missing from its prompt.
 
 ### Checklist format — sprint-based feature task tracking
 

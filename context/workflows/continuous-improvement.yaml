@@ -43,7 +43,7 @@ phases:
       - "  workflow-analyst: macro workflow flow, handoffs, task bottlenecks, and cycle times"
       - "  tokenomics-analyst: micro agent effectiveness, token economics, context bloat, model tiering (per context/models.yaml), and autonomy rates"
       - "Data sources:"
-      - "  artefacts/build/agent-interruptions.md — blocking moments (questions, approvals, escalations)"
+      - "  artefacts/build/interruptions/*.jsonl — blocking moments (questions, approvals, escalations)"
       - "  artefacts/build/agent-incidents.md — framework failures already logged"
       - "  git log --format='%H %s%n%b' — reconstruct per-commit metrics from Agent-Session lines:"
       - "    tokens= (injected by prepare-commit-msg hook from session telemetry)"
