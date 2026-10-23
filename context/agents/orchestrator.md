@@ -118,6 +118,42 @@ Procedural skills (`context/skills/*.md`) enforce technology-specific operationa
 3. **Agent Frontmatter Skills**: Check the spawned agent's `skills:` frontmatter (e.g. `@python-coder` carries `python-scripting.md`, `@documentation` carries `technical-authoring.md`).
 4. **Append to `BEFORE starting, read:`**: Include resolved skills alongside resolved rules in the spawn prompt.
 
+### Standards Resolution
+
+Do not auto-load standards. And unlike rules, standards are **reference material, not baseline**. Files in `context/standards/` explain *why and how*: they are too verbose to preload, but omitting the one a task is judged against makes the agent invent its own criteria. Resolve them per task:
+
+1. **Start from the agent's pool** — read the `standards:` frontmatter of `context/agents/{agent-name}.md`. That list is the durable declaration of what the agent may be judged against; do not assemble a pool from the task description. There is no always-apply list for standards.
+
+2. **Match the task against the Standards Map** — `context/standards/README.md` is the authoritative index (standard, purpose, read when, not for). Use its `Read when` / `Not for` columns, plus any `read-when` / `not-for` frontmatter on the standard itself, as the selection signal:
+
+   | Signal                                          | Meaning                                        | Action                                          |
+   | ----------------------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+   | `read-when` matches the work in the task        | Standard governs this task                     | Include                                         |
+   | `not-for` matches the work in the task          | Standard explicitly excludes it                | Omit, even when it is in the agent's pool       |
+   | Standard appears in an included standard's `related:` (where present) | Adjacent concern       | Include only if the task crosses that boundary  |
+   | No signal either way                            | Pool membership alone is not a task signal     | Omit — standards are read on demand             |
+
+3. **Target sections, not whole files** — name the headings the agent needs (e.g. `security-standards.md` §Authentication & Authorisation) and tell it to read only those. If the task genuinely requires the whole document, say so explicitly.
+
+4. **Handle pool gaps explicitly** — if the task needs a standard the agent does not declare, include it in the prompt *and* report the gap to the human so `standards:` can be corrected and adapters recompiled. Never let prompt and frontmatter drift apart silently.
+
+5. **Build the BEFORE STARTING read list** — append resolved standards after the resolved rules, as full paths with section anchors:
+
+   ```text
+   Relevant standards:
+   1. context/standards/coding-standards.md — §File Organisation, §Error Handling & Safe Failure
+   2. context/standards/security-standards.md — §Authentication & Authorisation, §Secrets Management
+   ```
+
+**Example**: spawning `@python-coder` for a task touching `services/data-service/src/**/*.py`, adding an authenticated endpoint, producing code only:
+
+- Pool (frontmatter): tech-standards, coding-standards, security-standards, doc-standards
+- `Read when` matches → coding-standards (§Python/FastAPI Patterns, §Error Handling & Safe Failure), security-standards (§Authentication & Authorisation, §Secrets Management), tech-standards (§Preferred Technology Stack) — **include, with sections**
+- doc-standards → the task produces no docs or artefacts — **omit**
+- testing-standards, visual-standards → not in the pool; testing is covered by the `testing.md` rule and the functional-tester's own rubric, visual-standards is `not-for` backend — **omit**
+
+**Why this matters**: the resolved list *is* the rubric. Reviewers grade against the standards injected into their prompt, so give the reviewer the same standards the implementer was held to — otherwise the review invents the missing criteria and the gate becomes noise. Resolving the identical list for implementer and reviewer is what makes APPROVED / CHANGES REQUIRED comparable.
+
 ---
 
 ## Parallel Execution
