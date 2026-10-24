@@ -60,7 +60,7 @@ Hydration index. Read only the section a task needs. Each folder has a readme.md
 
 **Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) · [retrospective](workflows/retrospective.yaml)
 
-**Templates**: [index](templates/README.md) · [agent](templates/agent-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
+**Templates**: [index](templates/README.md) · [agent](templates/agent-template.md) · [logging](templates/logging-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
 
 **Personas**: [author](persona/author.md) · [technical-writer](persona/technical-writer.md) · [opinionated-blogger](persona/opinionated-blogger.md) · [editor](persona/editor.md) · [expert-reviewer](persona/expert-reviewer.md)
 

@@ -23,6 +23,7 @@ Reusable formats for artefacts produced during development.
 | `architecture-template.md` | System architecture reference | `artefacts/architecture/architecture.md` |
 | `design-template.md` | Feature design document | `artefacts/design/design-{feature}.md` |
 | `agent-template.md` | New agent definition | `context/agents/{name}.md` |
+| `logging-template.md` | Session metrics and interruption log schemas (JSONL) | `artefacts/build/metrics/session-log.jsonl` · `artefacts/build/interruptions/{task-id}.jsonl` |
 | `task-prompt-template.md` | Agent task prompt (orchestrator use only) | — |
 | `settings-local-template.json` | Claude Code / local runtime permissions | `.claude/settings.local.json` |
 

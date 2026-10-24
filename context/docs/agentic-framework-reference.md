@@ -1006,6 +1006,7 @@ The `commit-message-template.md` is not only for humans formatting commits: it d
 | `design-template.md` | Standard design document for complex features or screens |
 | `domain-rules-template.yaml` | Template for domain-specific constraints |
 | `handoff-template.md` | Standard agent handoff format |
+| `logging-template.md` | Canonical schema for the session metrics log and per-task interruption logs |
 | `pr-description-template.md` | Standard pull request description format |
 | `requirements-template.md` | Standard requirements structure |
 | `review-template.md` | Standard review finding format |
@@ -1055,7 +1056,7 @@ Validators are pre-commit hooks stored in `context/scripts/validators/`. Each va
 
 #### `workspace_conventions.py`
 
-Enforces invariants from `context/rules/workspace-conventions.md`. Reads `.git/COMMIT_EDITMSG` at the `commit-msg` stage. Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped. Also validates JSONL entries under `artefacts/build/metrics/` (`ts`, `task`, `agent`, `event`, `tokens`, ISO 8601 timestamps, valid events, `to` field on handoffs), validates interruption logs under `artefacts/build/interruptions/` against the schema in `context/templates/agent-template.md` § Escalation Protocol (base fields `id`, `ts`, `agent`, `task_id`, `type`; per-type fields; nullable outcome fields; unique ids; resolvable `ref`; filename stem equal to `task_id`), and validates output paths and filenames (`artefacts/`, `secrets/`, `services/{name}/tests/`).
+Enforces invariants from `context/rules/workspace-conventions.md`. Reads `.git/COMMIT_EDITMSG` at the `commit-msg` stage. Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped. Also validates JSONL entries under `artefacts/build/metrics/` (`ts`, `task`, `agent`, `event`, `tokens`, ISO 8601 timestamps, valid events, `to` field on handoffs), validates interruption logs under `artefacts/build/interruptions/` against the schema in `context/templates/logging-template.md` § Interruption Log (base fields `id`, `ts`, `agent`, `task_id`, `type`; per-type fields; nullable outcome fields; unique ids; resolvable `ref`; filename stem equal to `task_id`), and validates output paths and filenames (`artefacts/`, `secrets/`, `services/{name}/tests/`).
 
 #### `tech_writing.py`
 
