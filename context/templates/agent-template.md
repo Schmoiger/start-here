@@ -93,3 +93,9 @@ Include in your report:
 - **Files changed**: exact paths you wrote or edited (these become the `git add` list)
 - **Commit message**: path to your `/tmp/{task-id}_commit_msg.txt`
 - **Status**: Summary of outcomes and validation evidence.
+
+---
+
+## Task
+
+{$ARGUMENTS}
