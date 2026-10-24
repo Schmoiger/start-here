@@ -81,36 +81,9 @@ If context window compaction occurs during task execution, execute this sequence
 
 ## Escalation Protocol
 
-Append blocking interruptions to the task's rolling log — one JSON object per line, appended, never rewritten:
+When you halt for a question, a tool approval, or a human decision, append the interruption to the task's rolling log at `artefacts/build/interruptions/{task-id}.jsonl`.
 
-`artefacts/build/interruptions/{task-id}.jsonl`
-
-Every record carries:
-
-| Field | Value |
-| :--- | :--- |
-| `id` | Unique short identifier for this record, e.g. `a1f3` |
-| `ts` | ISO-8601 UTC timestamp, e.g. `2026-10-23T14:05:11Z` |
-| `agent` | Your agent name, without the `@`, e.g. `python-coder` |
-| `task_id` | The task identifier, e.g. `TASK-004` |
-| `type` | `question` \| `tool_approval` \| `escalation` \| `resolution` |
-
-Fields by `type`:
-
-| `type` | Additional fields |
-| :--- | :--- |
-| `question` | `question`, `blocker`, `answered_by`, `resolution` |
-| `tool_approval` | `tool`, `action`, `decision` (`approved` \| `denied`), `decision_by` |
-| `escalation` | `impact` (`high` \| `medium` \| `low`), `escalated_to`, `options` (array), `resolution`, `decided_by` |
-| `resolution` | `ref` (the `id` of the record it resolves), `resolution`, `decided_by` |
-
-```jsonl
-{"id":"a1f3","ts":"2026-10-23T14:05:11Z","agent":"python-coder","task_id":"TASK-004","type":"question","question":"Which schema applies to the audit fields?","blocker":"AC-2 cannot be met without it","answered_by":"orchestrator","resolution":"Use the schema in agent-template.md"}
-{"id":"b7c2","ts":"2026-10-23T14:05:19Z","agent":"python-coder","task_id":"TASK-004","type":"tool_approval","tool":"supabase","action":"db push --linked","decision":"approved","decision_by":"user"}
-{"id":"c9d4","ts":"2026-10-23T15:01:02Z","agent":"solution-architect","task_id":"TASK-008","type":"escalation","impact":"high","escalated_to":"human","options":["frontmatter-only","body-table"],"resolution":"frontmatter-only","decided_by":"human"}
-```
-
-Write the record when the interruption is resolved, so the ask and the outcome share a line. If you must log at the moment of blocking — you are halting and cannot continue — leave the outcome fields `null` and append a `resolution` record with `ref` set to that record's `id`. Never edit a line already written.
+The record schema — base fields, the fields required per `type`, the append discipline, and worked examples — is defined in `context/templates/logging-template.md` § Interruption Log. Do not restate it in an agent definition; reference it.
 
 ---
 

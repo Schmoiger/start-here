@@ -81,7 +81,7 @@ Before marking a service as "Ready for Integration", the agent shall ensure:
 
 ## 4. Interruptions Logging
 
-An interruption is any moment that required the user's or orchestrating agent's attention before work could continue. Agents shall append each interruption to the task's rolling log, `artefacts/build/interruptions/{task-id}.jsonl` — one JSON object per line, appended and never rewritten — using the schema in `context/templates/agent-template.md` § Escalation Protocol.
+An interruption is any moment that required the user's or orchestrating agent's attention before work could continue. Agents shall append each interruption to the task's rolling log, `artefacts/build/interruptions/{task-id}.jsonl` — one JSON object per line, appended and never rewritten — using the schema in `context/templates/logging-template.md` § Interruption Log.
 
 **When to log**: append the record when the interruption is resolved, so the ask and the outcome share a line. If you must log at the moment of blocking, leave the outcome fields `null` and append a `resolution` record later — do not batch at end of sprint, and never edit a line already written.
 

@@ -8,7 +8,7 @@ Enforces:
 2. Conventional commit message format and Agent-Session trailers (Section 2)
 3. Agent metrics logging format in artefacts/build/metrics/*.jsonl (Section 3)
 4. Interruption logging format in artefacts/build/interruptions/*.jsonl (Section 4) —
-   schema defined by context/templates/agent-template.md § Escalation Protocol
+   schema defined by context/templates/logging-template.md § Interruption Log
 """
 
 import argparse
@@ -242,7 +242,7 @@ def validate_metrics_file(file_path: Path) -> list[str]:
 
 # --- Section 4: Interruptions Logging ---
 #
-# Schema source of truth: context/templates/agent-template.md § Escalation Protocol.
+# Schema source of truth: context/templates/logging-template.md § Interruption Log.
 # One rolling log per task at artefacts/build/interruptions/{task-id}.jsonl; each
 # line is a single JSON object, appended and never rewritten.
 

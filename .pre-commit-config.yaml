@@ -62,7 +62,7 @@ repos:
         files: ^artefacts/build/metrics/.*\.jsonl$
 
       - id: workspace-conventions-interruptions
-        name: Validate interruption logs (agent-template.md § Escalation Protocol)
+        name: Validate interruption logs (logging-template.md § Interruption Log)
         entry: uv run python context/scripts/validators/workspace_conventions.py interruptions
         language: python
         files: ^artefacts/build/interruptions/.*\.jsonl$

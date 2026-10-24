@@ -47,14 +47,15 @@ alwaysApply: true
 ## 3. Metrics Logging
 
 1. **Session Log**: Append events (start, handoff, escalate, complete, blocked) to `artefacts/build/metrics/session-log.jsonl`.
-2. **Format**: One JSON object per line. Never overwrite.
-3. **Location**: Metrics are build records, so they live under `artefacts/build/` alongside tasks, reviews, and interruption logs. A repository-root `metrics/` directory is not permitted.
+2. **Schema**: Fields, token-source rules, and examples are defined in `context/templates/logging-template.md` § Session Metrics Log.
+3. **Format**: One JSON object per line. Never overwrite.
+4. **Location**: Metrics are build records, so they live under `artefacts/build/` alongside tasks, reviews, and interruption logs. A repository-root `metrics/` directory is not permitted.
 
 ---
 
 ## 4. Interruption Logging
 
 1. **Task Log**: Append each blocking interruption to `artefacts/build/interruptions/{task-id}.jsonl` — one rolling log per task.
-2. **Schema**: The record fields are defined in `context/templates/agent-template.md` § Escalation Protocol; the log's filename stem MUST equal the `task_id` of every record it contains.
+2. **Schema**: The record fields are defined in `context/templates/logging-template.md` § Interruption Log; the log's filename stem MUST equal the `task_id` of every record it contains.
 3. **Format**: One JSON object per line, appended and never rewritten. Record the interruption when it is resolved; if logged at the point of blocking, leave outcome fields `null` and append a `resolution` record referencing the original `id`.
 

@@ -63,6 +63,6 @@ Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf
 ## Execution Reminders
 
 - **State Recovery**: If context compaction occurs, execute your standard recovery protocol from your agent definition using the **Primary Output Path** above. Write findings incrementally.
-- **Escalation**: If blocked or requiring tool approval, append a record immediately to `artefacts/build/interruptions/{task-id}.jsonl` using the schema in your agent definition's Escalation Protocol.
+- **Escalation**: If blocked or requiring tool approval, append a record immediately to `artefacts/build/interruptions/{task-id}.jsonl` using the schema in `context/templates/logging-template.md` § Interruption Log.
 - **Linting**: Before reporting back, run your designated linter (`ruff` / `biome`) on modified files and fix any errors.
 - **Reporting Back**: Include the files changed, commit message, and status summary so that the orchestrator can commit on your behalf.

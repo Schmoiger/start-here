@@ -35,8 +35,8 @@ SKIPPED_FILES = {"TEMPLATE.md", "README.md", "MODEL-RECOMMENDATIONS.md", "orches
 # Canonical body section defined by context/templates/agent-template.md.
 CONTEXT_ACQUISITION_HEADING = "## Context Acquisition"
 
-# Interruption logs are one rolling file per task (context/templates/agent-template.md
-# § Escalation Protocol). Legacy per-agent or per-timestamp names are drift.
+# Interruption logs are one rolling file per task (context/templates/logging-template.md
+# § Interruption Log). Legacy per-agent or per-timestamp names are drift.
 INTERRUPTIONS_PATH_PATTERN = re.compile(r"artefacts/build/interruptions/([^\s`)\]|]+)")
 INTERRUPTION_LOG_NAME_PATTERN = re.compile(r"^\{task-id\}\.jsonl$")
 

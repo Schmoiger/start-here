@@ -226,7 +226,7 @@ If compaction occurs mid-task, recover state from disk before continuing:
 
 ## Escalation
 
-Append your own interruptions to `artefacts/build/interruptions/{task-id}.jsonl` — the schema is defined in `context/templates/agent-template.md` § Escalation Protocol. One JSON object per line; never rewrite a line already written.
+Append your own interruptions to `artefacts/build/interruptions/{task-id}.jsonl` — the schema is defined in `context/templates/logging-template.md` § Interruption Log. One JSON object per line; never rewrite a line already written.
 
 Do NOT log autonomous decisions or self-resolved issues.
 

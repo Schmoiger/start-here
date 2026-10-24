@@ -98,7 +98,7 @@ Append blocking interruptions to the task's rolling log — one JSON object per 
 
 `artefacts/build/interruptions/{task-id}.jsonl`
 
-The record schema is defined in `context/templates/agent-template.md` § Escalation Protocol. Write the record when the interruption is resolved, so the ask and the outcome share a line. If you must log at the moment of blocking, leave the outcome fields `null` and append a `resolution` record with `ref` set to that record's `id`. Never edit a line already written.
+The record schema is defined in `context/templates/logging-template.md` § Interruption Log. Write the record when the interruption is resolved, so the ask and the outcome share a line. If you must log at the moment of blocking, leave the outcome fields `null` and append a `resolution` record with `ref` set to that record's `id`. Never edit a line already written.
 
 ---
 

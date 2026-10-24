@@ -42,30 +42,9 @@ git log main..HEAD --format='%b' | grep '^Agent-Session:'
 
 ## 3. Metrics Logging Schema
 
-Append events to `artefacts/build/metrics/session-log.jsonl` using the following schema:
+Append events to `artefacts/build/metrics/session-log.jsonl` — `start`, `handoff`, `escalate`, `complete`, `blocked` — one JSON object per line, never rewriting a line already written.
 
-```json
-{
-  "ts": "ISO8601 timestamp",
-  "task": "task-id",
-  "agent": "agent-id",
-  "event": "start|handoff|escalate|complete|blocked",
-  "tokens": {
-    "in": 0,
-    "out": 0,
-    "source": "api_response|estimated|unavailable"
-  },
-  "to": "target-agent (for handoff/escalate)",
-  "notes": "optional context"
-}
-```
-
-### Token Estimation
-| Source | When | Accuracy |
-|--------|------|----------|
-| api_response | Platform provides usage metadata | Exact |
-| estimated | Calculate as chars/4 | ~80% accurate |
-| unavailable | Platform doesn't expose, can't estimate | Log anyway |
+The record schema (required fields, the `to` rule for handoffs, the token `source` values, and worked examples) is defined in `context/templates/logging-template.md` § Session Metrics Log. Read it before writing your first record; do not guess the shape.
 
 ---
 
