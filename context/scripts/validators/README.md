@@ -14,7 +14,7 @@ Additionally, this directory hosts standalone utility validators for repository 
 
 | Rule File | Validator Script | Enforced Invariants |
 |---|---|---|
-| [`workspace-conventions.md`](../../rules/workspace-conventions.md) | `workspace_conventions.py` | Conventional commit message format (`{type}({scope}): {desc}`), `Agent-Session` trailer, metrics JSONL schema, output directory structure and file naming |
+| [`workspace-conventions.md`](../../rules/workspace-conventions.md) | `workspace_conventions.py` | Conventional commit message format (`{type}({scope}): {desc}`), `Agent-Session` trailer, metrics JSONL schema, interruption log schema and one-log-per-task naming, output directory structure and file naming |
 | [`tech-writing.md`](../../rules/tech-writing.md) | `tech_writing.py` | British English spelling (`-ise`, `-our`, `-re`, `licence`, `artefact`), date format DD/MM/YYYY, EARS requirement syntax (`requirements.md`, `user-stories.md`) |
 | [`ui-dev.md`](../../rules/ui-dev.md) | `ui_dev.py` | Prohibit `!important`, prohibit raw hex colour codes, single `index.css`, DaisyUI semantic tokens, Heroicons barrel, spacing scale |
 | [`supabase.md`](../../rules/supabase.md) | `supabase.py` | Prohibit Supabase client imports outside database service / stores, require `schema_migrations` audit insert in SQL migrations |
@@ -23,7 +23,7 @@ Additionally, this directory hosts standalone utility validators for repository 
 | [`ui-testing.md`](../../rules/ui-testing.md) | `ui_testing.py` | Prohibit full `puppeteer` (require `puppeteer-core`), prohibit `playwright` and `cypress` in `package.json` dependencies |
 | [`secrets.md`](../../rules/secrets.md) | `secrets.py` | Scan for hardcoded credentials, API keys, private key blocks, `.env` files with credentials, secrets outside `/secrets/` |
 
-### Excluded Rules (Tool Execution & Runtime Behavior)
+### Excluded Rules (Tool Execution & Runtime Behaviour)
 
 The following rules govern real-time agent execution choices or runtime protocols and do not have static output validators:
 - `bash-environment.md`: Tool substitutions, sandbox flags, bash pipe syntax, safe command invocation.
@@ -32,7 +32,7 @@ The following rules govern real-time agent execution choices or runtime protocol
 
 ### Additional Purpose Validators (Non-Rule Utilities)
 
-- **`agent_definitions.py`**: Validates agent definition frontmatter, references to rules/standards/skills, and structural integrity in `context/agents/*.md`.
+- **`agent_definitions.py`**: Validates agent definition frontmatter, references to rules/standards/skills, and structural integrity in `context/agents/*.md` — including the canonical `Context Acquisition` body section and the one-log-per-task interruption log path (`artefacts/build/interruptions/{task-id}.jsonl`).
 - **`adapter_drift.py`**: Validates synchronisation between canonical `context/` definitions and on-disk runtime adapter projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.claude/`, `.github/`, `.openai/`, `.agents/skills/`).
 - **`verify_typst_formatting.py`**: Enforces Typst-friendly Markdown formatting (at least 2 blank lines after mermaid code fences, horizontal rule `---` before `##` section headings).
 - **`framework_docs_staleness.py`**: Ensures architectural documentation (`agentic-framework-reference.md`, `agentic-framework.md`) is updated alongside changes to `context/`.
@@ -63,6 +63,9 @@ uv run python context/scripts/validators/workspace_conventions.py commit-msg .gi
 
 # Validate metrics log
 uv run python context/scripts/validators/workspace_conventions.py metrics metrics/session-log.jsonl
+
+# Validate interruption log (schema: context/templates/agent-template.md § Escalation Protocol)
+uv run python context/scripts/validators/workspace_conventions.py interruptions artefacts/build/interruptions/TASK-004.jsonl
 
 # Validate output paths
 uv run python context/scripts/validators/workspace_conventions.py paths artefacts/build/tasks.md
@@ -126,6 +129,7 @@ Validates invariants from `context/rules/workspace-conventions.md`.
 - **Commit Messages**: `{type}({scope}): {description}` subject, max 72 chars, imperative mood, lowercase alphanumeric scope.
 - **Agent Trailers**: Validates `Agent-Session: tool=... model=... agents=...` and ensures `Co-Authored-By:` is present.
 - **Metrics Logging**: Ensures JSONL entries in `metrics/` match schema (`ts`, `task`, `agent`, `event`, `tokens`), valid events (`start`, `handoff`, `escalate`, `complete`, `blocked`), and `to` field for handoffs.
+- **Interruption Logging**: Ensures logs in `artefacts/build/interruptions/` follow the schema in `context/templates/agent-template.md` § Escalation Protocol: `id`, `ts` (ISO 8601 UTC), `agent` (no `@`), `task_id`, and `type` (`question`, `tool_approval`, `escalation`, `resolution`), plus the per-type fields. Outcome fields may be `null` when a record is written at the moment of blocking, provided a `resolution` record later references it via `ref`. Record ids must be unique, `ref` must resolve within the same log, and the filename stem must equal the `task_id` — one rolling log per task, so legacy `{agent-name}-{task-id}-{timestamp}.jsonl` names fail.
 - **Output Locations**: Verifies outputs land in designated directories (`artefacts/`, `secrets/`, `services/{name}/tests/`) with standard naming (`v2-{task-id}-results.txt`).
 
 ### 2. Technical Writing (`tech_writing.py`)

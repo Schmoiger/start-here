@@ -35,6 +35,11 @@ SKIPPED_FILES = {"TEMPLATE.md", "README.md", "MODEL-RECOMMENDATIONS.md", "orches
 # Canonical body section defined by context/templates/agent-template.md.
 CONTEXT_ACQUISITION_HEADING = "## Context Acquisition"
 
+# Interruption logs are one rolling file per task (context/templates/agent-template.md
+# § Escalation Protocol). Legacy per-agent or per-timestamp names are drift.
+INTERRUPTIONS_PATH_PATTERN = re.compile(r"artefacts/build/interruptions/([^\s`)\]|]+)")
+INTERRUPTION_LOG_NAME_PATTERN = re.compile(r"^\{task-id\}\.jsonl$")
+
 
 def validate_agent_definition(
     file_path: Path,
@@ -123,6 +128,19 @@ def validate_agent_definition(
         errors.append(
             f"Missing '{CONTEXT_ACQUISITION_HEADING}' section "
             "(copy the body structure from context/templates/agent-template.md)"
+        )
+
+    # Interruption logs follow the template's one-log-per-task contract. Wildcard
+    # references (e.g. reading all logs) are allowed; concrete names must be
+    # '{task-id}.jsonl'.
+    for match in INTERRUPTIONS_PATH_PATTERN.finditer(body):
+        referenced = match.group(1).rstrip(".,;:")
+        if referenced.startswith("*") or INTERRUPTION_LOG_NAME_PATTERN.match(referenced):
+            continue
+        errors.append(
+            "Interruption log path must be "
+            "'artefacts/build/interruptions/{task-id}.jsonl' "
+            f"(found '{referenced}') — one rolling log per task"
         )
 
     return errors

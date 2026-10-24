@@ -66,7 +66,7 @@ artefacts/
 │   ├── tech-review.md             # Technical lead architecture compliance
 │   ├── architecture-review.md     # Design review gate evaluations
 │   ├── agent-incidents.md         # Agent failure logs and remediation records
-│   ├── interruptions/             # Per-task interruption logs (JSONL; questions, tool approvals)
+│   ├── interruptions/             # Per-task interruption logs (JSONL; questions, tool approvals, escalations, resolutions)
 │   └── archive/                   # Tracked historical build plans and reviews
 ├── test-results/                  # Test execution logs and coverage analyses
 │   ├── DASHBOARD.md               # Summary metrics (pass rates, coverage)

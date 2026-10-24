@@ -94,13 +94,11 @@ If context window compaction occurs during task execution, execute this sequence
 
 ## Escalation Protocol
 
-Append blocking interruptions as `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl`:
+Append blocking interruptions to the task's rolling log — one JSON object per line, appended, never rewritten:
 
-* **Unresolved Ambiguity**:
-  `**Agent**: @{name} | **Type**: Question | **Question**: {question} | **Blocker**: {reason}`
+`artefacts/build/interruptions/{task-id}.jsonl`
 
-* **Tool Authorization Request**:
-  `**Agent**: @{name} | **Type**: Tool approval | **Tool**: {tool_name} | **Action**: {action}`
+The record schema is defined in `context/templates/agent-template.md` § Escalation Protocol. Write the record when the interruption is resolved, so the ask and the outcome share a line. If you must log at the moment of blocking, leave the outcome fields `null` and append a `resolution` record with `ref` set to that record's `id`. Never edit a line already written.
 
 ---
 

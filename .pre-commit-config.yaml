@@ -61,6 +61,12 @@ repos:
         language: python
         files: ^metrics/.*\.jsonl$
 
+      - id: workspace-conventions-interruptions
+        name: Validate interruption logs (agent-template.md § Escalation Protocol)
+        entry: uv run python context/scripts/validators/workspace_conventions.py interruptions
+        language: python
+        files: ^artefacts/build/interruptions/.*\.jsonl$
+
       - id: tech-writing-ears
         name: Validate EARS notation in requirements (tech-writing.md)
         entry: uv run python context/scripts/validators/tech_writing.py ears

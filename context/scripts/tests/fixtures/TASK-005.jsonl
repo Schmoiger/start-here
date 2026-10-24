@@ -1,0 +1,4 @@
+{"ts":"2026-10-23T14:05:11Z","agent":"python-coder","task_id":"TASK-005","type":"question","question":"Which schema applies to the audit fields?","blocker":"AC-2 cannot be met without it","answered_by":null,"resolution":null}
+{"id":"b001","ts":"2026-10-23 14:05:19","agent":"@python-coder","task_id":"TASK-005","type":"approval","tool":"supabase","action":"db push --linked","decision":"maybe","decision_by":"user"}
+{"id":"b002","ts":"2026-10-23T15:01:02Z","agent":"solution-architect","task_id":"TASK-005","type":"escalation","impact":"critical","escalated_to":"human","options":"frontmatter-only","resolution":"frontmatter-only","decided_by":"human"}
+{"id":"b002","ts":"2026-10-23T15:02:02Z","agent":"solution-architect","task_id":"TASK-005","type":"resolution","ref":"zzzz","resolution":"frontmatter-only","decided_by":"human"}

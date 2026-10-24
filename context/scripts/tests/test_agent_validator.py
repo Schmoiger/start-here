@@ -271,3 +271,51 @@ skills: [nonexistent-skill.md]
 """)
         errors = validate_agent_definition(bad_agent)
         assert any("doesn't exist" in e for e in errors)
+
+    def test_canonical_interruption_log_path_passes(self, tmp_path):
+        """Test that the one-log-per-task interruption path is accepted."""
+        agent = tmp_path / "good_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: sonnet
+---
+{CONTEXT_ACQUISITION_BODY}
+
+## Escalation Protocol
+
+Append to `artefacts/build/interruptions/{{task-id}}.jsonl`.
+""")
+        errors = validate_agent_definition(agent)
+        assert not any("Interruption log path" in e for e in errors)
+
+    def test_legacy_interruption_log_path_rejected(self, tmp_path):
+        """Test that legacy per-agent/per-timestamp interruption names are caught."""
+        agent = tmp_path / "legacy_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: sonnet
+---
+{CONTEXT_ACQUISITION_BODY}
+
+## Escalation Protocol
+
+Append to `artefacts/build/interruptions/{{agent-name}}-{{task-id}}-{{timestamp}}.jsonl`.
+""")
+        errors = validate_agent_definition(agent)
+        assert any("Interruption log path" in e for e in errors)
+
+    def test_interruption_log_wildcard_allowed(self, tmp_path):
+        """Test that reading all interruption logs with a wildcard is allowed."""
+        agent = tmp_path / "reader_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: sonnet
+---
+{CONTEXT_ACQUISITION_BODY}
+
+## Context
+
+Read `{{project-root}}/artefacts/build/interruptions/*.jsonl`.
+""")
+        errors = validate_agent_definition(agent)
+        assert not any("Interruption log path" in e for e in errors)

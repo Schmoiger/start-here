@@ -1,5 +1,5 @@
 ---
-description: Universal workspace conventions covering output locations, git commits, and metrics logging
+description: Universal workspace conventions covering output locations, git commits, metrics logging, and interruption logging
 globs: []
 alwaysApply: true
 ---
@@ -48,3 +48,12 @@ alwaysApply: true
 
 1. **Session Log**: Append events (start, handoff, escalate, complete, blocked) to `metrics/session-log.jsonl`.
 2. **Format**: One JSON object per line. Never overwrite.
+
+---
+
+## 4. Interruption Logging
+
+1. **Task Log**: Append each blocking interruption to `artefacts/build/interruptions/{task-id}.jsonl` — one rolling log per task.
+2. **Schema**: The record fields are defined in `context/templates/agent-template.md` § Escalation Protocol; the log's filename stem MUST equal the `task_id` of every record it contains.
+3. **Format**: One JSON object per line, appended and never rewritten. Record the interruption when it is resolved; if logged at the point of blocking, leave outcome fields `null` and append a `resolution` record referencing the original `id`.
+

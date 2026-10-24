@@ -83,6 +83,18 @@ def invalid_metrics(fixtures_dir):
 
 
 @pytest.fixture
+def valid_interruptions(fixtures_dir):
+    """Return path to valid interruption log fixture (one log per task)."""
+    return fixtures_dir / 'TASK-004.jsonl'
+
+
+@pytest.fixture
+def invalid_interruptions(fixtures_dir):
+    """Return path to invalid interruption log fixture."""
+    return fixtures_dir / 'TASK-005.jsonl'
+
+
+@pytest.fixture
 def test_workflow(fixtures_dir):
     """Return path to test workflow fixture."""
     return fixtures_dir / 'test_workflow.yaml'
