@@ -124,7 +124,7 @@ See `context/rules/escalation.md` for the authoritative escalation model:
 - **Decision matrix**: impact × confidence → assume / flag / escalate
 - **Impact classification**: distinguishes scope deferrals (low) from operational deferrals (high)
 - **Two-tier triage**: subagent → orchestrator (resolve or forward) → human
-- **Logging**: escalations are logged to `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl`
+- **Logging**: escalations are logged to `artefacts/build/interruptions/{task-id}.jsonl`
 
 Document assumptions in handoff with decision, confidence, rationale, and impact if wrong.
 

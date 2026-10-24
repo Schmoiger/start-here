@@ -226,17 +226,7 @@ If compaction occurs mid-task, recover state from disk before continuing:
 
 ## Escalation
 
-Append interruptions to `artefacts/build/interruptions/{agent-name}-{task-id}-{timestamp}.jsonl` — the schema is defined in `context/templates/agent-template.md` § Escalation Protocol:
-
-**Question** (missing data or ambiguous scope):
-```
-**Agent**: @tokenomics-analyst | **Type**: Question | **Question**: {question} | **Answered by**: | **Resolution**:
-```
-
-**Tool approval** (user was prompted):
-```
-**Agent**: @tokenomics-analyst | **Type**: Tool approval | **Tool**: {tool and action} | **Approved by**: User | **Resolution**: Approved/Denied
-```
+Append your own interruptions to `artefacts/build/interruptions/{task-id}.jsonl` — the schema is defined in `context/templates/agent-template.md` § Escalation Protocol. One JSON object per line; never rewrite a line already written.
 
 Do NOT log autonomous decisions or self-resolved issues.
 

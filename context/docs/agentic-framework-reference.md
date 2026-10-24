@@ -880,7 +880,7 @@ Validation highlights: git log parsed for session metrics; interruption and inci
 
 The YAML lists these sources explicitly:
 
-- `artefacts/build/interruptions/*.jsonl`: blocking moments (questions, approvals, escalations), one record per file
+- `artefacts/build/interruptions/*.jsonl`: blocking moments (questions, approvals, escalations), one rolling log per task, one JSON object per record
 - `artefacts/build/agent-incidents.md`: prior framework failures
 - `git log` with `%H`, subject, body: reconstruct tokens=, duration=, agents=, dispatch=, interactions=, approvals= from commit trailers
 
