@@ -98,13 +98,29 @@ def validate_output_paths(paths: list[str | Path]) -> list[str]:
 VALID_COMMIT_TYPES = r"(feat|fix|test|refactor|docs|chore|perf)"
 COMMIT_SUBJECT_PATTERN = re.compile(rf"^{VALID_COMMIT_TYPES}\([a-z][a-z0-9-]*\): .{{1,}}$")
 COAUTHOR_PATTERN = re.compile(r"^Co-Authored-By: .+ <.+@.+\..+>$")
+# Tokens= comes from prepare-commit-msg.format_tokens(): no suffix (<1000),
+# 'K' (>=1000), or 'M' (>=1_000_000). Lowercase variants are tolerated too.
 AGENT_SESSION_PATTERN = re.compile(
-    r"^Agent-Session: tool=[a-z0-9-]+ model=[a-z0-9.-]+ agents=[a-z0-9,-]+"
-    r"( duration=\d+[mh])?"
-    r"( dispatch=(human|orchestrator))?"
-    r"( interactions=\d+)?"
-    r"( approvals=\d+)?"
-    r"( tokens=\d+(\.\d+)?K?/\d+(\.\d+)?K?)?$"
+    r"^Agent-Session:\s+"
+    r"(?:"
+    # Canonical form: tool=, model=, agents= first (commit-message-template.md).
+    r"tool=[a-z0-9-]+\s+model=[a-z0-9.-]+\s+agents=[a-z0-9,-]+"
+    r"(?:\s+duration=\d+[mh])?"
+    r"(?:\s+dispatch=(?:human|orchestrator))?"
+    r"(?:\s+interactions=\d+)?"
+    r"(?:\s+approvals=\d+)?"
+    r"(?:\s+tokens=\d+(?:\.\d+)?[KkMm]?/\d+(?:\.\d+)?[KkMm]?)?"
+    r"|"
+    # Hook-appended form: prepare-commit-msg appends tool=, model=, tokens=
+    # to a trailer authored without them (hook-owned fields).
+    r"agents=[a-z0-9,-]+"
+    r"(?:\s+duration=\d+[mh])?"
+    r"(?:\s+dispatch=(?:human|orchestrator))?"
+    r"(?:\s+interactions=\d+)?"
+    r"(?:\s+approvals=\d+)?"
+    r"(?:\s+tool=[a-z0-9-]+)(?:\s+model=[a-z0-9.-]+)"
+    r"(?:\s+tokens=\d+(?:\.\d+)?[KkMm]?/\d+(?:\.\d+)?[KkMm]?)?"
+    r")$"
 )
 TOOL_FIELD_PATTERN = re.compile(r"\btool=([a-z0-9-]+)")
 MODEL_FIELD_PATTERN = re.compile(r"\bmodel=([a-z0-9.-]+)")

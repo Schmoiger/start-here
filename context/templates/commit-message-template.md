@@ -96,7 +96,7 @@ Agent-Session: tool=cursor model=sonnet agents=python-coder duration=32m dispatc
 
 Co-Authored-By: Cursor <cursor@cursor.com>
 ```
-The hook appends `tokens=8.2K/5.1K` to the Agent-Session line at commit time.
+The hook appends `tokens=8.2K/5.1K` (or `tokens=3.59M/7.4K` for sessions with ≥1M input tokens) to the Agent-Session line at commit time.
 
 ### Multi-Task with Review
 
@@ -156,7 +156,7 @@ pattern = (
     r'(?: dispatch=(human|orchestrator))?'
     r'(?: interactions=(\d+))?'
     r'(?: approvals=(\d+))?'
-    r'(?: tokens=([\d.]+K?)/([\d.]+K?))?'
+    r'(?: tokens=([\d.]+[kKmM]?)/([\d.]+[kKmM]?))?'
 )
 match = re.search(pattern, line)
 # match.group(1)=tool, (2)=model, (3)=agents, (4)=duration,

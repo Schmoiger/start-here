@@ -144,6 +144,43 @@ Agent-Session: tool=cursor model=sonnet agents=python-coder duration=5m tokens=1
         assert not is_valid
         assert "require Co-Authored-By" in error
 
+    def test_agent_session_tokens_mega_suffix(self):
+        """prepare-commit-msg formats >=1M token counts with an M suffix."""
+        msg = """feat(test): valid subject
+
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=3.59M/7.4K
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert is_valid, f"expected M token suffix to pass: {error}"
+
+    def test_agent_session_tokens_lowercase_suffix(self):
+        """Lowercase k/m token suffixes are accepted."""
+        msg = """feat(test): valid subject
+
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=1m/2k
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert is_valid, f"expected lowercase token suffixes to pass: {error}"
+
+    def test_agent_session_hook_appended_form(self):
+        """prepare-commit-msg appends tool=/model=/tokens= when the author omits them."""
+        msg = """feat(test): valid subject
+
+Agent-Session: agents=python-coder dispatch=human interactions=2 approvals=0 tool=cursor model=sonnet tokens=35.01M/47.2K
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert is_valid, f"expected hook-appended trailer to pass: {error}"
+
+    def test_agent_session_malformed_tokens_fails(self):
+        """A tokens= value without the in/out slash is still rejected."""
+        msg = """feat(test): valid subject
+
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=35M
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert not is_valid
+        assert "Invalid Agent-Session format" in error
+
 
 class TestAgentSessionCorroboration:
     """Tests for runtime-telemetry corroboration of Agent-Session tool=/model=.
