@@ -228,7 +228,7 @@ The framework ships 14 output templates, 8 rule-mapped pre-commit validators, an
 
 | Validator | Rule / Purpose | How it works |
 |-----------|----------------|-------------|
-| `workspace_conventions.py` | `workspace-conventions.md` | Reads `.git/COMMIT_EDITMSG` to validate conventional commit format, imperative mood, and `Agent-Session:` trailers with co-author. Validates `metrics/*.jsonl` event schemas, interruption log schemas (`artefacts/build/interruptions/{task-id}.jsonl`), and output file paths. |
+| `workspace_conventions.py` | `workspace-conventions.md` | Reads `.git/COMMIT_EDITMSG` to validate conventional commit format, imperative mood, and `Agent-Session:` trailers with co-author. Validates `artefacts/build/metrics/*.jsonl` event schemas, interruption log schemas (`artefacts/build/interruptions/{task-id}.jsonl`), and output file paths. |
 | `tech_writing.py` | `tech-writing.md` | Scans files for American spellings (`color`, `behavior`, `organize`, `center`, `license`, `artifact`) and enforces British English. Validates EARS syntax in requirements files. |
 | `ui_dev.py` | `ui-dev.md` | Scans frontend code to prohibit `!important`, raw hex colours, multiple CSS files, and off-barrel Heroicon imports; enforces DaisyUI semantic tokens and spacing scales. |
 | `supabase.py` | `supabase.md` | Scans imports to prohibit `import supabase` outside database services/stores. Verifies SQL migrations insert audit records into `schema_migrations`. |

@@ -46,8 +46,9 @@ alwaysApply: true
 
 ## 3. Metrics Logging
 
-1. **Session Log**: Append events (start, handoff, escalate, complete, blocked) to `metrics/session-log.jsonl`.
+1. **Session Log**: Append events (start, handoff, escalate, complete, blocked) to `artefacts/build/metrics/session-log.jsonl`.
 2. **Format**: One JSON object per line. Never overwrite.
+3. **Location**: Metrics are build records, so they live under `artefacts/build/` alongside tasks, reviews, and interruption logs. A repository-root `metrics/` directory is not permitted.
 
 ---
 

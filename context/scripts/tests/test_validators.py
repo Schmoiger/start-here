@@ -286,6 +286,20 @@ class TestMetricsLogging:
         errors = validate_metrics_file(invalid_metrics)
         assert len(errors) > 0
 
+    def test_metrics_log_location_under_build(self):
+        """Test that metrics logs are build records at artefacts/build/metrics/."""
+        assert validate_output_path("artefacts/build/metrics/session-log.jsonl") == []
+
+    def test_metrics_log_requires_jsonl_suffix(self):
+        """Test that output path validation requires a .jsonl metrics log."""
+        errors = validate_output_path("artefacts/build/metrics/session-log.log")
+        assert any(".jsonl" in e for e in errors)
+
+    def test_metrics_log_rejects_repository_root(self):
+        """Test that a repository-root metrics/ directory is rejected."""
+        errors = validate_output_path("metrics/session-log.jsonl")
+        assert any("artefacts/build/metrics/" in e for e in errors)
+
     def test_missing_required_field(self):
         """Test that missing required field is caught."""
         entry = {
@@ -577,7 +591,7 @@ class TestInterruptionsLogging:
         """Test that only artefacts/build/interruptions/ paths route to this validator."""
         assert is_interruptions_log("artefacts/build/interruptions/TASK-004.jsonl")
         assert not is_interruptions_log("artefacts/build/interruptions/nested/TASK-004.jsonl")
-        assert not is_interruptions_log("metrics/session-log.jsonl")
+        assert not is_interruptions_log("artefacts/build/metrics/session-log.jsonl")
 
     def test_interruption_log_requires_jsonl_suffix(self):
         """Test that output path validation requires a .jsonl interruption log."""
@@ -600,8 +614,8 @@ class TestInterruptionsLogging:
 
     def test_main_auto_detects_metrics_log(self, tmp_path, monkeypatch, capsys):
         """Test that a bare metrics path still routes to the metrics validator."""
-        metrics_dir = tmp_path / "metrics"
-        metrics_dir.mkdir()
+        metrics_dir = tmp_path / "artefacts" / "build" / "metrics"
+        metrics_dir.mkdir(parents=True)
         log = metrics_dir / "session-log.jsonl"
         log.write_text(
             json.dumps(

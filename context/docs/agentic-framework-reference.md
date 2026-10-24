@@ -911,7 +911,7 @@ Purpose: Standalone proactive review—`workflow-analyst` reviews accumulated op
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read `artefacts/build/interruptions/*.jsonl`, `agent-metrics.log`, `agent-incidents.md`; report patterns with file:line evidence |
+| `review` | `workflow-analyst` | Read `artefacts/build/interruptions/*.jsonl`, `artefacts/build/metrics/session-log.jsonl`, `agent-incidents.md`; report patterns with file:line evidence |
 | `discuss` | None (human gate) | Human selects which findings to implement |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Approved framework changes |
 | `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
@@ -1055,7 +1055,7 @@ Validators are pre-commit hooks stored in `context/scripts/validators/`. Each va
 
 #### `workspace_conventions.py`
 
-Enforces invariants from `context/rules/workspace-conventions.md`. Reads `.git/COMMIT_EDITMSG` at the `commit-msg` stage. Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped. Also validates JSONL entries under `metrics/` (`ts`, `task`, `agent`, `event`, `tokens`, ISO 8601 timestamps, valid events, `to` field on handoffs), validates interruption logs under `artefacts/build/interruptions/` against the schema in `context/templates/agent-template.md` § Escalation Protocol (base fields `id`, `ts`, `agent`, `task_id`, `type`; per-type fields; nullable outcome fields; unique ids; resolvable `ref`; filename stem equal to `task_id`), and validates output paths and filenames (`artefacts/`, `secrets/`, `services/{name}/tests/`).
+Enforces invariants from `context/rules/workspace-conventions.md`. Reads `.git/COMMIT_EDITMSG` at the `commit-msg` stage. Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped. Also validates JSONL entries under `artefacts/build/metrics/` (`ts`, `task`, `agent`, `event`, `tokens`, ISO 8601 timestamps, valid events, `to` field on handoffs), validates interruption logs under `artefacts/build/interruptions/` against the schema in `context/templates/agent-template.md` § Escalation Protocol (base fields `id`, `ts`, `agent`, `task_id`, `type`; per-type fields; nullable outcome fields; unique ids; resolvable `ref`; filename stem equal to `task_id`), and validates output paths and filenames (`artefacts/`, `secrets/`, `services/{name}/tests/`).
 
 #### `tech_writing.py`
 

@@ -42,7 +42,7 @@ git log main..HEAD --format='%b' | grep '^Agent-Session:'
 
 ## 3. Metrics Logging Schema
 
-Append events to `metrics/session-log.jsonl` using the following schema:
+Append events to `artefacts/build/metrics/session-log.jsonl` using the following schema:
 
 ```json
 {

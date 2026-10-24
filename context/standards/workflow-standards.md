@@ -191,7 +191,7 @@ Agent-Session: tool=claude-code model=opus agents=python-coder duration=32m disp
 
 **Interaction tracking**: `interactions` and `approvals` measure the total human cost for the task — the orchestrator sums its own human touchpoints plus the subagent's. See `context/rules/git-commits.md` for the full counting rule and `context/templates/pr-description-template.md` for PR-level autonomy metrics.
 
-**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`, alongside the structured events in `metrics/session-log.jsonl`.
+**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`, alongside the structured events in `artefacts/build/metrics/session-log.jsonl`.
 
 ---
 

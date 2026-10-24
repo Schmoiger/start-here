@@ -59,7 +59,7 @@ repos:
         name: Validate agent metrics logging (workspace-conventions.md)
         entry: uv run python context/scripts/validators/workspace_conventions.py metrics
         language: python
-        files: ^metrics/.*\.jsonl$
+        files: ^artefacts/build/metrics/.*\.jsonl$
 
       - id: workspace-conventions-interruptions
         name: Validate interruption logs (agent-template.md § Escalation Protocol)

@@ -6,7 +6,7 @@ from __future__ import annotations
 Enforces:
 1. Output locations and naming conventions (Section 1)
 2. Conventional commit message format and Agent-Session trailers (Section 2)
-3. Agent metrics logging format in metrics/*.jsonl (Section 3)
+3. Agent metrics logging format in artefacts/build/metrics/*.jsonl (Section 3)
 4. Interruption logging format in artefacts/build/interruptions/*.jsonl (Section 4) —
    schema defined by context/templates/agent-template.md § Escalation Protocol
 """
@@ -60,6 +60,13 @@ def validate_output_path(path: str | Path) -> list[str]:
                         f"Interruption log '{filename}' must be JSONL named '{{task-id}}.jsonl' "
                         "(one rolling log per task)."
                     )
+            if sub_dir == "build" and len(parts) >= 4 and parts[2] == "metrics":
+                filename = parts[3]
+                if not filename.endswith(".jsonl"):
+                    errors.append(
+                        f"Metrics log '{filename}' must be JSONL "
+                        "(artefacts/build/metrics/session-log.jsonl)."
+                    )
         elif top_dir == "services":
             if len(parts) >= 3 and parts[2] == "tests":
                 # Valid service test directory
@@ -67,6 +74,12 @@ def validate_output_path(path: str | Path) -> list[str]:
         elif top_dir == "secrets":
             # Secrets directory
             pass
+        elif top_dir == "metrics":
+            # Metrics are build records, not a top-level output category.
+            errors.append(
+                f"Metrics logs belong in 'artefacts/build/metrics/', not at the repository root "
+                f"(found '{path}')"
+            )
 
     return errors
 
