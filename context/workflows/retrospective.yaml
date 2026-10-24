@@ -11,7 +11,7 @@ phases:
     notes:
       - Read and analyse all three data sources:
         - artefacts/build/interruptions/*.jsonl — blocking moments (questions, approvals, escalations)
-        - artefacts/build/agent-metrics.log — agent invocations and status
+        - artefacts/build/metrics/session-log.jsonl — agent invocations, status, and token usage
         - artefacts/build/agent-incidents.md — framework failures already logged
       - Look for patterns, not individual events:
         - Repeated interruption types (same rule violation recurring)
