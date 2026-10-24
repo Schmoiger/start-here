@@ -56,19 +56,19 @@ Agent-Session: tool=<tool> model=<model> agents=<agent-ids>
 
 | Field | Authored by | Format | Example |
 |-------|------------|--------|---------|
-| tool | Agent or orchestrator | The IDE/platform that ran the model | tool=cursor, tool=claude-code |
-| model | Agent or orchestrator | The model/backend used | model=sonnet, model=opus |
+| tool | prepare-commit-msg hook (runtime telemetry) — do not hand-write | The IDE/platform running the model | tool=cursor, tool=claude-code |
+| model | prepare-commit-msg hook (runtime telemetry) — do not hand-write | The model/backend used, without provider prefix | model=sonnet, model=deepseek-v4-flash-0731 |
 | agents | Agent or orchestrator | Agent role(s) from context/agents | agents=python-coder |
 | duration | Orchestrator | Minutes or hours | duration=45m |
 | dispatch | Orchestrator | Who initiated the task | dispatch=orchestrator, dispatch=human |
 | interactions | Orchestrator | Total human messages across orchestrator + subagent | interactions=0 |
 | approvals | Orchestrator | Total tool/action approvals across orchestrator + subagent | approvals=2 |
 
-`tokens=` is appended automatically by the `prepare-commit-msg` hook — do not include it manually.
+`tool=`, `model=`, and `tokens=` are populated automatically by the `prepare-commit-msg` hook from runtime telemetry — do not include them manually. Hand-written values the `commit-msg` validator cannot corroborate against the runtime session are rejected.
 
 **Counting rule**: `interactions` and `approvals` measure the **total human cost** for the task. The orchestrator sums its own human touchpoints (e.g. asking the human about the task, getting tool approvals for the commit) plus the subagent's. `dispatch=orchestrator` with `interactions=0 approvals=0` means nobody needed a human for anything.
 
-**Triplet**: Always list the actual (tool, model, agent) for this commit. Agent names are from `context/agents/*.md` (e.g. python-coder, typescript-coder, functional-tester, code-reviewer, tech-lead). Do not substitute a default; use what was actually used.
+**Triplet**: Always list the actual (tool, model, agent) for this commit. Agent names are from `context/agents/*.md` (e.g. python-coder, typescript-coder, functional-tester, code-reviewer, tech-lead). `tool=` and `model=` are hook-owned: they must match the runtime session telemetry and the `commit-msg` validator rejects contradictions. Do not substitute a default; use what was actually used.
 
 ### Co-Authored-By (required for agent commits)
 

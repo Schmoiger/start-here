@@ -23,7 +23,7 @@ When committing on behalf of an agent (or yourself), verify the message:
    ```
    Agent-Session: tool={tool} model={model} agents={agent-role} duration={time} dispatch={human|orchestrator} interactions={N} approvals={N}
    ```
-   *Note: `tokens=` is appended automatically by the `prepare-commit-msg` hook — never include it manually.*
+   *Note: `tool=`, `model=`, and `tokens=` are written by the `prepare-commit-msg` hook from runtime session telemetry — never include them manually. The `commit-msg` validator rejects `model=`/`tool=` values the runtime session contradicts or cannot corroborate.*
 3. **Format**: Format source files (ruff/biome) before staging.
 4. **Commit**: Write the message to a temporary file (e.g., `/tmp/msg.txt`) and run `git add {files} && git commit -F /tmp/msg.txt`. Do NOT use `git commit -m "$(...)"`.
 5. **Push**: `git push` immediately to publish the commit.

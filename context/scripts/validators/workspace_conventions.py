@@ -12,6 +12,7 @@ Enforces:
 """
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -105,9 +106,78 @@ AGENT_SESSION_PATTERN = re.compile(
     r"( approvals=\d+)?"
     r"( tokens=\d+(\.\d+)?K?/\d+(\.\d+)?K?)?$"
 )
+TOOL_FIELD_PATTERN = re.compile(r"\btool=([a-z0-9-]+)")
+MODEL_FIELD_PATTERN = re.compile(r"\bmodel=([a-z0-9.-]+)")
 
 
-def validate_commit_message(msg: str) -> tuple[bool, str]:
+# -----------------------------------------------------------------------------
+# Runtime telemetry corroboration for Agent-Session tool=/model=
+# -----------------------------------------------------------------------------
+
+_RUNTIME_TELEMETRY_MODULE = None
+
+
+def _load_runtime_telemetry():
+    """Import prepare-commit-msg.py (the hook) to reuse its runtime extractors."""
+    global _RUNTIME_TELEMETRY_MODULE
+    if _RUNTIME_TELEMETRY_MODULE is not None:
+        return _RUNTIME_TELEMETRY_MODULE
+    hook_path = Path(__file__).resolve().parent.parent / "prepare-commit-msg.py"
+    spec = importlib.util.spec_from_file_location("prepare_commit_msg", hook_path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod  # required: module-level @dataclass resolves via __module__
+    spec.loader.exec_module(mod)
+    _RUNTIME_TELEMETRY_MODULE = mod
+    return mod
+
+
+def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root: str) -> tuple[bool, str]:
+    """Check declared tool=/model= against runtime session telemetry.
+
+    Tools without a framework extractor (unknown third-party tools such as
+    'cursor') are not adjudicated. Framework tools must be corroborated by an
+    active runtime session: a model the runtime contradicts — or cannot confirm
+    at all — is rejected.
+    """
+    try:
+        mod = _load_runtime_telemetry()
+    except Exception as exc:
+        return False, f"cannot be corroborated: telemetry module unavailable ({exc})"
+
+    extractor_cls = mod.EXTRACTORS.get(declared_tool.lower())
+    if extractor_cls is None:
+        # Third-party tool with no canonical telemetry store.
+        return True, ""
+
+    try:
+        extractor = extractor_cls()
+        available = extractor.is_available()
+    except Exception as exc:
+        return False, f"tool='{declared_tool}' cannot be corroborated: extractor error ({exc})"
+
+    if not available:
+        return False, f"tool='{declared_tool}' cannot be corroborated: no {declared_tool} runtime telemetry found"
+
+    try:
+        result = extractor.extract_delta(repo_root, {})
+    except Exception as exc:
+        return False, f"tool='{declared_tool}' cannot be corroborated: extraction error ({exc})"
+
+    if result.error:
+        return False, f"tool='{declared_tool}' cannot be corroborated: {result.error}"
+
+    runtime_model = mod.short_model(result.model)
+    if not runtime_model:
+        return False, f"tool='{declared_tool}' cannot be corroborated: runtime reported no model"
+    if runtime_model != declared_model:
+        return False, (
+            f"model='{declared_model}' contradicts runtime telemetry for "
+            f"tool='{declared_tool}' (actual: {runtime_model}); write model= via prepare-commit-msg"
+        )
+    return True, ""
+
+
+def validate_commit_message(msg: str, repo_root: str | None = None) -> tuple[bool, str]:
     """Validate commit message against conventional commits and agent trailers."""
     lines = msg.strip().split("\n")
     if not lines or not lines[0].strip():
@@ -143,6 +213,8 @@ def validate_commit_message(msg: str) -> tuple[bool, str]:
                 return False, f"Invalid Co-Authored-By format: {line}"
 
     has_agent_session = False
+    declared_tool = ""
+    declared_model = ""
     for line in lines:
         if line.startswith("Agent-Session:"):
             has_agent_session = True
@@ -154,9 +226,26 @@ def validate_commit_message(msg: str) -> tuple[bool, str]:
                     " [tokens=8.2K/5.1K]\n"
                     "Triplet: tool, model, agents from context/agents"
                 )
+            tool_m = TOOL_FIELD_PATTERN.search(line)
+            model_m = MODEL_FIELD_PATTERN.search(line)
+            if tool_m:
+                declared_tool = tool_m.group(1)
+            if model_m:
+                declared_model = model_m.group(1)
 
     if has_agent_session and not has_coauthor:
         return False, "Agent commits require Co-Authored-By line when Agent-Session is present"
+
+    # tool=/model= are hook-owned: a hand-written model that runtime telemetry
+    # contradicts, or cannot confirm, must be rejected (see commit-message-template.md).
+    if has_agent_session and declared_tool and declared_model:
+        ok, reason = corroborate_agent_session(
+            declared_tool,
+            declared_model,
+            repo_root or str(Path.cwd()),
+        )
+        if not ok:
+            return False, reason
 
     return True, ""
 
@@ -440,7 +529,7 @@ def _auto_detect(args: list[str]) -> int:
         msg = p.read_text()
         if msg.startswith(("Merge ", "Revert ")):
             return 0
-        is_valid, err = validate_commit_message(msg)
+        is_valid, err = validate_commit_message(msg, repo_root=str(Path.cwd()))
         if not is_valid:
             print(f"❌ Invalid commit message:\n{err}", file=sys.stderr)
             return 1
@@ -515,7 +604,7 @@ def main() -> int:
         msg = p.read_text()
         if msg.startswith(("Merge ", "Revert ")):
             return 0
-        is_valid, err = validate_commit_message(msg)
+        is_valid, err = validate_commit_message(msg, repo_root=str(Path.cwd()))
         if not is_valid:
             print(f"❌ Invalid commit message:\n{err}", file=sys.stderr)
             return 1

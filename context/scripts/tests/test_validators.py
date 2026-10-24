@@ -145,6 +145,74 @@ Agent-Session: tool=cursor model=sonnet agents=python-coder duration=5m tokens=1
         assert "require Co-Authored-By" in error
 
 
+class TestAgentSessionCorroboration:
+    """Tests for runtime-telemetry corroboration of Agent-Session tool=/model=.
+
+    Framework tools (cline, claude-code, antigravity, copilot, codex, ...) must be
+    corroborated by an active runtime session; unknown third-party tools (e.g.
+    cursor) are not adjudicated.
+    """
+
+    def _cline_session_for_repo(self, root: Path, session_id: str, repo: str, model: str):
+        sdir = root / "sessions" / session_id
+        sdir.mkdir(parents=True)
+        (sdir / f"{session_id}.json").write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "session_id": session_id,
+                    "provider": "openrouter",
+                    "model": model,
+                    "cwd": repo,
+                    "workspace_root": repo,
+                    "metadata": {},
+                }
+            )
+        )
+        (sdir / f"{session_id}.messages.json").write_text(json.dumps([]))
+
+    @staticmethod
+    def _agent_commit(tool: str, model: str) -> str:
+        return (
+            f"feat(test): subject\n\n"
+            f"Agent-Session: tool={tool} model={model} agents=python-coder\n\n"
+            f"Co-Authored-By: Agent <a@b.c>"
+        )
+
+    def test_model_corroborated_for_cline(self, tmp_path, monkeypatch):
+        """A cline session matching the runtime reports the declared model: valid."""
+        monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "cline"))
+        self._cline_session_for_repo(tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model")
+        is_valid, error = validate_commit_message(
+            self._agent_commit("cline", "test-model"), repo_root=str(tmp_path)
+        )
+        assert is_valid, f"expected corroborated model to pass: {error}"
+
+    def test_model_contradicting_runtime_fails(self, tmp_path, monkeypatch):
+        """A model that contradicts the runtime session is rejected."""
+        monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "cline"))
+        self._cline_session_for_repo(tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model")
+        is_valid, error = validate_commit_message(
+            self._agent_commit("cline", "sonnet"), repo_root=str(tmp_path)
+        )
+        assert not is_valid
+        assert "contradicts runtime telemetry" in error
+
+    def test_unconfirmable_model_fails(self, tmp_path, monkeypatch):
+        """A model the runtime cannot corroborate (no session) is rejected."""
+        monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "empty-cline"))
+        is_valid, error = validate_commit_message(
+            self._agent_commit("cline", "test-model"), repo_root=str(tmp_path)
+        )
+        assert not is_valid
+        assert "cannot be corroborated" in error
+
+    def test_third_party_tool_not_adjudicated(self):
+        """Unknown tool names without a canonical telemetry store are allowed."""
+        is_valid, error = validate_commit_message(self._agent_commit("cursor", "sonnet"))
+        assert is_valid, f"third-party tool should not be adjudicated: {error}"
+
+
 class TestEARSNotation:
     """Tests for EARS notation validator."""
 

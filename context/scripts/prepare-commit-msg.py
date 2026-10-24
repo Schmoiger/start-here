@@ -6,9 +6,12 @@ Extracts session telemetry across multiple AI runtimes:
 - Google Antigravity (~/.gemini/antigravity-ide/conversations/*.db)
 - GitHub Copilot Chat (VS Code workspaceStorage/*/chatSessions/*.jsonl)
 - OpenAI Codex / API run steps
+- Cline (~/.cline/data/sessions/*/
 
 Computes token consumption deltas since the last commit and injects or updates
 `tokens=<in>K/<out>K` in the `Agent-Session:` trailer of the commit message.
+It also populates `tool=` and `model=` from the detected runtime session so the
+trailer is corroborated by telemetry rather than hand-typed.
 
 If telemetry extraction fails or schema drift occurs, an error trailer
 `tokens=error(<reason>)` is recorded and a diagnostic warning is logged to stderr.
@@ -52,6 +55,14 @@ def format_tokens(count: int) -> str:
     if count >= 1000:
         return f"{count / 1000:.1f}K"
     return str(count)
+
+
+def short_model(model: Optional[str]) -> Optional[str]:
+    """Return a model id without its provider prefix, e.g.
+    'deepseek/deepseek-v4-flash-0731' -> 'deepseek-v4-flash-0731'."""
+    if not model:
+        return None
+    return model.rsplit("/", 1)[-1]
 
 
 def get_git_repo_root() -> Optional[str]:
@@ -514,19 +525,169 @@ class CodexExtractor(BaseExtractor):
         return ExtractionResult(error="codex_extractor_not_configured")
 
 
+class ClineExtractor(BaseExtractor):
+    """Extractor for Cline session telemetry (~/.cline/data/sessions/).
+
+    Cline persists one directory per session:
+      <sessions>/<session-id>/<session-id>.json
+          Session metadata: provider, model, cwd, workspace_root, git.*, status.
+      <sessions>/<session-id>/<session-id>.messages.json
+          JSON array of messages: {role, ts, id, content, modelInfo, metrics}.
+        - role == "assistant" messages carry:
+            modelInfo: {id, provider}
+            metrics:  {inputTokens, outputTokens, cacheReadTokens,
+                       cacheWriteTokens, cost}
+
+    The session json is authoritative for repo association (cwd match) and the
+    declared model; the messages file carries granular per-call usage for deltas.
+    """
+    name = "cline"
+
+    def __init__(self) -> None:
+        home = os.path.expanduser("~")
+        configured = os.getenv("CLINE_DATA_DIR", "").strip()
+        self.search_dirs = [
+            d
+            for d in [
+                os.path.join(configured, "sessions") if configured else "",
+                os.path.join(home, ".cline", "data", "sessions"),
+                os.path.join(home, ".config", "cline", "sessions"),
+                os.path.expandvars("%USERPROFILE%\\.cline\\data\\sessions"),
+            ]
+            if d
+        ]
+
+    def is_available(self) -> bool:
+        return any(os.path.isdir(d) for d in self.search_dirs)
+
+    @staticmethod
+    def _load_session_meta(meta_path: str) -> Optional[dict[str, Any]]:
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else None
+        except (json.JSONDecodeError, OSError):
+            return None
+
+    def find_active_session(self, repo_root: str) -> Optional[Tuple[str, float]]:
+        """Return (session json path, mtime) for the newest session rooted at repo_root."""
+        target = os.path.realpath(repo_root)
+        matches: list[Tuple[str, float]] = []
+        for s_dir in self.search_dirs:
+            if not os.path.isdir(s_dir):
+                continue
+            for meta_path in glob.glob(os.path.join(s_dir, "*", "*.json")):
+                session_id = os.path.splitext(os.path.basename(meta_path))[0]
+                if os.path.basename(os.path.dirname(meta_path)) != session_id:
+                    continue
+                meta = self._load_session_meta(meta_path)
+                if not meta:
+                    continue
+                cwd = meta.get("cwd") or meta.get("workspace_root")
+                if cwd and os.path.realpath(cwd) == target:
+                    try:
+                        matches.append((meta_path, os.path.getmtime(meta_path)))
+                    except OSError:
+                        continue
+        if not matches:
+            return None
+        matches.sort(key=lambda x: x[1], reverse=True)
+        return matches[0]
+
+    def extract_delta(self, repo_root: str, watermark: dict[str, Any]) -> ExtractionResult:
+        active = self.find_active_session(repo_root)
+        if not active:
+            return ExtractionResult(error="cline_session_not_found")
+
+        meta_path, _ = active
+        session_dir = os.path.dirname(meta_path)
+        session_id = os.path.splitext(os.path.basename(meta_path))[0]
+        meta = self._load_session_meta(meta_path) or {}
+        declared_model = meta.get("model")
+
+        messages_path = os.path.join(session_dir, f"{session_id}.messages.json")
+        try:
+            with open(messages_path, "r", encoding="utf-8") as f:
+                payload = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            return ExtractionResult(error="cline_messages_not_found")
+
+        if isinstance(payload, list):
+            messages = payload
+        elif isinstance(payload, dict) and isinstance(payload.get("messages"), list):
+            # Compacted/older sessions wrap the array in a metadata envelope.
+            messages = payload["messages"]
+        else:
+            return ExtractionResult(error="cline_messages_schema_drift")
+
+        last_idx = int(watermark.get("last_idx", -1))
+        if watermark.get("session_id") != session_id:
+            last_idx = -1
+        # Cline may compact or truncate long sessions; restart when the
+        # pointer has outlived the current message list.
+        if last_idx >= len(messages):
+            last_idx = -1
+
+        delta_in = 0
+        delta_out = 0
+        delta_thinking = 0
+        resolved_model: Optional[str] = None
+        max_idx = last_idx
+
+        for idx, msg in enumerate(messages):
+            if idx <= last_idx:
+                continue
+            max_idx = idx
+            if not isinstance(msg, dict) or msg.get("role") != "assistant":
+                continue
+            model_info = msg.get("modelInfo")
+            if resolved_model is None and isinstance(model_info, dict) and model_info.get("id"):
+                resolved_model = model_info.get("id")
+            metrics = msg.get("metrics")
+            if not isinstance(metrics, dict):
+                continue
+            metrics_int = {
+                key: metrics[key]
+                for key in ("inputTokens", "outputTokens", "cacheReadTokens", "cacheWriteTokens", "thinkingTokens", "reasoningTokens")
+                if isinstance(metrics.get(key), int)
+            }
+            delta_in += (
+                metrics_int.get("inputTokens", 0)
+                + metrics_int.get("cacheReadTokens", 0)
+                + metrics_int.get("cacheWriteTokens", 0)
+            )
+            delta_out += metrics_int.get("outputTokens", 0)
+            delta_thinking += metrics_int.get("thinkingTokens", 0) or metrics_int.get("reasoningTokens", 0)
+
+        return ExtractionResult(
+            tokens_in=delta_in,
+            tokens_out=delta_out,
+            thinking_tokens=delta_thinking,
+            model=resolved_model or declared_model or "cline",
+            runtime="cline",
+            watermark_updates={
+                "session_id": session_id,
+                "last_idx": max_idx,
+                "total_in": watermark.get("total_in", 0) + delta_in,
+                "total_out": watermark.get("total_out", 0) + delta_out,
+            },
+        )
+
+
 # =============================================================================
 # Commit Message Injection & Dispatcher
 # =============================================================================
 
-EXTRACTORS: dict[str, BaseExtractor] = {
-    "antigravity": AntigravityExtractor(),
-    "gemini": AntigravityExtractor(),
-    "copilot": CopilotExtractor(),
-    "github": CopilotExtractor(),
-    "claude-code": ClaudeExtractor(),
-    "claude": ClaudeExtractor(),
-    "codex": CodexExtractor(),
-    "openai": CodexExtractor(),
+EXTRACTORS: dict[str, type[BaseExtractor]] = {
+    "antigravity": AntigravityExtractor,
+    "gemini": AntigravityExtractor,
+    "copilot": CopilotExtractor,
+    "github": CopilotExtractor,
+    "claude-code": ClaudeExtractor,
+    "claude": ClaudeExtractor,
+    "codex": CodexExtractor,
+    "openai": CodexExtractor,
+    "cline": ClineExtractor,
 }
 
 
@@ -535,7 +696,7 @@ def select_extractor(declared_tool: Optional[str], repo_root: str) -> BaseExtrac
     if declared_tool:
         norm = declared_tool.strip().lower()
         if norm in EXTRACTORS:
-            return EXTRACTORS[norm]
+            return EXTRACTORS[norm]()
 
     # Auto-detect: find the runtime whose matching session has the freshest mtime
     candidates: list[Tuple[BaseExtractor, float]] = []
@@ -543,6 +704,7 @@ def select_extractor(declared_tool: Optional[str], repo_root: str) -> BaseExtrac
         AntigravityExtractor.name: AntigravityExtractor(),
         CopilotExtractor.name: CopilotExtractor(),
         ClaudeExtractor.name: ClaudeExtractor(),
+        ClineExtractor.name: ClineExtractor(),
     }
 
     for ext in unique_extractors.values():
@@ -559,8 +721,25 @@ def select_extractor(declared_tool: Optional[str], repo_root: str) -> BaseExtrac
     return AntigravityExtractor() if AntigravityExtractor().is_available() else ClaudeExtractor()
 
 
-def update_commit_message(msg_file: str, token_str: str) -> bool:
-    """Inject or replace token_str on the Agent-Session line in msg_file."""
+def _set_trailer_field(line: str, key: str, value: str) -> str:
+    """Replace `key=<old>` on an Agent-Session line, appending it if absent."""
+    if re.search(rf"\b{key}=\S+", line):
+        return re.sub(rf"\b{key}=\S+", f"{key}={value}", line)
+    return line.rstrip() + f" {key}={value}"
+
+
+def update_commit_message(
+    msg_file: str,
+    token_str: Optional[str],
+    tool: Optional[str] = None,
+    model: Optional[str] = None,
+) -> bool:
+    """Inject or update runtime-verified tool=/model=/tokens= on the Agent-Session line.
+
+    Hand-written tool=/model= values that runtime telemetry can corroborate are
+    overwritten with the surviving values; a null token_str removes a stale
+    tokens= so the trailer never claims usage the runtime did not record.
+    """
     try:
         with open(msg_file, "r", encoding="utf-8") as f:
             content = f.read()
@@ -575,10 +754,15 @@ def update_commit_message(msg_file: str, token_str: str) -> bool:
     updated = False
     for i, line in enumerate(lines):
         if line.startswith("Agent-Session:"):
-            if "tokens=" in line:
-                lines[i] = re.sub(r"tokens=\S+", token_str, line)
-            else:
-                lines[i] = line.rstrip() + " " + token_str
+            if tool:
+                lines[i] = _set_trailer_field(line, "tool", tool)
+            if model:
+                lines[i] = _set_trailer_field(lines[i], "model", model)
+            if token_str:
+                value = token_str.removeprefix("tokens=")
+                lines[i] = _set_trailer_field(lines[i], "tokens", value)
+            elif re.search(r"\btokens=\S+", lines[i]):
+                lines[i] = re.sub(r"\s+tokens=\S+", "", lines[i])
             updated = True
             break
 
@@ -636,15 +820,22 @@ def main() -> None:
         update_commit_message(msg_file, f"tokens=error({result.error})")
         sys.exit(0)
 
-    # Annotate tokens if there are consumed tokens to report
+    # Populate runtime-verified tool=, model=, and (when consumed) tokens=.
+    token_str = None
     if result.tokens_in > 0 or result.tokens_out > 0:
         token_str = f"tokens={format_tokens(result.tokens_in)}/{format_tokens(result.tokens_out)}"
-        update_commit_message(msg_file, token_str)
 
-        # Persist watermark updates for next commit
-        if result.watermark_updates:
-            current_watermark.update(result.watermark_updates)
-            write_watermark(watermark_file, current_watermark)
+    update_commit_message(
+        msg_file,
+        token_str,
+        tool=extractor.name,
+        model=short_model(result.model),
+    )
+
+    # Persist watermark updates for next commit
+    if token_str and result.watermark_updates:
+        current_watermark.update(result.watermark_updates)
+        write_watermark(watermark_file, current_watermark)
 
 
 if __name__ == "__main__":
