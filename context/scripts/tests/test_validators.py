@@ -5,6 +5,14 @@ import sys
 from pathlib import Path
 
 from context.scripts.validators.workspace_conventions import (
+    INTERRUPTION_BASE_FIELDS,
+    INTERRUPTION_TYPE_FIELDS,
+    REQUIRED_METRICS_FIELDS,
+    VALID_INTERRUPTION_DECISIONS,
+    VALID_INTERRUPTION_IMPACTS,
+    VALID_INTERRUPTION_TYPES,
+    VALID_METRICS_EVENTS,
+    VALID_TOKEN_SOURCES,
     is_interruptions_log,
     main as workspace_conventions_main,
     validate_commit_message,
@@ -398,7 +406,7 @@ class TestMetricsLogging:
 
 
 class TestInterruptionsLogging:
-    """Tests for interruption log validator (agent-template.md § Escalation Protocol)."""
+    """Tests for interruption log validator (logging-template.md § Interruption Log)."""
 
     @staticmethod
     def _question(**overrides):
@@ -411,7 +419,7 @@ class TestInterruptionsLogging:
             "question": "Which schema applies to the audit fields?",
             "blocker": "AC-2 cannot be met without it",
             "answered_by": "orchestrator",
-            "resolution": "Use the schema in agent-template.md",
+            "resolution": "Use the schema in logging-template.md",
         }
         entry.update(overrides)
         return entry
@@ -544,7 +552,7 @@ class TestInterruptionsLogging:
                     "task_id": "TASK-004",
                     "type": "resolution",
                     "ref": "zzzz",
-                    "resolution": "Use the schema in agent-template.md",
+                    "resolution": "Use the schema in logging-template.md",
                     "decided_by": "orchestrator",
                 }
             )
@@ -566,7 +574,7 @@ class TestInterruptionsLogging:
                     "task_id": "TASK-004",
                     "type": "resolution",
                     "ref": "a1f3",
-                    "resolution": "Use the schema in agent-template.md",
+                    "resolution": "Use the schema in logging-template.md",
                     "decided_by": "orchestrator",
                 }
             )
@@ -1102,4 +1110,39 @@ class TestSubrepoFreshness:
             exit_code = subrepo_freshness_main()
             assert exit_code == 0
 
+
+class TestLoggingTemplateDocs:
+    """Tests that the canonical logging template matches the enforced schema.
+
+    context/templates/logging-template.md is the single home for both log
+    schemas. These tests fail when a validator gains a field or value that the
+    template does not document, so the docs cannot silently drift from code.
+    """
+
+    TEMPLATES = Path(__file__).resolve().parents[3] / "context" / "templates"
+
+    def test_template_documents_metrics_schema(self):
+        """Test that every enforced metrics field and value appears in the template."""
+        text = (self.TEMPLATES / "logging-template.md").read_text()
+        for token in REQUIRED_METRICS_FIELDS + VALID_METRICS_EVENTS + VALID_TOKEN_SOURCES:
+            assert f"`{token}`" in text, f"logging-template.md omits '{token}'"
+
+    def test_template_documents_interruption_schema(self):
+        """Test that every enforced interruption field and value appears in the template."""
+        text = (self.TEMPLATES / "logging-template.md").read_text()
+        tokens = (
+            INTERRUPTION_BASE_FIELDS
+            + VALID_INTERRUPTION_TYPES
+            + VALID_INTERRUPTION_IMPACTS
+            + VALID_INTERRUPTION_DECISIONS
+        )
+        for fields in INTERRUPTION_TYPE_FIELDS.values():
+            tokens += fields
+        for token in tokens:
+            assert f"`{token}`" in text, f"logging-template.md omits '{token}'"
+
+    def test_agent_template_references_logging_template(self):
+        """Test that the agent template points at the schema instead of restating it."""
+        text = (self.TEMPLATES / "agent-template.md").read_text()
+        assert "context/templates/logging-template.md" in text
 
