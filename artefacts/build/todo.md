@@ -33,3 +33,4 @@
 [ ] Analyise low level logs (see Openrouter or Langfuse) to optimise the context delivery (there's a lot going on, not all relevant).
 [ ] TDD skill should enforce commit after each phase
 [ ] Committing is token-intesive. Investigate and rationalise.
+[ ] Rationalise the frontmatter context in the agents - not all are required.
