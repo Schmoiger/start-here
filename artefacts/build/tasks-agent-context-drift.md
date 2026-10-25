@@ -12,8 +12,8 @@
 |----|-----|--------|-------|----------|------------|-------------|
 | TASK-001 | critical | completed | diagnose | - | - | Record phantom-reference inventory for all 18 agents (§Findings) |
 | TASK-002 | critical | completed | fix | @harness-analyst | TASK-013 | Fix `context/templates/agent-template.md` — replace dead rule names (`british-english.md`, `handoff-hygiene.md`, `escalation.md`); add `Source` column to rules table |
-| TASK-003 | high | pending | fix | @functional-tester | - | RED: failing test in `context/scripts/tests/test_agent_validator.py` — body-table `Source` that does not resolve MUST error |
-| TASK-004 | high | pending | fix | @python-coder | TASK-003 | GREEN: extend `context/scripts/validators/agent_definitions.py` to parse body rule tables and assert each `Source` resolves under `context/rules/` or `context/skills/` (mirror L71–90) |
+| TASK-003 | high | completed | fix | @functional-tester | - | RED: failing test in `context/scripts/tests/test_agent_validator.py` — body-table `Source` that does not resolve MUST error |
+| TASK-004 | high | completed | fix | @python-coder | TASK-003 | GREEN: extend `context/scripts/validators/agent_definitions.py` to parse body rule tables and assert each `Source` resolves under `context/rules/` or `context/skills/` (mirror L71–90) |
 | TASK-005 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
 | TASK-006 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution. 14 of 15 definitions done; `orchestrator` §Rule Resolution is TASK-007's scope |
 | TASK-007 | normal | pending | fix | @harness-analyst | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `SKIPPED_FILES` (L30) keeps it |
@@ -450,6 +450,24 @@ definition.
    promoting into `context/scripts/validators/` with a RED test first (TASK-003, TASK-004).
 3. `context/agents/cursor-workflow-helper.mdc` cites `context/agents/CLAUDE.md` and uses `./artefacts/`
    paths. Not a definition and not globbed by the validator; same drift class, unowned.
+
+### Resolution — TASK-003, TASK-004 (25 Oct 2026)
+
+The body-blind spot is closed. `agent_definitions.py` now resolves two body shapes: a `Source` cell in a
+body rule table, and an inline `file.md §section` citation (residual finding 2 promoted into the validator,
+which is why the check is not table-only). Both name a file under `context/` — searched in `rules/`,
+`skills/`, `standards/`, `agents/`, `templates/`, `workflows/`, `docs/` — and, when a section is named, a
+heading that file carries. Section matching is deliberately generous (case/punctuation folded, abbreviations,
+bare section numbers, citations trailing into prose) so it catches deleted headings, not shorthand. Errors
+carry the offending line number.
+
+| Item | Detail |
+|------|--------|
+| RED | `d7c7271` — eight tests, four failing: phantom `Source` file, unresolved `Source` section, phantom inline citation file, unresolved inline citation section. The four positives (resolvable table, resolvable inline citation, `Source`-less table ignored, existing suite) pinned the false-positive boundary first. |
+| GREEN | `agent_definitions.py` — `_source_cells`, `_validate_body_citations`, `_resolve_context_file`, `_section_resolves`; `file.md` is the template placeholder and is skipped, not resolved. |
+| Gate | `agent_definitions.py` 14/14 valid, adapters 61 unchanged, drift in sync, 193 tests, ruff clean. Repo-wide run is now fully green — the 8 legacy failures recorded in TASK-019 are gone. |
+| Scope note | No agent definition carries a body rule table today (TASK-005/006 removed them), so the `Source` branch is forward-looking; the inline-citation branch is what protects the current definitions. |
+| Deviation | `context/scripts/validators/README.md`, `context/scripts/tests/README.md`, and both framework docs were updated with the new check — a validator nobody can find in the docs is the same discoverability gap that produced this incident. |
 
 ---
 
