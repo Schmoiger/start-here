@@ -55,7 +55,7 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Detection of private key blocks (`BEGIN PRIVATE KEY`)
 - Detection of raw API keys and tokens in source files
 
-### Agent Validator (26 tests in `test_agent_validator.py`)
+### Agent Validator (27 tests in `test_agent_validator.py`)
 
 **agent_definitions.py**
 - YAML frontmatter validation

@@ -150,8 +150,12 @@ def _source_cells(body: str) -> list[tuple[int, str]]:
     return cells
 
 
-def _validate_body_citations(body: str, ctx: Path) -> list[str]:
-    """Resolve every body attribution: Source cells and inline citations."""
+def _validate_body_citations(body: str, ctx: Path, line_offset: int = 0) -> list[str]:
+    """Resolve every body attribution: Source cells and inline citations.
+
+    `line_offset` is the number of file lines before the body, so diagnostics
+    quote the line number an editor would show.
+    """
     errors: list[str] = []
     seen: set[str] = set()
 
@@ -172,12 +176,16 @@ def _validate_body_citations(body: str, ctx: Path) -> list[str]:
 
     for number, cell in _source_cells(body):
         for match in CITATION_PATTERN.finditer(cell):
-            check(match.group("file"), match.group("section"), f"line {number}")
+            check(match.group("file"), match.group("section"), f"line {number + line_offset}")
 
     for number, line in enumerate(body.splitlines(), 1):
         for match in CITATION_PATTERN.finditer(line):
             if match.group("section") is not None:
-                check(match.group("file"), match.group("section"), f"line {number}")
+                check(
+                    match.group("file"),
+                    match.group("section"),
+                    f"line {number + line_offset}",
+                )
 
     return errors
 
@@ -287,7 +295,8 @@ def validate_agent_definition(
     # Body attributions resolve or the definition is lying about what it read.
     # The frontmatter checks above cannot see a body table that cites a file
     # deleted last quarter; this is the same check applied to the body.
-    errors.extend(_validate_body_citations(body, ctx))
+    body_line_offset = content[: len(content) - len(body)].count("\n")
+    errors.extend(_validate_body_citations(body, ctx, body_line_offset))
 
     return errors
 

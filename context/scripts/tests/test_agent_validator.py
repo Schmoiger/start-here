@@ -432,6 +432,27 @@ model: medium
         errors = validate_agent_definition(agent)
         assert errors == [], f"Unexpected errors: {errors}"
 
+    def test_body_citation_error_should_report_file_line_number_when_it_fails(self, tmp_path):
+        """Diagnostics must quote the editor's line number, not a body offset."""
+        agent = tmp_path / "drifted_agent.md"
+        lines = [
+            "---",
+            "name: test-agent",
+            "model: medium",
+            "---",
+            "",
+            "## Context Acquisition",
+            "",
+            "1. Standards: tech-standards.md",
+            "",
+            "#### Task Constraints",
+            "",
+            "- Follow the escalation protocol (`escalation.md` §1 Provisioning)",
+        ]
+        agent.write_text("\n".join(lines) + "\n")
+        errors = validate_agent_definition(agent)
+        assert any(f"(line {len(lines)})" in e for e in errors), errors
+
     def test_body_table_without_source_column_should_be_ignored(self, tmp_path):
         """Tables that carry no 'Source' column are not attribution tables."""
         agent = tmp_path / "plain_agent.md"
