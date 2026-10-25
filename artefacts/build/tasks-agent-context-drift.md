@@ -25,7 +25,8 @@
 | TASK-016 | high | completed | fix | @harness-analyst | TASK-013 | Analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness implementer is `@harness-analyst`, not `@orchestrator` |
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
-| TASK-019 | high | completed | fix | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
+| TASK-019 | high | completed | refactor | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
+| TASK-020 | high | pending | refactor | @harness-analyst | TASK-013 | Refactor `context/agents/code-reviewer.md` as a skill, the python-coder or typescript-coder agent + code-review skill should be able to do the work; focus skill on code quality, ensure DRY e.g. not duplicating security testing |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
 | TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
 | TASK-011 | low | pending | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |
