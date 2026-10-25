@@ -23,6 +23,8 @@ Before executing any operations, consume the following required context files in
 2. Rules: {rules}
 3. Skills: {skills}
 
+These three lists repeat the frontmatter exactly. The frontmatter is the single source of truth: do not restate the obligations in a body "Required Rules" table — that table is how definitions drift to citing files that do not exist.
+
 ---
 
 ## Workflow
@@ -46,7 +48,7 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 | Codebase | `{project-root}/{service}/` | Follow existing implementation patterns |
 
 #### Task Constraints
-- {Constraint 1: Imperative negative or positive constraint}
+- {Constraint 1: a short imperative. When it derives from a rule, skill, or standard, attribute it — `file.md §section`. A paraphrase without a source is a fork.}
 - {Constraint 2: File scope and single-responsibility limits}
 - Validate all outputs locally using `{validation-command}` prior to task completion.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
