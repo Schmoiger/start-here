@@ -319,3 +319,131 @@ Read `{{project-root}}/artefacts/build/interruptions/*.jsonl`.
 """)
         errors = validate_agent_definition(agent)
         assert not any("Interruption log path" in e for e in errors)
+
+    def test_body_table_source_should_fail_when_file_does_not_exist(self, tmp_path):
+        """A body 'Source' naming a phantom rule file is drift and must error."""
+        agent = tmp_path / "drifted_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+#### Task Constraints
+
+| Constraint | Source |
+| :--- | :--- |
+| Stop and ask the human | `handoff-hygiene.md` |
+""")
+        errors = validate_agent_definition(agent)
+        assert any(
+            "handoff-hygiene.md" in e and "doesn't exist" in e for e in errors
+        ), f"Expected a phantom body source error, got: {errors}"
+
+    def test_body_table_source_should_fail_when_section_does_not_exist(self, tmp_path):
+        """A body 'Source' section that no heading matches must error."""
+        agent = tmp_path / "drifted_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+#### Task Constraints
+
+| Constraint | Source |
+| :--- | :--- |
+| Stop and ask the human | `tech-writing.md` §Nonexistent Section |
+""")
+        errors = validate_agent_definition(agent)
+        assert any(
+            "Nonexistent Section" in e and "doesn't exist" in e for e in errors
+        ), f"Expected an unresolved section error, got: {errors}"
+
+    def test_body_table_source_should_pass_when_citations_resolve(self, tmp_path):
+        """Resolvable body sources — including numbered and named sections — pass."""
+        agent = tmp_path / "attributed_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+#### Task Constraints
+
+| Constraint | Source |
+| :--- | :--- |
+| British English spelling | `tech-writing.md` §1 British English |
+| GREEN phase must not edit tests | `tdd-workflow.md` §2 Phase 2: GREEN Phase (Implement) |
+| Test at the I/O boundary | `context/rules/testing.md` §2 Testing Constraints |
+""")
+        errors = validate_agent_definition(agent)
+        assert errors == [], f"Unexpected errors: {errors}"
+
+    def test_body_citation_should_fail_when_file_does_not_exist(self, tmp_path):
+        """An inline `file.md §section` citation to a phantom file must error."""
+        agent = tmp_path / "drifted_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+#### Task Constraints
+
+- Follow the escalation protocol (`escalation.md` §1 Provisioning)
+""")
+        errors = validate_agent_definition(agent)
+        assert any(
+            "escalation.md" in e and "doesn't exist" in e for e in errors
+        ), f"Expected a phantom citation error, got: {errors}"
+
+    def test_body_citation_should_fail_when_section_does_not_exist(self, tmp_path):
+        """An inline citation to a section the rule file lacks must error."""
+        agent = tmp_path / "drifted_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+#### Task Constraints
+
+- Read the phantom phase (`tdd-workflow.md` §9 Phase 9: Phantom Phase)
+""")
+        errors = validate_agent_definition(agent)
+        assert any(
+            "Phase 9" in e and "doesn't exist" in e for e in errors
+        ), f"Expected an unresolved section error, got: {errors}"
+
+    def test_body_citation_should_pass_when_section_resolves(self, tmp_path):
+        """An inline citation that resolves to a real heading passes."""
+        agent = tmp_path / "attributed_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+#### Task Constraints
+
+- British English spelling throughout (`tech-writing.md` §1 British English)
+""")
+        errors = validate_agent_definition(agent)
+        assert errors == [], f"Unexpected errors: {errors}"
+
+    def test_body_table_without_source_column_should_be_ignored(self, tmp_path):
+        """Tables that carry no 'Source' column are not attribution tables."""
+        agent = tmp_path / "plain_agent.md"
+        agent.write_text(f"""---
+name: test-agent
+model: medium
+---
+{CONTEXT_ACQUISITION_BODY}
+
+| Task Domain | Context Location |
+| :--- | :--- |
+| Product Features | `{{project-root}}/artefacts/product/` |
+""")
+        errors = validate_agent_definition(agent)
+        assert errors == [], f"Unexpected errors: {errors}"
