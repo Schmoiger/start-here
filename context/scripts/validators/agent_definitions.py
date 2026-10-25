@@ -92,6 +92,11 @@ def _headings(path: Path) -> list[str]:
     ]
 
 
+def _is_prefix(short: str, long: str) -> bool:
+    """True when `short` is `long` or a whole-word prefix of it."""
+    return bool(short) and (long == short or long.startswith(f"{short} "))
+
+
 def _section_resolves(section: str, headings: list[str]) -> bool:
     """True when the cited section names a heading the file actually carries.
 
@@ -104,14 +109,16 @@ def _section_resolves(section: str, headings: list[str]) -> bool:
     if not target:
         return True
     if any(
-        heading.startswith(target)
-        or target.startswith(heading)
-        or target.startswith(_without_number(heading))
+        _is_prefix(target, heading)
+        or _is_prefix(heading, target)
+        or _is_prefix(_without_number(heading), target)
         for heading in headings
     ):
         return True
     number = re.match(r"^\d+(?:\s+\d+)*", target)
-    return bool(number) and any(heading.startswith(number.group(0)) for heading in headings)
+    return bool(number) and any(
+        _is_prefix(number.group(0), heading) for heading in headings
+    )
 
 
 def _resolve_context_file(name: str, ctx: Path) -> Path | None:
