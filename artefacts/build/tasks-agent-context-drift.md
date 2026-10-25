@@ -28,7 +28,7 @@ both rewrite `context/workflows/design.yaml`.
 |----|-----|--------|-------|----------|------------|-------------|
 | TASK-014 | high | pending | fix | @agent-harness | TASK-013 | Adopt product merge — `product-expert` absorbed into `product-owner` (large; elicit + structure modes) |
 | TASK-015 | high | pending | fix | @agent-harness | TASK-013 | Adopt API merge — `api-designer` absorbed into `solution-architect`; OpenAPI conventions → skill |
-| TASK-016 | high | pending | fix | @agent-harness | TASK-013 | Adopt analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
+| TASK-016 | high | completed | fix | @agent-harness | TASK-013 | Adopt analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness lane implementer is `@agent-harness`, not `@orchestrator` |
 | TASK-018 | normal | pending | diagnose | @orchestrator | - | Extend `agent-harness` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
 | TASK-019 | high | pending | fix | @agent-harness | TASK-013, TASK-015 | Adopt single `devops` — absorb `database-designer`, extract technology playbooks to skills, model `small` → `medium` |
@@ -132,6 +132,16 @@ the OpenAPI skill is listed in the architect's frontmatter.
 ---
 
 ### TASK-016 — Analyst merge → `harness-analyst`
+
+**Status: completed (25 Oct 2026)** — executed out of dependency order (before TASK-013) on direct user request, by
+Cline rather than `@agent-harness`. All files below landed; both lens skills exist and are in the agent frontmatter;
+output paths unchanged. Gate: `agent_definitions.py` valid for `harness-analyst.md`, `generate_adapters.py`
+(4 created / 1 updated), `adapter_drift.py` in sync, `pytest context/scripts/tests/` 186 passed, acceptance grep
+(`workflow-analyst|tokenomics-analyst` in `context/`) empty. Caveat: repo-wide `agent_definitions.py` stays red on
+12 legacy agents outside this task's scope (baseline 14/18 failing at HEAD before this change) — owned by
+TASK-014/015/019 and pending template-alignment work. One deliberate deviation: the composite "Workflow Health
+Score X/100" from `workflow-analyst.md` was dropped (kept the per-metric scoring rubric) because
+`retrospective.yaml` §workflow_rules prohibits health scores — rule wins over agent.
 
 **Decision**: one retrospective measurement agent, `model: medium`, with lens selection by task
 prompt. Rationale: identical frontmatter pools, identical data sources (interruptions JSONL,
