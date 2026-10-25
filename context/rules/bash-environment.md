@@ -36,7 +36,7 @@ Dedicated Write/Edit/Glob/Grep tools execute with higher precision, structured d
 | `pytest ...` | Bypasses project virtualenv and test dependencies | Use `uv run [--project <path>] pytest ...` |
 | `pip ...`, `pip3 ...` | Non-deterministic unpinned dependency management | Use `uv add` or `uv sync` |
 | `PYTHONPATH=...` path hacks | Masks broken environment configurations and violates isolation | Fix project virtualenv via `uv sync` |
-| Silent fallback when tool fails | Masks defects, causes environment drift, violates fail-fast invariant | Diagnose root cause of failure or escalate per `escalation.md` |
+| Silent fallback when tool fails | Masks defects, causes environment drift, violates fail-fast invariant | Diagnose root cause of failure or escalate per `multi-agent-collaboration.md` §1 Escalation |
 | `printf ... \| git commit -F -` | Pipe splits at `\|`; each segment checked independently | Write to `/tmp/msg.txt`, then `git commit -F /tmp/msg.txt` |
 | `$(...)` command substitution | Blocked by terminal sandboxes | Write output to temp file; read separately |
 | `<(...)` process substitution | Blocked by terminal sandboxes | Write to temp file |
