@@ -32,3 +32,4 @@
 [ ] Improve use of HANDOFF.md: orchestrator only maintains build/HANDOFF.md but agents maintain service-scoped HANDOFF.md. Should be described in multi-agent skill. How is HANDOFF.md different to the status payload the sub-agent returns to the orchestrator.
 [ ] Analyise low level logs (see Openrouter or Langfuse) to optimise the context delivery (there's a lot going on, not all relevant).
 [ ] TDD skill should enforce commit after each phase
+[ ] Committing is token-intesive. Investigate and rationalise.
