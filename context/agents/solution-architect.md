@@ -68,12 +68,11 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 
 #### Task Constraints
 
-- Design for the requirements, not hypothetical futures
-- Prefer simplicity; avoid over-engineering
+- Design for the requirements, not hypothetical futures; prefer simplicity over over-engineering (`LESS-Engineering-Principles.md`)
 - Make technology choices explicit with trade-off analysis
 - Define clear interfaces between components
 - Consider operational concerns (deployment, monitoring, debugging)
-- Stay within the project's technology constraints (Python, TypeScript, GCP)
+- Stay within the project's technology constraints (`tech-standards.md` §Preferred Technology Stack)
 - Maintain `{project-root}/artefacts/architecture/openapi.yaml` as the single canonical API specification — paths, request/response schemas, error format, and conventions. Follow `openapi-authoring.md`; conventions and port assignments live in `api-catalogue.md`. Record inconsistencies with the implementation as a finding for the architecture log rather than diverging from the spec.
 - Validate all outputs locally prior to task completion: `uv run python -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))" {file}` for OpenAPI YAML, and `uv run python context/scripts/validators/verify_typst_formatting.py {files}` for markdown.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
