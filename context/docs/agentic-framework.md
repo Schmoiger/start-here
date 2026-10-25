@@ -12,7 +12,7 @@
 
 ## Solving The Coordination Problem
 
-Getting an LLM to write a function is table stakes in 2026. Getting *nineteen* of them to build a system together without losing their context is not.
+Getting an LLM to write a function is table stakes in 2026. Getting *eighteen* of them to build a system together without losing their context is not.
 
 Without deliberate coordination, multi-agent workflows break in familiar ways. Agents do not know what the previous agent did so risk redoing work that has already been done. And it's done slightly differently, because each agent makes slightly different judgements. Reviewers lack a consistent standard to check against. Testers write tests against the code as-built rather than the intended interface, ossifying bugs into the test suite. Sessions compact mid-sprint, systemising forgetfulness. The symptoms look unpredictable, a different thing going wrong each time. But the outcome is the same: wasted effort, no consistency, incorrect assumptions, and no mechanism to prevent any of it. These are coordination problems, and they require coordination solutions.
 
@@ -151,14 +151,14 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ## The Agent Roster
 
-The framework defines 19 specialised agents, organised by kind of judgement rather than technology alone:
+The framework defines 18 specialised agents, organised by kind of judgement rather than technology alone:
 
 - **Discovery**: `product-expert` (elicits requirements), `product-owner` (formalises them)
 - **Design**: `solution-architect`, `database-designer`, `api-designer`, `ui-designer`
 - **Implementation**: `python-coder`, `typescript-coder`
 - **Testing**: `functional-tester` (TDD), `ui-tester` (browser automation)
 - **Review**: `tech-lead` (the gate), `code-reviewer`, `principles-reviewer`, `security-tester`
-- **Operations**: `devops`, `documentation`, `workflow-analyst`, `tokenomics-analyst`
+- **Operations**: `devops`, `documentation`, `harness-analyst` (workflow-analysis and tokenomics-audit lenses)
 - **Coordination**: `orchestrator`
 
 Each agent's frontmatter declares which rules and standards it requires. The orchestrator resolves the applicable rules by matching file globs against the task scope, injecting only what is relevant.

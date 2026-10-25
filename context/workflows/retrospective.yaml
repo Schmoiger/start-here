@@ -5,10 +5,11 @@ phases:
   - id: review
     name: Data Review
     agents:
-      - workflow-analyst
+      - harness-analyst
     outputs:
       - Summary of findings (reported to orchestrator, not a standalone file)
     notes:
+      - Default lens: workflow-analysis — name the lens in the task prompt; use tokenomics-audit for token/model-tier audits
       - Read and analyse all three data sources:
         - artefacts/build/interruptions/*.jsonl — blocking moments (questions, approvals, escalations)
         - artefacts/build/metrics/session-log.jsonl — agent invocations, status, and token usage

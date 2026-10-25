@@ -25,7 +25,6 @@
 | **devops** | small | Deploys and validates infrastructure |
 | **documentation** | medium | Generates user-facing docs, API references, and guides |
 | | | |
-| **workflow-analyst** | medium | Analyses workflow efficiency for retrospectives |
-| **tokenomics-analyst** | medium | Audits agent effectiveness, token economics, and model tiering |
+| **harness-analyst** | medium | Retrospective measurement — workflow efficiency and token economics lenses (workflow-analysis, tokenomics-audit) |
 
 *Note: Model tiers (small, medium, large) are mapped to specific provider models via `context/models.yaml`.*

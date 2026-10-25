@@ -58,7 +58,7 @@ tiers:
       - Schema and API design (@database-designer, @api-designer)
       - User stories and requirements structuring (@product-owner)
       - Technical documentation authoring (@documentation)
-      - Workflow and tokenomics analysis (@workflow-analyst, @tokenomics-analyst)
+      - Workflow and tokenomics analysis (@harness-analyst)
     providers:
       anthropic:
         family: "sonnet"

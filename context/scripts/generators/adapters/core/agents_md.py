@@ -38,8 +38,7 @@ def generate_agent_dispatch_all(agents: dict[str, CanonicalAgent]) -> str:
         'ui-tester', 'security-tester',
         'devops', 'gcp-devops',
         'documentation',
-        'workflow-analyst',
-        'tokenomics-analyst',
+        'harness-analyst',
     ]
     
     # Sort by predefined order, then alphabetically for the rest

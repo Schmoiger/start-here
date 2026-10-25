@@ -36,12 +36,11 @@ phases:
     name: Data Review
     mode: retrospective
     agents:
-      - workflow-analyst
-      - tokenomics-analyst
+      - harness-analyst
     notes:
-      - "Specialisation:"
-      - "  workflow-analyst: macro workflow flow, handoffs, task bottlenecks, and cycle times"
-      - "  tokenomics-analyst: micro agent effectiveness, token economics, context bloat, model tiering (per context/models.yaml), and autonomy rates"
+      - "Lens selection: name the lens in the task prompt; spawn twice in parallel with disjoint outputs if both lenses are needed (efficiency-report.md vs tokenomics-report.md)"
+      - "  workflow-analysis lens: macro workflow flow, handoffs, task bottlenecks, and cycle times"
+      - "  tokenomics-audit lens: micro agent effectiveness, token economics, context bloat, model tiering (per context/models.yaml), and autonomy rates"
       - "Data sources:"
       - "  artefacts/build/interruptions/*.jsonl — blocking moments (questions, approvals, escalations)"
       - "  artefacts/build/agent-incidents.md — framework failures already logged"

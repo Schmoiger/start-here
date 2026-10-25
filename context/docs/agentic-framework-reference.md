@@ -330,6 +330,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `documentation.md` | User-facing documentation, API references, and guide generation |
 | `functional-tester.md` | Detroit-school TDD: intent-first, tests before implementation |
 | `git-subrepo-operations.md` | Procedural guidance for inspecting, pulling, cloning, and gated pushing with git-subrepo |
+| `harness-analyst.md` | Retrospective measurement: workflow efficiency and token economics lenses |
 | `intent-fidelity.md` | Ensures business intent is faithfully captured in requirements, TDD, and tests |
 | `mermaid-authoring.md` | Mermaid diagram syntax, layout constraints, and semantic guidance |
 | `multi-agent-workflows.md` | Orchestrator triage and handoff archival |
@@ -345,7 +346,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `tdd-workflow.md` | Strict RED–GREEN–REFACTOR TDD cycle |
 | `tech-lead.md` | Architecture compliance, consistency, and engineering standards review |
 | `technical-authoring.md` | Technical whitepapers, architecture roadmaps, and book chapters using the AS persona |
-| `tokenomics-analyst.md` | Agent effectiveness, token economics, and context efficiency auditing |
+| `tokenomics-audit.md` | Agent effectiveness, token economics, model-tier conformance, and autonomy auditing (harness-analyst micro lens) |
 | `typescript-coder.md` | Frontend/backend TypeScript integrating with Python APIs |
 | `typescript-development.md` | TypeScript/JavaScript projects using Yarn Berry workspaces |
 | `typst-pipeline.md` | Authoring, building, and publishing PDFs via the project's Typst/Pandoc engine — covers Markdown formatting rules, `build.yaml` registration, brand/seed selection, and `make` commands |
@@ -353,7 +354,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `ui-development.md` | UI component and layout authoring |
 | `ui-tester.md` | End-to-end user workflow testing, screenshots, and accessibility checks |
 | `ui-testing.md` | UI testing and browser automation |
-| `workflow-analyst.md` | Workflow efficiency analysis across handoffs, git history, and token usage |
+| `workflow-analysis.md` | Workflow efficiency analysis across handoffs, git history, and token usage (harness-analyst macro lens) |
 
 ---
 
@@ -361,7 +362,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus nineteen delegatable specialists (twenty role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus seventeen delegatable specialists (eighteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -450,7 +451,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines 19 specialised agents, organised by kind of judgement.
+The framework defines 18 specialised agents, organised by kind of judgement.
 
 #### Core Coordinator
 
@@ -498,8 +499,7 @@ The framework defines 19 specialised agents, organised by kind of judgement.
 |-------|---------|
 | `devops` | Handles deployment and infrastructure-related work |
 | `documentation` | Cleans up, archives, and maintains human-facing documentation |
-| `workflow-analyst` | Reviews process effectiveness and supports retrospectives |
-| `tokenomics-analyst` | Audits agent effectiveness, token economics, context efficiency, and model tiering |
+| `harness-analyst` | Reviews process effectiveness, token economics, and model tiering via the workflow-analysis and tokenomics-audit lenses; supports retrospectives |
 
 ### Creating a New Agent
 
@@ -829,7 +829,7 @@ Draft and review phases list concrete checks in YAML (persona voice, British Eng
 
 ### Continuous improvement (`continuous-improvement.yaml`)
 
-Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `workflow-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
+Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `harness-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
 
 #### Workflow file and modes
 
@@ -865,7 +865,7 @@ Sequential phases:
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read artefacts/build/interruptions/*.jsonl (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
+| `review` | `harness-analyst` | Read artefacts/build/interruptions/*.jsonl (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
 | `discuss` | None (gate: human approval) | Present pattern → root cause → proposed fix; human chooses what to act on |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
 | `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
@@ -890,9 +890,9 @@ From those, the analyst is expected to answer questions such as: total tokens pe
 
 #### Relationship to other artefacts
 
-Tasks and handoffs (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful secondary context when the orchestrator or `@workflow-analyst` widens an investigation, but they are not the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
+Tasks and handoffs (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful secondary context when the orchestrator or `@harness-analyst` widens an investigation, but they are not the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
 
-The agent definition `context/agents/workflow-analyst.md` still describes broader analysis habits (for example task and handoff mining). When in doubt, the workflow YAML wins for phase order, outputs, and validation.
+The lens skills `context/skills/workflow-analysis.md` and `context/skills/tokenomics-audit.md` still describe broader analysis habits (for example task and handoff mining). When in doubt, the workflow YAML wins for phase order, outputs, and validation.
 
 ---
 
@@ -907,11 +907,11 @@ These are examples of fixable gaps, not a separate scoring methodology:
 
 ### Retrospective (`retrospective.yaml`)
 
-Purpose: Standalone proactive review—`workflow-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. Not the same file as `continuous-improvement.yaml` (that file adds incident mode and git Agent-Session mining in its retrospective path).
+Purpose: Standalone proactive review—`harness-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. Not the same file as `continuous-improvement.yaml` (that file adds incident mode and git Agent-Session mining in its retrospective path).
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read `artefacts/build/interruptions/*.jsonl`, `artefacts/build/metrics/session-log.jsonl`, `agent-incidents.md`; report patterns with file:line evidence |
+| `review` | `harness-analyst` (workflow-analysis lens) | Read `artefacts/build/interruptions/*.jsonl`, `artefacts/build/metrics/session-log.jsonl`, `agent-incidents.md`; report patterns with file:line evidence |
 | `discuss` | None (human gate) | Human selects which findings to implement |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Approved framework changes |
 | `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
@@ -1365,7 +1365,7 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 
 1. `context/workflows/continuous-improvement.yaml`
 2. [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) (this document — effectiveness and incident handling)
-3. `context/agents/workflow-analyst.md`
+3. `context/agents/harness-analyst.md`
 4. `context/standards/workflow-standards.md`
 
 ### Writing Human-Facing Content (Blogs, Papers, Guides)
