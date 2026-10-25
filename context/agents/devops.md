@@ -94,10 +94,8 @@ All three modes follow the same generic procedure:
 
 #### Task Constraints
 
-- Default to PostgreSQL syntax; note explicitly if a different database is in use
-- Prefer normalisation unless performance requires otherwise
-- Use snake_case for tables and columns; `created_at` and `updated_at` timestamps; UUID primary keys unless there is a stated reason not to
-- Include indexes for foreign keys and common query patterns
+- Default to PostgreSQL and normalise until performance requires otherwise (`database-design.md` §Physical Design Rules)
+- snake_case tables and columns, plural tables, UUID primary keys, `created_at` and `updated_at` timestamps, and indexes on foreign keys and common query patterns (`database-design.md` §Physical Design Rules)
 - Document every design decision and trade-off — including deviations from the conceptual model
 - Never deploy to production before staging has passed and a human has approved (`gcp-deployment.md` §Staging Before Production)
 - Follow least privilege for all IAM and infrastructure resources; encrypt at rest and in transit (`gcp-deployment.md` §Platform Shape)
