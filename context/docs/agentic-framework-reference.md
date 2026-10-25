@@ -336,8 +336,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `multi-agent-workflows.md` | Orchestrator triage and handoff archival |
 | `orchestrator.md` | Workflow execution coordination, agent delegation, and quality gate management |
 | `principles-reviewer.md` | Review against LESS Engineering Principles |
-| `product-expert.md` | Eliciting clear requirements from vague ideas |
-| `product-owner.md` | Transforming vague requests into structured requirements and user stories |
+| `product-owner.md` | Eliciting and structuring requirements and user stories |
 | `python-coder.md` | Production Python code with testing in mind |
 | `python-scripting.md` | `uv`, PEP 723 inline metadata, and the `--with` pattern |
 | `security-tester.md` | Threat modelling, OWASP assessment, and vulnerability scanning |
@@ -362,7 +361,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus seventeen delegatable specialists (eighteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus sixteen delegatable specialists (seventeen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -451,7 +450,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines 18 specialised agents, organised by kind of judgement.
+The framework defines 17 specialised agents, organised by kind of judgement.
 
 #### Core Coordinator
 
@@ -463,8 +462,7 @@ The framework defines 18 specialised agents, organised by kind of judgement.
 
 | Agent | Purpose |
 |-------|---------|
-| `product-expert` | Elicits problem understanding and discovery insight from the user |
-| `product-owner` | Turns clarified needs into structured requirements and stories |
+| `product-owner` | Elicits problem understanding, then structures it into requirements and stories |
 
 #### Design
 
@@ -598,7 +596,7 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 
 | Phase | Agents (pattern) | Role |
 |-------|------------------|------|
-| `discovery` | `product-expert` then `product-owner` (sequential) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
+| `discovery` | `product-owner` (elicitation then structuring) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
 | `design-architecture` | `solution-architect` | Architecture, logical API contracts, data model, component design docs |
 | `design-contracts` | `database-designer` and `api-designer` (parallel) | Physical schema and migrations; OpenAPI with HTTP semantics |
 | `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows, and visual assets |
@@ -764,7 +762,7 @@ When to run: Before merging a long-running branch to main, after large refactors
 ### Content (`content.yaml`)
 
 File: `context/workflows/content.yaml`
-Pattern: Sequential chain — `product-expert` for research, then `documentation` with a different persona per phase (draft → editor → optional expert reviewer → finalize).
+Pattern: Sequential chain — `product-owner` in elicitation mode for research, then `documentation` with a different persona per phase (draft → editor → optional expert reviewer → finalize).
 Use for: External-facing prose: blogs, papers, guides, talks, marketing where voice matters.
 Do not use for: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use [Design](#design-designyaml) then [Build](#build-buildyaml) with `doc-standards.md` without personas.
 
@@ -784,7 +782,7 @@ flowchart TD
     start([Start]) --> research
 
     subgraph research["Research"]
-        pe["product-expert"]
+        pe["product-owner (elicitation)"]
     end
 
     research --> draft
@@ -819,7 +817,7 @@ flowchart TD
 
 | Phase | Agent | Persona / role | Primary output |
 |-------|--------|----------------|------------------|
-| `research` | `product-expert` | Audience, purpose, key messages, sources | Research notes (see YAML `outputs`) |
+| `research` | `product-owner` (elicitation mode) | Audience, purpose, key messages, sources | Research notes (see YAML `outputs`) |
 | `draft` | `documentation` | `technical-writer` or `opinionated-blogger` | `artefacts/content/drafts/{title}-draft.md` |
 | `review` | `documentation` | `editor` | `artefacts/content/drafts/{title}-reviewed.md` |
 | `technical-review` | `documentation` | `expert-reviewer` (optional — skip for non-technical pieces) | `artefacts/content/drafts/{title}-tech-reviewed.md` |
@@ -953,7 +951,7 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 
 `design.yaml`
 
-- Discovery: Sequential (`product-expert` then `product-owner`).
+- Discovery: Sequential (`product-owner` elicitation mode then structuring mode).
 - Architecture: Single agent (`solution-architect`).
 - Contracts: Parallel hive-like pair (`database-designer` and `api-designer` on the same architecture outputs).
 - UI and visuals: Single phase (`ui-designer` — component specs, wireframes, and visual assets consolidated).

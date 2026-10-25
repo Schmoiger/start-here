@@ -4,8 +4,7 @@
 |-------|-------|---------|
 | **orchestrator** | large | Coordinates workflow execution, delegates to specialised agents, manages quality gates |
 | | | |
-| **product-expert** | large | Elicits and clarifies vague ideas into requirements through conversation |
-| **product-owner** | medium | Transforms requests into structured requirements and user stories |
+| **product-owner** | large | Elicits and structures requirements and user stories |
 | | | |
 | **solution-architect** | large | Designs system architecture, component boundaries, and data flow |
 | **database-designer** | medium | Designs schemas, relationships, and migrations |

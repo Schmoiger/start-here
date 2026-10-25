@@ -5,7 +5,7 @@ phases:
   - id: research
     name: Research & Context Gathering
     agents:
-      - product-expert  # Gather domain context, understand audience and purpose, identify key messages
+      - product-owner  # Elicitation mode: gather domain context, understand audience and purpose, identify key messages
     outputs:
       - Research notes
       - Source materials

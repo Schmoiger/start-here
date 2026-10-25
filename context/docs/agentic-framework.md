@@ -12,7 +12,7 @@
 
 ## Solving The Coordination Problem
 
-Getting an LLM to write a function is table stakes in 2026. Getting *eighteen* of them to build a system together without losing their context is not.
+Getting an LLM to write a function is table stakes in 2026. Getting *seventeen* of them to build a system together without losing their context is not.
 
 Without deliberate coordination, multi-agent workflows break in familiar ways. Agents do not know what the previous agent did so risk redoing work that has already been done. And it's done slightly differently, because each agent makes slightly different judgements. Reviewers lack a consistent standard to check against. Testers write tests against the code as-built rather than the intended interface, ossifying bugs into the test suite. Sessions compact mid-sprint, systemising forgetfulness. The symptoms look unpredictable, a different thing going wrong each time. But the outcome is the same: wasted effort, no consistency, incorrect assumptions, and no mechanism to prevent any of it. These are coordination problems, and they require coordination solutions.
 
@@ -46,13 +46,13 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **Policy and explanation serve different purposes.** Rules are short, binary, and cheap to inject into agent prompts. Standards are rich, contextual, and expensive to load. Merging them would force a choice between token-efficient prompts and comprehensive reference material. Separating them serves both needs without compromise. (The token cost analysis appears in [The Rules, Standards, and Skills Split](#the-rules-standards-and-skills-split) below.)
 
-**Specialist agents outperform generalists at the cost of coordination overhead.** A single large prompt that covers all responsibilities tends toward diluted output. Eighteen focused agents, each with a bounded responsibility, a curated rule set, and a defined workflow position, produce more reliable work and cleaner handoffs. The trade-off is real: 18 agents means 18 handoff boundaries and 18 prompt injections. For production-quality work, the improved output quality and accountability justify this cost.
+**Specialist agents outperform generalists at the cost of coordination overhead.** A single large prompt that covers all responsibilities tends toward diluted output. Seventeen focused agents, each with a bounded responsibility, a curated rule set, and a defined workflow position, produce more reliable work and cleaner handoffs. The trade-off is real: 17 agents means 17 handoff boundaries and 17 prompt injections. For production-quality work, the improved output quality and accountability justify this cost.
 
 **The orchestrator controls the blast radius.** The orchestrator selects the agent, constrains the files it may touch, injects only the relevant rules and standards, monitors progress, and sequences the commits. No agent has unconstrained access to the repository. This is why the framework defaults to a hive model rather than a swarm: specialist agents work within bounded scopes under centralised coordination, rather than exploring the problem space independently. The orchestrator carries the coordination cost so that individual agents remain focused and their impact remains contained.
 
 **Coordination must be explicit.** Agents need context, not instructions. They do not attend stand-ups, read between the lines, or ask clarifying questions mid-task. Implicit coordination (relying on agents to infer the correct sequence, ownership boundaries, or quality bar) is where hidden coupling and inconsistent behaviour originate. The framework encodes dependencies, gates, file ownership, and parallel execution boundaries in workflow YAML. Where context is ambiguous, agent rules encourage escalation rather than assumption. What is not in the file is not in the process.
 
-**Speed and rigour are sequenced, not opposed.** The New DevX workflow sequences four phases (Prototype, Specify, Build, Deploy), each with a different standard of rigour matched to its purpose. Not all work needs 18 agents and mandatory quality gates. `prototype.yaml` provides fast iteration with minimal agents and no gates, because exploration matters more than engineering discipline when prototyping. `build.yaml` provides the full TDD cycle with parallel specialists, review sequencing, and coverage gates, because production quality is non-negotiable for deployed code. The workflow determines the rigour.
+**Speed and rigour are sequenced, not opposed.** The New DevX workflow sequences four phases (Prototype, Specify, Build, Deploy), each with a different standard of rigour matched to its purpose. Not all work needs 17 agents and mandatory quality gates. `prototype.yaml` provides fast iteration with minimal agents and no gates, because exploration matters more than engineering discipline when prototyping. `build.yaml` provides the full TDD cycle with parallel specialists, review sequencing, and coverage gates, because production quality is non-negotiable for deployed code. The workflow determines the rigour.
 
 **Humans govern above the loop.** TDD phases, coverage gates, browser screenshots, review agents, and pre-commit validators bias the framework toward outputs that can be checked rather than merely asserted. An agent reporting "all tests pass" is not evidence. A command's stdout showing green is. Human attention moves from reviewing every line to designing the verification systems, classifying risk, and intervening where automated checks are insufficient.
 
@@ -151,9 +151,9 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ## The Agent Roster
 
-The framework defines 18 specialised agents, organised by kind of judgement rather than technology alone:
+The framework defines 17 specialised agents, organised by kind of judgement rather than technology alone:
 
-- **Discovery**: `product-expert` (elicits requirements), `product-owner` (formalises them)
+- **Discovery**: `product-owner` (elicitation mode understands the problem, structuring mode formalises it)
 - **Design**: `solution-architect`, `database-designer`, `api-designer`, `ui-designer`
 - **Implementation**: `python-coder`, `typescript-coder`
 - **Testing**: `functional-tester` (TDD), `ui-tester` (browser automation)

@@ -8,8 +8,7 @@ phases:
     skills:
       - superpowers:brainstorming
     agents:
-      - product-expert  # Interview user; produce discovery-notes.md
-      - product-owner   # Formalise discovery-notes.md into requirements.md and user-stories.md
+      - product-owner   # Mode 1: interview into discovery-notes.md; Mode 2: formalise into requirements.md and user-stories.md
     outputs:
       - artefacts/product/
 

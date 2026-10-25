@@ -31,7 +31,7 @@ def generate_workflow_table(workflows: dict[str, WorkflowDAG]) -> str:
 def generate_agent_dispatch_all(agents: dict[str, CanonicalAgent]) -> str:
     """Render agent dispatch table."""
     category_order = [
-        'product-owner', 'product-expert',
+        'product-owner',
         'solution-architect', 'database-designer', 'api-designer', 'ui-designer',
         'functional-tester', 'python-coder', 'typescript-coder',
         'tech-lead', 'code-reviewer', 'principles-reviewer',

@@ -353,7 +353,7 @@ The monorepo root `/artefacts/` directory contains system-wide artefacts that af
 
 ### 4.1. Product (`/artefacts/product/`)
 
-*   **`discovery-notes.md`**: Refined problem statement from exploratory conversations (created by @product-expert)
+*   **`discovery-notes.md`**: Refined problem statement from exploratory conversations (created by @product-owner, elicitation mode)
 *   **`requirements.md`**: System-wide functional and non-functional requirements (EARS notation)
 *   **`user-stories.md`**: End-to-end user stories spanning multiple services
 *   **`open-questions.md`**: Unresolved questions about requirements or scope

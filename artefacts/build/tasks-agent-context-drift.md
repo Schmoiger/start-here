@@ -26,7 +26,7 @@ both rewrite `context/workflows/design.yaml`.
 
 | ID | Pri | Status | Phase | Assignee | Blocked By | Description |
 |----|-----|--------|-------|----------|------------|-------------|
-| TASK-014 | high | pending | fix | @agent-harness | TASK-013 | Adopt product merge — `product-expert` absorbed into `product-owner` (large; elicit + structure modes) |
+| TASK-014 | high | completed | fix | @agent-harness | TASK-013 | Adopt product merge — `product-expert` absorbed into `product-owner` (large; elicit + structure modes) |
 | TASK-015 | high | pending | fix | @agent-harness | TASK-013 | Adopt API merge — `api-designer` absorbed into `solution-architect`; OpenAPI conventions → skill |
 | TASK-016 | high | completed | fix | @agent-harness | TASK-013 | Adopt analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness lane implementer is `@agent-harness`, not `@orchestrator` |
@@ -40,6 +40,17 @@ A merge is not complete until all four pass and no reference to a deleted agent 
 `artefacts/build/archive/`.
 
 ### TASK-014 — Product merge (`product-expert` → `product-owner`)
+
+**Status: completed (25 Oct 2026)** — executed by Cline (not `@agent-harness`, which TASK-013 has not yet
+created). All files below landed. Gate: `agent_definitions.py` valid for `product-owner.md` (repo-wide stays red
+on 10 legacy agents outside this task, down from the 12/18 baseline recorded in TASK-016), `generate_adapters.py`
+(1 created / 4 updated, plus removal of the two orphaned `product-expert` projections the generator does not
+prune), `adapter_drift.py` in sync, `pytest context/scripts/tests/` 186 passed. Acceptance grep
+(`product-expert` in `context/`, `artefacts/` outside archive and this task file) empty; workflows dispatch only
+existing agents. Two deliberate deviations: (1) `requirements-elicitation.md` is listed in the agent's `skills:`
+frontmatter, not only in the body — the original file list named three skills and would have left the new skill
+unloaded; (2) `test_e2e_compilation.py` pinned the roster size with `>= 18` assertions, now derived from
+`context/agents/*.md` so later merges (TASK-015, TASK-019) do not break an unrelated gate.
 
 **Decision**: one product agent, name `product-owner` (least reference churn), `model: large`.
 Mode 1 Elicitation (interview → `discovery-notes.md`); Mode 2 Structuring (EARS requirements,

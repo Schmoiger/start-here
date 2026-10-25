@@ -56,7 +56,6 @@ tiers:
       - Code review for edge cases and bugs (@code-reviewer)
       - Threat modelling and vulnerability analysis (@security-tester)
       - Schema and API design (@database-designer, @api-designer)
-      - User stories and requirements structuring (@product-owner)
       - Technical documentation authoring (@documentation)
       - Workflow and tokenomics analysis (@harness-analyst)
     providers:
@@ -82,7 +81,7 @@ tiers:
       - Central multi-agent workflow coordination (@orchestrator)
       - High-level system architecture and domain decomposition (@solution-architect)
       - LESS engineering principles evaluation (@principles-reviewer)
-      - Eliciting and clarifying ambiguous human ideas into product vision (@product-expert)
+      - Eliciting and structuring ambiguous human ideas into validated requirements (@product-owner)
       - Complex failure diagnosis and root-cause analysis
     providers:
       anthropic:

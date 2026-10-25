@@ -31,6 +31,12 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     created_files = result["created"] + result["updated"]
     assert len(created_files) >= 80
 
+    # Expected projection count is derived from canonical definitions, not pinned
+    # to the roster size — merges and retirements must not break this gate.
+    expected_agents = len(
+        [p for p in (context_dir / "agents").glob("*.md") if p.name != "README.md"]
+    )
+
     # 1. Core verification
     assert (tmp_path / "AGENTS.md").is_file()
     agents_content = (tmp_path / "AGENTS.md").read_text()
@@ -54,14 +60,14 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     claude_prompts_dir = tmp_path / ".claude" / "prompts"
     assert claude_prompts_dir.is_dir()
     claude_prompts = list(claude_prompts_dir.glob("*.md"))
-    assert len(claude_prompts) >= 18
+    assert len(claude_prompts) >= expected_agents
 
     # 4. GitHub Copilot verification
     assert (tmp_path / ".github" / "copilot-instructions.md").is_file()
     gh_prompts_dir = tmp_path / ".github" / "prompts"
     assert gh_prompts_dir.is_dir()
     gh_prompts = list(gh_prompts_dir.glob("*.prompt.md"))
-    assert len(gh_prompts) >= 18
+    assert len(gh_prompts) >= expected_agents
     gh_instructions_dir = tmp_path / ".github" / "instructions"
     assert gh_instructions_dir.is_dir()
     assert len(list(gh_instructions_dir.glob("*.instructions.md"))) >= 3
@@ -70,7 +76,7 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     openai_prompts_dir = tmp_path / ".openai" / "prompts"
     assert openai_prompts_dir.is_dir()
     openai_prompts = list(openai_prompts_dir.glob("*.txt"))
-    assert len(openai_prompts) >= 18
+    assert len(openai_prompts) >= expected_agents
     assert (tmp_path / ".openai" / "tools.json").is_file()
     assert (tmp_path / ".openai" / "runner.py").is_file()
 

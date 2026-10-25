@@ -8,7 +8,7 @@ System-wide outputs representing completed work across discovery, design, develo
 
 | Category | Location | Typical Files | Primary Agents |
 |----------|----------|---------------|----------------|
-| **Product** | `product/` | `requirements.md`, `user-stories.md`, `open-questions.md` | `@product-expert`, `@product-owner` |
+| **Product** | `product/` | `requirements.md`, `user-stories.md`, `open-questions.md` | `@product-owner` |
 | **Architecture** | `architecture/` | `architecture.md`, `data-model.md`, `api-catalogue.md` | `@solution-architect`, `@database-designer` |
 | **API** | `api/` | `openapi.yaml`, `api-contract.json`, `api-design-guide.md` | `@api-designer` |
 | **Design** | `design/` | `design-tokens.json`, `components.md`, `user-flows.md`, `visuals/` | `@ui-designer` |
