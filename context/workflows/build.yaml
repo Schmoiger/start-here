@@ -60,7 +60,7 @@ phases:
       - Schema verified against expected state (AC command passes)
       - Rollback migration documented
     notes:
-      - devops operates in local mode for this phase (see context/agents/devops.md)
+      - devops operates in Supabase local mode for this phase (see context/skills/supabase-operations.md §5)
       - Migration files are the "implementation" — AC is the schema assertion, not passing tests
       - Skip this phase if the sprint has no schema changes
 

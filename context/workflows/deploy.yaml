@@ -19,7 +19,7 @@ phases:
       - Health checks pass on all services
       - Rollback plan documented
     notes:
-      - devops operates in GCP mode for this phase (see context/agents/devops.md)
+      - devops operates in GCP mode for this phase (see context/skills/gcp-deployment.md)
 
   - id: deployment-review
     name: Deployment Review
@@ -53,7 +53,7 @@ quality_gates:
         operator: "=="
 
 workflow_rules:
-  - devops operates in GCP mode (Terraform + gcloud), not Supabase mode
+  - devops operates in GCP mode (Terraform + gcloud), not Supabase mode — procedure in context/skills/gcp-deployment.md
   - Staging must be validated before production deployment
   - Rollback plan is mandatory before deployment-review can APPROVE
   - Use Write/Edit tools for file operations (not bash with echo/cat/sed)
@@ -63,5 +63,5 @@ workflow_rules:
 # Notes (human reference)
 #
 # Run after build.yaml local-deployment is complete and validated.
-# devops agent operates in GCP mode — see context/agents/devops.md for Mode 2 workflow.
+# devops agent operates in GCP mode — see context/skills/gcp-deployment.md for the procedure.
 # Coverage threshold rises to 97% at this gate (higher than 95% quality-review threshold).

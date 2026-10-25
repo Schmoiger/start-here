@@ -28,7 +28,7 @@
 | TASK-016 | high | completed | fix | @harness-analyst | TASK-013 | Analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness implementer is `@harness-analyst`, not `@orchestrator` |
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
-| TASK-019 | high | pending | fix | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
+| TASK-019 | high | completed | fix | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
 
 Detail map: TASK-001–TASK-013 → §Findings · TASK-014–TASK-019 → §Task detail.
 
@@ -273,6 +273,37 @@ under `context/skills/` or `context/standards/` (no phantom entries — see this
 
 ### TASK-019 — Single `devops` (absorb `database-designer`, extract skills, `small` → `medium`)
 
+**Completed 25 Oct 2026** by Cline (`@harness-analyst` role). Gate: `devops.md` passes
+`agent_definitions.py`; adapters 2 created / 4 updated, orphaned `.agents/skills/database-designer` and
+`.github/prompts/database-designer.prompt.md` removed by hand; drift in sync; 186 tests; Typst formatting
+clean on all changed markdown. Repo-wide validator red on 8 legacy agents (down from 9 — `devops` is the
+agent fixed and `database-designer` the one retired). Acceptance grep for `database-designer` / `gcp-devops`
+is empty outside this task file; `supabase db push` appears only in the "Wrong" mapping row of
+`supabase-operations.md`; all workflows dispatch existing agents (15 role files on disk).
+
+**Deviations** (deliberate): (1) `context/workflows/deploy.yaml` was updated as well — its three devops
+notes pointed at `context/agents/devops.md` "Mode 2", which no longer exists; they now point at
+`gcp-deployment.md`. (2) `context/README.md` skills inventory and the skills catalogue in
+`agentic-framework-reference.md` gained `database-design` and `gcp-deployment`. (3) `architecture-fidelity.md`
+was **not** added to the skills list — the absorbed boundary is written into the body instead, because the
+skill's globs cover `openapi.yaml` rather than `data-model.md`. (4) The `database-design.md` ER-diagram
+example gained a blank line to satisfy `verify_typst_formatting.py`. (5) `context/agents/cursor-workflow-helper.mdc`
+still named `database-designer.md` and the non-existent `gcp-devops.md`; it is not globbed by the validator
+(`*.md` only), so it was edited by hand to keep the acceptance grep honest — the rest of that file's drift
+(`./artefacts/`, `context/agents/CLAUDE.md`) is out of this task's scope.
+
+**Follow-on (same day, human direction)**: `context/rules/supabase.md` deleted. A rule file that asserts
+*how to use a tool* duplicates the skill that owns the same domain, globs, and workflows — the skill is the
+right home. Its full intent moved into `supabase-operations.md` §1 (MCP-only tooling, forbidden
+`db push`/`db query`/`db reset`/`psql`, the single `supabase functions deploy` whitelist, never assume Docker,
+the `schema_migrations` audit insert, and timestamp-bloat prevention); later sections renumbered, §5 → §6.
+Four agents dropped `supabase.md` from `rules:`; `functional-tester` and `tech-lead` gained
+`supabase-operations.md` in `skills:` so the guidance still reaches them, and `python-coder`'s stale
+"supabase CLI" tool entry became "supabase MCP". `supabase.py` is unchanged in behaviour and now cites the
+skill; pre-commit hook names, `context/README.md`, both framework docs and `validators/README.md` retargeted.
+Gate: `agent_definitions.py` 8/14 legacy (unchanged), adapters 10 updated, drift in sync, 186 tests,
+`supabase.py` ✅.
+
 **Decision**: one data and infrastructure owner spanning design-time schema, build-time migrations, Supabase
 local/staging deployment and GCP deployment. Technology playbooks move to skills; the agent body keeps mode
 dispatch plus the generic deploy procedure. `model: medium` — physical schema design is judgement work, and
@@ -323,8 +354,9 @@ already assigns migrations to devops; the split with `database-designer` is by l
 - `context/docs/*` — counts and references.
 
 **Acceptance**: `devops` is `medium` in the definition and inventory;
-`grep -rn 'supabase db push' context/agents/ context/skills/` returns only the "Wrong" mapping row in
-`supabase-operations.md`; no reference to `database-designer` or `gcp-devops` remains outside archive; the
+`grep -rn 'supabase db push' context/agents/ context/skills/` returns only the §1 forbiddance and the "Wrong"
+mapping row in `supabase-operations.md` (amended by the follow-on note above, which deleted the rule file);
+no reference to `database-designer` or `gcp-devops` remains outside archive; the
 design workflow dispatches only existing agents; the four validation commands pass.
 
 **Write scope**: as TASK-014, plus `context/rules/supabase.md`.

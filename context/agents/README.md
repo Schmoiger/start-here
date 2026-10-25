@@ -7,7 +7,6 @@
 | **product-owner** | large | Elicits and structures requirements and user stories |
 | | | |
 | **solution-architect** | large | Designs system architecture, component boundaries, data flow, and the canonical OpenAPI contract |
-| **database-designer** | medium | Designs schemas, relationships, and migrations |
 | **ui-designer** | medium | Designs UI layouts, component specs, design systems, and visual assets |
 | | | |
 | **python-coder** | medium | Writes production Python code |
@@ -20,7 +19,7 @@
 | **security-tester** | medium | Identifies vulnerabilities via threat modelling and code analysis |
 | | | |
 | **ui-tester** | small | Tests UI behaviour using browser automation |
-| **devops** | small | Deploys and validates infrastructure |
+| **devops** | medium | Designs physical schemas and migrations; deploys and validates infrastructure |
 | **documentation** | medium | Generates user-facing docs, API references, and guides |
 | | | |
 | **harness-analyst** | large | Owns the agent-facing harness (definitions, rules, skills, templates, workflows, validators) and measures it — workflow-analysis and tokenomics-audit lenses |

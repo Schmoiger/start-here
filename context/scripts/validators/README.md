@@ -17,7 +17,7 @@ Additionally, this directory hosts standalone utility validators for repository 
 | [`workspace-conventions.md`](../../rules/workspace-conventions.md) | `workspace_conventions.py` | Conventional commit message format (`{type}({scope}): {desc}`), `Agent-Session` trailer, metrics JSONL schema, interruption log schema and one-log-per-task naming, output directory structure and file naming |
 | [`tech-writing.md`](../../rules/tech-writing.md) | `tech_writing.py` | British English spelling (`-ise`, `-our`, `-re`, `licence`, `artefact`), date format DD/MM/YYYY, EARS requirement syntax (`requirements.md`, `user-stories.md`) |
 | [`ui-dev.md`](../../rules/ui-dev.md) | `ui_dev.py` | Prohibit `!important`, prohibit raw hex colour codes, single `index.css`, DaisyUI semantic tokens, Heroicons barrel, spacing scale |
-| [`supabase.md`](../../rules/supabase.md) | `supabase.py` | Prohibit Supabase client imports outside database service / stores, require `schema_migrations` audit insert in SQL migrations |
+| [`supabase-operations.md`](../../skills/supabase-operations.md) §1 (skill) | `supabase.py` | Prohibit Supabase client imports outside database service / stores, require `schema_migrations` audit insert in SQL migrations |
 | [`testing.md`](../../rules/testing.md) | `testing.py` | Assert on outcomes, not interactions; prohibit interaction-based assertions (`mock.assert_called_once_with`) on internal collaborators |
 | [`typescript-environment.md`](../../rules/typescript-environment.md) | `typescript_environment.py` | Prohibit `package-lock.json` (enforce `yarn.lock`), require strict compiler options in `tsconfig.json`, check root `package.json` workspaces |
 | [`ui-testing.md`](../../rules/ui-testing.md) | `ui_testing.py` | Prohibit full `puppeteer` (require `puppeteer-core`), prohibit `playwright` and `cypress` in `package.json` dependencies |
@@ -158,7 +158,7 @@ Validates invariants from `context/rules/ui-dev.md`.
 
 ### 4. Supabase (`supabase.py`)
 
-Validates invariants from `context/rules/supabase.md`.
+Validates invariants from `context/skills/supabase-operations.md` §1.
 
 - Prohibits `import supabase`, `from supabase`, or `@supabase/supabase-js` outside `database_service`, `database/`, or `stores/`.
 - Verifies SQL migration files in `**/migrations/*.sql` insert an audit row into `schema_migrations`.

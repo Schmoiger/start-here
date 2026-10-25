@@ -256,7 +256,6 @@ Only a subset of rules currently have matching Python validators under `context/
 | `typescript-environment.md` | Enforces `yarn` for package management, `yarn dlx` for one-off tools |
 | `bash-environment.md` | Prevents unsafe or inconsistent shell usage; pushes work toward approved tools |
 | `mermaid-environment.md` | Constrains Mermaid diagram syntax, layout direction, and node label conventions |
-| `supabase.md` | Defines constraints around Supabase-related usage |
 
 #### Quality and Process
 
@@ -325,9 +324,10 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `architecture-fidelity.md` | Adherence to architecture docs and API contracts during implementation |
 | `bootstrap-workflow.md` | Agent context setup, git-subrepo initialisation, and pre-commit hook activation |
 | `code-reviewer.md` | PR-style code review focusing on bugs, edge cases, and maintainability |
-| `database-designer.md` | Database schema design, relationships, and migrations |
+| `database-design.md` | Physical PostgreSQL schema design from the conceptual data model — keys, timestamps, indexes, ER diagram |
 | `documentation.md` | User-facing documentation, API references, and guide generation |
 | `functional-tester.md` | Detroit-school TDD: intent-first, tests before implementation |
+| `gcp-deployment.md` | Terraform validate/plan before apply, staging before production, rollback plan mandatory |
 | `git-subrepo-operations.md` | Procedural guidance for inspecting, pulling, cloning, and gated pushing with git-subrepo |
 | `harness-analyst.md` | Agent-facing harness ownership plus retrospective measurement: workflow efficiency and token economics lenses |
 | `intent-fidelity.md` | Ensures business intent is faithfully captured in requirements, TDD, and tests |
@@ -361,7 +361,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus fifteen delegatable specialists (sixteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus fourteen delegatable specialists (fifteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -469,7 +469,6 @@ The framework defines 17 specialised agents, organised by kind of judgement.
 | Agent | Purpose |
 |-------|---------|
 | `solution-architect` | Designs architecture, boundaries, data flow, and the canonical OpenAPI contract |
-| `database-designer` | Designs schemas, relationships, and migrations |
 | `ui-designer` | Designs UI structure, component behaviour, user flow, and visual assets |
 
 #### Implementation and Test
@@ -494,7 +493,7 @@ The framework defines 17 specialised agents, organised by kind of judgement.
 
 | Agent | Purpose |
 |-------|---------|
-| `devops` | Handles deployment and infrastructure-related work |
+| `devops` | Owns the physical data layer and every deployment target — physical schema design, migrations, Supabase local/staging, and GCP cloud/production |
 | `documentation` | Cleans up, archives, and maintains human-facing documentation |
 | `harness-analyst` | Owns the agent-facing harness (definitions, rules, skills, templates, workflows, validators, generators, model tiering) and reviews process effectiveness, token economics, and model tiering via the workflow-analysis and tokenomics-audit lenses |
 
@@ -597,7 +596,7 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 |-------|------------------|------|
 | `discovery` | `product-owner` (elicitation then structuring) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
 | `design-architecture` | `solution-architect` | Architecture, canonical OpenAPI specification, data model, component design docs |
-| `design-contracts` | `database-designer` | Physical schema and migrations from the architect's data model |
+| `design-contracts` | `devops` | Physical schema and migrations from the architect's data model |
 | `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows, and visual assets |
 | `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `ui-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
 
@@ -952,7 +951,7 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 
 - Discovery: Sequential (`product-owner` elicitation mode then structuring mode).
 - Architecture: Single agent (`solution-architect`).
-- Contracts: Single schema specialist (`database-designer` builds the physical schema from the architect's data model; `solution-architect` owns the canonical OpenAPI specification in the preceding phase).
+- Contracts: Single schema owner (`devops` builds the physical schema from the architect's data model; `solution-architect` owns the canonical OpenAPI specification in the preceding phase).
 - UI and visuals: Single phase (`ui-designer` — component specs, wireframes, and visual assets consolidated).
 - Design review: Sequential reviewers with iterative return to earlier phases when required.
 
@@ -1041,7 +1040,7 @@ Validators are pre-commit hooks stored in `context/scripts/validators/`. Each va
 | `workspace_conventions.py` | `workspace-conventions.md` | Commit message format, `Agent-Session` trailer, metrics JSONL schema, interruption log schema and one-log-per-task naming, output paths |
 | `tech_writing.py` | `tech-writing.md` | British English spelling (`-ise`, `-our`, `-re`, `licence`, `artefact`), EARS requirements syntax |
 | `ui_dev.py` | `ui-dev.md` | Prohibits `!important`, raw hex colors, multiple CSS files, DaisyUI tokens, Heroicons barrel |
-| `supabase.py` | `supabase.md` | Supabase import boundary, `schema_migrations` audit row insert in SQL migrations |
+| `supabase.py` | `supabase-operations.md` (skill) | Supabase import boundary, `schema_migrations` audit row insert in SQL migrations |
 | `testing.py` | `testing.md` | Detroit-school outcome-based assertions, prohibits mock interaction assertions on internal collaborators |
 | `typescript_environment.py` | `typescript-environment.md` | Prohibits `package-lock.json` (enforces `yarn.lock`), strict `tsconfig.json` compiler options, workspaces |
 | `ui_testing.py` | `ui-testing.md` | Prohibits full `puppeteer` (enforces `puppeteer-core`), prohibits `playwright` and `cypress` |
@@ -1065,7 +1064,7 @@ Enforces invariants from `context/rules/ui-dev.md`. Scans frontend source files 
 
 #### `supabase.py`
 
-Enforces invariants from `context/rules/supabase.md`. Regex-checks source files to ensure `import supabase`, `from supabase`, or `@supabase/supabase-js` imports only occur within designated database services or stores. Also verifies that SQL migration files under `**/migrations/*.sql` contain an audit row insert into `schema_migrations`.
+Enforces invariants from `context/skills/supabase-operations.md` §1. Regex-checks source files to ensure `import supabase`, `from supabase`, or `@supabase/supabase-js` imports only occur within designated database services or stores. Also verifies that SQL migration files under `**/migrations/*.sql` contain an audit row insert into `schema_migrations`.
 
 #### `testing.py`
 

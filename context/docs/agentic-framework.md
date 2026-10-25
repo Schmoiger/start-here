@@ -12,7 +12,7 @@
 
 ## Solving The Coordination Problem
 
-Getting an LLM to write a function is table stakes in 2026. Getting *sixteen* of them to build a system together without losing their context is not.
+Getting an LLM to write a function is table stakes in 2026. Getting *fifteen* of them to build a system together without losing their context is not.
 
 Without deliberate coordination, multi-agent workflows break in familiar ways. Agents do not know what the previous agent did so risk redoing work that has already been done. And it's done slightly differently, because each agent makes slightly different judgements. Reviewers lack a consistent standard to check against. Testers write tests against the code as-built rather than the intended interface, ossifying bugs into the test suite. Sessions compact mid-sprint, systemising forgetfulness. The symptoms look unpredictable, a different thing going wrong each time. But the outcome is the same: wasted effort, no consistency, incorrect assumptions, and no mechanism to prevent any of it. These are coordination problems, and they require coordination solutions.
 
@@ -151,10 +151,10 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ## The Agent Roster
 
-The framework defines 16 specialised agents, organised by kind of judgement rather than technology alone:
+The framework defines 15 specialised agents, organised by kind of judgement rather than technology alone:
 
 - **Discovery**: `product-owner` (elicitation mode understands the problem, structuring mode formalises it)
-- **Design**: `solution-architect` (including the canonical OpenAPI contract), `database-designer`, `ui-designer`
+- **Design**: `solution-architect` (including the canonical OpenAPI contract), `ui-designer`
 - **Implementation**: `python-coder`, `typescript-coder`
 - **Testing**: `functional-tester` (TDD), `ui-tester` (browser automation)
 - **Review**: `tech-lead` (the gate), `code-reviewer`, `principles-reviewer`, `security-tester`
@@ -231,7 +231,7 @@ The framework ships 14 output templates, 8 rule-mapped pre-commit validators, an
 | `workspace_conventions.py` | `workspace-conventions.md` | Reads `.git/COMMIT_EDITMSG` to validate conventional commit format, imperative mood, and `Agent-Session:` trailers with co-author. Validates `artefacts/build/metrics/*.jsonl` event schemas, interruption log schemas (`artefacts/build/interruptions/{task-id}.jsonl`), and output file paths. |
 | `tech_writing.py` | `tech-writing.md` | Scans files for American spellings (`color`, `behavior`, `organize`, `center`, `license`, `artifact`) and enforces British English. Validates EARS syntax in requirements files. |
 | `ui_dev.py` | `ui-dev.md` | Scans frontend code to prohibit `!important`, raw hex colours, multiple CSS files, and off-barrel Heroicon imports; enforces DaisyUI semantic tokens and spacing scales. |
-| `supabase.py` | `supabase.md` | Scans imports to prohibit `import supabase` outside database services/stores. Verifies SQL migrations insert audit records into `schema_migrations`. |
+| `supabase.py` | `supabase-operations.md` (skill) | Scans imports to prohibit `import supabase` outside database services/stores. Verifies SQL migrations insert audit records into `schema_migrations`. |
 | `testing.py` | `testing.md` | Enforces Detroit-school outcome-based testing by prohibiting interaction assertions (`mock.assert_called_once_with`) on internal collaborators unless marked with `# io-boundary`. |
 | `typescript_environment.py` | `typescript-environment.md` | Prohibits `package-lock.json` (enforces Yarn Berry), validates strict compiler flags in `tsconfig.json`, and verifies workspace declarations. |
 | `ui_testing.py` | `ui-testing.md` | Prohibits full `puppeteer`, `playwright`, and `cypress` in UI package dependencies, requiring lightweight `puppeteer-core`. |

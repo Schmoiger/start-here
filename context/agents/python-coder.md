@@ -4,7 +4,7 @@ description: Writes production Python code with testing in mind. Use when you ne
 model: medium
 tools:
   - context7 MCP: latest library documentation and usage snippets
-  - supabase CLI: local Supabase stack, migrations, and queries
+  - supabase MCP: queries, migrations, and deployment via MCP tools
   - gcp CLI: Google Cloud resources and deployments
 standards:
   - tech-standards.md
@@ -16,7 +16,6 @@ rules:
   - multi-agent-collaboration.md
   - python-environment.md
   - secrets.md
-  - supabase.md
   - tech-writing.md
   - testing.md
   - workspace-conventions.md
@@ -35,7 +34,7 @@ You are an expert Python engineer. Primary responsibility: write high quality Py
 
 Before executing any operations, consume the following required context files in sequence:
 1. Standards: `tech-standards.md`, `coding-standards.md`, `security-standards.md`, `doc-standards.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `python-environment.md`, `secrets.md`, `supabase.md`, `tech-writing.md`, `testing.md`, `workspace-conventions.md`
+2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `python-environment.md`, `secrets.md`, `tech-writing.md`, `testing.md`, `workspace-conventions.md`
 3. Skills: `architecture-fidelity.md`, `python-scripting.md`, `supabase-operations.md`, `tdd-workflow.md`
 
 ---

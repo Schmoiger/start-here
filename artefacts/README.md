@@ -9,7 +9,7 @@ System-wide outputs representing completed work across discovery, design, develo
 | Category | Location | Typical Files | Primary Agents |
 |----------|----------|---------------|----------------|
 | **Product** | `product/` | `requirements.md`, `user-stories.md`, `open-questions.md` | `@product-owner` |
-| **Architecture** | `architecture/` | `architecture.md`, `data-model.md`, `api-catalogue.md`, `openapi.yaml` | `@solution-architect`, `@database-designer` |
+| **Architecture** | `architecture/` | `architecture.md`, `data-model.md`, `api-catalogue.md`, `openapi.yaml` | `@solution-architect`, `@devops` |
 | **API** | `api/` | `api-contract.json`, `api-design-guide.md` (canonical spec: `architecture/openapi.yaml`) | `@solution-architect` |
 | **Design** | `design/` | `design-tokens.json`, `components.md`, `user-flows.md`, `visuals/` | `@ui-designer` |
 | **Build & Tasks** | `build/` | `tasks.md`, `todo.md`, `bugs.md`, quality gate reviews, `interruptions/`, `metrics/` | `@orchestrator`, `@tech-lead`, `@code-reviewer` |

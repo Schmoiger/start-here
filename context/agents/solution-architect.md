@@ -137,7 +137,7 @@ Anti-pattern to catch: a conversion function that accepts an optional second arg
 You own the entire API artefact chain: logical contracts in `architecture.md` and `api-catalogue.md`, and the canonical OpenAPI specification at `{project-root}/artefacts/architecture/openapi.yaml`. No other agent maintains or extends the specification; other agents consume it. HTTP details, validation, examples, and conventions belong in the same file, authored under `openapi-authoring.md`.
 
 ### Data Model Ownership
-You create the **conceptual** `data-model.md`: entities, relationships, and business rules in prose. The `@database-designer` agent implements the **physical** schema (`schema.sql`, `er-diagram.md`) based on your model, adding indexes, constraints, and PostgreSQL-specific details.
+You create the **conceptual** `data-model.md`: entities, relationships, and business rules in prose. The `@devops` agent implements the **physical** schema (`schema.sql`, `er-diagram.md`) based on your model, adding indexes, constraints, and PostgreSQL-specific details.
 
 ---
 

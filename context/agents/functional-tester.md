@@ -14,7 +14,6 @@ rules:
   - bash-environment.md
   - multi-agent-collaboration.md
   - python-environment.md
-  - supabase.md
   - tech-writing.md
   - testing.md
   - typescript-environment.md
@@ -22,6 +21,7 @@ rules:
 skills:
   - architecture-fidelity.md
   - intent-fidelity.md
+  - supabase-operations.md
   - tdd-workflow.md
   - typescript-development.md
 ---

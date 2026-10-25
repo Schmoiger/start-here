@@ -88,7 +88,7 @@ repos:
         pass_filenames: true
 
       - id: supabase
-        name: Validate Supabase invariants (supabase.md)
+        name: Validate Supabase invariants (supabase-operations.md)
         entry: uv run python context/scripts/validators/supabase.py
         language: python
         files: (\.py|\.ts|\.tsx|\.sql)$

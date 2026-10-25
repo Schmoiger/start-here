@@ -26,7 +26,6 @@ tiers:
     token_budget_guideline: "10k-30k tokens per task"
     typical_tasks:
       - Browser UI testing (@ui-tester)
-      - Infrastructure deployment commands (@devops)
       - Simple mechanical file refactors and formatting
       - Basic smoke checks and pre-flight validation
     providers:
@@ -55,7 +54,7 @@ tiers:
       - Architecture fidelity and technical review gate (@tech-lead)
       - Code review for edge cases and bugs (@code-reviewer)
       - Threat modelling and vulnerability analysis (@security-tester)
-      - Schema design and migrations (@database-designer)
+      - Physical schema design, migrations, and infrastructure deployment (@devops)
       - Technical documentation authoring (@documentation)
     providers:
       anthropic:
