@@ -237,7 +237,7 @@ The framework ships 14 output templates, 8 rule-mapped pre-commit validators, an
 | `ui_testing.py` | `ui-testing.md` | Prohibits full `puppeteer`, `playwright`, and `cypress` in UI package dependencies, requiring lightweight `puppeteer-core`. |
 | `secrets.py` | `secrets.md` | Scans files for private key blocks, committed API keys, and credentialed `.env` files. |
 | `framework_docs_staleness.py` | Utility | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. Bypassed with `[docs-ok]`. |
-| `agent_definitions.py` | Utility | Validates agent definition frontmatter, required fields, and verifies that all referenced standards, rules, and skills exist. |
+| `agent_definitions.py` | Utility | Validates agent definition frontmatter, required fields, and verifies that all referenced standards, rules, and skills exist — in the frontmatter and in the body's `Source` cells and `file.md §section` citations. |
 | `adapter_drift.py` | Utility | Regenerates all adapter projections in-memory and compares against on-disk files to detect drift. |
 | `verify_typst_formatting.py` | Utility | Validates and formats Markdown files according to Typst typesetting rules. |
 

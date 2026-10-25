@@ -55,7 +55,7 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Detection of private key blocks (`BEGIN PRIVATE KEY`)
 - Detection of raw API keys and tokens in source files
 
-### Agent Validator (19 tests in `test_agent_validator.py`)
+### Agent Validator (26 tests in `test_agent_validator.py`)
 
 **agent_definitions.py**
 - YAML frontmatter validation
@@ -64,6 +64,8 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Referenced standards, rules, and skills existence checks
 - Canonical `Context Acquisition` body section enforced; legacy body sections rejected
 - Interruption log path must be `artefacts/build/interruptions/{task-id}.jsonl`; legacy per-agent/per-timestamp names rejected
+- Body rule-table `Source` cells must resolve to an existing file, and to an existing heading when a section is named
+- Inline `file.md §section` citations must resolve the same way; tables without a `Source` column are ignored
 
 ### Generator & Adapter Projections (27 tests)
 

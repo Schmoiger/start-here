@@ -32,7 +32,7 @@ The following rules govern real-time agent execution choices or runtime protocol
 
 ### Additional Purpose Validators (Non-Rule Utilities)
 
-- **`agent_definitions.py`**: Validates agent definition frontmatter, references to rules/standards/skills, and structural integrity in `context/agents/*.md` — including the canonical `Context Acquisition` body section and the one-log-per-task interruption log path (`artefacts/build/interruptions/{task-id}.jsonl`).
+- **`agent_definitions.py`**: Validates agent definition frontmatter, references to rules/standards/skills, and structural integrity in `context/agents/*.md` — including the canonical `Context Acquisition` body section, the one-log-per-task interruption log path (`artefacts/build/interruptions/{task-id}.jsonl`), and body attributions: every `Source` cell in a body rule table and every inline `file.md §section` citation must resolve to a file (and, when named, a heading) that exists.
 - **`adapter_drift.py`**: Validates synchronisation between canonical `context/` definitions and on-disk runtime adapter projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `.claude/`, `.github/`, `.openai/`, `.agents/skills/`).
 - **`verify_typst_formatting.py`**: Enforces Typst-friendly Markdown formatting (at least 2 blank lines after mermaid code fences, horizontal rule `---` before `##` section headings).
 - **`framework_docs_staleness.py`**: Ensures architectural documentation (`agentic-framework-reference.md`, `agentic-framework.md`) is updated alongside changes to `context/`.

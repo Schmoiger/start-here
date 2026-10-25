@@ -17,6 +17,9 @@ Checks:
    'Required Rules' body sections are rejected — the frontmatter is the single
    source of truth and the template defines the body shape.
 5. Critical reminders include source attribution.
+6. Body attributions resolve — every 'Source' cell in a body rule table and
+   every inline `file.md §section` citation names a file that exists under
+   `context/`, and, when a section is given, a heading that file carries.
 """
 
 import argparse
@@ -39,6 +42,144 @@ CONTEXT_ACQUISITION_HEADING = "## Context Acquisition"
 # § Interruption Log). Legacy per-agent or per-timestamp names are drift.
 INTERRUPTIONS_PATH_PATTERN = re.compile(r"artefacts/build/interruptions/([^\s`)\]|]+)")
 INTERRUPTION_LOG_NAME_PATTERN = re.compile(r"^\{task-id\}\.jsonl$")
+
+# Body attributions. A body rule table may attribute a constraint to its source
+# through a 'Source' column, and constraint bullets carry `file.md §section`
+# citations. Both are references to a rule, skill or standard: one that does not
+# resolve is the same defect class as a phantom frontmatter entry — the agent is
+# told to read something that is not there, then paraphrases from memory.
+SOURCE_COLUMN_NAME = "source"
+# `file.md` is the placeholder agent-template.md uses to illustrate the
+# citation shape; it is not a reference to a file on disk.
+PLACEHOLDER_CITATIONS = {"file.md"}
+CITATION_PATTERN = re.compile(
+    r"`?(?P<file>[A-Za-z0-9_][A-Za-z0-9_./-]*\.md)`?(?:\s*§\s*(?P<section>[^§`|;\n]*))?"
+)
+CITATION_SEARCH_DIRS = (
+    "rules",
+    "skills",
+    "standards",
+    "agents",
+    "templates",
+    "workflows",
+    "docs",
+)
+HEADING_PATTERN = re.compile(r"^#{1,6}\s+(?P<title>.+?)\s*$")
+TABLE_SEPARATOR_PATTERN = re.compile(r"^:?-{2,}:?$")
+
+
+def _normalise_title(text: str) -> str:
+    """Fold a heading or citation section into comparable words."""
+    folded = re.sub(r"[^a-z0-9]+", " ", text.strip().lower())
+    return re.sub(r"\s+", " ", folded).strip()
+
+
+def _without_number(title: str) -> str:
+    """Drop the leading '1.' / '2.6.' style numbering from a normalised heading."""
+    return re.sub(r"^\d+(?:\s+\d+)*\s*", "", title)
+
+
+def _headings(path: Path) -> list[str]:
+    """Return the file's headings, normalised for comparison with a citation."""
+    try:
+        content = path.read_text()
+    except (OSError, UnicodeDecodeError):
+        return []
+    return [
+        _normalise_title(match.group("title"))
+        for line in content.splitlines()
+        if (match := HEADING_PATTERN.match(line))
+    ]
+
+
+def _section_resolves(section: str, headings: list[str]) -> bool:
+    """True when the cited section names a heading the file actually carries.
+
+    Citations are written for humans, so they abbreviate (`§1 British English`
+    for `1. British English Spelling & Invariants`), cite a number alone
+    (`§6`), or trail into prose. Each of those still resolves; a name that
+    matches no heading does not.
+    """
+    target = _normalise_title(section)
+    if not target:
+        return True
+    if any(
+        heading.startswith(target)
+        or target.startswith(heading)
+        or target.startswith(_without_number(heading))
+        for heading in headings
+    ):
+        return True
+    number = re.match(r"^\d+(?:\s+\d+)*", target)
+    return bool(number) and any(heading.startswith(number.group(0)) for heading in headings)
+
+
+def _resolve_context_file(name: str, ctx: Path) -> Path | None:
+    """Resolve a citation to a file under `context/`, or a repo-relative path."""
+    if name.startswith(("context/", "artefacts/")):
+        candidate = REPO_ROOT / name
+        return candidate if candidate.exists() else None
+    if (candidate := ctx / name).exists():
+        return candidate
+    for directory in CITATION_SEARCH_DIRS:
+        if (candidate := ctx / directory / name).exists():
+            return candidate
+    return None
+
+
+def _source_cells(body: str) -> list[tuple[int, str]]:
+    """Return (line number, cell) for every 'Source' cell in the body tables."""
+    cells: list[tuple[int, str]] = []
+    source_index: int | None = None
+    for number, line in enumerate(body.splitlines(), 1):
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            source_index = None
+            continue
+        row = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if source_index is None:
+            # First row after prose is the header for this table.
+            names = [_normalise_title(cell) for cell in row]
+            source_index = names.index(SOURCE_COLUMN_NAME) if SOURCE_COLUMN_NAME in names else -1
+            continue
+        if source_index < 0 or source_index >= len(row):
+            continue
+        if all(TABLE_SEPARATOR_PATTERN.match(cell or "") for cell in row):
+            continue
+        cells.append((number, row[source_index]))
+    return cells
+
+
+def _validate_body_citations(body: str, ctx: Path) -> list[str]:
+    """Resolve every body attribution: Source cells and inline citations."""
+    errors: list[str] = []
+    seen: set[str] = set()
+
+    def check(name: str, section: str | None, location: str) -> None:
+        if name in PLACEHOLDER_CITATIONS:
+            return
+        path = _resolve_context_file(name, ctx)
+        cited = (section or "").strip().rstrip(".,;:)`")
+        if path is None:
+            message = f"Body source doesn't exist: {name} ({location})"
+        elif cited and not _section_resolves(cited, _headings(path)):
+            message = f"Body source section doesn't exist: {name} §{cited} ({location})"
+        else:
+            return
+        if message not in seen:
+            seen.add(message)
+            errors.append(message)
+
+    for number, cell in _source_cells(body):
+        for match in CITATION_PATTERN.finditer(cell):
+            check(match.group("file"), match.group("section"), f"line {number}")
+
+    for number, line in enumerate(body.splitlines(), 1):
+        for match in CITATION_PATTERN.finditer(line):
+            if match.group("section") is not None:
+                check(match.group("file"), match.group("section"), f"line {number}")
+
+    return errors
 
 
 def validate_agent_definition(
@@ -142,6 +283,11 @@ def validate_agent_definition(
             "'artefacts/build/interruptions/{task-id}.jsonl' "
             f"(found '{referenced}') — one rolling log per task"
         )
+
+    # Body attributions resolve or the definition is lying about what it read.
+    # The frontmatter checks above cannot see a body table that cites a file
+    # deleted last quarter; this is the same check applied to the body.
+    errors.extend(_validate_body_citations(body, ctx))
 
     return errors
 
