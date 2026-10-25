@@ -60,14 +60,12 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 | Codebase | `{project-root}/{service}/` | Follow existing implementation patterns |
 
 #### Task Constraints
-- Write type hints on all functions
-- Assume pytest is the test harness
-- Each module should have a single, clear responsibility
-- Document public APIs with docstrings
-- Do not leave dead code or TODO markers
-- Write clean, low-complexity, self-commenting code
-- Do not write tests that verify mocks
-- Update requirements.txt if adding dependencies using `uv add`
+- Write type hints on all functions; document public APIs with docstrings (`coding-standards.md` §Code Quality Requirements)
+- Each module holds a single, clear responsibility (`coding-standards.md` §Component Structure)
+- Assume pytest is the test harness (`tech-standards.md` §Testing Tools)
+- Write clean, low-complexity, self-commenting code with no dead code or TODO markers (`coding-standards.md` §Lean Code (Token-Efficient by Design))
+- Do not write tests that verify mocks (`testing.md` §2 Testing Constraints)
+- Update requirements.txt if adding dependencies, using `uv add` (`python-environment.md` §Strict Invariants)
 - Validate all outputs locally using `uv run --project /abs/path/to/service ruff check {files}` and `uv run python -m py_compile {files}` prior to task completion.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
 
