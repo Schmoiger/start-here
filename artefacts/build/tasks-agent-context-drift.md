@@ -464,9 +464,9 @@ carry the offending line number.
 | Item | Detail |
 |------|--------|
 | RED | `d7c7271` — eight tests, four failing: phantom `Source` file, unresolved `Source` section, phantom inline citation file, unresolved inline citation section. The four positives (resolvable table, resolvable inline citation, `Source`-less table ignored, existing suite) pinned the false-positive boundary first. |
-| GREEN | `agent_definitions.py` — `_source_cells`, `_validate_body_citations`, `_resolve_context_file`, `_section_resolves`; `file.md` is the template placeholder and is skipped, not resolved. |
+| GREEN | `f7bb29b` — `agent_definitions.py` gains `_source_cells`, `_validate_body_citations`, `_resolve_context_file`, `_section_resolves`; `file.md` is the template placeholder and is skipped, not resolved. |
 | Gate | `agent_definitions.py` 14/14 valid, adapters 61 unchanged, drift in sync, 194 tests, ruff clean. Repo-wide run is now fully green — the 8 legacy failures recorded in TASK-019 are gone. |
-| Follow-up | Diagnostics initially reported body-relative line numbers, which point at the wrong line in an editor. `_validate_body_citations` now takes the frontmatter line offset, pinned by a ninth test. |
+| Follow-up | `bfc774e` — diagnostics first reported body-relative line numbers, which point at the wrong line in an editor; `_validate_body_citations` now takes the frontmatter offset, pinned by a ninth test. `bcd0da4` — section prefixes must end on a word boundary, so a truncated citation (`§Test`) no longer matches `Testing Constraints`. |
 | Scope note | No agent definition carries a body rule table today (TASK-005/006 removed them), so the `Source` branch is forward-looking; the inline-citation branch is what protects the current definitions. |
 | Deviation | `context/scripts/validators/README.md`, `context/scripts/tests/README.md`, and both framework docs were updated with the new check — a validator nobody can find in the docs is the same discoverability gap that produced this incident. |
 
