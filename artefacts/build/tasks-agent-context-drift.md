@@ -14,11 +14,12 @@ instructed to read phantom paths and silently falls back to an 8-word paraphrase
 
 ## Rationalisation Tasks (adopted 25 Oct 2026)
 
-Roster review adopted six changes. Executing them takes the roster from 19 to 16 agents:
+Roster review adopted six changes. Executing them takes the roster from 19 to 15 agents (the harness
+owner and the retrospective analyst are one role, `harness-analyst`):
 
-`orchestrator`, `agent-harness`, `product-owner`, `solution-architect`, `ui-designer`,
+`orchestrator`, `harness-analyst`, `product-owner`, `solution-architect`, `ui-designer`,
 `python-coder`, `typescript-coder`, `functional-tester`, `ui-tester`, `security-tester`,
-`tech-lead`, `code-reviewer`, `principles-reviewer`, `devops`, `documentation`, `harness-analyst`.
+`tech-lead`, `code-reviewer`, `principles-reviewer`, `devops`, `documentation`.
 
 Execution order: TASK-018 and TASK-017 amend the specs first; TASK-013 then creates the role;
 TASK-014, TASK-015, TASK-016 and TASK-019 implement the merges. TASK-015 must precede TASK-019 —
@@ -26,12 +27,12 @@ both rewrite `context/workflows/design.yaml`.
 
 | ID | Pri | Status | Phase | Assignee | Blocked By | Description |
 |----|-----|--------|-------|----------|------------|-------------|
-| TASK-014 | high | completed | fix | @agent-harness | TASK-013 | Adopt product merge — `product-expert` absorbed into `product-owner` (large; elicit + structure modes) |
-| TASK-015 | high | pending | fix | @agent-harness | TASK-013 | Adopt API merge — `api-designer` absorbed into `solution-architect`; OpenAPI conventions → skill |
-| TASK-016 | high | completed | fix | @agent-harness | TASK-013 | Adopt analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
-| TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness lane implementer is `@agent-harness`, not `@orchestrator` |
-| TASK-018 | normal | pending | diagnose | @orchestrator | - | Extend `agent-harness` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
-| TASK-019 | high | pending | fix | @agent-harness | TASK-013, TASK-015 | Adopt single `devops` — absorb `database-designer`, extract technology playbooks to skills, model `small` → `medium` |
+| TASK-014 | high | completed | fix | @harness-analyst | TASK-013 | Adopt product merge — `product-expert` absorbed into `product-owner` (large; elicit + structure modes) |
+| TASK-015 | high | pending | fix | @harness-analyst | TASK-013 | Adopt API merge — `api-designer` absorbed into `solution-architect`; OpenAPI conventions → skill |
+| TASK-016 | high | completed | fix | @harness-analyst | TASK-013 | Adopt analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
+| TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness lane implementer is `@harness-analyst`, not `@orchestrator` |
+| TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
+| TASK-019 | high | pending | fix | @harness-analyst | TASK-013, TASK-015 | Adopt single `devops` — absorb `database-designer`, extract technology playbooks to skills, model `small` → `medium` |
 
 Every task below ends with the same validation gate: `uv run python context/scripts/validators/agent_definitions.py`,
 then `uv run python context/scripts/generators/generate_adapters.py`, then
@@ -41,7 +42,7 @@ A merge is not complete until all four pass and no reference to a deleted agent 
 
 ### TASK-014 — Product merge (`product-expert` → `product-owner`)
 
-**Status: completed (25 Oct 2026)** — executed by Cline (not `@agent-harness`, which TASK-013 has not yet
+**Status: completed (25 Oct 2026)** — executed by Cline (not `@harness-analyst`, whose TASK-013 role had not yet
 created). All files below landed. Gate: `agent_definitions.py` valid for `product-owner.md` (repo-wide stays red
 on 10 legacy agents outside this task, down from the 12/18 baseline recorded in TASK-016), `generate_adapters.py`
 (1 created / 4 updated, plus removal of the two orphaned `product-expert` projections the generator does not
@@ -145,7 +146,7 @@ the OpenAPI skill is listed in the architect's frontmatter.
 ### TASK-016 — Analyst merge → `harness-analyst`
 
 **Status: completed (25 Oct 2026)** — executed out of dependency order (before TASK-013) on direct user request, by
-Cline rather than `@agent-harness`. All files below landed; both lens skills exist and are in the agent frontmatter;
+Cline rather than `@harness-analyst`. All files below landed; both lens skills exist and are in the agent frontmatter;
 output paths unchanged. Gate: `agent_definitions.py` valid for `harness-analyst.md`, `generate_adapters.py`
 (4 created / 1 updated), `adapter_drift.py` in sync, `pytest context/scripts/tests/` 186 passed, acceptance grep
 (`workflow-analyst|tokenomics-analyst` in `context/`) empty. Caveat: repo-wide `agent_definitions.py` stays red on
@@ -197,7 +198,7 @@ frontmatter; output paths unchanged so existing retrospective consumers still re
 
 ### TASK-017 — Fix the TASK-012 lanes inconsistency
 
-**Decision**: the harness lane is implemented by `@agent-harness` (matching the TASK-013 boundary
+**Decision**: the harness lane is implemented by `@harness-analyst` (matching the TASK-013 boundary
 table: "Harness implements, tech-lead gates"). `@functional-tester` writes the RED validator tests.
 `@orchestrator` keeps only the bootstrap exception (creating the role that does not yet exist) and
 ownership of `HANDOFF.md` / `tasks.md` / `bugs.md`.
@@ -206,13 +207,13 @@ ownership of `HANDOFF.md` / `tasks.md` / `bugs.md`.
 
 - `artefacts/build/tasks-agent-context-drift.md` § "Workflow gap — the `fix` phase assumes a code
   fix" → "Proposed lanes" table — harness lane
-  Implementer becomes `` `@agent-harness`; `@functional-tester` for validator behaviour (RED first) ``;
+  Implementer becomes `` `@harness-analyst`; `@functional-tester` for validator behaviour (RED first) ``;
   the artefacts list gains `context/models.yaml` and `context/scripts/generators/` (TASK-013 write
   scope); add the note: orchestrator writes task files/HANDOFF and bootstraps the role only.
 - The TASK-012 row in this file — description references the corrected table; `Blocked By` gains
   TASK-017.
 - Re-read TASK-006, TASK-007 and TASK-009 assignments; confirm they read correctly once the harness
-  owner exists (they already name `@agent-harness` / `@devops`).
+  owner exists (they already name `@harness-analyst` / `@devops`).
 
 **Acceptance**: lanes table, TASK-012 description, TASK-013 boundary table and write scope all
 agree; no task in this file implies a gate agent (`@tech-lead`, `@code-reviewer`,
@@ -220,14 +221,14 @@ agree; no task in this file implies a gate agent (`@tech-lead`, `@code-reviewer`
 
 ---
 
-### TASK-018 — Extend the `agent-harness` skill/standards pools
+### TASK-018 — Extend the `harness-analyst` skill/standards pools
 
 **Decision** (roster review §1): the harness role needs the machinery skills in its durable
 frontmatter, not only glob-resolved ones.
 
 **Files**:
 
-- `artefacts/build/tasks-agent-context-drift.md` § "New agent spec — agent-harness":
+- `artefacts/build/tasks-agent-context-drift.md` § "New agent spec — harness-analyst":
   - `skills` += `python-scripting.md` — validators and generators are PEP 723 scripts under
     `context/scripts/**/*`;
   - `skills` += `git-subrepo-operations.md` — `context/` is a git-subrepo; pushing harness changes
@@ -237,9 +238,15 @@ frontmatter, not only glob-resolved ones.
 - The TASK-013 row — `Blocked By` gains TASK-018; acceptance criteria mention the full pool
   (4 standards, 6 skills).
 
-**Acceptance**: the spec table lists all four standards and all six skills; TASK-013 acceptance
-criteria reference them; every listed path exists under `context/skills/` or `context/standards/`
-(no phantom entries — see this incident's own root cause).
+**Acceptance**: the spec table lists all four standards and all six machinery skills (eight skills in
+total once the two measurement lenses are included); TASK-013 acceptance criteria reference them;
+every listed path exists under `context/skills/` or `context/standards/` (no phantom entries — see
+this incident's own root cause).
+
+**Status: completed (25 Oct 2026)** — the four standards and six machinery skills landed in
+`context/agents/harness-analyst.md` frontmatter alongside the two lens skills (eight total), and the
+spec table in this file records the combined pool. No phantom paths: every entry resolves under
+`context/standards/` or `context/skills/`.
 
 ---
 
@@ -312,13 +319,13 @@ archive; the design workflow dispatches only existing agents; the four validatio
 |----|-----|--------|-------|----------|------------|-------------|
 | TASK-001 | critical | completed | diagnose | - | - | Record phantom-reference inventory for all 18 agents (see Findings) |
 | TASK-012 | high | pending | diagnose | @solution-architect | TASK-017 | Extend `context/workflows/continuous-improvement.yaml` fix phase with artefact-type lanes (code / harness / docs), each with an owning agent and validation, so non-code fixes are not routed to `@python-coder` |
-| TASK-013 | high | pending | fix | @orchestrator | TASK-012, TASK-018 | Create `context/agents/agent-harness.md` — specialist owner for the agent-facing harness (definitions, rules, skills, templates, workflows, validators); register in `context/agents/README.md`; regenerate adapters. Spec in Findings |
-| TASK-002 | critical | pending | fix | @agent-harness | TASK-013 | Fix `context/templates/agent-template.md` — replace dead rule names (`british-english.md`, `handoff-hygiene.md`, `escalation.md`); add `Source` column to the rules table |
+| TASK-013 | high | completed | fix | @orchestrator | TASK-012, TASK-018 | Create `context/agents/harness-analyst.md` — specialist owner for the agent-facing harness (definitions, rules, skills, templates, workflows, validators, generators); register in `context/agents/README.md`; regenerate adapters. Spec in Findings |
+| TASK-002 | critical | pending | fix | @harness-analyst | TASK-013 | Fix `context/templates/agent-template.md` — replace dead rule names (`british-english.md`, `handoff-hygiene.md`, `escalation.md`); add `Source` column to the rules table |
 | TASK-003 | high | pending | fix | @functional-tester | - | RED: add failing test in `context/scripts/tests/test_agent_validator.py` — a body-table `Source` that does not resolve MUST produce an error |
 | TASK-004 | high | pending | fix | @python-coder | TASK-003 | GREEN: extend `context/scripts/validators/agent_definitions.py` to parse body rule tables and assert each `Source` resolves under `context/rules/` or `context/skills/` (mirror frontmatter checks at L71–90) |
-| TASK-005 | high | pending | fix | @agent-harness | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match its frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
-| TASK-006 | high | pending | fix | @agent-harness | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — delete pointer-only rows, keep short imperatives, add `Source` attribution |
-| TASK-007 | normal | pending | fix | @agent-harness | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `orchestrator.md` stays in `SKIPPED_FILES` (L30) |
+| TASK-005 | high | pending | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match its frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
+| TASK-006 | high | pending | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — delete pointer-only rows, keep short imperatives, add `Source` attribution |
+| TASK-007 | normal | pending | fix | @harness-analyst | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `orchestrator.md` stays in `SKIPPED_FILES` (L30) |
 | TASK-008 | normal | pending | discuss | @solution-architect | TASK-012 | Decide the compliance mechanism and layer taxonomy (frontmatter vs body vs injection); record in `artefacts/architecture/architecture-decision.md`; include whether a framework-maintainer agent is needed |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections (`generate_adapters.py`), clear adapter drift, and add the validator to `.github/workflows/pr-subrepo-checks.yml` |
 | TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance criteria; issue APPROVED / CHANGES REQUIRED to `artefacts/build/tech-review.md` |
@@ -335,8 +342,8 @@ defaulted to `@python-coder` for 7 of 10 tasks because the repo is Python, which
 |-------|-------|-----|
 | `@python-coder` | TASK-004 | The only Python source deliverable: validator logic |
 | `@functional-tester` | TASK-003 | RED test first — no implementation without a failing test (`skills/tdd-workflow.md`) |
-| `@agent-harness` | TASK-002, 005, 006, 007 | Specialist owner of the agent-facing harness (TASK-013) — the gate must not implement |
-| `@orchestrator` | TASK-011, 013 | Bootstraps the harness role, then records the incident |
+| `@harness-analyst` | TASK-002, 005, 006, 007 | Specialist owner of the agent-facing harness (TASK-013) — the gate must not implement |
+| `@orchestrator` | TASK-011, 013 | Bootstraps the harness role (completed), then records the incident |
 | `@solution-architect` | TASK-008, 012 | Owns design decisions and ADRs — lane taxonomy and layer authority |
 | `@devops` | TASK-009 | Owns `build-standards.md` and CI/CD; adapters and workflow wiring are pipeline concerns |
 | `@tech-lead` | TASK-010 | THE GATE only — `tech-lead.md` L77: "Don't rewrite code — describe what needs to change" |
@@ -358,7 +365,7 @@ TASK-013 creates the missing role, giving a three-way separation:
 | Activity | Owner |
 |----------|-------|
 | Decide the taxonomy and lane boundaries | `@solution-architect` (TASK-012, TASK-008) |
-| Apply it to definitions, rules, templates, workflows | `@agent-harness` (TASK-002, 005, 006, 007) |
+| Apply it to definitions, rules, templates, workflows | `@harness-analyst` (TASK-002, 005, 006, 007) |
 | Approve or reject the result | `@tech-lead` (TASK-010) |
 
 `@orchestrator` retains TASK-013 because the role does not exist yet to create itself, and keeps its existing
@@ -404,7 +411,7 @@ Proposed lanes, for TASK-012 to ratify:
 | Lane | Artefacts | Implementer | Gate |
 |------|-----------|-------------|------|
 | code | `services/**/src/`, `tests/` | `@python-coder` / `@typescript-coder`, after RED | `@tech-lead` |
-| harness | `context/agents/`, `context/rules/`, `context/skills/`, `context/templates/`, `context/workflows/`, `context/scripts/validators/` | `@orchestrator`; `@functional-tester` for validator behaviour | `@tech-lead` |
+| harness | `context/agents/`, `context/rules/`, `context/skills/`, `context/templates/`, `context/workflows/`, `context/scripts/validators/` | `@harness-analyst`; `@functional-tester` for validator behaviour | `@tech-lead` |
 | docs | `artefacts/`, service `README.md`, user guides | `@documentation` | `@tech-lead` (informal) |
 
 Edge case TASK-012 must resolve: `agent_definitions.py` is harness intent implemented in Python. The rule that
@@ -416,15 +423,31 @@ definitions are exempt: they run 80–140 lines, so the limit is already being b
 
 ---
 
-### New agent spec — `agent-harness` (TASK-013)
+### New agent spec — `harness-analyst` (TASK-013)
+
+**Status: completed (25 Oct 2026)** — the role is `harness-analyst`, the name adopted from TASK-016's
+retrospective measurement agent, so one agent owns the harness and measures it rather than two agents
+sharing the same name space. `context/agents/harness-analyst.md` carries the combined contract;
+`context/agents/README.md` registers it at `large`; `context/models.yaml` lists harness ownership under
+`large`; every prior harness-owner reference in this file now names `@harness-analyst`. Gate:
+`agent_definitions.py` valid for the definition, `generate_adapters.py` regenerated,
+`adapter_drift.py` in sync, `pytest context/scripts/tests/` 186 passed. `TASK-018` landed as part of
+this work (four standards, six machinery skills); `TASK-012` remains pending, so the fix-phase lane
+wiring it owns is still outstanding, but the role itself exists, is registered, and owns every
+harness task listed in this file. Deviation: the definition keeps the two measurement lens skills as
+well as the six machinery skills (eight total) because merging the roles must not break TASK-016's
+retrospective function.
 
 | Field | Value |
 |-------|-------|
-| `name` | `agent-harness` |
+| `name` | `harness-analyst` |
 | `model` | `large` — must hold the full harness contract (frontmatter ↔ rules ↔ skills ↔ injected prompts) at once; a wrong edit propagates to every spawn |
-| `standards` | `agent-standards.md`, `context-framework.md`, `doc-standards.md` |
+| `standards` | `agent-standards.md`, `context-framework.md`, `doc-standards.md`, `workflow-standards.md` |
 | `rules` | `bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, `workspace-conventions.md` |
-| `skills` | `agent-workflows.md`, `architecture-fidelity.md`, `multi-agent-workflows.md` |
+| `skills` | `agent-sandbox.md`, `agent-workflows.md`, `architecture-fidelity.md`, `git-subrepo-operations.md`, `multi-agent-workflows.md`, `python-scripting.md`, `tokenomics-audit.md`, `workflow-analysis.md` |
+
+The first six skills are the TASK-018 machinery pool; `tokenomics-audit.md` and `workflow-analysis.md`
+are the TASK-016 measurement lenses.
 
 **Write scope**: `context/agents/`, `context/rules/`, `context/skills/`, `context/templates/`, `context/workflows/`,
 `context/scripts/validators/`, `context/scripts/generators/`, `context/models.yaml`.
@@ -483,4 +506,4 @@ no paraphrase survives without a pointer.
 4. Adapter drift check passes after regeneration.
 5. One of the two competing compliance mechanisms is documented as authoritative.
 6. The `fix` phase declares an explicit lane for non-code artefacts, so every task in this file routes to an owner without human judgement.
-7. `@agent-harness` exists, is registered in `context/agents/README.md`, passes `agent_definitions.py`, and owns every harness task — no gate agent implements.
+7. `@harness-analyst` exists, is registered in `context/agents/README.md`, passes `agent_definitions.py`, and owns every harness task — no gate agent implements.

@@ -57,7 +57,6 @@ tiers:
       - Threat modelling and vulnerability analysis (@security-tester)
       - Schema and API design (@database-designer, @api-designer)
       - Technical documentation authoring (@documentation)
-      - Workflow and tokenomics analysis (@harness-analyst)
     providers:
       anthropic:
         family: "sonnet"
@@ -83,6 +82,7 @@ tiers:
       - LESS engineering principles evaluation (@principles-reviewer)
       - Eliciting and structuring ambiguous human ideas into validated requirements (@product-owner)
       - Complex failure diagnosis and root-cause analysis
+      - Agent-facing harness ownership and retrospective measurement (@harness-analyst)
     providers:
       anthropic:
         family: "opus"

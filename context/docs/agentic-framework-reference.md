@@ -330,7 +330,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `documentation.md` | User-facing documentation, API references, and guide generation |
 | `functional-tester.md` | Detroit-school TDD: intent-first, tests before implementation |
 | `git-subrepo-operations.md` | Procedural guidance for inspecting, pulling, cloning, and gated pushing with git-subrepo |
-| `harness-analyst.md` | Retrospective measurement: workflow efficiency and token economics lenses |
+| `harness-analyst.md` | Agent-facing harness ownership plus retrospective measurement: workflow efficiency and token economics lenses |
 | `intent-fidelity.md` | Ensures business intent is faithfully captured in requirements, TDD, and tests |
 | `mermaid-authoring.md` | Mermaid diagram syntax, layout constraints, and semantic guidance |
 | `multi-agent-workflows.md` | Orchestrator triage and handoff archival |
@@ -497,7 +497,7 @@ The framework defines 17 specialised agents, organised by kind of judgement.
 |-------|---------|
 | `devops` | Handles deployment and infrastructure-related work |
 | `documentation` | Cleans up, archives, and maintains human-facing documentation |
-| `harness-analyst` | Reviews process effectiveness, token economics, and model tiering via the workflow-analysis and tokenomics-audit lenses; supports retrospectives |
+| `harness-analyst` | Owns the agent-facing harness (definitions, rules, skills, templates, workflows, validators, generators, model tiering) and reviews process effectiveness, token economics, and model tiering via the workflow-analysis and tokenomics-audit lenses |
 
 ### Creating a New Agent
 
@@ -827,7 +827,7 @@ Draft and review phases list concrete checks in YAML (persona voice, British Eng
 
 ### Continuous improvement (`continuous-improvement.yaml`)
 
-Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `harness-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
+Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. Within that workflow, `harness-analyst` appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states. Harness implementation work is dispatched to the same agent directly by the orchestrator, outside this workflow.
 
 #### Workflow file and modes
 

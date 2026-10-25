@@ -158,7 +158,7 @@ The framework defines 17 specialised agents, organised by kind of judgement rath
 - **Implementation**: `python-coder`, `typescript-coder`
 - **Testing**: `functional-tester` (TDD), `ui-tester` (browser automation)
 - **Review**: `tech-lead` (the gate), `code-reviewer`, `principles-reviewer`, `security-tester`
-- **Operations**: `devops`, `documentation`, `harness-analyst` (workflow-analysis and tokenomics-audit lenses)
+- **Operations**: `devops`, `documentation`, `harness-analyst` (owns the agent-facing harness; workflow-analysis and tokenomics-audit lenses)
 - **Coordination**: `orchestrator`
 
 Each agent's frontmatter declares which rules and standards it requires. The orchestrator resolves the applicable rules by matching file globs against the task scope, injecting only what is relevant.
