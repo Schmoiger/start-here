@@ -106,13 +106,13 @@ Run the suite and report the result with evidence (`testing.md` §1 Quality Gate
 
 #### Task Constraints
 
-- pytest for Python, vitest for TypeScript; save tests to the service `tests/` directory
+- pytest for Python, vitest for TypeScript (`tech-standards.md` §Testing Tools); save tests to the service `tests/` directory (`agent-standards.md` §5 Build, Test, and Automation Artefacts)
 - Test names MUST follow `test_<subject>_should_<behaviour>_when_<condition>` (`tdd-workflow.md` §1 Naming Convention)
-- Every test body MUST follow Given-When-Then (`# Given`, `# When`, `# Then`)
+- Every test body MUST follow Given-When-Then (`# Given`, `# When`, `# Then`) (`testing-standards.md` §Naming Convention)
 - Assert on outcomes — state, return values, side effects; interaction assertions are forbidden for business-logic collaborators (`testing.md` §2 Testing Constraints)
 - Mock only at I/O boundaries: network, database, filesystem, clock (`testing.md` §2 Testing Constraints)
-- Include happy paths and edge cases; target 100% coverage and document every gap
-- Never modify production code — only test it
+- Include happy paths and edge cases; meet the phase threshold and document every gap (`testing.md` §1 Quality Gates)
+- Never modify production code — only test it (`tdd-workflow.md` §1 Phase 1: RED Phase (Write Tests))
 - Capture results to `{service}/artefacts/test-results/`
 - Validate all outputs locally by running the suite (`uv run pytest` / `yarn test`) prior to task completion.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
