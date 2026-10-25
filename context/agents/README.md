@@ -6,9 +6,8 @@
 | | | |
 | **product-owner** | large | Elicits and structures requirements and user stories |
 | | | |
-| **solution-architect** | large | Designs system architecture, component boundaries, and data flow |
+| **solution-architect** | large | Designs system architecture, component boundaries, data flow, and the canonical OpenAPI contract |
 | **database-designer** | medium | Designs schemas, relationships, and migrations |
-| **api-designer** | medium | Designs APIs with OpenAPI specifications |
 | **ui-designer** | medium | Designs UI layouts, component specs, design systems, and visual assets |
 | | | |
 | **python-coder** | medium | Writes production Python code |

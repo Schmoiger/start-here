@@ -46,9 +46,10 @@ For example:
 │   ├── architecture/                # System architecture
 │   │   ├── architecture.md
 │   │   ├── data-model.md
-│   │   └── api-catalogue.md
-│   ├── api/                         # API specifications
-│   │   ├── openapi.yaml
+│   │   ├── api-catalogue.md
+│   │   └── openapi.yaml             # Canonical API specification
+│   ├── api/                         # Ancillary API contracts
+│   │   ├── api-contract.json
 │   │   └── api-design-guide.md
 │   ├── design/                      # UI/UX design
 │   │   ├── design-system.md         # tokens, components, accessibility, wireframes
@@ -364,11 +365,14 @@ The monorepo root `/artefacts/` directory contains system-wide artefacts that af
 *   **`architecture-decision.md`**: Running log of significant technical decisions (the *why* behind choices). Add an entry here whenever a non-obvious technical decision is made — choice between alternatives, discovered gotcha, or convention established. Format: numbered ADR with Date, Status, Context, Decision, Consequences.
 *   **`data-model.md`**: Conceptual data model showing entities and relationships across the system
 *   **`api-catalogue.md`**: Catalogue of all service APIs with their purposes and relationships
+*   **`openapi.yaml`**: Canonical API specification for all services — the single source of truth, owned by `@solution-architect`
 *   Other architecture documents (e.g., reliability strategies, ADRs)
 
-### 4.3. API Specifications (`/artefacts/api/`)
+### 4.3. API Companion Artefacts (`/artefacts/api/`)
 
-*   **`openapi.yaml`**: Complete API specification for all services
+These accompany the canonical OpenAPI specification in `/artefacts/architecture/`; they never replace it.
+
+*   **`api-contract.json`**: Machine-readable schemas and payloads
 *   **`api-design-guide.md`**: API design standards and conventions
 
 ### 4.4. Design System (`/artefacts/design/`)

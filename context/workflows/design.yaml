@@ -18,18 +18,18 @@ phases:
     skills:
       - superpowers:brainstorming
     agents:
-      - solution-architect  # Output architecture.md, logical API contracts, data-model.md; produce design docs for complex components
+      - solution-architect  # Output architecture.md, data-model.md, api-catalogue.md, canonical openapi.yaml, and design docs for complex components
     outputs:
       - artefacts/architecture/
+      - artefacts/architecture/openapi.yaml  # Canonical API specification, owned by solution-architect
       - artefacts/design/  # Design docs for complex components (see design_doc_standard below)
 
   - id: design-contracts
-    name: Contract & Schema Design
+    name: Schema Design
     depends_on: [design-architecture]
     parallel: true
     agents:
       - database-designer  # Physical schema and migrations from solution-architect's data model
-      - api-designer       # Full OpenAPI spec with HTTP semantics from solution-architect's API contracts
     outputs:
       - artefacts/architecture/
       - artefacts/database/
@@ -114,7 +114,7 @@ workflow_rules:
   - Subagents write artefacts incrementally — never accumulate in memory and flush at end
   - Update HANDOFF.md Phase: field BEFORE spawning agents
   - For the parallel design-contracts phase, log each agent's output scope in HANDOFF.md before spawning
-  - database-designer owns artefacts/database/; api-designer owns artefacts/architecture/openapi.yaml — disjoint by default
+  - database-designer owns artefacts/database/; solution-architect owns artefacts/architecture/openapi.yaml — disjoint by phase
 
 state_recovery:
   after_compaction:
@@ -132,8 +132,8 @@ state_recovery:
 # Notes (human reference)
 #
 # PHASE DEPENDENCIES:
-#   discovery → design-architecture → design-contracts (parallel: database-designer + api-designer)
-#   → design-ui → design-review (sequential: tech-lead → code-reviewer → ...)
+#   discovery → design-architecture (architecture + canonical openapi.yaml)
+#   → design-contracts (database-designer) → design-ui → design-review (sequential: tech-lead → ...)
 #
 # design-review is a gate: CHANGES REQUIRED returns to the appropriate design phase.
 # Output: artefacts/product/, artefacts/architecture/, artefacts/database/, artefacts/design/

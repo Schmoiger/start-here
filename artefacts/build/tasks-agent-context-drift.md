@@ -24,7 +24,7 @@
 | TASK-012 | high | pending | diagnose | @solution-architect | TASK-017 | Add artefact-type lanes (code / harness / docs) with owner and validation to `continuous-improvement.yaml` §fix, so non-code fixes do not route to `@python-coder` (§Fix lanes) |
 | TASK-013 | high | completed | fix | @orchestrator | TASK-012, TASK-018 | Create `context/agents/harness-analyst.md` — harness owner; register in `context/agents/README.md`; regenerate adapters (§Harness-analyst spec) |
 | TASK-014 | high | completed | fix | @harness-analyst | TASK-013 | Product merge — `product-expert` absorbed into `product-owner` (elicit + structure modes) |
-| TASK-015 | high | pending | fix | @harness-analyst | TASK-013 | API merge — `api-designer` absorbed into `solution-architect`; OpenAPI conventions → skill |
+| TASK-015 | high | completed | fix | @harness-analyst | TASK-013 | API merge — `api-designer` absorbed into `solution-architect`; OpenAPI conventions → skill |
 | TASK-016 | high | completed | fix | @harness-analyst | TASK-013 | Analyst merge — one `harness-analyst` + `workflow-analysis.md` and `tokenomics-audit.md` lens skills |
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness implementer is `@harness-analyst`, not `@orchestrator` |
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
@@ -126,6 +126,17 @@ break an unrelated gate.
 ---
 
 ### TASK-015 — API merge (`api-designer` → `solution-architect`)
+
+**Completed 25 Oct 2026** by Cline (`@harness-analyst` role). Gate green: `solution-architect.md` passes
+`agent_definitions.py`; adapters 1 created / 3 updated, orphaned `.agents/skills/api-designer` removed by
+hand; drift in sync; 186 tests; acceptance grep empty outside this task file. Repo-wide validator remains red
+on 9 legacy agents (down from 10 — the architect body was rewritten to the template shape).
+
+**Open decision resolved by human**: canonical OpenAPI path is `artefacts/architecture/openapi.yaml`.
+Recorded as ADR-001 in `artefacts/architecture/architecture-decision.md` (file did not exist; created as the
+ADR log). The empty, tracked `artefacts/api/openapi.yaml` scaffold was deleted so `artefacts/api/` holds only
+companion artefacts; standards references (`doc-standards.md` §4.2–4.3, `context-framework.md`) were updated
+to match, extending the TASK-014 write scope by `context/standards/` and the two scaffold files.
 
 **Decision**: `solution-architect` owns the whole API artefact chain — logical contracts (`architecture.md`,
 `api-catalogue.md`) and the canonical OpenAPI spec; `model: large` unchanged. OpenAPI authoring conventions

@@ -9,8 +9,8 @@ System-wide outputs representing completed work across discovery, design, develo
 | Category | Location | Typical Files | Primary Agents |
 |----------|----------|---------------|----------------|
 | **Product** | `product/` | `requirements.md`, `user-stories.md`, `open-questions.md` | `@product-owner` |
-| **Architecture** | `architecture/` | `architecture.md`, `data-model.md`, `api-catalogue.md` | `@solution-architect`, `@database-designer` |
-| **API** | `api/` | `openapi.yaml`, `api-contract.json`, `api-design-guide.md` | `@api-designer` |
+| **Architecture** | `architecture/` | `architecture.md`, `data-model.md`, `api-catalogue.md`, `openapi.yaml` | `@solution-architect`, `@database-designer` |
+| **API** | `api/` | `api-contract.json`, `api-design-guide.md` (canonical spec: `architecture/openapi.yaml`) | `@solution-architect` |
 | **Design** | `design/` | `design-tokens.json`, `components.md`, `user-flows.md`, `visuals/` | `@ui-designer` |
 | **Build & Tasks** | `build/` | `tasks.md`, `todo.md`, `bugs.md`, quality gate reviews, `interruptions/`, `metrics/` | `@orchestrator`, `@tech-lead`, `@code-reviewer` |
 | **Test Results** | `test-results/` | `DASHBOARD.md`, `unit/`, `integration/`, `e2e/`, `security/` | `@functional-tester`, `@ui-tester`, `@security-tester` |
@@ -24,7 +24,7 @@ System-wide outputs representing completed work across discovery, design, develo
 
 - **Discovery & Requirements**: [requirements](product/requirements.md) · [user-stories](product/user-stories.md) · [open-questions](product/open-questions.md)
 - **Architecture & Data**: [architecture](architecture/architecture.md) · [data-model](architecture/data-model.md) · [api-catalogue](architecture/api-catalogue.md)
-- **API Contracts**: [openapi](api/openapi.yaml) · [contract](api/api-contract.json) · [design-guide](api/api-design-guide.md)
+- **API Contracts**: [openapi](architecture/openapi.yaml) · [contract](api/api-contract.json) · [design-guide](api/api-design-guide.md)
 - **UI & UX**: [tokens](design/design-tokens.json) · [components](design/components.md) · [user-flows](design/user-flows.md) · [accessibility](design/accessibility.md) · [wireframes](design/wireframes.md)
 - **Task Tracking & Gates**: [tasks](build/tasks-agent-context-drift.md) · [todo](build/todo.md) · [incidents](build/agent-incidents.md) · [interruptions](build/interruptions/) · [metrics](build/metrics/session-log.jsonl)
 - **Test Outcomes**: [coverage-gaps](test-results/test-coverage-gaps.md) · [functional-tests](test-results/functional-tests.json)
@@ -45,9 +45,9 @@ artefacts/
 │   ├── architecture.md            # System topology and service interactions
 │   ├── data-model.md              # Conceptual data model and entity relations
 │   ├── api-catalogue.md           # Service API registry and ownership
-│   └── architecture-decision.md   # Architectural Decision Records (ADRs)
-├── api/                           # Formal API interface contracts
 │   ├── openapi.yaml               # Canonical OpenAPI 3.x specification
+│   └── architecture-decision.md   # Architectural Decision Records (ADRs)
+├── api/                           # Ancillary API contracts
 │   ├── api-contract.json          # Machine-readable schemas and payloads
 │   └── api-design-guide.md        # API design conventions and headers
 ├── design/                        # UI/UX design specifications and assets

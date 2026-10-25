@@ -32,7 +32,7 @@ def generate_agent_dispatch_all(agents: dict[str, CanonicalAgent]) -> str:
     """Render agent dispatch table."""
     category_order = [
         'product-owner',
-        'solution-architect', 'database-designer', 'api-designer', 'ui-designer',
+        'solution-architect', 'database-designer', 'ui-designer',
         'functional-tester', 'python-coder', 'typescript-coder',
         'tech-lead', 'code-reviewer', 'principles-reviewer',
         'ui-tester', 'security-tester',

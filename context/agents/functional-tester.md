@@ -94,8 +94,8 @@ REQUIREMENTS GAP — cannot proceed with RED phase for [behaviour]
 Requirement: [REQ-NNN] states "[quote the requirement]"
 Missing: [what specific detail is absent — default value / accepted formats /
           validation rules / error behaviour / boundary conditions]
-Needed from: @product-owner (acceptance criteria) | @api-designer (contract detail)
-             | @solution-architect (boundary decision)
+Needed from: @product-owner (acceptance criteria) | @solution-architect (contract detail
+             and boundary decision)
 Blocked tasks: [list the test cases you cannot write until this is resolved]
 ```
 

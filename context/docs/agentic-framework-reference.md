@@ -322,7 +322,6 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 |-------|---------|
 | `agent-sandbox.md` | Procedural constraints for running terminal commands inside agent sandboxes without triggering security blocks |
 | `agent-workflows.md` | Agent git commits, pull requests, and metrics logging patterns |
-| `api-designer.md` | RESTful and GraphQL API design with OpenAPI specifications |
 | `architecture-fidelity.md` | Adherence to architecture docs and API contracts during implementation |
 | `bootstrap-workflow.md` | Agent context setup, git-subrepo initialisation, and pre-commit hook activation |
 | `code-reviewer.md` | PR-style code review focusing on bugs, edge cases, and maintainability |
@@ -334,6 +333,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `intent-fidelity.md` | Ensures business intent is faithfully captured in requirements, TDD, and tests |
 | `mermaid-authoring.md` | Mermaid diagram syntax, layout constraints, and semantic guidance |
 | `multi-agent-workflows.md` | Orchestrator triage and handoff archival |
+| `openapi-authoring.md` | Canonical OpenAPI specification authoring, naming, responses, examples, and validation |
 | `orchestrator.md` | Workflow execution coordination, agent delegation, and quality gate management |
 | `principles-reviewer.md` | Review against LESS Engineering Principles |
 | `product-owner.md` | Eliciting and structuring requirements and user stories |
@@ -361,7 +361,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus sixteen delegatable specialists (seventeen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus fifteen delegatable specialists (sixteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -468,9 +468,8 @@ The framework defines 17 specialised agents, organised by kind of judgement.
 
 | Agent | Purpose |
 |-------|---------|
-| `solution-architect` | Designs architecture, boundaries, and data flow |
+| `solution-architect` | Designs architecture, boundaries, data flow, and the canonical OpenAPI contract |
 | `database-designer` | Designs schemas, relationships, and migrations |
-| `api-designer` | Designs APIs and contract artefacts |
 | `ui-designer` | Designs UI structure, component behaviour, user flow, and visual assets |
 
 #### Implementation and Test
@@ -597,8 +596,8 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 | Phase | Agents (pattern) | Role |
 |-------|------------------|------|
 | `discovery` | `product-owner` (elicitation then structuring) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
-| `design-architecture` | `solution-architect` | Architecture, logical API contracts, data model, component design docs |
-| `design-contracts` | `database-designer` and `api-designer` (parallel) | Physical schema and migrations; OpenAPI with HTTP semantics |
+| `design-architecture` | `solution-architect` | Architecture, canonical OpenAPI specification, data model, component design docs |
+| `design-contracts` | `database-designer` | Physical schema and migrations from the architect's data model |
 | `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows, and visual assets |
 | `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `ui-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
 
@@ -953,7 +952,7 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 
 - Discovery: Sequential (`product-owner` elicitation mode then structuring mode).
 - Architecture: Single agent (`solution-architect`).
-- Contracts: Parallel hive-like pair (`database-designer` and `api-designer` on the same architecture outputs).
+- Contracts: Single schema specialist (`database-designer` builds the physical schema from the architect's data model; `solution-architect` owns the canonical OpenAPI specification in the preceding phase).
 - UI and visuals: Single phase (`ui-designer` — component specs, wireframes, and visual assets consolidated).
 - Design review: Sequential reviewers with iterative return to earlier phases when required.
 

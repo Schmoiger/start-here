@@ -18,7 +18,7 @@ Information that is consulted but not actioned. It doesn't change during a phase
 |---------|----------|---------|
 | Architecture decisions | `artefacts/architecture/` | How the system is designed |
 | Requirements | `artefacts/product/requirements.md` | What to build |
-| API contracts | `artefacts/api/openapi.yaml` | Interface agreements |
+| API contracts | `artefacts/architecture/openapi.yaml` | Interface agreements |
 | Standards and rules | `context/standards/`, `context/rules/` | How to work |
 | Existing code | Service directories | What already exists |
 

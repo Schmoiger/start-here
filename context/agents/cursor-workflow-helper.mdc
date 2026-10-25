@@ -50,9 +50,8 @@ Then reference: "Following the python-coder rule, implement..."
 - `product-owner.md` - Requirements gathering
 
 **Phase 1: Design**
-- `solution-architect.md` - System architecture
+- `solution-architect.md` - System architecture and the canonical OpenAPI specification
 - `database-designer.md` - Database schema
-- `api-designer.md` - OpenAPI specs
 - `ui-designer.md` - UI wireframes and visual design assets
 
 **Phase 2-3: Development**
@@ -77,7 +76,7 @@ Then reference: "Following the python-coder rule, implement..."
 Follow the TDD workflow from `context/agents/CLAUDE.md`:
 
 1. **Discovery**: product-owner → requirements.md
-2. **Design**: solution-architect, database-designer, api-designer (parallel)
+2. **Design**: solution-architect (architecture and canonical OpenAPI specification), then database-designer (schema)
 3. **Tests First**: functional-tester → write failing tests (TDD RED)
 4. **Development**: python-coder, typescript-coder → make tests pass (TDD GREEN)
 5. **Review**: tech-lead (must approve) → code-reviewer

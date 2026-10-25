@@ -55,7 +55,7 @@ tiers:
       - Architecture fidelity and technical review gate (@tech-lead)
       - Code review for edge cases and bugs (@code-reviewer)
       - Threat modelling and vulnerability analysis (@security-tester)
-      - Schema and API design (@database-designer, @api-designer)
+      - Schema design and migrations (@database-designer)
       - Technical documentation authoring (@documentation)
     providers:
       anthropic:
