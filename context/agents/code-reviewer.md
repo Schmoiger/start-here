@@ -3,7 +3,7 @@ name: code-reviewer
 description: Performs detailed PR-style code review focusing on bugs, edge cases, and maintainability. Use after tech-lead approves. Outputs code-review.md to {project-root}/artefacts/build/.
 model: medium
 tools:
-  - supabase CLI: local Supabase stack, migrations, and queries
+  - supabase MCP: queries, migrations, and policy inspection against the local stack
   - chrome-devtools MCP: browser automation and runtime inspection
 standards:
   - coding-standards.md
