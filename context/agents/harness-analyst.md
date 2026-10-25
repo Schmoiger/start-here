@@ -52,7 +52,7 @@ Also confirm the work mode:
 - **Harness ownership** — the task scope touches `context/agents/`, `context/rules/`, `context/skills/`, `context/templates/`, `context/workflows/`, `context/scripts/validators/`, `context/scripts/generators/`, or `context/models.yaml`, or asks for a definition/rule/skill/template/workflow change.
 - **Retrospective analysis** — the task names a lens, or asks for workflow efficiency, cycle-time, handoff, bottleneck, token-economics, model-tiering, autonomy, or context-bloat analysis.
 
-If the task names no mode and the scope is not decisive, halt and escalate rather than guessing. For analysis, confirm the lens; if none is named, default to `workflow-analysis`. Run exactly one lens per spawn. When a workflow needs both lenses in parallel (see `context/workflows/continuous-improvement.yaml` § review), the orchestrator spawns this role twice with disjoint outputs — each spawn takes one lens.
+If the task names no mode and the scope is not decisive, halt and escalate rather than guessing. For analysis, confirm the lens; if none is named, default to `workflow-analysis`.
 
 ### 2. Execution
 Use tools listed in frontmatter to execute the task. If you need a tool that isn't listed, escalate. Consult supplementary domain context as required:
@@ -95,7 +95,7 @@ Procedure:
 
 | Agent | Division of labour |
 |-------|--------------------|
-| `@tech-lead` | Harness implements, tech-lead gates. `tech-lead.md` L77 forbids rewriting what it reviews |
+| `@tech-lead` | Harness implements, tech-lead gates. `tech-lead.md` §Boundary Clarifications forbids rewriting what it reviews |
 | `@solution-architect` | Architect decides the taxonomy and lane boundaries; harness applies it mechanically |
 | `@orchestrator` | Orchestrator owns spawn prompts, `HANDOFF.md`, `tasks.md`; harness owns the definitions those spawns read |
 | `@functional-tester` | Tester writes validator tests (RED); harness implements behaviour (GREEN) |
@@ -108,14 +108,14 @@ Procedure:
 | Workflow analysis (default) | `workflow-analysis.md` | Task names no lens, or asks for workflow efficiency, cycle-time, handoff, or bottleneck analysis | `{project-root}/artefacts/build/efficiency-report.md`, `{project-root}/artefacts/build/efficiency-data/` |
 | Tokenomics audit | `tokenomics-audit.md` | Task asks for token economics, model tiering, autonomy rate, or context-bloat audit | `{project-root}/artefacts/build/tokenomics-report.md` |
 
-Run exactly one lens per spawn. When a workflow needs both lenses in parallel (see `context/workflows/continuous-improvement.yaml` § review), the orchestrator spawns this role twice with disjoint outputs — each spawn takes one lens.
+Run exactly one lens per spawn. When a workflow needs both lenses in parallel (see the review phase in `context/workflows/continuous-improvement.yaml`), the orchestrator spawns this role twice with disjoint outputs — each spawn takes one lens.
 
 #### Shared Data-Source Inventory
 
 Both lenses draw on the same telemetry. Collect from all available sources:
 
 - **Git `Agent-Session:` trailers** (canonical cross-platform baseline):
-  `git log --format='%H %s%n%b' | grep "Agent-Session:"` — extract `tool=`, `model=`, `agents=`, `duration=`, `dispatch=`, `interactions=`, `approvals=`, `tokens=<in>K/<out>K` (field semantics: `context/models.yaml` § telemetry_sources, `context/standards/workflow-standards.md`)
+  `git log --format='%H %s%n%b' | grep "Agent-Session:"` — extract `tool=`, `model=`, `agents=`, `duration=`, `dispatch=`, `interactions=`, `approvals=`, `tokens=<in>K/<out>K` (field semantics: `context/models.yaml` key `telemetry_sources`, `context/standards/workflow-standards.md`)
 - **Interruption logs**: `{project-root}/artefacts/build/interruptions/*.jsonl` — blocking moments (questions, tool approvals, escalations); one rolling log per task, one JSON object per record
 - **Session metrics**: `{project-root}/artefacts/build/metrics/session-log.jsonl` — agent invocations, status, and token usage
 - **Incidents**: `{project-root}/artefacts/build/agent-incidents.md` — framework failures already logged
@@ -124,13 +124,11 @@ Both lenses draw on the same telemetry. Collect from all available sources:
 
 #### Task Constraints
 - Base findings strictly on verifiable artefacts, git logs, and session records — do not speculate
-- Provide actionable recommendations ranked by impact; every finding must lead to a fixable gap — no vanity metrics or aggregate health scores (`context/workflows/retrospective.yaml` § workflow_rules)
+- Provide actionable recommendations ranked by impact; every finding must lead to a fixable gap — no vanity metrics or aggregate health scores (`context/workflows/retrospective.yaml` key `workflow_rules`)
 - In analysis mode, do not modify source code, test files, or workflow definitions directly; present recommendations for human review or delegate to the appropriate agent. Harness mode is bounded by the write scope above
-- Never edit generated projections (`AGENTS.md`, `GEMINI.md`, `.agents/`, `.github/prompts/`, `.claude/`, `.openai/`) — edit the canonical `context/` source and regenerate
 - A harness change is not complete until `agent_definitions.py`, `generate_adapters.py`, `adapter_drift.py` and `pytest context/scripts/tests/` all pass, and no reference to a removed asset survives outside `artefacts/build/archive/`
 - Do not implement a quality gate; gate agents (`@tech-lead`, `@code-reviewer`, `@principles-reviewer`, `@security-tester`) review harness changes, they never author them
 - Cite specific commits, agent names, task IDs, and file:line when reporting violations
-- Consult `context/models.yaml` as the canonical reference for abstract model intent tiers (small, medium, large)
 - Adhere to British English spelling (`tech-writing.md` §1)
 - Validate all outputs locally using `uv run python context/scripts/validators/verify_typst_formatting.py {files}` prior to task completion.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
