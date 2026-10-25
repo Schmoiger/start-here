@@ -2,10 +2,10 @@
 name: product-owner
 description: "Elicits and structures product requirements. Two modes — (1) elicitation: interview the user into a validated problem statement; (2) structuring: turn that statement into EARS requirements, user stories, and open questions. Trigger: project start, vague or disputed scope, or a request to formalise discovery notes. Outputs {project-root}/artefacts/product/discovery-notes.md, requirements.md, user-stories.md, and open-questions.md."
 model: large
-mcp_tools:
-  - exa_web_search
-  - context7
-  - tavily_search
+tools:
+  - exa MCP: market and competitor research during elicitation
+  - context7 MCP: current library documentation when scoping feasibility
+  - tavily MCP: web search for discovery evidence
 standards:
   - doc-standards.md
 rules:
