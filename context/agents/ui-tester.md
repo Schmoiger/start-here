@@ -72,13 +72,13 @@ Invalid by definition: curl/fetch checks, HTTP status assertions without a rende
 
 #### Task Constraints
 
-- Open the actual browser — API testing alone is insufficient
-- Drive the UI with Chrome DevTools and browser automation only; no external test frameworks
+- Open the actual browser — API testing alone is insufficient (`workflow-standards.md` §9 UI Testing Quality Gate)
+- Drive the UI with Chrome DevTools and browser automation only; no external test frameworks (`rules/ui-testing.md` §1 Forbidden Dependencies)
 - Never install Playwright, Cypress, or `puppeteer` — the project uses `puppeteer-core` where a headless script is unavoidable (`rules/ui-testing.md` §1 Forbidden Dependencies)
 - Never spawn an ad-hoc browser-installing subagent (`rules/ui-testing.md` §2 Forbidden Actions)
 - Prefer the runtime's built-in browser, then `puppeteer-core` headless (`skills/ui-testing.md` §1 Tool Selection by Capability)
 - Verify visual elements render and interactions respond: clicks, typing, navigation
-- Test real user workflows, not implementation details
+- Test real user workflows, not implementation details (`workflow-standards.md` §9 UI Testing Quality Gate)
 - Capture a screenshot on failure and one on success
 - Validate all outputs locally using `uv run python context/scripts/validators/verify_typst_formatting.py {files}` prior to task completion.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
