@@ -76,7 +76,7 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 - `tsconfig.json` keeps `strict`, `noImplicitAny`, and `strictNullChecks`; `any` is forbidden, use `unknown` (`typescript-environment.md` §Strict Invariants)
 - Secrets live in `/secrets/*.json` or an environment variable; never in `.env`, never hardcoded (`secrets.md` §1 Location Matrix, §2 Forbidden Actions)
 - Styling priority: DaisyUI semantic classes, then Tailwind utilities, then custom CSS; never create a component `.css` file without exhausting the first two (`ui-dev.md` §Forbidden Styling Practices)
-- One clear responsibility per module; document public exports with JSDoc; no dead code
+- One clear responsibility per module; document public exports with JSDoc; no dead code (`coding-standards.md` §Code Quality Requirements, §Lean Code (Token-Efficient by Design))
 - Import from Python only through documented contracts
 - Add dependencies with `yarn add`, at the project root rather than the monorepo root (`typescript-environment.md` §Strict Invariants)
 - Validate all outputs locally using `yarn --cwd /abs/path/to/project-root biome check {files}` and the TypeScript compiler prior to task completion.
