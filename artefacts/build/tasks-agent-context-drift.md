@@ -11,11 +11,11 @@
 | ID | Pri | Status | Phase | Assignee | Blocked By | Description |
 |----|-----|--------|-------|----------|------------|-------------|
 | TASK-001 | critical | completed | diagnose | - | - | Record phantom-reference inventory for all 18 agents (§Findings) |
-| TASK-002 | critical | pending | fix | @harness-analyst | TASK-013 | Fix `context/templates/agent-template.md` — replace dead rule names (`british-english.md`, `handoff-hygiene.md`, `escalation.md`); add `Source` column to rules table |
+| TASK-002 | critical | completed | fix | @harness-analyst | TASK-013 | Fix `context/templates/agent-template.md` — replace dead rule names (`british-english.md`, `handoff-hygiene.md`, `escalation.md`); add `Source` column to rules table |
 | TASK-003 | high | pending | fix | @functional-tester | - | RED: failing test in `context/scripts/tests/test_agent_validator.py` — body-table `Source` that does not resolve MUST error |
 | TASK-004 | high | pending | fix | @python-coder | TASK-003 | GREEN: extend `context/scripts/validators/agent_definitions.py` to parse body rule tables and assert each `Source` resolves under `context/rules/` or `context/skills/` (mirror L71–90) |
-| TASK-005 | high | pending | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
-| TASK-006 | high | pending | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution |
+| TASK-005 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
+| TASK-006 | high | in_progress | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution. Body tables removed from 13 of the 15 definitions; `orchestrator` deferred by human direction |
 | TASK-007 | normal | pending | fix | @harness-analyst | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `SKIPPED_FILES` (L30) keeps it |
 | TASK-008 | normal | pending | discuss | @solution-architect | TASK-012 | Decide compliance mechanism and layer taxonomy (frontmatter vs body vs injection); record in `artefacts/architecture/architecture-decision.md`; include whether a framework-maintainer agent is needed |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
@@ -395,6 +395,30 @@ Zero matches anywhere in the repo (verified with `find`, excluding `.git` and `n
   (`context-framework.md` orphaned).
 - CI blind spot: `agent_definitions.py` L71–90 validates frontmatter only; `orchestrator.md` is in
   `SKIPPED_FILES` (L30).
+
+### Resolution — TASK-002, 005, 006 (25 Oct 2026)
+
+Body rule tables are gone from 13 definitions; the frontmatter is the single source of truth and every
+surviving constraint carries a `file.md §section` attribution. `orchestrator` deferred by human direction
+(TASK-007). Gate green after every commit: `agent_definitions.py` 14/14, adapters regenerated, drift in
+sync, 186 tests.
+
+| Agent | Commit | Notes |
+|-------|--------|-------|
+| `tech-lead` | `3944b00` | gate procedure and boundary table kept; wiring check now cites the architect's tracing method |
+| `functional-tester` | `0161ca2` | context-framework.md restored to the standards list (was "read all 3"); RED/GREEN and gap protocol kept |
+| `ui-designer` | `3bc917f` | design constraints re-attributed to `ui-dev.md`, `visual-standards.md`, `mermaid-authoring.md` |
+| `ui-tester` | `93d38d1` | validity bar attributed to `workflow-standards.md` §9 |
+| `security-tester` | `f6ba141` | review scope attributed to `security-standards.md` §Boundaries and §LLM/AI APIs |
+| `principles-reviewer` | `d2e224d` | design and implementation review become explicit modes |
+| `documentation` | `8cd2f0c` | archive procedure repointed from `doc-standards.md` §2.5 to §2.6 |
+| `typescript-coder` | `d57b842` | seven phantom rule names replaced by `typescript-environment.md`, `secrets.md`, `ui-dev.md` |
+| `code-reviewer` | `27fb423` | frontmatter advertised the forbidden Supabase CLI |
+| `agent-template.md` | `3ee0fab` | TASK-002: attribution rule and frontmatter supremacy stated; no body table permitted |
+| `bash-environment.md`, `agent-sandbox.md` | `9d936de` | the last two `escalation.md` phantom references repointed to `multi-agent-collaboration.md` §1 |
+
+`python-coder`, `harness-analyst`, `product-owner`, `solution-architect` and `devops` were already in template
+shape; `code-reviewer` passed the validator but carried the CLI drift above.
 
 ---
 
