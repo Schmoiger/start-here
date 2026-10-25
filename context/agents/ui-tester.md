@@ -74,9 +74,9 @@ Invalid by definition: curl/fetch checks, HTTP status assertions without a rende
 
 - Open the actual browser — API testing alone is insufficient
 - Drive the UI with Chrome DevTools and browser automation only; no external test frameworks
-- Never install Playwright, Cypress, or `puppeteer` — the project uses `puppeteer-core` where a headless script is unavoidable (`ui-testing.md` §1 Forbidden Dependencies)
-- Never spawn an ad-hoc browser-installing subagent (`ui-testing.md` §2 Forbidden Actions)
-- Prefer the runtime's built-in browser, then `puppeteer-core` headless (`ui-testing.md` §1 Tool Selection by Capability)
+- Never install Playwright, Cypress, or `puppeteer` — the project uses `puppeteer-core` where a headless script is unavoidable (`rules/ui-testing.md` §1 Forbidden Dependencies)
+- Never spawn an ad-hoc browser-installing subagent (`rules/ui-testing.md` §2 Forbidden Actions)
+- Prefer the runtime's built-in browser, then `puppeteer-core` headless (`skills/ui-testing.md` §1 Tool Selection by Capability)
 - Verify visual elements render and interactions respond: clicks, typing, navigation
 - Test real user workflows, not implementation details
 - Capture a screenshot on failure and one on success
