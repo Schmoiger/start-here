@@ -17,10 +17,7 @@
 | TASK-005 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
 | TASK-006 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution. 14 of 15 definitions done; `orchestrator` §Rule Resolution is TASK-007's scope |
 | TASK-007 | normal | pending | fix | @harness-analyst | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `SKIPPED_FILES` (L30) keeps it |
-| TASK-008 | normal | pending | discuss | @solution-architect | TASK-012 | Decide compliance mechanism and layer taxonomy (frontmatter vs body vs injection); record in `artefacts/architecture/architecture-decision.md`; include whether a framework-maintainer agent is needed |
-| TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
-| TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
-| TASK-011 | low | pending | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md` |
+| TASK-008 | normal | pending | discuss | @solution-architect | TASK-012 | Decide compliance mechanism and layer taxonomy (frontmatter vs body vs injection); record in `artefacts/architecture/architecture-decision.md`; decide whether to add to harness-analyst agent or workflow-analyst skill |
 | TASK-012 | high | pending | diagnose | @solution-architect | TASK-017 | Add artefact-type lanes (code / harness / docs) with owner and validation to `continuous-improvement.yaml` §fix, so non-code fixes do not route to `@python-coder` (§Fix lanes) |
 | TASK-013 | high | completed | fix | @orchestrator | TASK-012, TASK-018 | Create `context/agents/harness-analyst.md` — harness owner; register in `context/agents/README.md`; regenerate adapters (§Harness-analyst spec) |
 | TASK-014 | high | completed | fix | @harness-analyst | TASK-013 | Product merge — `product-expert` absorbed into `product-owner` (elicit + structure modes) |
@@ -29,6 +26,9 @@
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness implementer is `@harness-analyst`, not `@orchestrator` |
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
 | TASK-019 | high | completed | fix | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
+| TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
+| TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
+| TASK-011 | low | pending | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |
 
 Detail map: TASK-001–TASK-013 → §Findings · TASK-014–TASK-019 → §Task detail.
 
