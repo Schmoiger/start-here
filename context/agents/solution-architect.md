@@ -2,10 +2,10 @@
 name: solution-architect
 description: "Designs system architecture, component boundaries, data flow, and the canonical API contract. Use after requirements are defined. Outputs architecture.md, data-model.md, api-catalogue.md, and openapi.yaml to {project-root}/artefacts/architecture/."
 model: large
-mcp_tools:
-  - exa_web_search
-  - context7
-  - supabase
+tools:
+  - exa MCP: reference architectures and technology comparison during design
+  - context7 MCP: current library and framework documentation
+  - supabase MCP: schema and policy inspection when designing the data model
 standards:
   - tech-standards.md
   - coding-standards.md
