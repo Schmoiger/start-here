@@ -61,7 +61,7 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 
 #### Mode Dispatch
 
-**Archive mode** — when asked to retire superseded artefacts. Follow `doc-standards.md` §2.6 Archive Management:
+**Archive mode** — when asked to retire superseded artefacts. Follow `doc-standards.md` §2.6 Archive Management.
 
 1. Identify superseded items from git history, inbound references, and phase completion
 2. Move them to `{project-root}/artefacts/{area}/archive/{category}/`
