@@ -15,7 +15,7 @@
 | TASK-003 | high | pending | fix | @functional-tester | - | RED: failing test in `context/scripts/tests/test_agent_validator.py` — body-table `Source` that does not resolve MUST error |
 | TASK-004 | high | pending | fix | @python-coder | TASK-003 | GREEN: extend `context/scripts/validators/agent_definitions.py` to parse body rule tables and assert each `Source` resolves under `context/rules/` or `context/skills/` (mirror L71–90) |
 | TASK-005 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
-| TASK-006 | high | in_progress | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution. Body tables removed from 13 of the 15 definitions; `orchestrator` deferred by human direction |
+| TASK-006 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution. 14 of 15 definitions done; `orchestrator` §Rule Resolution is TASK-007's scope |
 | TASK-007 | normal | pending | fix | @harness-analyst | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `SKIPPED_FILES` (L30) keeps it |
 | TASK-008 | normal | pending | discuss | @solution-architect | TASK-012 | Decide compliance mechanism and layer taxonomy (frontmatter vs body vs injection); record in `artefacts/architecture/architecture-decision.md`; include whether a framework-maintainer agent is needed |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
@@ -398,7 +398,7 @@ Zero matches anywhere in the repo (verified with `find`, excluding `.git` and `n
 
 ### Resolution — TASK-002, 005, 006 (25 Oct 2026)
 
-Body rule tables are gone from 13 definitions; the frontmatter is the single source of truth and every
+Body rule tables are gone from 14 definitions; the frontmatter is the single source of truth and every
 surviving constraint carries a `file.md §section` attribution. `orchestrator` deferred by human direction
 (TASK-007). Gate green after every commit: `agent_definitions.py` 14/14, adapters regenerated, drift in
 sync, 186 tests.
@@ -419,6 +419,37 @@ sync, 186 tests.
 
 `python-coder`, `harness-analyst`, `product-owner`, `solution-architect` and `devops` were already in template
 shape; `code-reviewer` passed the validator but carried the CLI drift above.
+
+### Resolution — TASK-006 audit pass (25 Oct 2026)
+
+Structural conformance was already green, so this pass audited content: every `file.md §section`
+citation in the 14 non-orchestrator definitions was resolved against the real file and the real
+heading, and every constraint bullet that paraphrased a rule was given its source. 81 citations
+checked; only `orchestrator.md` §Rule Resolution remains, and that list is TASK-007's scope by
+definition.
+
+| Agent | Commit | Notes |
+|-------|--------|-------|
+| `ui-tester` | `5ef7962`, `e4aac57` | two files named `ui-testing.md` (rules and skills) were cited interchangeably; evidence bullets attributed to `workflow-standards.md` §9 |
+| `documentation` | `8a340b9` | §2.6 citation did not resolve as written (stray colon) |
+| `harness-analyst` | `4810273` | lens rule stated twice; projection ban stated twice; three YAML "§" pseudo-sections corrected to keys and phases; `L77` line citation replaced |
+| `devops` | `453da10`, `42d7c24` | `mcp_tools:` → `tools:`; trigger added to description; procedure restatements dropped; platform enumeration replaced by `gcp-deployment.md` §Platform Shape; schema bullets attributed to `database-design.md` §Physical Design Rules |
+| `product-owner` | `9e98090` | `mcp_tools:` → `tools:`; `exa_web_search`/`tavily_search` were MCP method names, not server names |
+| `solution-architect` | `e42b6f0`, `3797da5` | `mcp_tools:` → `tools:`; Lean and technology constraints attributed |
+| `functional-tester` | `94dbf8c` | five unattributed bullets attributed |
+| `python-coder` | `7cc7307` | eight bullets became five, each attributed |
+| `typescript-coder` | `dea984c` | module constraint attributed |
+
+**Residual findings for later tasks** (not TASK-006 defects, recorded so they are not lost):
+
+1. Tool declarations use the roster convention `{server} MCP` (`supabase MCP`), while `context/mcp/mcp.json`
+   registers `supabase`. Nothing validates the name, so a definition can declare a capability that no
+   runtime exposes — the same failure class as a phantom rule file. Candidate check for TASK-004.
+2. No validator resolves `file.md §section` citations today. The audit script used here
+   (resolve file, then match heading) found six defects across five definitions in one pass — worth
+   promoting into `context/scripts/validators/` with a RED test first (TASK-003, TASK-004).
+3. `context/agents/cursor-workflow-helper.mdc` cites `context/agents/CLAUDE.md` and uses `./artefacts/`
+   paths. Not a definition and not globbed by the validator; same drift class, unowned.
 
 ---
 
