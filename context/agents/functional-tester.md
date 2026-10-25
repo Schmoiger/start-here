@@ -8,7 +8,6 @@ tools:
 standards:
   - testing-standards.md
   - tech-standards.md
-  - context-framework.md
   - doc-standards.md
 rules:
   - bash-environment.md

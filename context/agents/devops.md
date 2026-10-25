@@ -12,7 +12,6 @@ rules:
   - bash-environment.md
   - multi-agent-collaboration.md
   - secrets.md
-  - tech-writing.md
   - workspace-conventions.md
 skills:
   - agent-sandbox.md

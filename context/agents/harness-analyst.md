@@ -15,8 +15,6 @@ rules:
 skills:
   - agent-sandbox.md
   - agent-workflows.md
-  - architecture-fidelity.md
-  - git-subrepo-operations.md
   - multi-agent-workflows.md
   - python-scripting.md
   - tokenomics-audit.md
