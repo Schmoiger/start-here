@@ -1,7 +1,7 @@
 [ ] Check standards are DRY, do not include code samples, even no installation notes (tech-standards needs work)
 [ ] Investigate Comprehensive Pre-Commit Validators: Upgrade british_english.py beyond a hardcoded list to comprehensive dictionary-based checks (e.g. pyspelling/Hunspell) and add pre-commit enforcement against forbidden toolchains.
 [ ] Replace per-repo context in existing repositories (e.g. bollinger) with the canonical standards subrepo (`git subrepo clone git@github.com:Schmoiger/start-here.git context -b standards`).
-[ ] Configure GitHub Actions secrets and variables in repository settings (`ANTHROPIC_API_KEY` in Secrets, `RUN_LLM_TESTS` in Variables) to support CI LLM consistency testing.
+[ ] Configure GitHub Actions secrets and variables in repository settings (`ANTHROPIC_API_KEY`, `RUN_LLM_TESTS` in .env) to support CI LLM consistency testing.
 [ ] Framework has token bloat for simple tasks. Implement system 1 thinking (Jev) to pre-classify the work: use Jev to pick which workflow to follow. Add system one models to model LUT.
 [ ] Add new workflow for trivial work, uses a general purpose agent. 
 [ ] revise Persona to be formatted the same (as author.md)

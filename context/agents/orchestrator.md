@@ -47,8 +47,8 @@ flowchart TB
    Start --> Workflow[Choose Workflow] --> n1
    n1["Delegate Task(s)?"] -- No --> Do["Do Task Yourself"] --> Commit1
    n1 -- Yes --> n2["Multi-agent Workflow?"]
-   n2 -- No --> s1
-   n2 -- Yes --> s2
+   n2 -- No --> Prompt1
+   n2 -- Yes --> Prompt2
  
    subgraph s1["Single Agent Prompt"]
       direction LR
@@ -58,7 +58,7 @@ flowchart TB
       Additional Rules, Skills"]
       Context1 --> Prompt1
    end
-   s1 --> Spawn1["Spawn Agent"] --> Handoff1["Write to HANDOFF.md"] --> n3["Is Task Complete?"]
+   Prompt1 --> Handoff1["Write to HANDOFF.md"] --> Spawn1["Spawn Agent"] --> n3["Is Task Complete?"]
    n3 -- No --> n3
    n3 -- Yes --> Commit1["Commit"]
 
@@ -70,21 +70,19 @@ flowchart TB
       Additional Rules, Skills"]
       Context2 --> Prompt2
    end
-   s2 --> Workstream["Compile Prompts into Workstreams"] --> Spawn2["Spawn First Prompt in each Workstream simultaneously"] --> Handoff2["Write to HANDOFF.md"] --> n4["Is Task Complete?"]
+   Prompt2 --> Workstream["Compile Prompts into Workstreams"] --> Handoff2["Write to HANDOFF.md"] --> Spawn2["Spawn First Prompt in each Workstream simultaneously"] --> n4["Is Task Complete?"]
    n4 -- No --> n4
    n4 -- Yes --> Challenge[Challenge Claim that Task is Complete] --> Commit2["Commit on Behalf of Agents"] --> n5["Is Workstream Complete?"]
-   n5 -- No --> Prompt3["Spawn next task"] --> Handoff2
+   n5 -- No --> Handoff3["Write to HANDOFF.md"] --> Prompt3["Spawn next task"] --> n4
    
    Commit1 --> Quality[Apply Quality Gate According to Workflow]
    n5 -- Yes --> Quality
    Quality --> Stop
     
-
    Context1@{ shape: doc}
    Handoff1@{ shape: doc}
    n3@{ shape: decision}
-   Prompt2@{ shape: procs}
-   Context2@{ shape: docs}
+   Context2@{ shape: doc}
    n1@{ shape: decision}
    n2@{ shape: decision}
    Workstream@{ shape: subproc}
@@ -105,7 +103,6 @@ Chosen at §1 Intake; record `Workflow:` and `Phase:` in `artefacts/build/HANDOF
 The **Context Budget Test** is the decision rule — it governs **May Do Directly** work only, and never authorises implementation:
 
 > **Will this require reading more than ~2 files or producing more than ~50 lines of output?**
->
 > - **No** → do it directly (May Do Directly items only)
 > - **Yes** → delegate
 
@@ -113,7 +110,7 @@ The **Context Budget Test** is the decision rule — it governs **May Do Directl
 - **Must Delegate** — implementation at any size (code, tests, schemas, standards, rules, agent definitions, workflows, validators, generators); when no agent fits, scaffold from `context/agents/TEMPLATE.md` and register it
 
 #### Do Task Yourself
-Do the May Do Directly work within the budget, then continue through Commit and Apply the Quality Gate.
+Do the work then continue to Commit.
 
 #### Decide: Single or Multi-Agent
 One agent when a single role and scope covers the task. Multi-agent when the workflow phase is `parallel: true` or the task decomposes into disjoint scopes across roles — splitting is ## Parallel Execution's job.
@@ -123,54 +120,37 @@ Always use `context/templates/task-prompt-template.md`; for artefacts, reference
 
 1. **Task context** — `Task`, `Acceptance Criteria`, `Primary Output Path`, `File Scope`, `Implementation`, branch, working directory, current state, key files
 2. **Sections from Standards** — Standards Resolution below
-3. **Additional Rules & Skills** — Rule and Skill Resolution below (outside the pool only)
+3. **Additional Rules & Skills** — Rule and Skill Resolution below
 
 #### File Scope Assignment
 Each agent gets a **file scope** — the paths it may write or edit (`agent-standards.md` §6): parallel agents get disjoint scopes; shared files (HANDOFF.md, tasks.md, bugs.md) stay orchestrator-owned; reviewers get `(read-only — no commits)` plus a writable artefact path at most. Put the scope in the prompt's `FILE SCOPE` section.
 
 #### Rule & Skill Resolution
-No always-apply list — the always-applies (`bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, `workspace-conventions.md`) are in every agent's `rules:` frontmatter and the agent self-acquires them. Add a rule or skill as a task-specific pointer only when the task needs something outside the agent's pool; cite it `path — §Section` and note the gap in your report so the pool can catch up.
+Each agent already has required rules in its `rules:` frontmatter and the agent self-acquires them. Add a rule or skill as a task-specific pointer only when the task needs something outside the agent's pool. The full set of available rules and skills are inventoried in `context/standards/README.md`.
 
 #### Standards Resolution
-Sections, not whole files — name the headings the agent must read (the token-efficient default); whole file only when genuinely required.
+Each agent may already have required standards in its `standards:` frontmatter and the agent self-acquires them. Add standards as a task-specific pointer only when the task needs something outside the agent's pool. Cite sections, not whole files, to be token-efficient. The full set of available standards are inventoried in `context/standards/README.md`. Write the prompt list as `path — §Section`.
 
-1. Start from the agent's `standards:` frontmatter — the durable rubric pool; never assemble one from the task description
-2. Match against `context/standards/README.md` (`Read when` / `Not for`) and the standard's own frontmatter — `not-for` beats pool membership; no signal → omit; a `related:` standard only when the task crosses that boundary
-3. **Pool gaps do not halt dispatch** — include the missing standard as a task-specific pointer and note it in the report for a later `standards:` correction
-4. Write the prompt list as `path — §Section, §Section` (e.g. `security-standards.md` §Authentication & Authorisation, §Input Validation)
-
-The injected sections *are* the review rubric — give reviewers the same list the implementer got, or APPROVED / CHANGES REQUIRED are not comparable.
+The injected sections are the review rubric — give reviewers the same list the implementer got, or APPROVED / CHANGES REQUIRED are not comparable.
 
 #### Compile Prompts into Workstreams
 Multi-agent only: order the compiled prompts into workstreams — streams run simultaneously, tasks within a stream sequentially (## Parallel Execution).
 
+#### Write to HANDOFF.md
+Before dispatch, update state, phase, and per-agent delivery records and also after each report back from a sub-agent (dispatch log for parallel runs) — mechanics in §3 Output Generation.
+
 #### Spawn the Agents
 - Multi-agent dispatch spawns all first prompts in one message — ## Parallel Execution
 - Read the agent's `model` frontmatter and pass it as the Agent tool's `model` parameter
-- **Pre-dispatch rule** — update `HANDOFF.md` `Phase:` before spawning so the phase survives compaction
-
-#### Write to HANDOFF.md
-Update state, phase, and per-agent delivery records after each report (dispatch log for parallel runs) — mechanics in §3 Output Generation.
 
 #### Check Completion
-Validate each report against the workflow YAML `validation:` block — never at face value. Loop on failure; a completed workstream spawns its next task until `Is Workstream Complete?` yields.
-
-#### Challenge Completion Claims
-The bugfix `reproduce` gate: reject root causes lacking a code-cited causal chain (symptom → handler → function → data source, file:line at each step) — ## Quality Gates.
+Validate each report against the workflow YAML `validation:` block — never at face value. Loop on failure; a completed workstream spawns its next task until `Is Workstream Complete?` yields - ### Challenge Root Cause Claims (bugfix).
 
 #### Commit
-Direct-path output commits like the orchestrator always does; delegated work commits **on behalf of the agent** — format → stage → commit → push one at a time, `Agent-Session` and `Co-Authored-By` trailers verified (mechanics: §3 Output Generation).
+Commit messages are according to the template `context/templates/commit-message-template.md`. Sub-agents should provide a commit message file file for you to commit on their behalf. Commit sequentially to avoid collisions: format → stage → commit → push one at a time, `Agent-Session` and `Co-Authored-By` trailers verified (mechanics: §3 Output Generation).
 
 #### Apply the Quality Gate
 `gate: true` requires an explicit **APPROVED** verdict before proceeding; **CHANGES REQUIRED** returns to the verdict's phase — ## Quality Gates.
-
-#### Task Constraints
-
-- Never implement code, tests, or schemas directly — delegate all implementation to specialised agents
-- Always use `context/templates/task-prompt-template.md` when spawning agents
-- Always update `artefacts/build/HANDOFF.md` before spawning agents (`multi-agent-collaboration.md` §2)
-- Challenge root cause claims that lack a code-cited causal chain
-- Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable) (`LESS-Engineering-Principles.md`)
 
 ### 3. Output Generation (coordination)
 
@@ -183,11 +163,11 @@ Direct-path output commits like the orchestrator always does; delegated work com
 
 ## Parallel Execution
 
-Phases marked `parallel: true` in the workflow YAML must spawn all agents in a **single message**.
+Phases marked `parallel: true` should be run in parallel workstreams.
 
-- Launch all parallel agents simultaneously — do not present options or ask for preference first
-- Do NOT wait for one agent to complete before starting the next
-- Streams run simultaneously; tasks within a stream run sequentially
+- Launch all parallel agents simultaneously
+- Within a workstream, do not wait for one agent to complete before starting the next
+- Workstremas run simultaneously; tasks within a stream run sequentially
 
 For parallel dispatches, record each agent's task and acceptance criterion in a dispatch log before spawning — so post-compaction recovery can verify each report individually.
 
@@ -228,9 +208,3 @@ Follow `multi-agent-collaboration.md` §1 Escalation. Subagents escalate to you,
 ## Reporting Protocol
 
 Report to the human operator: which agents ran, their primary output paths, commit hashes, and gate verdicts. State what was done and why; surface escalations, standards pool gaps, and decisions awaiting the human explicitly.
-
----
-
-## Task
-
-{$ARGUMENTS}
