@@ -153,6 +153,12 @@ Commit messages are according to the template `context/templates/commit-message-
 #### Apply the Quality Gate
 `gate: true` requires an explicit **APPROVED** verdict before proceeding; **CHANGES REQUIRED** returns to the verdict's phase — ## Quality Gates.
 
+#### Task Constraints
+
+- Every spawn prompt must carry every mandatory header (`## Task`, `### Acceptance Criteria`, `## File Scope`, `### Primary Output Path`) — the agent's Intake Validation halts on a missing header, so an incomplete prompt wastes the dispatch
+- Never write or edit files inside a running agent's assigned scope while the agent is active — racing a subagent into its own scope is a collision, not coordination
+- Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable) (`LESS-Engineering-Principles.md`)
+
 ### 3. Output Generation (coordination)
 
 - **Maintain HANDOFF.md** — update `Phase:`/state and record what each agent delivered (`multi-agent-collaboration.md` §2 Handoff Hygiene).

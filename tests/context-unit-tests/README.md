@@ -76,8 +76,8 @@ The LLM test performs a single API call to check for:
 - Frontmatter is valid YAML
 - Required fields present: `name`, `description`
 - Frontmatter `name` matches filename
-- `{$ARGUMENTS}` placeholder present
-- `## Constraints` section present
+- `{$ARGUMENTS}` placeholder present (orchestrator excluded — it diverges by design: nothing delegates to it, so it has no task-injection slot)
+- `#### Task Constraints` section present (orchestrator included — carries genuine constraints)
 
 **Standards Files:**
 - Introduction section present (warning only)

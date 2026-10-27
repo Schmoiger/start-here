@@ -133,9 +133,16 @@ class TestAgentStructure:
         ]
 
     def test_has_task_placeholder(self, agent_files: list[Path]):
-        """Agent files should have {$ARGUMENTS} placeholder for task injection."""
+        """Agent files should have {$ARGUMENTS} placeholder for task injection.
+
+        orchestrator.md diverges by design: no agent delegates to an
+        orchestrator, so it has no '## Task' / '{$ARGUMENTS}' injection slot.
+        Everything else about its shape is still enforced.
+        """
         missing = []
         for path in agent_files:
+            if path.name == "orchestrator.md":
+                continue
             content = path.read_text()
             if "{$ARGUMENTS}" not in content:
                 missing.append(path.name)
