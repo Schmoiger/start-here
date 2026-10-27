@@ -42,99 +42,127 @@ The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatt
 
 ### 2. Execution
 
-#### Context Budget Test
+```mermaid
+flowchart TB
+   Start --> Workflow[Choose Workflow] --> n1
+   n1["Delegate Task(s)?"] -- No --> Do["Do Task Yourself"] --> Commit1
+   n1 -- Yes --> n2["Multi-agent Workflow?"]
+   n2 -- No --> s1
+   n2 -- Yes --> s2
+ 
+   subgraph s1["Single Agent Prompt"]
+      direction LR
+      Prompt1["Compile Prompt"]
+      Context1["Task Context
+      Sections from Standards
+      Additional Rules, Skills"]
+      Context1 --> Prompt1
+   end
+   s1 --> Spawn1["Spawn Agent"] --> Handoff1["Write to HANDOFF.md"] --> n3["Is Task Complete?"]
+   n3 -- No --> n3
+   n3 -- Yes --> Commit1["Commit"]
+
+   subgraph s2["Multi-Agent Prompts"]
+      direction RL
+      Prompt2["Compile Prompts"]
+      Context2["Task Context
+      Sections from Standards
+      Additional Rules, Skills"]
+      Context2 --> Prompt2
+   end
+   s2 --> Workstream["Compile Prompts into Workstreams"] --> Spawn2["Spawn First Prompt in each Workstream simultaneously"] --> Handoff2["Write to HANDOFF.md"] --> n4["Is Task Complete?"]
+   n4 -- No --> n4
+   n4 -- Yes --> Challenge[Challenge Claim that Task is Complete] --> Commit2["Commit on Behalf of Agents"] --> n5["Is Workstream Complete?"]
+   n5 -- No --> Prompt3["Spawn next task"] --> Handoff2
+   
+   Commit1 --> Quality[Apply Quality Gate According to Workflow]
+   n5 -- Yes --> Quality
+   Quality --> Stop
+    
+
+   Context1@{ shape: doc}
+   Handoff1@{ shape: doc}
+   n3@{ shape: decision}
+   Prompt2@{ shape: procs}
+   Context2@{ shape: docs}
+   n1@{ shape: decision}
+   n2@{ shape: decision}
+   Workstream@{ shape: subproc}
+   Challenge@{ shape: subproc}
+   Handoff2@{ shape: doc}
+   n4@{ shape: decision}
+   n5@{ shape: decision}
+   Start@{ shape: terminal}
+   Stop@{ shape: terminal}
+```
+
+Each box in the chart maps to a subsection below — the chart is the order, the subsections are the how.
+
+#### Choose Workflow
+Chosen at §1 Intake; record `Workflow:` and `Phase:` in `artefacts/build/HANDOFF.md` before the first spawn. Do not re-choose mid-run.
+
+#### Decide: Direct or Delegate
+The **Context Budget Test** is the decision rule — it governs **May Do Directly** work only, and never authorises implementation:
 
 > **Will this require reading more than ~2 files or producing more than ~50 lines of output?**
 >
-> - **No** → do it directly — but ONLY for work in the May Do Directly list
+> - **No** → do it directly (May Do Directly items only)
 > - **Yes** → delegate
 
-**The budget test governs coordination and task management only — it never authorises implementation.** Reading source code is investigation and may be done directly within the budget; writing or editing code, tests, schemas, standards, rules, or agent definitions is implementation and is **always delegated, regardless of size**. "Do it directly" never means writing implementation to save time.
+- **May Do Directly** — git operations; task management (tasks.md, HANDOFF.md, `artefacts/build/interruptions/`); coordinating agent output; committing on behalf of subagents; file moves/renames/deletes with no content judgement
+- **Must Delegate** — implementation at any size (code, tests, schemas, standards, rules, agent definitions, workflows, validators, generators); when no agent fits, scaffold from `context/agents/TEMPLATE.md` and register it
 
-#### May Do Directly
+#### Do Task Yourself
+Do the May Do Directly work within the budget, then continue through Commit and Apply the Quality Gate.
 
-- Git operations (status, log, diff, add, commit, push)
-- Task management (update tasks.md, HANDOFF.md, and `artefacts/build/interruptions/`)
-- Coordinating and sequencing agent outputs
-- Committing and pushing on behalf of subagents (format → stage → commit → push, one at a time to protect from accidental deletion)
-- File operations (move, rename, delete) when no content judgement is needed
+#### Decide: Single or Multi-Agent
+One agent when a single role and scope covers the task. Multi-agent when the workflow phase is `parallel: true` or the task decomposes into disjoint scopes across roles — splitting is ## Parallel Execution's job.
 
-#### Must Delegate
+#### Compile the Prompt(s)
+Always use `context/templates/task-prompt-template.md`; for artefacts, reference the artefact template in IMPLEMENTATION/ACCEPTANCE (`context/templates/README.md`). The agent's frontmatter pool is self-acquired via its Context Acquisition — do not re-inject it; the prompt carries only task-specific context:
 
-- Code, tests, and schemas — always, even one-line changes
-- Harness content — standards, rules, agent definitions, workflow YAML, validators, generators (`@harness-analyst` owns harness edits; `@devops` owns CI wiring; gate agents never implement)
-- If no agent exists for a task: create one from `context/agents/TEMPLATE.md`, register it in `context/agents/README.md`, then delegate. Do not write implementation directly to save time.
+1. **Task context** — `Task`, `Acceptance Criteria`, `Primary Output Path`, `File Scope`, `Implementation`, branch, working directory, current state, key files
+2. **Sections from Standards** — Standards Resolution below
+3. **Additional Rules & Skills** — Rule and Skill Resolution below (outside the pool only)
 
 #### File Scope Assignment
+Each agent gets a **file scope** — the paths it may write or edit (`agent-standards.md` §6): parallel agents get disjoint scopes; shared files (HANDOFF.md, tasks.md, bugs.md) stay orchestrator-owned; reviewers get `(read-only — no commits)` plus a writable artefact path at most. Put the scope in the prompt's `FILE SCOPE` section.
 
-Before spawning, assign each agent a **file scope** — the paths it may write or edit (`agent-standards.md` §6):
-
-- **Parallel agents must have disjoint scopes** — verify no path overlap before dispatching
-- **Shared files are orchestrator-owned** — HANDOFF.md, tasks.md, bugs.md are never in an agent's scope; update them after agents report back (`multi-agent-collaboration.md` §2)
-- **Read-only agents** (reviewers) get `(read-only — no commits)` as their scope and a writable artefact output path at most (e.g. `artefacts/reviews/`)
-
-Include the scope in the spawn prompt's `FILE SCOPE` section.
-
-#### Compile the Spawn Prompt
-
-Always use `context/templates/task-prompt-template.md` when spawning agents — it carries the mandatory headings into the subagent run. When the task produces an artefact, consult `context/templates/README.md` and reference that artefact template explicitly in the prompt's IMPLEMENTATION or ACCEPTANCE section; agents do not select templates independently.
-
-**The subagent's frontmatter is its durable, task-independent context pool** — its Context Acquisition section mirrors that frontmatter and tells it to read the pool no matter the task. Do not re-inject the pool; that is redundant context. Your job is the two **task-specific** contexts, and reasoning is the point of this role:
-
-1. **Task context** — the task itself: `Task`, `Acceptance Criteria`, `Primary Output Path`, `File Scope`, `Implementation`, plus branch, working directory, current state, and key files.
-2. **Standards context** — the §sections of standards from the agent's pool relevant to *this* task (Standards Resolution below). Sections, not whole files: it is not token-efficient to make an agent read all of a standard when one section governs the task.
-
-#### Rule Resolution
-
-The agent self-acquires its rule pool from its own definition (frontmatter `rules:` → Context Acquisition), including the always-applies `bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, and `workspace-conventions.md` — already listed in every agent's `rules:` frontmatter, so there is **no always-apply injection list** to maintain here.
-
-Resolve a **task-specific rule pointer** only when the task demands a rule outside the agent's declared `rules:` (e.g. browser-automation constraints for a UI task the coder's pool lacks). When you do, cite it as `path — §Section` in the prompt and note the gap in your report for a later `rules:` correction — flagging it keeps the divergence from being silent.
-
-#### Skill Resolution
-
-Same principle. Match `context/skills/*.md` against the `AGENTS.md` `## Skills` index (`Globs / Triggers`) and the active workflow phase. Include a procedural skill only when the task needs a discipline the agent's `skills:` pool does not carry, or when the workflow phase names one explicitly.
+#### Rule & Skill Resolution
+No always-apply list — the always-applies (`bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, `workspace-conventions.md`) are in every agent's `rules:` frontmatter and the agent self-acquires them. Add a rule or skill as a task-specific pointer only when the task needs something outside the agent's pool; cite it `path — §Section` and note the gap in your report so the pool can catch up.
 
 #### Standards Resolution
+Sections, not whole files — name the headings the agent must read (the token-efficient default); whole file only when genuinely required.
 
-Standards are **reference material, not baseline** — too verbose to preload, but omitting the one a task is judged against makes the agent invent its own criteria. Select the **sections** of the agent's pool relevant to this exact task:
+1. Start from the agent's `standards:` frontmatter — the durable rubric pool; never assemble one from the task description
+2. Match against `context/standards/README.md` (`Read when` / `Not for`) and the standard's own frontmatter — `not-for` beats pool membership; no signal → omit; a `related:` standard only when the task crosses that boundary
+3. **Pool gaps do not halt dispatch** — include the missing standard as a task-specific pointer and note it in the report for a later `standards:` correction
+4. Write the prompt list as `path — §Section, §Section` (e.g. `security-standards.md` §Authentication & Authorisation, §Input Validation)
 
-1. **Start from the agent's pool** — the `standards:` frontmatter of `context/agents/{agent-name}.md` is the durable declaration of what the agent may be judged against; do not assemble a pool from the task description.
-2. **Match against the Standards Map** — `context/standards/README.md` (`Read when` / `Not for` columns) plus `read-when` / `not-for` frontmatter on the standard itself. `not-for` beats pool membership; no signal means omit:
+The injected sections *are* the review rubric — give reviewers the same list the implementer got, or APPROVED / CHANGES REQUIRED are not comparable.
 
-   | Signal                                          | Meaning                                        | Action                                       |
-   | ----------------------------------------------- | ---------------------------------------------- | -------------------------------------------- |
-   | `read-when` matches the work in the task        | Standard governs this task                     | Include                                      |
-   | `not-for` matches the work in the task           | Standard explicitly excludes it                | Omit, even when it is in the agent's pool    |
-   | Standard appears in an included standard's `related:` (where present) | Adjacent concern        | Include only if the task crosses that boundary |
-   | No signal either way                            | Pool membership alone is not a task signal    | Omit — standards are read on demand          |
+#### Compile Prompts into Workstreams
+Multi-agent only: order the compiled prompts into workstreams — streams run simultaneously, tasks within a stream sequentially (## Parallel Execution).
 
-3. **Target sections, not whole files** — name the headings the agent needs (e.g. `security-standards.md` §Authentication & Authorisation) and tell it to read only those. If the task genuinely requires the whole document, say so explicitly.
+#### Spawn the Agents
+- Multi-agent dispatch spawns all first prompts in one message — ## Parallel Execution
+- Read the agent's `model` frontmatter and pass it as the Agent tool's `model` parameter
+- **Pre-dispatch rule** — update `HANDOFF.md` `Phase:` before spawning so the phase survives compaction
 
-4. **Handle pool gaps without halting** — if the task needs a standard the agent does not declare, include it in the prompt as a task-specific pointer and note the gap in your report for a later `standards:` correction; do not stop dispatch to fix frontmatter first. Flagging it in the report keeps the divergence from being silent.
+#### Write to HANDOFF.md
+Update state, phase, and per-agent delivery records after each report (dispatch log for parallel runs) — mechanics in §3 Output Generation.
 
-5. **Build the read list** as full paths with section anchors:
+#### Check Completion
+Validate each report against the workflow YAML `validation:` block — never at face value. Loop on failure; a completed workstream spawns its next task until `Is Workstream Complete?` yields.
 
-   ```text
-   Relevant standards:
-   1. context/standards/coding-standards.md — §File Organisation, §Error Handling & Safe Failure
-   2. context/standards/security-standards.md — §Authentication & Authorisation, §Input Validation
-   ```
+#### Challenge Completion Claims
+The bugfix `reproduce` gate: reject root causes lacking a code-cited causal chain (symptom → handler → function → data source, file:line at each step) — ## Quality Gates.
 
-**Example**: spawning `@python-coder` for a task touching `services/data-service/src/**/*.py`, adding an authenticated endpoint, producing code only:
+#### Commit
+Direct-path output commits like the orchestrator always does; delegated work commits **on behalf of the agent** — format → stage → commit → push one at a time, `Agent-Session` and `Co-Authored-By` trailers verified (mechanics: §3 Output Generation).
 
-- Pool (frontmatter): tech-standards, coding-standards, security-standards, doc-standards
-- `Read when` matches → coding-standards (§Python/FastAPI Patterns, §Error Handling & Safe Failure), security-standards (§Authentication & Authorisation, §Input Validation), tech-standards (§Preferred Technology Stack) — **include, with sections**
-- doc-standards → the task produces no docs or artefacts — **omit**
-- testing-standards, visual-standards → not in the pool; testing is covered by the `testing.md` rule, visual-standards is not-for backend — **omit**
-
-**Why this matters**: the resolved sections *are* the rubric. Reviewers grade against the standards injected into their prompt, so give the reviewer the same sections the implementer was held to — otherwise the review invents the missing criteria and the gate becomes noise. Resolving the identical list for implementer and reviewer is what makes APPROVED / CHANGES REQUIRED comparable.
-
-#### Spawn and Monitor
-
-- Read the agent's `model` field from `context/agents/{agent-name}.md` frontmatter and pass it as the `model` parameter on the Agent tool call, so the agent runs on the model its definition specifies.
-- **Pre-dispatch rule**: update `HANDOFF.md` `Phase:` *before* spawning, not after — the phase must be on disk before the subagent runs, so it survives compaction.
-- `parallel: true` phases spawn all agents in a single message (Parallel Execution below).
-- When a subagent reports back, validate its output against the workflow YAML `validation:` block for the phase — do not accept a report at face value.
+#### Apply the Quality Gate
+`gate: true` requires an explicit **APPROVED** verdict before proceeding; **CHANGES REQUIRED** returns to the verdict's phase — ## Quality Gates.
 
 #### Task Constraints
 
