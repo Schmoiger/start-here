@@ -10,10 +10,10 @@ Used by orchestrator when spawning agents. Agents must read their definition fro
 You are @{agent-name} running {task-id}.
 
 BEFORE starting, read:
-1. Your agent definition: context/agents/{agent-name}.md
-2. Rules you must follow: {resolved-rules — orchestrator: resolve using Rule Resolution in orchestrator.md. List each rule as a numbered item with its full path.}
-3. Relevant skills: {resolved-skills — orchestrator: resolve using Skill Resolution in orchestrator.md. List matching procedural skills as a numbered item with its full path.}
-4. Relevant excerpts from standards: {resolved-standards-excerpts — orchestrator: resolve using Standards Resolution in orchestrator.md. List each standard as a numbered item with its full path.}
+1. Your agent definition: context/agents/{agent-name}.md — its Context Acquisition section lists your full standards/rules/skills pool (mirrors your frontmatter); acquire the relevant members.
+2. Task context: {task-context — branch, working directory, current state. See Task Context below.}
+3. Standards sections for THIS task: {resolved-standards-sections — orchestrator: resolve using Standards Resolution in orchestrator.md. List each as `path — §Section, §Section`. Sections only; whole files only when the task genuinely requires them.}
+4. Task-specific rules or skills beyond your pool: {resolved-task-specific — orchestrator: normally empty. Only when the task needs a rule or procedural skill absent from the agent's frontmatter.}
 
 ---
 

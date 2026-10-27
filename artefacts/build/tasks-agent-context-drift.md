@@ -16,7 +16,7 @@
 | TASK-004 | high | completed | fix | @python-coder | TASK-003 | GREEN: extend `context/scripts/validators/agent_definitions.py` to parse body rule tables and assert each `Source` resolves under `context/rules/` or `context/skills/` (mirror L71–90) |
 | TASK-005 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite `context/agents/python-coder.md` rule table to match frontmatter; remove duplicate type-hint constraint (L51 vs L72) |
 | TASK-006 | high | completed | fix | @harness-analyst | TASK-002, TASK-013 | Rewrite remaining 17 agent rule tables — drop pointer-only rows, keep short imperatives, add `Source` attribution. 14 of 15 definitions done; `orchestrator` §Rule Resolution is TASK-007's scope |
-| TASK-007 | normal | pending | fix | @harness-analyst | TASK-013 | Reconcile `context/agents/orchestrator.md` Rule Resolution always-apply list (L80–85, L105–106) with files that exist; decide whether `SKIPPED_FILES` (L30) keeps it |
+| TASK-007 | normal | completed | fix | @harness-analyst | TASK-013 | Rebuild `context/agents/orchestrator.md` on the task-specific-context model (agent pool self-acquires; orchestrator injects task + standards sections): kill the always-apply list, fix orphans (`escalation.md`, `git-commits.md`, `output-locations.md`, `british-english.md`), conform to `agent-template.md` shape; remove orchestrator from `SKIPPED_FILES` so the validator tests it (L36) |
 | TASK-008 | normal | pending | discuss | @solution-architect | TASK-012 | Decide compliance mechanism and layer taxonomy (frontmatter vs body vs injection); record in `artefacts/architecture/architecture-decision.md`; decide whether to add to harness-analyst agent or workflow-analyst skill |
 | TASK-012 | high | pending | diagnose | @solution-architect | TASK-017 | Add artefact-type lanes (code / harness / docs) with owner and validation to `continuous-improvement.yaml` §fix, so non-code fixes do not route to `@python-coder` (§Fix lanes) |
 | TASK-013 | high | completed | fix | @orchestrator | TASK-012, TASK-018 | Create `context/agents/harness-analyst.md` — harness owner; register in `context/agents/README.md`; regenerate adapters (§Harness-analyst spec) |
@@ -470,6 +470,27 @@ carry the offending line number.
 | Follow-up | `bfc774e` — diagnostics first reported body-relative line numbers, which point at the wrong line in an editor; `_validate_body_citations` now takes the frontmatter offset, pinned by a ninth test. `bcd0da4` — section prefixes must end on a word boundary, so a truncated citation (`§Test`) no longer matches `Testing Constraints`. |
 | Scope note | No agent definition carries a body rule table today (TASK-005/006 removed them), so the `Source` branch is forward-looking; the inline-citation branch is what protects the current definitions. |
 | Deviation | `context/scripts/validators/README.md`, `context/scripts/tests/README.md`, and both framework docs were updated with the new check — a validator nobody can find in the docs is the same discoverability gap that produced this incident. |
+
+---
+
+## TASK-007 prompt
+
+The frontmatter of each agent lists all the context that an agent will need no matter what its task. The job of the orchestrator is to add context that is specific to the task: 1) The task itself; 2) The section of standards (and infrequently, frameworks) that is relevant to the task. This is the Orchestrator's job because reasoning is needed to create both of these contexts e.g. it is not token-efficient to force a python agent to read all of the coding standards so the Orchestrator decides which ones are relevant to the task it is delegating.
+
+Let's fix the orchestrator agent, making sure it's token-efficient for agents:
+1. fix the minor citation staleness (the index row cites `SKIPPED_FILES` at validator "L30"; in the current file it's at __L36__)
+2. ensure it matches the agent template context/templates/agent-template.md; if there's a valid reason to diverge escalate to me
+3. fix the drift in referenced orphans
+4. fix any contradictions e.g. line 27 "Do NOT write code" vs line 35-37 "> **Will this require reading more than ~2 files or producing more than ~50 lines of output?**
+>
+> - **No** → do it directly"
+5. rebuild the Execution section as a workflow e.g.:
+- acquire the next task e.g. from prompt or task file or workflow
+- decide if it is a small task so should execute itself
+- compile the prompt to the subagent which will comprise all expected headings, task context, standards context
+- maintain HANDOFF.md
+- commit
+5. fix the validator so that it tests the orchestrator as well 
 
 ---
 

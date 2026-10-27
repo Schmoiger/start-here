@@ -14,12 +14,11 @@ All agents shall follow the standards defined in `./context/standards/` and rule
 
 ### Rule Injection
 
-Subagents do not auto-load rules. The orchestrator injects rules into each spawn prompt via Rule Resolution (see `context/agents/orchestrator.md`):
+Each agent's `rules:` frontmatter — mirrored by its Context Acquisition section — is the durable, task-independent rule pool of that agent. `agent_definitions.py` validates every frontmatter entry against `context/rules/`, and subagents acquire the pool by reading their own definition.
 
-1. **Always-apply rules** are hardcoded in the orchestrator definition and included for every agent. When adding a new rule with `alwaysApply: true`, you must also add it to the orchestrator's always-apply list.
-2. **Agent-specific rules** come from the agent's `rules:` frontmatter, filtered by glob match against the task's files.
+The orchestrator does not re-inject the pool. It adds only the two task-specific contexts: the task itself, and the §sections of standards relevant to that task (see `context/agents/orchestrator.md` §Standards Resolution). A task-specific rule pointer is added only when the task demands a rule outside the agent's declared `rules:` — and the frontmatter is corrected rather than the prompt silently diverging.
 
-This means a rule with `alwaysApply: true` in its `.mdc` frontmatter will NOT be injected unless it is also listed in the orchestrator's always-apply list.
+A rule with `alwaysApply: true` in its own frontmatter (e.g. `workspace-conventions.md`) is an always-apply rule because every agent bound by it lists it in its `rules:` frontmatter — not because a list is maintained inside the orchestrator definition.
 
 ### Canonical Asset Parsing
 
