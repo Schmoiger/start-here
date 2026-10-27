@@ -6,7 +6,7 @@ phases:
     name: Requirements & Planning
     sequential: true
     skills:
-      - superpowers:brainstorming
+
     agents:
       - product-owner   # Mode 1: interview into discovery-notes.md; Mode 2: formalise into requirements.md and user-stories.md
     outputs:
@@ -16,7 +16,7 @@ phases:
     name: Architecture Design
     depends_on: [discovery]
     skills:
-      - superpowers:brainstorming
+
     agents:
       - solution-architect  # Output architecture.md, data-model.md, api-catalogue.md, canonical openapi.yaml, and design docs for complex components
     outputs:
@@ -38,7 +38,7 @@ phases:
     name: UI & Visual Design
     depends_on: [design-contracts]
     skills:
-      - frontend-design
+
     agents:
       - ui-designer  # Component specs, design tokens, wireframes, user flows, and visual assets
     outputs:
@@ -51,8 +51,7 @@ phases:
     sequential: true
     gate: true
     skills:
-      - superpowers:requesting-code-review
-      - superpowers:receiving-code-review
+
     agents:
       - tech-lead           # Architecture and standards gate; APPROVED unblocks remaining reviewers
       - code-reviewer       # Implementation feasibility and line-level issues

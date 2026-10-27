@@ -11,6 +11,7 @@
 [ ] TDD skill should enforce commit after each phase (not assuming this will be by the orchestrator)
 [ ] Committing is token-intesive. Investigate and rationalise.
 [ ] Do we need context/agents/cursor-workflow-helper.mdc? Is it created by the Cursor runtime projection? Check.
+[ ] How to project skills as Claude superpowers? Do we even need to, as skills will be available anyway.
 
 ## Done
 

@@ -27,6 +27,7 @@
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
 | TASK-019 | high | completed | refactor | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
 | TASK-020 | high | won't do | refactor | @harness-analyst | TASK-013 | Retire `@code-reviewer` into a coder-executed skill — won't do (breaks author/reviewer separation; REQ-WF-003). Done instead: create `code-review` skill; slim `code-reviewer.md` to reference it (§TASK-020) |
+| TASK-021 | high | pending | refactor | @harness-analyst | TASK-013 | Some workflows are not DRY: they are specifying skills and rules when they should only be specifying agents and rarely, additional constraints for the Orchestrator to pick up |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
 | TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
 | TASK-011 | low | pending | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |

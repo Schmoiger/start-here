@@ -26,8 +26,7 @@ phases:
     parallel: true
     gate: true
     skills:
-      - superpowers:writing-plans
-      - superpowers:dispatching-parallel-agents
+
     agents:
       - tech-lead           # Architecture compliance, API contracts, functional smoke-check on subtask plan
       - solution-architect  # Service boundary traces; flag missing inter-service contracts
@@ -68,7 +67,7 @@ phases:
     name: "TDD Red: Write Failing Tests"
     depends_on: [schema-migration]
     skills:
-      - superpowers:test-driven-development
+
     agents:
       - functional-tester  # Write failing tests for all ACs; happy path, error path, edge cases
     outputs:
@@ -86,7 +85,7 @@ phases:
     name: Test Plan Review
     depends_on: [tdd-red]
     skills:
-      - superpowers:test-driven-development
+
     agents:
       - code-reviewer  # Verify every AC maps to a failing test; APPROVED unblocks tdd-green
     outputs:
@@ -106,11 +105,7 @@ phases:
     depends_on: [test-plan-review]
     parallel: true
     skills:
-      - superpowers:test-driven-development
-      - superpowers:dispatching-parallel-agents
-      - frontend-design
-      - superpowers:verification-before-completion
-      - superpowers:systematic-debugging
+
     agents:
       - python-coder      # Minimal Python to pass tests; no refactoring yet
       - typescript-coder  # Minimal TypeScript/React to pass tests; no refactoring yet
@@ -130,8 +125,7 @@ phases:
     depends_on: [tdd-green]
     gate: true
     skills:
-      - superpowers:verification-before-completion
-      - superpowers:systematic-debugging
+
     agents:
       - functional-tester  # Run coverage on changed files; fail gate if <95%
     outputs:
@@ -151,9 +145,7 @@ phases:
     depends_on: [coverage-gate]
     parallel: true
     skills:
-      - superpowers:test-driven-development
-      - superpowers:dispatching-parallel-agents
-      - superpowers:verification-before-completion
+
     agents:
       - python-coder      # Refactor Python; no new behaviour; tests must stay green
       - typescript-coder  # Refactor TypeScript; no new behaviour; tests must stay green
@@ -172,9 +164,7 @@ phases:
     depends_on: [tdd-blue]
     parallel: true
     skills:
-      - superpowers:dispatching-parallel-agents
-      - superpowers:requesting-code-review
-      - superpowers:receiving-code-review
+
     agents:
       - code-reviewer   # MUST FIX / SHOULD FIX findings → Pre-Sprint N+1
       - ui-tester       # Browser automation, screenshots, accessibility
@@ -193,7 +183,7 @@ phases:
     name: Local Deployment
     depends_on: [sprint-review]
     skills:
-      - superpowers:verification-before-completion
+
     agents:
       - devops  # Apply schema changes, deploy local services, smoke test, document rollback
     outputs:
@@ -208,7 +198,7 @@ phases:
     name: "Unit Regression (Changed Modules)"
     depends_on: [local-deployment]
     skills:
-      - superpowers:verification-before-completion
+
     agents:
       - functional-tester  # Full pytest/vitest on changed modules; confirm >=95% coverage
     scope: changed-modules
@@ -226,8 +216,7 @@ phases:
     name: "Integration Regression (Changed Interfaces)"
     depends_on: [unit-regression]
     skills:
-      - superpowers:verification-before-completion
-      - superpowers:systematic-debugging
+
     agents:
       - functional-tester  # API contract and boundary tests for changed interfaces
     scope: changed-interfaces
@@ -245,8 +234,7 @@ phases:
     depends_on: [integration-regression]
     parallel: true
     skills:
-      - superpowers:verification-before-completion
-      - superpowers:requesting-code-review
+
     agents:
       - ui-tester      # Browser test of changed workflows; screenshots required
       - code-reviewer  # Trace each happy path from button press to backend effect; compare against design artefacts and sequence diagrams
@@ -291,8 +279,7 @@ phases:
     depends_on: [docs-cleanup]
     gate: true
     skills:
-      - superpowers:requesting-code-review
-      - superpowers:receiving-code-review
+
     agents:
       - tech-lead  # Code and docs quality gate; APPROVED unblocks final-holistic-review
     outputs:
@@ -311,9 +298,7 @@ phases:
     parallel: true
     gate: true
     skills:
-      - superpowers:dispatching-parallel-agents
-      - superpowers:requesting-code-review
-      - superpowers:receiving-code-review
+
     agents:
       - solution-architect  # Architecture coherence at full-feature scale
       - tech-lead           # Aggregate test health and pre-commit hooks clean

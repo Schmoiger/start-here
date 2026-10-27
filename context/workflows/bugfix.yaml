@@ -7,8 +7,7 @@ phases:
     gate: true
     parallel: true
     skills:
-      - superpowers:systematic-debugging
-      - superpowers:dispatching-parallel-agents
+
     agents:
       - ui-tester          # Reproduce in browser using Chrome DevTools; capture screenshot and console errors
       - functional-tester  # Run existing test suite to establish baseline; identify which tests fail (if any)
@@ -36,9 +35,7 @@ phases:
     name: Implement Fix
     depends_on: [reproduce]
     skills:
-      - superpowers:systematic-debugging
-      - superpowers:test-driven-development
-      - superpowers:verification-before-completion
+
     agents:
       - functional-tester  # Write failing test that reproduces the bug (TDD Red) before any code change
       - python-coder        # Fix Python/backend code; run tests to green
@@ -73,9 +70,7 @@ phases:
     gate: true
     parallel: true
     skills:
-      - superpowers:systematic-debugging
-      - superpowers:dispatching-parallel-agents
-      - superpowers:verification-before-completion
+
     agents:
       - ui-tester          # Confirm fix in browser using Chrome DevTools; screenshot required
       - functional-tester  # Run full test suite; confirm no regressions introduced
