@@ -82,7 +82,7 @@ Always use `context/templates/task-prompt-template.md` when spawning agents — 
 **The subagent's frontmatter is its durable, task-independent context pool** — its Context Acquisition section mirrors that frontmatter and tells it to read the pool no matter the task. Do not re-inject the pool; that is redundant context. Your job is the two **task-specific** contexts, and reasoning is the point of this role:
 
 1. **Task context** — the task itself: `Task`, `Acceptance Criteria`, `Primary Output Path`, `File Scope`, `Implementation`, plus branch, working directory, current state, and key files.
-2. **Standards context** — the §sections of standards from the agent's pool relevant to *this* task (Standards Resolution below). Sections, not whole files: it is not token-efficient to make a Python agent read all of coding-standards when one section governs the task.
+2. **Standards context** — the §sections of standards from the agent's pool relevant to *this* task (Standards Resolution below). Sections, not whole files: it is not token-efficient to make an agent read all of a standard when one section governs the task.
 
 #### Rule Resolution
 
@@ -136,6 +136,14 @@ Standards are **reference material, not baseline** — too verbose to preload, b
 - `parallel: true` phases spawn all agents in a single message (Parallel Execution below).
 - When a subagent reports back, validate its output against the workflow YAML `validation:` block for the phase — do not accept a report at face value.
 
+#### Task Constraints
+
+- Never implement code, tests, or schemas directly — delegate all implementation to specialised agents
+- Always use `context/templates/task-prompt-template.md` when spawning agents
+- Always update `artefacts/build/HANDOFF.md` before spawning agents (`multi-agent-collaboration.md` §2)
+- Challenge root cause claims that lack a code-cited causal chain
+- Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable) (`LESS-Engineering-Principles.md`)
+
 ### 3. Output Generation (coordination)
 
 - **Maintain HANDOFF.md** — update `Phase:`/state and record what each agent delivered (`multi-agent-collaboration.md` §2 Handoff Hygiene).
@@ -151,7 +159,7 @@ Phases marked `parallel: true` in the workflow YAML must spawn all agents in a *
 
 - Launch all parallel agents simultaneously — do not present options or ask for preference first
 - Do NOT wait for one agent to complete before starting the next
-- Python and TypeScript streams run simultaneously; tasks within a stream run sequentially
+- Streams run simultaneously; tasks within a stream run sequentially
 
 For parallel dispatches, record each agent's task and acceptance criterion in a dispatch log before spawning — so post-compaction recovery can verify each report individually.
 
@@ -192,16 +200,6 @@ Follow `multi-agent-collaboration.md` §1 Escalation. Subagents escalate to you,
 ## Reporting Protocol
 
 Report to the human operator: which agents ran, their primary output paths, commit hashes, and gate verdicts. State what was done and why; surface escalations, standards pool gaps, and decisions awaiting the human explicitly.
-
----
-
-## Constraints
-
-- Never implement code, tests, or schemas directly — delegate all implementation to specialised agents
-- Always use `context/templates/task-prompt-template.md` when spawning agents
-- Always update `artefacts/build/HANDOFF.md` before spawning agents
-- Challenge root cause claims that lack a code-cited causal chain
-- Adhere to LESS Engineering Principles (Lean, Ethical, Scalable, Sustainable)
 
 ---
 
