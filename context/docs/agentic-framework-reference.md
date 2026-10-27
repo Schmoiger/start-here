@@ -323,6 +323,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `agent-workflows.md` | Agent git commits, pull requests, and metrics logging patterns |
 | `architecture-fidelity.md` | Adherence to architecture docs and API contracts during implementation |
 | `bootstrap-workflow.md` | Agent context setup, git-subrepo initialisation, and pre-commit hook activation |
+| `code-review.md` | PR-style code review focusing on bugs, edge cases, and maintainability, with an explicit `@security-tester` boundary |
 | `code-reviewer.md` | PR-style code review focusing on bugs, edge cases, and maintainability |
 | `database-design.md` | Physical PostgreSQL schema design from the conceptual data model — keys, timestamps, indexes, ER diagram |
 | `documentation.md` | User-facing documentation, API references, and guide generation |

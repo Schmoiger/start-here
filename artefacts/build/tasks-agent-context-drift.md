@@ -26,12 +26,12 @@
 | TASK-017 | high | pending | diagnose | @orchestrator | - | Fix TASK-012 lanes inconsistency — harness implementer is `@harness-analyst`, not `@orchestrator` |
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
 | TASK-019 | high | completed | refactor | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
-| TASK-020 | high | pending | refactor | @harness-analyst | TASK-013 | Refactor `context/agents/code-reviewer.md` as a skill, the python-coder or typescript-coder agent + code-review skill should be able to do the work; focus skill on code quality, ensure DRY e.g. not duplicating security testing |
+| TASK-020 | high | won't do | refactor | @harness-analyst | TASK-013 | Retire `@code-reviewer` into a coder-executed skill — won't do (breaks author/reviewer separation; REQ-WF-003). Done instead: create `code-review` skill; slim `code-reviewer.md` to reference it (§TASK-020) |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
 | TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
 | TASK-011 | low | pending | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |
 
-Detail map: TASK-001–TASK-013 → §Findings · TASK-014–TASK-019 → §Task detail.
+Detail map: TASK-001–TASK-013 → §Findings · TASK-014–TASK-020 → §Task detail.
 
 ---
 
@@ -361,6 +361,43 @@ no reference to `database-designer` or `gcp-devops` remains outside archive; the
 design workflow dispatches only existing agents; the four validation commands pass.
 
 **Write scope**: as TASK-014, plus `context/rules/supabase.md`.
+
+---
+
+### TASK-020 — `code-review` skill; `code-reviewer` stays a gate agent
+
+**Won't do (original refactor); Option A implemented 27 Oct 2026** by Cline (`@harness-analyst` role). Gate green: `agent_definitions.py` passes for the
+slimmed `code-reviewer.md`; adapters regenerated (new `.agents/skills/code-review/SKILL.md` projection and
+`AGENTS.md` Skills row); drift in sync; pytest green. The roster stays 15 — `code-reviewer` remains an agent.
+
+**Decision** — the original refactor is recorded as **won't do** (§Dispatch, `artefacts/build/todo.md`):
+retiring `@code-reviewer` into a skill executed by `@python-coder` / `@typescript-coder` turns an independent
+gate into self-review. The framework's gates depend on author/reviewer separation — `tech-lead.md` §Task
+Constraints ("Do not rewrite code — describe what needs to change") is only meaningful because the reviewer is
+not the author; REQ-WF-003 (`artefacts/product/requirements.md` L62) requires quality reviewers (tech-lead,
+code-reviewer, security-tester) to record formal approval before downstream phases unlock; and the TASK-013
+boundary table keeps gate agents as reviewers, never authors. A skill run inside the authoring agent shares
+the author's context and blind spots, and neither coder can review the other language stream (python-coder is
+Python-only; typescript-coder is TS-only).
+
+**Done instead (Option A)** — keep the gate agent; extract the review *technique* into a skill the agent
+references (DRY without losing independence):
+
+- Create `context/skills/code-review.md` — review scope, trace-every-path technique, `file:line` attribution,
+  prioritisation, fix snippets, no formatting nitpicks, and the explicit `@security-tester` boundary (catch
+  security bugs in changed code; never run a systematic security audit).
+  `globs: ["**/*.py", "**/*.ts", "**/*.tsx"]`.
+- `context/agents/code-reviewer.md` — `skills:` += `code-review.md`; §2 Task Constraints slims from eleven
+  inline bullets to five (gate ordering, reference the skill, output path, Typst validation, step-by-step
+  commits). The security boundary now lives only in the skill.
+- `context/README.md` — Skills inventory += `code-review`.
+- `context/docs/agentic-framework-reference.md` — Skills Catalogue += `code-review.md`.
+- `artefacts/build/todo.md` — `[WON'TDO]` entry recording the rejected agent retirement.
+
+**Acceptance**: `code-review.md` resolves under `context/skills/`; `code-reviewer.md` passes
+`agent_definitions.py` and its body no longer restates the skill's technique; the four validation commands
+pass; `code-reviewer` remains in `context/agents/`, the roster, `models.yaml`, and every workflow dispatch
+site unchanged.
 
 ---
 
