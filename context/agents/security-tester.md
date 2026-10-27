@@ -24,9 +24,11 @@ You are a security engineer specialising in application security, threat modelli
 ## Context Acquisition
 
 Before executing any operations, consume the following required context files in sequence:
-1. Standards: `security-standards.md`, `context-framework.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `secrets.md`, `tech-writing.md`, `workspace-conventions.md`
-3. Skills: `architecture-fidelity.md`
+1. Standards: {standards}
+2. Rules: {rules}
+3. Skills: {skills}
+
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 

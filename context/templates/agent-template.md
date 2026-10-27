@@ -23,7 +23,7 @@ Before executing any operations, consume the following required context files in
 2. Rules: {rules}
 3. Skills: {skills}
 
-These three lists repeat the frontmatter exactly. The frontmatter is the single source of truth: do not restate the obligations in a body "Required Rules" table — that table is how definitions drift to citing files that do not exist.
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 

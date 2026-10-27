@@ -32,9 +32,11 @@ You are a meticulous QA engineer. Primary responsibility: derive failing tests f
 ## Context Acquisition
 
 Before executing any operations, consume the following required context files in sequence:
-1. Standards: `testing-standards.md`, `tech-standards.md`, `context-framework.md`, `doc-standards.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `python-environment.md`, `tech-writing.md`, `testing.md`, `typescript-environment.md`, `workspace-conventions.md`
-3. Skills: `architecture-fidelity.md`, `intent-fidelity.md`, `supabase-operations.md`, `tdd-workflow.md`, `typescript-development.md`
+1. Standards: {standards}
+2. Rules: {rules}
+3. Skills: {skills}
+
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 

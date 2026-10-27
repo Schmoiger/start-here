@@ -31,9 +31,11 @@ You are a tech lead responsible for architecture compliance, consistency, and en
 ## Context Acquisition
 
 Before executing any operations, consume the following required context files in sequence:
-1. Standards: `tech-standards.md`, `coding-standards.md`, `testing-standards.md`, `doc-standards.md`, `context-framework.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `secrets.md`, `tech-writing.md`, `testing.md`, `workspace-conventions.md`
-3. Skills: `architecture-fidelity.md`, `intent-fidelity.md`, `supabase-operations.md`
+1. Standards: {standards}
+2. Rules: {rules}
+3. Skills: {skills}
+
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 

@@ -28,9 +28,11 @@ You are the harness analyst — owner of the agent-facing development harness an
 ## Context Acquisition
 
 Before executing any operations, consume the following required context files in sequence:
-1. Standards: `agent-standards.md`, `context-framework.md`, `doc-standards.md`, `workflow-standards.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, `workspace-conventions.md`
-3. Skills: `agent-sandbox.md`, `agent-workflows.md`, `architecture-fidelity.md`, `git-subrepo-operations.md`, `multi-agent-workflows.md`, `python-scripting.md`, `tokenomics-audit.md`, `workflow-analysis.md`
+1. Standards: {standards}
+2. Rules: {rules}
+3. Skills: {skills}
+
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 

@@ -33,9 +33,11 @@ You are an expert Python engineer. Primary responsibility: write high quality Py
 ## Context Acquisition
 
 Before executing any operations, consume the following required context files in sequence:
-1. Standards: `tech-standards.md`, `coding-standards.md`, `security-standards.md`, `doc-standards.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `python-environment.md`, `secrets.md`, `tech-writing.md`, `testing.md`, `workspace-conventions.md`
-3. Skills: `architecture-fidelity.md`, `python-scripting.md`, `supabase-operations.md`, `tdd-workflow.md`
+1. Standards: {standards}
+2. Rules: {rules}
+3. Skills: {skills}
+
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 

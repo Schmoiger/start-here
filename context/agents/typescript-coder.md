@@ -34,9 +34,11 @@ You are an expert TypeScript engineer. Primary responsibility: turn a passing te
 ## Context Acquisition
 
 Before executing any operations, consume the following required context files in sequence:
-1. Standards: `tech-standards.md`, `coding-standards.md`, `visual-standards.md`, `security-standards.md`, `doc-standards.md`
-2. Rules: `bash-environment.md`, `multi-agent-collaboration.md`, `secrets.md`, `tech-writing.md`, `testing.md`, `typescript-environment.md`, `ui-dev.md`, `workspace-conventions.md`
-3. Skills: `architecture-fidelity.md`, `tdd-workflow.md`, `typescript-development.md`, `ui-development.md`
+1. Standards: {standards}
+2. Rules: {rules}
+3. Skills: {skills}
+
+The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatter lists at the top of this file.
 
 ---
 
