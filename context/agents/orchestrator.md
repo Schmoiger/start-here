@@ -88,7 +88,7 @@ Always use `context/templates/task-prompt-template.md` when spawning agents — 
 
 The agent self-acquires its rule pool from its own definition (frontmatter `rules:` → Context Acquisition), including the always-applies `bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, and `workspace-conventions.md` — already listed in every agent's `rules:` frontmatter, so there is **no always-apply injection list** to maintain here.
 
-Resolve a **task-specific rule pointer** only when the task demands a rule outside the agent's declared `rules:` (e.g. browser-automation constraints for a UI task the coder's pool lacks). When you do, cite it as `path — §Section` in the prompt and report the gap so `rules:` is corrected — never let prompt and frontmatter drift silently.
+Resolve a **task-specific rule pointer** only when the task demands a rule outside the agent's declared `rules:` (e.g. browser-automation constraints for a UI task the coder's pool lacks). When you do, cite it as `path — §Section` in the prompt and note the gap in your report for a later `rules:` correction — flagging it keeps the divergence from being silent.
 
 #### Skill Resolution
 
@@ -110,7 +110,7 @@ Standards are **reference material, not baseline** — too verbose to preload, b
 
 3. **Target sections, not whole files** — name the headings the agent needs (e.g. `security-standards.md` §Authentication & Authorisation) and tell it to read only those. If the task genuinely requires the whole document, say so explicitly.
 
-4. **Handle pool gaps explicitly** — if the task needs a standard the agent does not declare, include it *and* report the gap to the human so `standards:` is corrected and adapters recompiled. Never let prompt and frontmatter drift silently.
+4. **Handle pool gaps without halting** — if the task needs a standard the agent does not declare, include it in the prompt as a task-specific pointer and note the gap in your report for a later `standards:` correction; do not stop dispatch to fix frontmatter first. Flagging it in the report keeps the divergence from being silent.
 
 5. **Build the read list** as full paths with section anchors:
 
