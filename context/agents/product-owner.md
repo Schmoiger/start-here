@@ -7,6 +7,7 @@ tools:
   - context7 MCP: current library documentation when scoping feasibility
   - tavily MCP: web search for discovery evidence
 standards:
+  - context-framework.md
   - doc-standards.md
 rules:
   - bash-environment.md

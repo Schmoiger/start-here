@@ -4,6 +4,7 @@ description: Coordinates workflow execution, delegates implementation to special
 model: large
 standards:
   - agent-standards.md
+  - context-framework.md
   - workflow-standards.md
 rules:
   - bash-environment.md

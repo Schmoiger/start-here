@@ -6,9 +6,10 @@ tools:
   - chrome-devtools MCP: runtime inspection when a test needs a real browser session
   - supabase MCP: schema, policy, and fixture inspection against the local stack
 standards:
-  - testing-standards.md
-  - tech-standards.md
+  - context-framework.md
   - doc-standards.md
+  - tech-standards.md
+  - testing-standards.md
 rules:
   - bash-environment.md
   - multi-agent-collaboration.md
