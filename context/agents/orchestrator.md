@@ -117,7 +117,7 @@ Do the work then continue to Commit.
 One agent when a single role and scope covers the task. Multi-agent when the workflow phase is `parallel: true` or the task decomposes into disjoint scopes across roles — splitting is ## Parallel Execution's job.
 
 #### Compile the Prompt(s)
-Always use `context/templates/task-prompt-template.md`; for artefacts, reference the artefact template in IMPLEMENTATION/ACCEPTANCE (`context/templates/README.md`). The agent's frontmatter pool is self-acquired via its Context Acquisition — do not re-inject it; the prompt carries only task-specific context:
+Always use `context/templates/task-prompt-template.md`; for artefacts, reference the artefact template in IMPLEMENTATION/ACCEPTANCE (`context/README.md` §Template Index). The agent's frontmatter pool is self-acquired via its Context Acquisition — do not re-inject it; the prompt carries only task-specific context:
 
 1. **Task context** — `Task`, `Acceptance Criteria`, `Primary Output Path`, `File Scope`, `Implementation`, branch, working directory, current state, key files
 2. **Sections from Standards** — Standards Resolution below
@@ -127,10 +127,10 @@ Always use `context/templates/task-prompt-template.md`; for artefacts, reference
 Each agent gets a **file scope** — the paths it may write or edit (`agent-standards.md` §6): parallel agents get disjoint scopes; shared files (HANDOFF.md, tasks.md, bugs.md) stay orchestrator-owned; reviewers get `(read-only — no commits)` plus a writable artefact path at most. Put the scope in the prompt's `FILE SCOPE` section.
 
 #### Rule & Skill Resolution
-Each agent already has required rules in its `rules:` frontmatter and the agent self-acquires them. Add a rule or skill as a task-specific pointer only when the task needs something outside the agent's pool. The full set of available rules and skills are inventoried in `context/standards/README.md`.
+Each agent already has required rules in its `rules:` frontmatter and the agent self-acquires them. Add a rule or skill as a task-specific pointer only when the task needs something outside the agent's pool. The full set of available rules and skills are inventoried in `context/README.md` §Inventory.
 
 #### Standards Resolution
-Each agent may already have required standards in its `standards:` frontmatter and the agent self-acquires them. Add standards as a task-specific pointer only when the task needs something outside the agent's pool. Cite sections, not whole files, to be token-efficient. The full set of available standards are inventoried in `context/standards/README.md`. Write the prompt list as `path — §Section`.
+Each agent may already have required standards in its `standards:` frontmatter and the agent self-acquires them. Add standards as a task-specific pointer only when the task needs something outside the agent's pool. Cite sections, not whole files, to be token-efficient. The full set of available standards are inventoried in `context/README.md` §Inventory and the Standards Map. Write the prompt list as `path — §Section`.
 
 The injected sections are the review rubric — give reviewers the same list the implementer got, or APPROVED / CHANGES REQUIRED are not comparable.
 

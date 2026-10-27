@@ -2,11 +2,14 @@
 
 ## Table of Contents
 
-Hydration index. Read only the section a task needs. Each folder has a readme.md to navigate.
+Hydration index. Read only the section a task needs. This is the single navigational README for the whole `context/` tree — sub-directories are not individually documented.
 
 1. [For Agents](#for-agents) — where everything lives, and how to change it safely
    - [Quick Reference](#quick-reference) — which directory holds what, and when to consult it
    - [Inventory](#inventory) — direct links to every rule, standard, skill, agent, workflow, template, persona, framework doc, script, and model profile
+      - [Agent Inventory](#agent-inventory) — the role roster with model tiers
+      - [Standards Map](#standards-map) — the Read when / Not for selection table
+      - [Template Index](#template-index) — artefact output formats and naming
    - [File Type Overview](#file-type-overview) — purpose of each file type, with its add/edit/delete checklist
      - [Agent Definition Files](#agent-definition-files) — agents, personas, model profiles, skills
      - [Context Definition Files](#context-definition-files) — rules, standards, workflows, framework docs
@@ -52,15 +55,15 @@ Hydration index. Read only the section a task needs. Each folder has a readme.md
 
 **Rules**: [bash-env](rules/bash-environment.md) · [multi-agent](rules/multi-agent-collaboration.md) · [python-env](rules/python-environment.md) · [secrets](rules/secrets.md) · [tech-writing](rules/tech-writing.md) · [testing](rules/testing.md) · [ts-env](rules/typescript-environment.md) · [ui-dev](rules/ui-dev.md) · [ui-testing](rules/ui-testing.md) · [workspace](rules/workspace-conventions.md)
 
-**Standards**: [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [build](standards/build-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [agent](standards/agent-standards.md) · [visual](standards/visual-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [mobile](standards/tech-mobile-standards.md) · [index](standards/README.md)
+**Standards**: [coding](standards/coding-standards.md) · [testing](standards/testing-standards.md) · [tech](standards/tech-standards.md) · [build](standards/build-standards.md) · [doc](standards/doc-standards.md) · [workflow](standards/workflow-standards.md) · [security](standards/security-standards.md) · [agent](standards/agent-standards.md) · [visual](standards/visual-standards.md) · [context](standards/context-framework.md) · [12-factor](standards/12-factor-principles.md) · [LESS](standards/LESS-Engineering-Principles.md) · [mobile](standards/tech-mobile-standards.md)
 
 **Skills**: [agent-sandbox](skills/agent-sandbox.md) · [agent-workflows](skills/agent-workflows.md) · [arch-fidelity](skills/architecture-fidelity.md) · [bootstrap-workflow](skills/bootstrap-workflow.md) · [database-design](skills/database-design.md) · [gcp-deployment](skills/gcp-deployment.md) · [git-subrepo](skills/git-subrepo-operations.md) · [intent-fidelity](skills/intent-fidelity.md) · [mermaid](skills/mermaid-authoring.md) · [multi-agent](skills/multi-agent-workflows.md) · [python-scripting](skills/python-scripting.md) · [supabase](skills/supabase-operations.md) · [tdd](skills/tdd-workflow.md) · [tech-authoring](skills/technical-authoring.md) · [ts-dev](skills/typescript-development.md) · [typst-pipeline](skills/typst-pipeline.md) · [ui-dev](skills/ui-development.md) · [ui-testing](skills/ui-testing.md)
 
-**Agents**: [orchestrator](agents/orchestrator.md) · [inventory](agents/README.md)
+**Agents**: [orchestrator](agents/orchestrator.md) · [product-owner](agents/product-owner.md) · [solution-architect](agents/solution-architect.md) · [ui-designer](agents/ui-designer.md) · [python-coder](agents/python-coder.md) · [typescript-coder](agents/typescript-coder.md) · [functional-tester](agents/functional-tester.md) · [tech-lead](agents/tech-lead.md) · [code-reviewer](agents/code-reviewer.md) · [principles-reviewer](agents/principles-reviewer.md) · [security-tester](agents/security-tester.md) · [ui-tester](agents/ui-tester.md) · [devops](agents/devops.md) · [documentation](agents/documentation.md) · [harness-analyst](agents/harness-analyst.md)
 
 **Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) · [retrospective](workflows/retrospective.yaml)
 
-**Templates**: [index](templates/README.md) · [agent](templates/agent-template.md) · [logging](templates/logging-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
+**Templates**: [agent](templates/agent-template.md) · [logging](templates/logging-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
 
 **Personas**: [author](persona/author.md) · [technical-writer](persona/technical-writer.md) · [opinionated-blogger](persona/opinionated-blogger.md) · [editor](persona/editor.md) · [expert-reviewer](persona/expert-reviewer.md)
 
@@ -70,6 +73,78 @@ Hydration index. Read only the section a task needs. Each folder has a readme.md
 
 **Model Profiles**: [models](models.yaml)
 
+
+### Agent Inventory
+
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| **orchestrator** | large | Coordinates workflow execution, delegates to specialised agents, manages quality gates |
+| **product-owner** | large | Elicits and structures requirements and user stories |
+| **solution-architect** | large | Designs system architecture, component boundaries, data flow, and the canonical OpenAPI contract |
+| **ui-designer** | medium | Designs UI layouts, component specs, design systems, and visual assets |
+| **python-coder** | medium | Writes production Python code |
+| **typescript-coder** | medium | Builds frontend and backend TypeScript |
+| **functional-tester** | medium | Writes and runs TDD tests for Python and TypeScript |
+| **tech-lead** | medium | Reviews code for architecture compliance — THE GATE |
+| **code-reviewer** | medium | PR-style review focusing on bugs, edge cases, and maintainability |
+| **principles-reviewer** | large | Reviews designs and implementations against LESS Engineering Principles |
+| **security-tester** | medium | Identifies vulnerabilities via threat modelling and code analysis |
+| **ui-tester** | small | Tests UI behaviour using browser automation |
+| **devops** | medium | Designs physical schemas and migrations; deploys and validates infrastructure |
+| **documentation** | medium | Generates user-facing docs, API references, and guides |
+| **harness-analyst** | large | Owns the agent-facing harness (definitions, rules, skills, templates, workflows, validators) and measures it — workflow-analysis and tokenomics-audit lenses |
+
+*Model tiers (small, medium, large) map to concrete provider models via `models.yaml`.*
+
+### Standards Map
+
+The orchestrator's Standards Resolution matches tasks against this table (`Read when` / `Not for`); `not-for` beats pool membership.
+
+| Standard | Purpose | Read when | Not for |
+|----------|---------|-----------|---------|
+| [tech-standards](standards/tech-standards.md) | Tool and platform choices | Tech choices, project setup | Testing methodology, code patterns |
+| [testing-standards](standards/testing-standards.md) | Testing methodology and TDD | Writing tests, coverage | Tool installation |
+| [coding-standards](standards/coding-standards.md) | Code patterns and structure | Writing code, reviewing PRs | Tool choices |
+| [security-standards](standards/security-standards.md) | Security principles | Auth design, data handling | Implementation details |
+| [build-standards](standards/build-standards.md) | CI/CD and deployment | Pipelines, deploying | Tech stack choices |
+| [doc-standards](standards/doc-standards.md) | Documentation structure | Writing docs, artefacts | Code patterns |
+| [workflow-standards](standards/workflow-standards.md) | Development process | Starting work, TDD flow | Tool choices |
+| [agent-standards](standards/agent-standards.md) | Agent behaviour and tools | Agent setup, tool usage | Tech stack |
+| [visual-standards](standards/visual-standards.md) | Visual design standards | UI design | Backend, API |
+| [LESS-Engineering-Principles](standards/LESS-Engineering-Principles.md) | Design philosophy | Architecture decisions | Implementation detail |
+| [12-factor-principles](standards/12-factor-principles.md) | SaaS application patterns | Designing services | Frontend, mobile |
+| [tech-mobile-standards](standards/tech-mobile-standards.md) | Mobile tech stack (deferred) | Mobile development | Web, backend |
+
+**DRY Principle**: each topic lives in **one** authoritative place. Standards cross-reference rather than duplicate. If the same guidance appears in two places, the standard listed in the "Purpose" column above is the authority.
+
+**Frontmatter Convention**: all standards use YAML frontmatter with `purpose`, `audience`, `read-when`, `not-for`, `related`.
+
+### Template Index
+
+The orchestrator consults this index when constructing a task prompt, references the matching template explicitly, and agents use whichever template the prompt specifies — they never select templates independently.
+
+| Template | Output type | Output location |
+|----------|-------------|-----------------|
+| `requirements-template.md` | EARS-format requirements | `artefacts/product/requirements.md` |
+| `user-stories-template.md` | User stories | `artefacts/product/user-stories.md` |
+| `tasks-doc-template.md` | Task tracking | `artefacts/build/tasks-{branch}.md` |
+| `bugs-template.md` | Bug tracker | `artefacts/build/bugs.md` |
+| `review-template.md` | Tech or code review | `artefacts/build/{tech,code}-review.md` |
+| `test-dashboard-template.md` | Test results dashboard | `artefacts/test-results/dashboard.md` |
+| `handoff-template.md` | Agent handoff state | `artefacts/build/HANDOFF.md` |
+| `commit-message-template.md` | Git commit message | git commit |
+| `pr-description-template.md` | Pull request description | GitHub PR body |
+| `domain-rules-template.yaml` | Domain-specific rules and blockers | `services/{domain}/context/domain-rules.yaml` |
+| `architecture-template.md` | System architecture reference | `artefacts/architecture/architecture.md` |
+| `design-template.md` | Feature design document | `artefacts/design/design-{feature}.md` |
+| `agent-template.md` | New agent definition | `context/agents/{name}.md` |
+| `logging-template.md` | Session metrics and interruption log schemas (JSONL) | `artefacts/build/metrics/session-log.jsonl` · `artefacts/build/interruptions/{task-id}.jsonl` |
+| `task-prompt-template.md` | Agent task prompt (orchestrator use only) | — |
+| `settings-local-template.json` | Claude Code / local runtime permissions | `.claude/settings.local.json` |
+
+**Format notes** — Local Settings: copy to `.claude/settings.local.json` to configure autonomous command permissions (Git, `uv`, `yarn`, test runners) conforming to `bash-environment.md` without triggering manual prompt friction. Handoffs: keep summary under 500 characters; reference shared artefacts rather than duplicating content. Reviews: issue format `**ID** \`file:line\` Problem. → Fix.`; severity critical / high / medium / low. Architecture: system-level reference, one per project, present tense ("what IS built") — inline HTML comments mark monolith vs microservice sections. Design: one per feature; update to "Current (as-built)" after implementation.
+
+**Naming**: templates use a `-template.{ext}` suffix. Generated files drop the `-template` suffix (e.g. `review-template.md` → `tech-review.md`).
 
 ### File Type Overview
 
@@ -120,7 +195,7 @@ Hydration index. Read only the section a task needs. Each folder has a readme.md
 - Agents read on-demand (too verbose to preload)
 - Examples: Python patterns, TDD philosophy, architecture decisions
 
-- **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `##` headings (Typst rule). Add to `context/README.md` Quick Reference and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
+- **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `##` headings (Typst rule). Add to `context/README.md` Quick Reference and the [Standards Map](#standards-map), and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
 
 **Workflows** (`workflows/*.yaml`):
 
@@ -142,8 +217,8 @@ Hydration index. Read only the section a task needs. Each folder has a readme.md
 
 - Output formats for artefacts, handoffs, reviews, git, and agent definitions
 - The orchestrator selects the appropriate template when constructing a task prompt; agents use whichever template the task prompt specifies
-- See `templates/README.md` for the full index
-- **On Add / Edit / Delete**: Create or edit template files. Update `templates/README.md` index. No adapter recompilation needed.
+- See the [Template Index](#template-index) in this README for the full list
+- **On Add / Edit / Delete**: Create or edit template files. Update the [Template Index](#template-index) in this README. No adapter recompilation needed.
 
 **Scripts** (`scripts/`):
 

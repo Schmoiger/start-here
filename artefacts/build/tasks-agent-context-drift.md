@@ -556,7 +556,7 @@ of spawn prompts, `HANDOFF.md`, `tasks.md`, `bugs.md`.
 ## Harness-analyst spec (TASK-013)
 
 **Completed 25 Oct 2026** — `harness-analyst.md` carries the combined contract, is registered at `large` in
-`context/agents/README.md` and `context/models.yaml`, and every former harness-owner reference names it. Gate
+`context/README.md` (Agent Inventory) and `context/models.yaml`, and every former harness-owner reference names it. Gate
 green: validator, adapters regenerated, drift, 186 tests. TASK-018 landed within this work; TASK-012 (fix-phase
 lane wiring) is outstanding. The definition keeps both measurement lenses beside the six machinery skills
 (eight total) so TASK-016's retrospective function survives.
@@ -589,7 +589,7 @@ First six skills = TASK-018 machinery pool; the last two = TASK-016 measurement 
 warning · change the agent to match the rule, never the rule to match the agent · every rule citation carries
 `file.md §section`; a paraphrase without a source is a fork.
 
-**Registration**: add to the `context/agents/README.md` inventory; `generate_adapters.py` propagates to
+**Registration**: add to the Agent Inventory in `context/README.md`; `generate_adapters.py` propagates to
 `AGENTS.md` and the runtime projections; `agent_definitions.py` and `adapter_drift.py` must pass.
 
 ---
@@ -625,4 +625,4 @@ paraphrase survives without a pointer.
 4. Adapter drift check passes after regeneration.
 5. One of the two competing compliance mechanisms is documented as authoritative.
 6. The `fix` phase declares an explicit lane for non-code artefacts, so every task in this file routes to an owner without human judgement.
-7. `@harness-analyst` exists, is registered in `context/agents/README.md`, passes `agent_definitions.py`, and owns every harness task — no gate agent implements.
+7. `@harness-analyst` exists, is registered in the Agent Inventory in `context/README.md`, passes `agent_definitions.py`, and owns every harness task — no gate agent implements.

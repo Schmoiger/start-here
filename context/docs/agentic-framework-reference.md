@@ -176,7 +176,7 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ### Standards Catalogue
 
-`context/standards/README.md` is the lightweight index for humans navigating the folder. The tables below describe what each standard is for when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
+`context/README.md` is the single lightweight index for the whole `context/` tree — its Standards Map is the selection table. The tables below describe what each standard is for when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
 
 #### Foundational
 
@@ -361,7 +361,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus fourteen delegatable specialists (fifteen role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships one orchestrator plus fourteen delegatable specialists (fifteen role files in total, excluding templates). The roster below groups them by concern; the Agent Inventory in `context/README.md` lists the same roles with model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -983,7 +983,7 @@ Prefer parallel execution when time is critical, tasks are large (overhead is a 
 
 Templates are stored in `context/templates/` and define standard output shapes for recurring artefacts. The orchestrator selects the appropriate template when constructing a task prompt; the producing agent uses it to structure its output.
 
-`context/templates/README.md` indexes every template file, when to use it, and how it relates to workflows—use it when you are adding a new artefact shape rather than guessing from filenames alone.
+The Template Index in `context/README.md` lists every template file, when to use it, and how it relates to workflows—use it when you are adding a new artefact shape rather than guessing from filenames alone.
 
 ### Why Templates Exist
 
@@ -1331,7 +1331,7 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 
 ### Adding a New Agent
 
-1. `context/agents/README.md`
+1. The Agent Inventory in `context/README.md`
 2. `context/templates/agent-template.md`
 3. `context/agents/orchestrator.md`
 4. The workflow where the new agent should appear

@@ -33,7 +33,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 CONTEXT_DIR = REPO_ROOT / "context"
 AGENTS_DIR = CONTEXT_DIR / "agents"
 
-SKIPPED_FILES = {"TEMPLATE.md", "README.md", "MODEL-RECOMMENDATIONS.md"}
+SKIPPED_FILES = {"TEMPLATE.md", "MODEL-RECOMMENDATIONS.md"}
 
 # Canonical body section defined by context/templates/agent-template.md.
 CONTEXT_ACQUISITION_HEADING = "## Context Acquisition"
