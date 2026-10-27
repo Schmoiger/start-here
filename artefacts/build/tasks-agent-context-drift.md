@@ -471,6 +471,25 @@ carry the offending line number.
 | Scope note | No agent definition carries a body rule table today (TASK-005/006 removed them), so the `Source` branch is forward-looking; the inline-citation branch is what protects the current definitions. |
 | Deviation | `context/scripts/validators/README.md`, `context/scripts/tests/README.md`, and both framework docs were updated with the new check — a validator nobody can find in the docs is the same discoverability gap that produced this incident. |
 
+### Resolution — TASK-007 (27 Oct 2026)
+
+The orchestrator is rebuilt on the task-specific-context model rather than reconciled entry-by-entry — the root cause of the third copy's drift (a hand-maintained always-apply list the validator could not see, because `orchestrator.md` sat in `SKIPPED_FILES`) is removed structurally:
+
+- **Division of labour**: the agent's frontmatter (via its Context Acquisition section) is the durable context pool it self-acquires; the orchestrator injects only the two task-specific contexts — the task itself, and the §sections of standards from the agent's pool relevant to it (Standards Resolution). Rule/Skill Resolution add task-specific pointers only when the task demands something outside the agent's declared pool.
+- **Always-apply list killed**: 4 of its 5 entries (`git-commits.md`, `escalation.md`, `output-locations.md`, `british-english.md`) cited files that do not exist. The always-applies (`bash-environment.md`, `multi-agent-collaboration.md`, `tech-writing.md`, `workspace-conventions.md`) are already in every agent's `rules:` frontmatter, so re-injection was redundant context.
+- **Template conformance**: `orchestrator.md` now matches `agent-template.md` shape (Context Acquisition, Workflow → Intake / Execution / Output, State Recovery, Escalation, Reporting). No valid reason to diverge structurally was found — the template explicitly permits role-specific workflow content; the divergence that remains is coordinated content only (The coordinator reports to the human, not back to itself).
+- **Contradiction fixed**: the budget test now governs the May Do Directly list only; implementation (code, tests, schemas, harness content) is always delegated regardless of size.
+- **Orphan fixed**: escalation repointed from `context/rules/escalation.md` (does not exist) to `multi-agent-collaboration.md` §1.
+- **CI blind spot closed**: `orchestrator.md` removed from `SKIPPED_FILES` (validator L36); `agent_definitions.py` now validates 15/15.
+- **Standards synced**: `agent-standards.md` §1.1 Rule Injection and `task-prompt-template.md`'s read list updated to the new model so no stale "always-apply list" instruction survives to regenerate the drift.
+
+| Item | Detail |
+|------|--------|
+| Commit | `4a390c1` — `fix(harness): rebuild orchestrator on task-specific-context model` |
+| Gate | `agent_definitions.py` 15/15 (orchestrator validated for the first time), adapters in sync, 194 tests pass |
+| Follow-ups | TASK-009 (`@devops`): regenerate projections and wire the validator into `.github/workflows/pr-subrepo-checks.yml` — that now guards the orchestrator too. `context/docs/agentic-framework-reference.md` and the `tokenomics-audit` lens still describe the pre-rebuild injection model; re-review in TASK-008's layer-taxonomy decision. The user's local `artefacts/build/orchestrator-old.md` backup is redundant with git history and untracked. |
+
+
 ---
 
 ## TASK-007 prompt
