@@ -1,5 +1,5 @@
 ---
-description: Universal workspace conventions covering output locations, git commits, metrics logging, and interruption logging
+description: Universal workspace conventions covering output locations, git commits, metrics logging, interruption logging, and effort estimation
 globs: []
 alwaysApply: true
 ---
@@ -59,4 +59,10 @@ alwaysApply: true
 1. **Task Log**: Append each blocking interruption to `artefacts/build/interruptions/{task-id}.jsonl` — one rolling log per task.
 2. **Schema**: The record fields are defined in `context/templates/logging-template.md` § Interruption Log; the log's filename stem MUST equal the `task_id` of every record it contains.
 3. **Format**: One JSON object per line, appended and never rewritten. Record the interruption when it is resolved; if logged at the point of blocking, leave outcome fields `null` and append a `resolution` record referencing the original `id`.
+
+---
+
+## 5. Effort Estimation
+
+1. Estimate effort in tokens, not time — models consume tokens, not minutes; token estimates are stable across machines and interruptions.
 

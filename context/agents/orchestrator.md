@@ -200,9 +200,11 @@ Before approving the `reproduce` gate, challenge any root cause that lacks a cod
 
 If compaction occurs while a subagent is running, the in-memory dispatch context is lost. On recovery:
 
-1. Read `HANDOFF.md` — the `Workflow:` and `Phase:` fields identify what was in flight
-2. Read the workflow YAML `validation:` block for that phase — this is what the subagent's report must satisfy
-3. When the report arrives, evaluate it against the validation criteria, not against recalled instructions
+1. Re-consume your own context: re-read `context/agents/orchestrator.md` and each file in its `rules:` and `standards:` frontmatter; run `git log --oneline -5`; glob `**/artefacts/README.md` and read all matches
+2. Read `HANDOFF.md` — the `Workflow:` and `Phase:` fields identify what was in flight
+3. Read the workflow YAML `validation:` block for that phase — this is what the subagent's report must satisfy
+4. Follow any workflow-specific recovery steps in that workflow's `state_recovery` section
+5. When the report arrives, evaluate it against the validation criteria, not against recalled instructions
 
 ---
 

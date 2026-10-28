@@ -4,8 +4,6 @@ description: GCP cloud deployment and deployment review — run after build work
 phases:
   - id: gcp-deployment
     name: GCP Cloud Deployment
-    skills:
-
     agents:
       - devops  # Terraform configs, Cloud Run / Firebase Hosting deployment, staging validation, rollback plan
     outputs:
@@ -18,14 +16,12 @@ phases:
       - Health checks pass on all services
       - Rollback plan documented
     notes:
-      - devops operates in GCP mode for this phase (see context/skills/gcp-deployment.md)
+      - devops operates in GCP mode for this phase
 
   - id: deployment-review
     name: Deployment Review
     depends_on: [gcp-deployment]
     gate: true
-    skills:
-
     agents:
       - tech-lead  # Deployment health, monitoring, rollback confirmed
     outputs:
@@ -51,15 +47,13 @@ quality_gates:
         operator: "=="
 
 workflow_rules:
-  - devops operates in GCP mode (Terraform + gcloud), not Supabase mode — procedure in context/skills/gcp-deployment.md
+  - devops operates in GCP mode (Terraform + gcloud), not Supabase mode — orchestrator names the mode at spawn
   - Staging must be validated before production deployment
   - Rollback plan is mandatory before deployment-review can APPROVE
-  - Use Write/Edit tools for file operations (not bash with echo/cat/sed)
-  - Estimate effort in tokens, not time
 
 # ---
 # Notes (human reference)
 #
 # Run after build.yaml local-deployment is complete and validated.
-# devops agent operates in GCP mode — see context/skills/gcp-deployment.md for the procedure.
+# devops agent operates in GCP mode — mode switch passed by orchestrator at spawn.
 # Coverage threshold rises to 97% at this gate (higher than 95% quality-review threshold).

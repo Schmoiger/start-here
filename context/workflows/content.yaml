@@ -61,13 +61,9 @@ quality_gates: []
 
 workflow_rules:
   - Always use a writing persona (technical-writer for guides, opinionated-blogger for blog posts)
-  - British English throughout (colour, optimise, whilst)
-  - No AI slop (em dashes, triads, vapid transitions)
   - Concrete examples, not abstract descriptions
-  - Opening hook required
   - Target audience clarity (leaders vs practitioners)
   - Persona voice consistency across phases
-  - Use Write/Edit tools for file operations (not bash with echo/cat/sed)
 
 # ---
 # Notes (human reference)
