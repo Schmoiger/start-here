@@ -147,122 +147,56 @@ If variables are missing, check that you are in a **new** shell (the `eval` hook
 
 ---
 
-## Runtime Adapters & Architecture
+## Agent Harness
 
-This framework employs a **Hexagonal (Ports and Adapters)** architecture to ensure cross-platform portability across AI coding runtimes.
+### Quickstart 
 
-```mermaid
-flowchart TD
-    Canon["`**Canonical Context**
-Source of Truth
-context/agents/
-context/workflows/
-context/rules/
-context/standards/
-context/models.yaml`"]
+This agent harness contains everything you need to build quality software in any of three DevX modes: dev as collaborator, dev as reviewer, dev as orchestrator.
 
-    Gen["generate_adapters.py
-(CLI)"]
-
-    Gemini["`**Antigravity / Gemini**
-.agents/skills/
-GEMINI.md`"]
-    Claude["`**Claude Code**
-CLAUDE.md
-.claude/prompts/`"]
-    Copilot["`**GitHub Copilot**
-.github/prompts/
-.github/instructions/`"]
-    Codex["`**OpenAI / Codex**
-.openai/prompts/
-tools.json`"]
-
-    Canon --> Gen
-    Gen --> Gemini
-    Gen --> Claude
-    Gen --> Copilot
-    Gen --> Codex
-```
-
-### Core Non-Functional Requirements (NFRs)
-
-1. **Autonomy**: Each projection provides self-contained context and tool contracts tailored to the target platform, enabling autonomous agent loops and subagent spawning without human intervention.
-2. **Token Efficiency**: Scoped projection instructions and selective includes ensure agent context windows are never polluted with irrelevant guidelines. Model tiers (`small`, `medium`, `large`) route tasks to cost-effective models via `models.yaml`. Smart generation (`--new`) only writes modified files, preventing file-watcher and cache churn.
-3. **Intent Preservation**: The canonical definition in `context/` acts as the single source of truth. Projections are deterministic transformations ensuring consistent engineering standards across all AI tools.
-
-### CLI Usage (`generate_adapters.py`)
+The harness is sourced into a ```context/``` folder and must be copied into the repo root to allow the LLM runtime to find and use the harness. This is taken care of in the initialisation script.
 
 ```bash
-# Smart update: write only changed or new files (default)
+./init.sh
+```
+
+
+#### Quick commands
+
+1. Update harness: pull latest version of harness into your repo
+
+```bash
+git subrepo pull context
+```
+
+2. Smart update: updated local harness with only changed or new files (default)
+
+```bash
 uv run python context/scripts/generators/generate_adapters.py
-
-# Force full regeneration of all files
-uv run python context/scripts/generators/generate_adapters.py -a
-
-# Dry-run: preview files that would be modified without writing to disk
-uv run python context/scripts/generators/generate_adapters.py -d
-
-# Target filtering with convenience shortcuts
-uv run python context/scripts/generators/generate_adapters.py -g          # Gemini / Antigravity
-uv run python context/scripts/generators/generate_adapters.py -c          # Claude Code
-uv run python context/scripts/generators/generate_adapters.py -p          # GitHub Copilot
-uv run python context/scripts/generators/generate_adapters.py -o          # OpenAI / Codex
 ```
 
-### Automated Drift Enforcement (`adapter_drift.py`)
-
-To prevent divergence between canonical context files and generated adapter projections, an automated drift validator runs during pre-commit checks:
+3. Push local updates to the harness back upstream
 
 ```bash
-uv run python context/scripts/validators/adapter_drift.py
-```
-
-If any generated projection is missing, manually edited, or out of date, the validator fails with exit code `1` and actionable remediation instructions.
-
----
-
-## Framework Distribution & Downstream Integration
-
-The framework distributes canonical context from the dedicated [`agents-framework`](https://github.com/Schmoiger/agents-framework) repository (`main` branch) as an isolated, self-contained directory (`context/`). Downstream repositories (including `start-here`) import standards, workflows, and agents without inheriting project-specific state (`artefacts/build/`, `artefacts/product/`, or application code).
-
-Bi-directional synchronisation is managed via `git-subrepo`:
-
-```mermaid
-graph LR
-    subgraph Upstream ["agents-framework (main)"]
-        UContext["context/ (Canonical Source)"]
-    end
-
-    subgraph Downstream ["start-here / Downstream Repos"]
-        DContext["context/ (Subrepo)"]
-        DBuild["artefacts/build/ (Local Only)"]
-        DCode["src / services / (Local Only)"]
-    end
-
-    UContext <== "git subrepo pull / push" ==> DContext
+git subrepo push context
 ```
 
 
-### Quick Commands for Downstream Projects
+#### What's included
 
-```bash
-# 1. Adopt standards into a new or existing repository
-PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo clone https://github.com/Schmoiger/agents-framework.git context -b main
+- **14 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
+- **13 standards** - Coding, testing, architecture, tech stack, documentation, security
+- **10 rules** - Enforceable constraints with automated validators
+- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
+- **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
 
-# 2. Re-compile runtime adapter projections after pulling upstream updates
-PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo pull context
-uv run python context/scripts/generators/generate_adapters.py
 
-# 3. Push local standards improvements back upstream
-uv run python context/scripts/validators/adapter_drift.py
-PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo push context
-```
+#### Runtime Telemetry & Session Token Tracking
 
-For complete setup instructions and pre-commit hook configuration, see [`context/README.md`](context/README.md#downstream-integration--standards-synchronisation-git-subrepo).
+The framework tracks cumulative token consumption directly from the underlying AI development runtimes. However, this mechanism is brittle because no vendor provides a public, frozen API for local telemetry; extraction relies on internal storage patterns. The telemetry extraction silently fails rather than blocking commits.
 
----
 
-## Documentation
+#### Further reading
 
 - **Getting started**: See `context/README.md` - Complete guide for agents and humans
 - **Workflow guide**: See `AGENTS.md` / `CLAUDE.md` - Auto-generated orchestration guides
@@ -270,14 +204,3 @@ For complete setup instructions and pre-commit hook configuration, see [`context
 - **Standards**: See `context/standards/` - Coding, testing, tech stack guidance
 - **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix)
 - **Validators**: See `context/scripts/validators/README.md` - Pre-commit consistency validators
-
----
-
-## What's Included
-
-- **19 specialised agents** - Discovery, architecture, coding, review, testing, deployment, workflow analysis, tokenomics
-- **14 standards** - Coding, testing, architecture, tech stack, documentation, security
-- **18 rules** - Enforceable constraints with automated validators
-- **9 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, continuous-improvement, retrospective
-- **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
-- **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention

@@ -501,6 +501,87 @@ with open('README.md', 'w') as f:
   log_success "Updated metadata in pyproject.toml and README.md"
 fi
 
+# Update README.md Agent Harness section from context/README.md Quickstart
+if [[ -f "context/README.md" ]] && [[ -f "README.md" ]]; then
+  log_info "Syncing Agent Harness section in README.md from context/README.md..."
+  uv run python -c "
+import sys
+
+def extract_quickstart(content):
+    \"\"\"Extract the ### Quickstart subsection from context/README.md content (including the heading).\"\"\"
+    lines = content.split('\n')
+    in_section = False
+    result = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith('### Quickstart'):
+            in_section = True
+            result.append(line)  # Include the heading itself
+            continue
+        if in_section:
+            # Stop at next ### or ## heading
+            if stripped.startswith('### ') or stripped.startswith('## '):
+                break
+            result.append(line)
+    # Remove trailing empty lines
+    while result and result[-1].strip() == '':
+        result.pop()
+    return '\n'.join(result)
+
+def update_readme(readme_content, quickstart_content):
+    \"\"\"Update README.md with Agent Harness section from Quickstart content.\"\"\"
+    lines = readme_content.split('\n')
+
+    # Find ## Agent Harness section
+    ah_idx = None
+    for i, line in enumerate(lines):
+        if line.strip() == '## Agent Harness':
+            ah_idx = i
+            break
+
+    if ah_idx is not None:
+        # Find end of section (next ## heading or EOF)
+        end_idx = len(lines)
+        for i in range(ah_idx + 1, len(lines)):
+            if lines[i].startswith('## '):
+                end_idx = i
+                break
+
+        # Replace content: keep header, add blank line, insert quickstart, keep rest
+        new_lines = lines[:ah_idx + 1]
+        new_lines.append('')
+        new_lines.extend(quickstart_content.split('\n'))
+        if end_idx < len(lines):
+            new_lines.extend(lines[end_idx:])
+        return '\n'.join(new_lines)
+    else:
+        # Append new ## Agent Harness section at end
+        new_lines = lines
+        # Strip trailing blank lines before appending
+        while new_lines and new_lines[-1].strip() == '':
+            new_lines.pop()
+        new_lines.append('')
+        new_lines.append('## Agent Harness')
+        new_lines.append('')
+        new_lines.extend(quickstart_content.split('\n'))
+        return '\n'.join(new_lines)
+
+with open('context/README.md', 'r') as f:
+    context_content = f.read()
+
+quickstart = extract_quickstart(context_content)
+
+with open('README.md', 'r') as f:
+    readme_content = f.read()
+
+updated = update_readme(readme_content, quickstart)
+
+with open('README.md', 'w') as f:
+    f.write(updated)
+"
+  log_success "Updated Agent Harness section in README.md"
+fi
+
 # Update git remote origin if specified
 if [[ -n "$SELECTED_GIT_REMOTE" ]]; then
   if git remote get-url origin &>/dev/null; then

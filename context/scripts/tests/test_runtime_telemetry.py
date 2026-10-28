@@ -41,6 +41,10 @@ parse_protobuf_fields = _mod.parse_protobuf_fields
 select_extractor = _mod.select_extractor
 update_commit_message = _mod.update_commit_message
 
+ClineExtractor = _mod.ClineExtractor
+EXTRACTORS = _mod.EXTRACTORS
+short_model = _mod.short_model
+
 
 
 # =============================================================================
@@ -347,3 +351,269 @@ def test_live_claude_storage_sanity():
             pytest.fail(f"Claude Code session file {jf} failed JSON parsing: {e}")
 
     assert tested > 0, "No valid Claude Code session files could be parsed."
+
+
+# =============================================================================
+# Cline extractor
+# =============================================================================
+
+def _make_cline_session(root: Path, session_id: str, cwd: str, messages, model="deepseek/test-model", provider="openrouter"):
+    """Create a synthetic Cline session tree under <root>/sessions/<session_id>/."""
+    sdir = root / "sessions" / session_id
+    sdir.mkdir(parents=True)
+    meta = {
+        "version": 1,
+        "session_id": session_id,
+        "source": "vscode",
+        "status": "running",
+        "provider": provider,
+        "model": model,
+        "cwd": cwd,
+        "workspace_root": cwd,
+        "metadata": {"title": "test"},
+    }
+    (sdir / f"{session_id}.json").write_text(json.dumps(meta))
+    (sdir / f"{session_id}.messages.json").write_text(json.dumps(messages))
+    return sdir
+
+
+def test_cline_extract_delta_counts_assistant_metrics(tmp_path, monkeypatch):
+    """Verify incremental extraction sums assistant-message metrics only."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    messages = [
+        {"role": "user", "content": [{"type": "text", "text": "u1"}], "ts": 1},
+        {"role": "assistant", "content": [{"type": "text", "text": "a1"}], "ts": 2,
+         "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
+         "metrics": {"inputTokens": 100, "cacheReadTokens": 200, "cacheWriteTokens": 0, "outputTokens": 25}},
+        {"role": "user", "content": [{"type": "text", "text": "u2"}], "ts": 3},
+        {"role": "assistant", "content": [{"type": "text", "text": "a2"}], "ts": 4,
+         "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
+         "metrics": {"inputTokens": 30, "cacheReadTokens": 0, "cacheWriteTokens": 40, "outputTokens": 10}},
+    ]
+    _make_cline_session(fake_home, "sess001", str(repo), messages)
+
+    ext = ClineExtractor()
+    r = ext.extract_delta(str(repo), {})
+
+    assert r.error is None
+    assert r.tokens_in == 370  # (100+200) + (30+0+40); user turns are excluded
+    assert r.tokens_out == 35
+    assert r.model == "deepseek/test-model"
+    assert r.runtime == "cline"
+
+    # Watermark makes the next commit delta-free (idempotent).
+    r2 = ext.extract_delta(str(repo), r.watermark_updates)
+    assert r2.error is None
+    assert r2.tokens_in == 0
+    assert r2.tokens_out == 0
+
+
+def test_cline_extract_delta_accepts_wrapped_messages(tmp_path, monkeypatch):
+    """Verify object-enveloped message files (compacted sessions) are parsed."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    payload = {
+        "sessionId": "sess001",
+        "messages": [
+            {"role": "assistant", "content": [], "ts": 1,
+             "modelInfo": {"id": "deepseek/x", "provider": "openrouter"},
+             "metrics": {"inputTokens": 20, "cacheReadTokens": 5, "cacheWriteTokens": 0, "outputTokens": 3}},
+        ],
+    }
+    sdir = _make_cline_session(fake_home, "sess001", str(repo), [])
+    (sdir / "sess001.messages.json").write_text(json.dumps(payload))
+
+    r = ClineExtractor().extract_delta(str(repo), {})
+    assert r.error is None
+    assert r.tokens_in == 25
+    assert r.tokens_out == 3
+    assert r.model == "deepseek/x"
+
+
+def test_cline_extract_delta_session_switch_resets(tmp_path, monkeypatch):
+    """Verify a new session_id resets the index pointer and counts from zero."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    messages = [
+        {"role": "assistant", "content": [{"type": "text", "text": "a1"}], "ts": 1,
+         "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
+         "metrics": {"inputTokens": 50, "cacheReadTokens": 0, "cacheWriteTokens": 0, "outputTokens": 5}},
+    ]
+    _make_cline_session(fake_home, "sess001", str(repo), messages)
+
+    ext = ClineExtractor()
+    stale = {"session_id": "some-other-session", "last_idx": 99, "total_in": 9999, "total_out": 999}
+    r = ext.extract_delta(str(repo), stale)
+
+    assert r.error is None
+    assert r.tokens_in == 50
+    assert r.tokens_out == 5
+    assert r.watermark_updates["session_id"] == "sess001"
+    assert r.watermark_updates["last_idx"] == 0
+
+
+def test_cline_extract_delta_falls_back_to_session_model(tmp_path, monkeypatch):
+    """Verify session-json model is used when assistant messages omit modelInfo."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    messages = [
+        {"role": "assistant", "content": [{"type": "text", "text": "a1"}], "ts": 1,
+         "metrics": {"inputTokens": 10, "cacheReadTokens": 0, "cacheWriteTokens": 0, "outputTokens": 5}},
+    ]
+    _make_cline_session(fake_home, "sess001", str(repo), messages, model="deepseek/fallback-model")
+
+    r = ClineExtractor().extract_delta(str(repo), {})
+    assert r.model == "deepseek/fallback-model"
+
+
+def test_cline_extract_delta_error_paths(tmp_path, monkeypatch):
+    """Verify schema-drift guards surface as error results, never exceptions."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    # No matching session for this repo.
+    r = ClineExtractor().extract_delta(str(repo), {})
+    assert r.error == "cline_session_not_found"
+
+    # Session exists but messages file is missing.
+    _make_cline_session(fake_home, "sess001", str(repo), [])
+    sdir = fake_home / "sessions" / "sess001"
+    (sdir / "sess001.messages.json").unlink()
+    r = ClineExtractor().extract_delta(str(repo), {})
+    assert r.error == "cline_messages_not_found"
+
+    # Messages file exists but is not a parseable message list (schema drift).
+    (sdir / "sess001.messages.json").write_text(json.dumps({"messages": {}}))
+    r = ClineExtractor().extract_delta(str(repo), {})
+    assert r.error == "cline_messages_schema_drift"
+
+
+def test_cline_find_active_session_matches_repo_and_picks_newest(tmp_path, monkeypatch):
+    """Verify sessions are associated to a repo via cwd and the newest wins."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    repo = tmp_path / "repo"
+    other = tmp_path / "other"
+    repo.mkdir()
+    other.mkdir()
+    _make_cline_session(fake_home, "old-repo", str(repo), [])
+    _make_cline_session(fake_home, "new-other", str(other), [])
+    _make_cline_session(fake_home, "new-repo", str(repo), [])
+
+    # Pin mtimes so ordering is deterministic: new-repo newest.
+    base = fake_home / "sessions"
+    os.utime(base / "old-repo" / "old-repo.json", (1_000_000, 1_000_000))
+    os.utime(base / "new-other" / "new-other.json", (2_000_000, 2_000_000))
+    os.utime(base / "new-repo" / "new-repo.json", (3_000_000, 3_000_000))
+
+    ext = ClineExtractor()
+    active = ext.find_active_session(str(repo))
+    assert active is not None
+    assert os.path.basename(active[0]) == "new-repo.json"
+    # Session for a different repo is never returned.
+    other_active = ext.find_active_session(str(other))
+    assert os.path.basename(other_active[0]) == "new-other.json"
+
+
+def test_cline_registry_and_selection(tmp_path, monkeypatch):
+    """Verify the Cline extractor is registered and selectable by declared tool."""
+    fake_home = tmp_path / "cline"
+    monkeypatch.setenv("CLINE_DATA_DIR", str(fake_home))
+    _make_cline_session(fake_home, "sess001", str(tmp_path), [])
+    assert ClineExtractor.name == "cline"
+    assert EXTRACTORS["cline"].name == "cline"
+    sel = select_extractor("cline", str(tmp_path))
+    assert isinstance(sel, ClineExtractor)
+
+
+def test_short_model_strips_provider_prefix():
+    """Verify short model ids drop any provider prefix for the Agent-Session trailer."""
+    assert short_model("deepseek/deepseek-v4-flash-0731") == "deepseek-v4-flash-0731"
+    assert short_model("claude") == "claude"
+    assert short_model(None) is None
+
+
+def test_update_commit_message_injects_tool_and_model(tmp_path):
+    """Verify the hook rewrites tool=/model= on the Agent-Session line."""
+    msg = tmp_path / "COMMIT_EDITMSG"
+    msg.write_text(
+        "feat(harness): test\n\n"
+        "Agent-Session: tool=cursor model=sonnet agents=python-coder\n\n"
+        "Co-Authored-By: Agent <a@b.c>\n"
+    )
+    assert update_commit_message(str(msg), "tokens=10.0K/1.0K", tool="cline", model="deepseek-v4-flash-0731")
+    content = msg.read_text()
+    assert "tool=cline" in content
+    assert "model=deepseek-v4-flash-0731" in content
+    assert "tokens=10.0K/1.0K" in content
+
+
+def test_update_commit_message_removes_stale_tokens(tmp_path):
+    """Verify tokens= is dropped when the runtime reports no new tokens."""
+    msg = tmp_path / "COMMIT_EDITMSG"
+    msg.write_text(
+        "feat(harness): test\n\n"
+        "Agent-Session: tool=cline model=deepseek-v4-flash-0731 agents=python-coder tokens=1.0K/2.0K\n\n"
+        "Co-Authored-By: Agent <a@b.c>\n"
+    )
+    assert update_commit_message(str(msg), None, tool="cline", model="deepseek-v4-flash-0731")
+    content = msg.read_text()
+    assert "tokens=1.0K/2.0K" not in content
+    assert "tool=cline" in content
+    assert "model=deepseek-v4-flash-0731" in content
+
+
+def test_live_cline_storage_sanity():
+    """Verify local Cline storage structure if installed.
+
+    Discriminates:
+    - Skipped if the Cline sessions directory is not installed.
+    - Skipped if installed but no session files exist.
+    - Fails if session files exist but drift from the expected schema.
+    """
+    extractor = ClineExtractor()
+    if not extractor.is_available():
+        pytest.skip("Cline sessions directory not found on this machine.")
+
+    session_dirs = []
+    for s_dir in extractor.search_dirs:
+        if s_dir and os.path.isdir(s_dir):
+            session_dirs.extend(Path(s_dir).glob("*/"))
+    session_dirs = [d for d in session_dirs if d.is_dir()]
+
+    if not session_dirs:
+        pytest.skip("Cline sessions directory exists, but no session files were found.")
+
+    tested = 0
+    for session_dir in session_dirs[:5]:
+        sj = session_dir / f"{session_dir.name}.json"
+        if not sj.exists():
+            continue
+        try:
+            meta = json.loads(sj.read_text())
+            sid = meta.get("session_id") or meta.get("sessionId")
+            assert sid, "session json missing session_id/sessionId"
+            mpath = session_dir / f"{sid}.messages.json"
+            if mpath.exists():
+                data = json.loads(mpath.read_text())
+                msgs = data if isinstance(data, list) else data.get("messages")
+                assert isinstance(msgs, list), "messages.json must contain a message list"
+            tested += 1
+        except Exception as e:
+            pytest.fail(f"Cline session file {sj} failed schema sanity: {e}")
+
+    assert tested > 0, "No valid Cline session files could be parsed."
+
+
+

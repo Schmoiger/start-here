@@ -6,9 +6,6 @@ phases:
     name: Reproduce Bug
     gate: true
     parallel: true
-    skills:
-      - superpowers:systematic-debugging
-      - superpowers:dispatching-parallel-agents
     agents:
       - ui-tester          # Reproduce in browser using Chrome DevTools; capture screenshot and console errors
       - functional-tester  # Run existing test suite to establish baseline; identify which tests fail (if any)
@@ -26,19 +23,12 @@ phases:
     notes:
       - Both agents run in parallel; gate requires evidence from both before proceeding
       - Do NOT fix anything in this phase — reproduce only
-      - Supabase MCP available for DB state inspection if relevant
       - "REQUIRED: Screenshot in artefacts/bugfix/screenshots/before/"
       - "Causal chain format: 'UI shows X → endpoint Y returns Z [file:line] → function W computes it as V [file:line] → root cause: [file:line]'"
-      - "Names are not evidence. A column named silver_populated does not tell you how it is computed. A filename does not tell you what the function does. Read the code."
-      - "Incremental writes: append each causal chain step to reproduce-evidence.md as it is verified — do not hold the chain in memory and flush at the end"
 
   - id: fix
     name: Implement Fix
     depends_on: [reproduce]
-    skills:
-      - superpowers:systematic-debugging
-      - superpowers:test-driven-development
-      - superpowers:verification-before-completion
     agents:
       - functional-tester  # Write failing test that reproduces the bug (TDD Red) before any code change
       - python-coder        # Fix Python/backend code; run tests to green
@@ -57,25 +47,16 @@ phases:
       - Docs updated if the fix changes observable behaviour
       - Each commit message includes the causal chain from reproduce-evidence.md and what was changed
     notes:
-      - "TDD Red → Green for bug fixes: failing test expresses correct behaviour → fix code to pass it"
-      - "The failing test is written against the correct behaviour (requirement), not the buggy implementation"
       - "Spawn functional-tester first; spawn python-coder and/or typescript-coder after the failing test exists"
       - Spawn only the coder(s) relevant to the bug location
-      - "Python: uv run pytest — never bare pytest"
-      - "TypeScript: yarn test --run"
       - Data fixes: use Supabase MCP or migration file depending on scope
       - Commit message is the record — see workflow_rules for required content
-      - "Incremental commits: commit the failing test before writing any code fix — if compaction occurs between steps, git log shows what exists and what remains"
 
   - id: verify
     name: Verify Fix in Running System
     depends_on: [fix]
     gate: true
     parallel: true
-    skills:
-      - superpowers:systematic-debugging
-      - superpowers:dispatching-parallel-agents
-      - superpowers:verification-before-completion
     agents:
       - ui-tester          # Confirm fix in browser using Chrome DevTools; screenshot required
       - functional-tester  # Run full test suite; confirm no regressions introduced
@@ -143,36 +124,18 @@ workflow_rules:
   - Browser evidence (screenshot + console state) required at reproduce and verify gates — tests alone do not satisfy gates
   - Agents must use Chrome DevTools MCP to inspect the actual running system, not reason from code
   - Supabase MCP available for DB state inspection when relevant
-  # TDD discipline for bug fixes
-  - "TDD Red → Green: write a failing test that reproduces the bug BEFORE any code change; fix the code to make it pass"
-  - The failing test expresses correct behaviour (the requirement); it does not describe the buggy code
-  - Do not modify tests to make them pass — fix the code
-  - Data fixes and doc fixes are part of the same fix, not deferred
   # Record-keeping
   - The commit message is the record — no separate requirement-gap artefact needed
   - "Commit body must include: (1) what the bug was, (2) causal chain summary, (3) what was changed (code/test/data/docs) and why"
-  - A good commit can be discovered later via git log; an artefact doc usually cannot
+  - Data fixes and doc fixes are part of the same fix, not deferred
   # Tooling
-  - "Python: `uv run pytest` — never bare pytest"
-  - "TypeScript: `yarn test --run` — never bare jest/vitest"
   - Screenshots saved to artefacts/bugfix/screenshots/before/ and after/
   # Compaction safety
-  - Subagents write findings incrementally to their output file as each step completes — never accumulate in memory and flush at end
   - Commit the failing test before writing any code fix — git log is the recovery point if the agent compacts between steps
-  - Update HANDOFF.md Phase: field BEFORE spawning agents — not after their response — so the active phase survives compaction
   - For the parallel reproduce phase, write artefacts/bugfix/dispatch.md before spawning, recording each agent's task and expected output
-  - After compaction, recover by reading HANDOFF.md (phase) and the workflow validation: block (criteria) — do not rely on recalled instructions
-  - When a subagent reports back post-compaction, validate against the workflow validation: block, not the subagent's self-assessment
-  # Hygiene
-  - Update HANDOFF.md on completion
 
 state_recovery:
   after_compaction:
-    - "Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter"
-    - Glob **/artefacts/README.md and read all matches for current state
-    - Run git log --oneline -5 to see recent changes
-    - Read HANDOFF.md Phase: field to identify which phase was in flight
-    - Read the validation: block for that phase in this file — that is what any pending subagent report must satisfy
     - Read artefacts/bugfix/dispatch.md if it exists — lists what each in-flight agent was asked to do
   critical_files:
     - "**/artefacts/README.md"

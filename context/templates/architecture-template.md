@@ -1,6 +1,6 @@
 # Architecture: {System Name}
 
-> This document is the authoritative reference for how the system is built. Create it once the system has a deployed or locally-running form. Update it when the system changes — never let it describe intent; only describe reality. Consumed by: solution-architect, python-coder, typescript-coder, database-designer, api-designer, tech-lead.
+> This document is the authoritative reference for how the system is built. Create it once the system has a deployed or locally-running form. Update it when the system changes — never let it describe intent; only describe reality. Consumed by: solution-architect, python-coder, typescript-coder, devops, tech-lead.
 
 **Canonical references** (link, do not duplicate):
 > - **API specification**: `{path to openapi.yaml or api-endpoints.md}`

@@ -59,7 +59,13 @@ repos:
         name: Validate agent metrics logging (workspace-conventions.md)
         entry: uv run python context/scripts/validators/workspace_conventions.py metrics
         language: python
-        files: ^metrics/.*\.jsonl$
+        files: ^artefacts/build/metrics/.*\.jsonl$
+
+      - id: workspace-conventions-interruptions
+        name: Validate interruption logs (logging-template.md § Interruption Log)
+        entry: uv run python context/scripts/validators/workspace_conventions.py interruptions
+        language: python
+        files: ^artefacts/build/interruptions/.*\.jsonl$
 
       - id: tech-writing-ears
         name: Validate EARS notation in requirements (tech-writing.md)
@@ -82,7 +88,7 @@ repos:
         pass_filenames: true
 
       - id: supabase
-        name: Validate Supabase invariants (supabase.md)
+        name: Validate Supabase invariants (supabase-operations.md)
         entry: uv run python context/scripts/validators/supabase.py
         language: python
         files: (\.py|\.ts|\.tsx|\.sql)$

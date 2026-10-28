@@ -6,7 +6,7 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 
 ## Test Coverage
 
-### Validators (61 tests in `test_validators.py`)
+### Validators (91 tests in `test_validators.py`)
 
 **workspace_conventions.py**
 - Valid commit format and type checking
@@ -16,6 +16,9 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Merge commit handling
 - Metrics JSONL schema validation (required fields, timestamps, token sources)
 - Handoff/escalate event requirements and recipient validation
+- Interruption log schema validation (`id`, `ts`, `agent`, `task_id`, `type` plus per-type fields)
+- Interruption outcome fields may be `null`; `resolution` records must resolve via `ref`
+- Interruption log naming: one rolling log per task (`{task-id}.jsonl`), legacy per-agent/per-timestamp names rejected
 - Output file path and naming conventions
 
 **tech_writing.py**
@@ -52,13 +55,17 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Detection of private key blocks (`BEGIN PRIVATE KEY`)
 - Detection of raw API keys and tokens in source files
 
-### Agent Validator (12 tests in `test_agent_validator.py`)
+### Agent Validator (27 tests in `test_agent_validator.py`)
 
 **agent_definitions.py**
 - YAML frontmatter validation
 - Required fields: name, model
 - Hardcoded absolute path detection (`/Users/`, `/home/`)
 - Referenced standards, rules, and skills existence checks
+- Canonical `Context Acquisition` body section enforced; legacy body sections rejected
+- Interruption log path must be `artefacts/build/interruptions/{task-id}.jsonl`; legacy per-agent/per-timestamp names rejected
+- Body rule-table `Source` cells must resolve to an existing file, and to an existing heading when a section is named
+- Inline `file.md §section` citations must resolve the same way; tables without a `Source` column are ignored
 
 ### Generator & Adapter Projections (27 tests)
 

@@ -50,9 +50,8 @@ Then reference: "Following the python-coder rule, implement..."
 - `product-owner.md` - Requirements gathering
 
 **Phase 1: Design**
-- `solution-architect.md` - System architecture
-- `database-designer.md` - Database schema
-- `api-designer.md` - OpenAPI specs
+- `solution-architect.md` - System architecture and the canonical OpenAPI specification
+- `devops.md` - Physical schema and migrations
 - `ui-designer.md` - UI wireframes and visual design assets
 
 **Phase 2-3: Development**
@@ -69,7 +68,7 @@ Then reference: "Following the python-coder rule, implement..."
 - `security-tester.md` - Security audit
 
 **Phase 6-7: Deploy & Docs**
-- `gcp-devops.md` - Infrastructure
+- `devops.md` - Infrastructure deployment
 - `documentation.md` - Documentation
 
 ## Workflow Sequence
@@ -77,12 +76,12 @@ Then reference: "Following the python-coder rule, implement..."
 Follow the TDD workflow from `context/agents/CLAUDE.md`:
 
 1. **Discovery**: product-owner → requirements.md
-2. **Design**: solution-architect, database-designer, api-designer (parallel)
+2. **Design**: solution-architect (architecture and canonical OpenAPI specification), then devops (physical schema)
 3. **Tests First**: functional-tester → write failing tests (TDD RED)
 4. **Development**: python-coder, typescript-coder → make tests pass (TDD GREEN)
 5. **Review**: tech-lead (must approve) → code-reviewer
 6. **Testing**: functional-tester, ui-tester, security-tester (parallel)
-7. **Deploy**: gcp-devops
+7. **Deploy**: devops
 8. **Docs**: documentation
 
 ## Key Differences from Claude Code

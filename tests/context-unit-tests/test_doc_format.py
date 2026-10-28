@@ -133,9 +133,16 @@ class TestAgentStructure:
         ]
 
     def test_has_task_placeholder(self, agent_files: list[Path]):
-        """Agent files should have {$ARGUMENTS} placeholder for task injection."""
+        """Agent files should have {$ARGUMENTS} placeholder for task injection.
+
+        orchestrator.md diverges by design: no agent delegates to an
+        orchestrator, so it has no '## Task' / '{$ARGUMENTS}' injection slot.
+        Everything else about its shape is still enforced.
+        """
         missing = []
         for path in agent_files:
+            if path.name == "orchestrator.md":
+                continue
             content = path.read_text()
             if "{$ARGUMENTS}" not in content:
                 missing.append(path.name)
@@ -146,15 +153,22 @@ class TestAgentStructure:
             )
 
     def test_has_constraints_section(self, agent_files: list[Path]):
-        """Agent files should have a Constraints section."""
+        """Agent files should have a Task Constraints section under Workflow.
+
+        The agent template moved constraints into the Workflow section as a
+        '#### Task Constraints' sub-heading (context/templates/agent-template.md);
+        the legacy top-level '## Constraints' heading is drift.
+        """
         missing = []
         for path in agent_files:
             content = path.read_text()
-            if "## Constraints" not in content:
+            if "#### Task Constraints" not in content:
                 missing.append(path.name)
 
         if missing:
-            pytest.fail(f"Missing '## Constraints' section in: {', '.join(missing)}")
+            pytest.fail(
+                f"Missing '#### Task Constraints' section in: {', '.join(missing)}"
+            )
 
 
 class TestStandardsFormat:

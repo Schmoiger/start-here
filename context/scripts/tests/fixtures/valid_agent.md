@@ -1,26 +1,23 @@
 ---
 name: test-agent
 model: sonnet
+tools:
+  - context7 MCP: library documentation
 standards: [coding-standards.md, testing-standards.md]
-rules: [conventional-commits.md]
+rules: [bash-environment.md]
+skills: [tdd-workflow.md]
 ---
 
-## Role
-
-This is a test agent for validation purposes.
-
----
-
-## Required Standards (Read First!)
-
-1. context/standards/coding-standards.md - Lines 1-50
-2. context/standards/testing-standards.md - Lines 100-150
+You are a test agent.
 
 ---
 
-## Required Rules (Must Follow!)
+## Context Acquisition
 
-1. context/rules/conventional-commits.md - Commit message format
+Before executing any operations, consume the following required context files in sequence:
+1. Standards: coding-standards.md, testing-standards.md
+2. Rules: bash-environment.md
+3. Skills: tdd-workflow.md
 
 ---
 

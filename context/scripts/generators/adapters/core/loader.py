@@ -19,6 +19,33 @@ def extract_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     return {}, content
 
 
+def normalise_tools(raw: Any) -> list[str]:
+    """Normalise a `tools:` / `mcp_tools:` frontmatter value to tool names.
+
+    `context/templates/agent-template.md` documents the annotated form
+    (``- {tool-name}: {purpose/runtime-scope}``), which YAML parses as a
+    single-key mapping. Older definitions use a plain list of strings, and a
+    top-level mapping is also tolerated. All three collapse to names here so
+    `CanonicalAgent.mcp_tools` stays `list[str]` for every adapter.
+    """
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        return [raw.strip()] if raw.strip() else []
+    if isinstance(raw, dict):
+        return [str(name).strip() for name in raw if str(name).strip()]
+    if isinstance(raw, (list, tuple)):
+        names: list[str] = []
+        for item in raw:
+            if isinstance(item, str):
+                if item.strip():
+                    names.append(item.strip())
+            elif isinstance(item, dict):
+                names.extend(str(name).strip() for name in item if str(name).strip())
+        return names
+    return [str(raw).strip()]
+
+
 def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
     """
     Scans the context directory and parses the canonical representation
@@ -43,7 +70,9 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
                     name=frontmatter["name"],
                     description=frontmatter.get("description", ""),
                     model=frontmatter.get("model", ""),
-                    mcp_tools=frontmatter.get("mcp_tools", []),
+                    mcp_tools=normalise_tools(
+                        frontmatter.get("tools", frontmatter.get("mcp_tools", []))
+                    ),
                     standards=frontmatter.get("standards", []),
                     rules=frontmatter.get("rules", []),
                     skills=frontmatter.get("skills", []),

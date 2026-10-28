@@ -36,14 +36,14 @@ phases:
     name: Data Review
     mode: retrospective
     agents:
-      - workflow-analyst
-      - tokenomics-analyst
+      - harness-analyst
     notes:
-      - "Specialisation:"
-      - "  workflow-analyst: macro workflow flow, handoffs, task bottlenecks, and cycle times"
-      - "  tokenomics-analyst: micro agent effectiveness, token economics, context bloat, model tiering (per context/models.yaml), and autonomy rates"
+      - "Lens selection: name the lens in the task prompt; spawn twice in parallel with disjoint outputs if both lenses are needed (efficiency-report.md vs tokenomics-report.md)"
+      - "  workflow-analysis lens: macro workflow flow, handoffs, task bottlenecks, and cycle times"
+      - "  tokenomics-audit lens: micro agent effectiveness, token economics, context bloat, model tiering (per context/models.yaml), and autonomy rates"
       - "Data sources:"
-      - "  artefacts/build/agent-interruptions.md — blocking moments (questions, approvals, escalations)"
+      - "  artefacts/build/interruptions/*.jsonl — blocking moments (questions, approvals, escalations)"
+      - "  artefacts/build/metrics/session-log.jsonl — agent invocations, status, and token usage"
       - "  artefacts/build/agent-incidents.md — framework failures already logged"
       - "  git log --format='%H %s%n%b' — reconstruct per-commit metrics from Agent-Session lines:"
       - "    tokens= (injected by prepare-commit-msg hook from session telemetry)"
@@ -79,6 +79,7 @@ phases:
       - Present findings as patterns with evidence, not raw metrics
       - Each finding framed as: pattern observed → root cause → proposed fix
       - Human decides which findings to act on
+      - Do not proceed without explicit human approval of which fixes to make
 
   # --- Shared tail ---
   - id: fix
@@ -95,6 +96,7 @@ phases:
     validation:
       - All identified files updated
       - Acceptance criteria met (e.g. grep confirms old pattern removed)
+      - Only approved fixes implemented (retrospective mode)
 
   - id: record
     name: Record for Portability
@@ -120,10 +122,9 @@ workflow_rules:
   - Every finding or incident must lead to a fixable gap — no vanity metrics or health scores
   - Human decides what to fix in retrospective mode; incident mode proceeds on diagnosis
   - One incident per run in incident mode; multiple findings per run in retrospective mode
+  - Orchestrator drives the review — delegate fixes, not analysis
+  - Present findings as patterns with evidence, not raw metrics
 
 state_recovery:
   after_compaction:
-    - "Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter"
-    - Run git log --oneline -5 to see recent changes
-    - Read HANDOFF.md Phase: field to identify which phase was in flight
     - Read artefacts/build/agent-incidents.md — latest entry is the active incident (incident mode)

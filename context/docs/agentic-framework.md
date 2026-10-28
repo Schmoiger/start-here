@@ -12,7 +12,7 @@
 
 ## Solving The Coordination Problem
 
-Getting an LLM to write a function is table stakes in 2026. Getting *nineteen* of them to build a system together without losing their context is not.
+Getting an LLM to write a function is table stakes in 2026. Getting *fifteen* of them to build a system together without losing their context is not.
 
 Without deliberate coordination, multi-agent workflows break in familiar ways. Agents do not know what the previous agent did so risk redoing work that has already been done. And it's done slightly differently, because each agent makes slightly different judgements. Reviewers lack a consistent standard to check against. Testers write tests against the code as-built rather than the intended interface, ossifying bugs into the test suite. Sessions compact mid-sprint, systemising forgetfulness. The symptoms look unpredictable, a different thing going wrong each time. But the outcome is the same: wasted effort, no consistency, incorrect assumptions, and no mechanism to prevent any of it. These are coordination problems, and they require coordination solutions.
 
@@ -46,13 +46,13 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **Policy and explanation serve different purposes.** Rules are short, binary, and cheap to inject into agent prompts. Standards are rich, contextual, and expensive to load. Merging them would force a choice between token-efficient prompts and comprehensive reference material. Separating them serves both needs without compromise. (The token cost analysis appears in [The Rules, Standards, and Skills Split](#the-rules-standards-and-skills-split) below.)
 
-**Specialist agents outperform generalists at the cost of coordination overhead.** A single large prompt that covers all responsibilities tends toward diluted output. Eighteen focused agents, each with a bounded responsibility, a curated rule set, and a defined workflow position, produce more reliable work and cleaner handoffs. The trade-off is real: 18 agents means 18 handoff boundaries and 18 prompt injections. For production-quality work, the improved output quality and accountability justify this cost.
+**Specialist agents outperform generalists at the cost of coordination overhead.** A single large prompt that covers all responsibilities tends toward diluted output. Fifteen focused agents, each with a bounded responsibility, a curated rule set, and a defined workflow position, produce more reliable work and cleaner handoffs. The trade-off is real: 15 agents means 15 handoff boundaries and 15 prompt injections. For production-quality work, the improved output quality and accountability justify this cost.
 
 **The orchestrator controls the blast radius.** The orchestrator selects the agent, constrains the files it may touch, injects only the relevant rules and standards, monitors progress, and sequences the commits. No agent has unconstrained access to the repository. This is why the framework defaults to a hive model rather than a swarm: specialist agents work within bounded scopes under centralised coordination, rather than exploring the problem space independently. The orchestrator carries the coordination cost so that individual agents remain focused and their impact remains contained.
 
 **Coordination must be explicit.** Agents need context, not instructions. They do not attend stand-ups, read between the lines, or ask clarifying questions mid-task. Implicit coordination (relying on agents to infer the correct sequence, ownership boundaries, or quality bar) is where hidden coupling and inconsistent behaviour originate. The framework encodes dependencies, gates, file ownership, and parallel execution boundaries in workflow YAML. Where context is ambiguous, agent rules encourage escalation rather than assumption. What is not in the file is not in the process.
 
-**Speed and rigour are sequenced, not opposed.** The New DevX workflow sequences four phases (Prototype, Specify, Build, Deploy), each with a different standard of rigour matched to its purpose. Not all work needs 18 agents and mandatory quality gates. `prototype.yaml` provides fast iteration with minimal agents and no gates, because exploration matters more than engineering discipline when prototyping. `build.yaml` provides the full TDD cycle with parallel specialists, review sequencing, and coverage gates, because production quality is non-negotiable for deployed code. The workflow determines the rigour.
+**Speed and rigour are sequenced, not opposed.** The New DevX workflow sequences four phases (Prototype, Specify, Build, Deploy), each with a different standard of rigour matched to its purpose. Not all work needs 15 agents and mandatory quality gates. `prototype.yaml` provides fast iteration with minimal agents and no gates, because exploration matters more than engineering discipline when prototyping. `build.yaml` provides the full TDD cycle with parallel specialists, review sequencing, and coverage gates, because production quality is non-negotiable for deployed code. The workflow determines the rigour.
 
 **Humans govern above the loop.** TDD phases, coverage gates, browser screenshots, review agents, and pre-commit validators bias the framework toward outputs that can be checked rather than merely asserted. An agent reporting "all tests pass" is not evidence. A command's stdout showing green is. Human attention moves from reviewing every line to designing the verification systems, classifying risk, and intervening where automated checks are insufficient.
 
@@ -151,14 +151,14 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ## The Agent Roster
 
-The framework defines 19 specialised agents, organised by kind of judgement rather than technology alone:
+The framework defines 15 specialised agents, organised by kind of judgement rather than technology alone:
 
-- **Discovery**: `product-expert` (elicits requirements), `product-owner` (formalises them)
-- **Design**: `solution-architect`, `database-designer`, `api-designer`, `ui-designer`
+- **Discovery**: `product-owner` (elicitation mode understands the problem, structuring mode formalises it)
+- **Design**: `solution-architect` (including the canonical OpenAPI contract), `ui-designer`
 - **Implementation**: `python-coder`, `typescript-coder`
 - **Testing**: `functional-tester` (TDD), `ui-tester` (browser automation)
 - **Review**: `tech-lead` (the gate), `code-reviewer`, `principles-reviewer`, `security-tester`
-- **Operations**: `devops`, `documentation`, `workflow-analyst`, `tokenomics-analyst`
+- **Operations**: `devops`, `documentation`, `harness-analyst` (owns the agent-facing harness; workflow-analysis and tokenomics-audit lenses)
 - **Coordination**: `orchestrator`
 
 Each agent's frontmatter declares which rules and standards it requires. The orchestrator resolves the applicable rules by matching file globs against the task scope, injecting only what is relevant.
@@ -171,7 +171,7 @@ This produces narrow, focused prompts with clear handoff boundaries. The roster 
 
 ## Workflow Architecture
 
-Workflows are YAML files encoding phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. The framework ships nine:
+Workflows are YAML files encoding phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. The framework ships eight:
 
 | Workflow | Purpose |
 |----------|---------|
@@ -182,8 +182,7 @@ Workflows are YAML files encoding phase dependencies, agent assignments, quality
 | **bugfix** | Empirical reproduction, diagnosis, fix, verification |
 | **full-test** | Complete regression across all modules |
 | **content** | Human-facing writing with personas |
-| **continuous-improvement** | Incident response and retrospective analysis |
-| **retrospective** | Process review and pattern identification |
+| **continuous-improvement** | Incident response and retrospective analysis (proactive review is a mode) |
 
 Per-file summaries, phase tables, and how **design → build → deploy** compose as default delivery: `context/docs/agentic-framework-reference.md` (Workflows).
 
@@ -210,7 +209,7 @@ Production workflows combine these. **Design** adds one parallel phase (database
 
 Context compaction during active work is a routine occurrence in long-running agent sessions: all accumulated state vanishes and the next agent starts from zero. The framework treats this systemised forgetfulness as a first-class design concern rather than an edge case.
 
-Every workflow YAML includes a `state_recovery` section listing the files an orchestrator should read to reconstruct its position. Every agent handoff writes durable state to disk. The `HANDOFF.md` file records the active phase *before* agents are spawned, not after they report back. This ensures the phase survives even if compaction occurs during execution.
+Workflow YAMLs include a `state_recovery` section with the workflow-specific files an orchestrator reads to reconstruct its position; the generic recovery steps live in `orchestrator.md` §State Recovery Protocol. Every agent handoff writes durable state to disk. The `HANDOFF.md` file records the active phase *before* agents are spawned, not after they report back. This ensures the phase survives even if compaction occurs during execution.
 
 Agent session telemetry is recorded in git commits via a `prepare-commit-msg` hook. This multi-runtime token extractor reads telemetry from Antigravity (SQLite protobuf), GitHub Copilot (JSONL), Claude Code (JSONL), and Codex, using per-runtime watermark files for incremental delta computation. It injects `tokens=<in>K/<out>K` into every `Agent-Session:` commit trailer, and never blocks the commit on extraction failure. Token usage, duration, and interaction count are all reconstructable from `git log`, eliminating the need for a separate metrics database.
 
@@ -228,16 +227,16 @@ The framework ships 14 output templates, 8 rule-mapped pre-commit validators, an
 
 | Validator | Rule / Purpose | How it works |
 |-----------|----------------|-------------|
-| `workspace_conventions.py` | `workspace-conventions.md` | Reads `.git/COMMIT_EDITMSG` to validate conventional commit format, imperative mood, and `Agent-Session:` trailers with co-author. Validates `metrics/*.jsonl` event schemas and output file paths. |
+| `workspace_conventions.py` | `workspace-conventions.md` | Reads `.git/COMMIT_EDITMSG` to validate conventional commit format, imperative mood, and `Agent-Session:` trailers with co-author. Validates `artefacts/build/metrics/*.jsonl` event schemas, interruption log schemas (`artefacts/build/interruptions/{task-id}.jsonl`), and output file paths. |
 | `tech_writing.py` | `tech-writing.md` | Scans files for American spellings (`color`, `behavior`, `organize`, `center`, `license`, `artifact`) and enforces British English. Validates EARS syntax in requirements files. |
 | `ui_dev.py` | `ui-dev.md` | Scans frontend code to prohibit `!important`, raw hex colours, multiple CSS files, and off-barrel Heroicon imports; enforces DaisyUI semantic tokens and spacing scales. |
-| `supabase.py` | `supabase.md` | Scans imports to prohibit `import supabase` outside database services/stores. Verifies SQL migrations insert audit records into `schema_migrations`. |
+| `supabase.py` | `supabase-operations.md` (skill) | Scans imports to prohibit `import supabase` outside database services/stores. Verifies SQL migrations insert audit records into `schema_migrations`. |
 | `testing.py` | `testing.md` | Enforces Detroit-school outcome-based testing by prohibiting interaction assertions (`mock.assert_called_once_with`) on internal collaborators unless marked with `# io-boundary`. |
 | `typescript_environment.py` | `typescript-environment.md` | Prohibits `package-lock.json` (enforces Yarn Berry), validates strict compiler flags in `tsconfig.json`, and verifies workspace declarations. |
 | `ui_testing.py` | `ui-testing.md` | Prohibits full `puppeteer`, `playwright`, and `cypress` in UI package dependencies, requiring lightweight `puppeteer-core`. |
 | `secrets.py` | `secrets.md` | Scans files for private key blocks, committed API keys, and credentialed `.env` files. |
 | `framework_docs_staleness.py` | Utility | Queries `git diff --cached` for staged `context/` files. If any are found, blocks unless `agentic-framework-reference.md` is also staged; warns if `agentic-framework.md` is missing. Bypassed with `[docs-ok]`. |
-| `agent_definitions.py` | Utility | Validates agent definition frontmatter, required fields, and verifies that all referenced standards, rules, and skills exist. |
+| `agent_definitions.py` | Utility | Validates agent definition frontmatter, required fields, and verifies that all referenced standards, rules, and skills exist — in the frontmatter and in the body's `Source` cells and `file.md §section` citations. |
 | `adapter_drift.py` | Utility | Regenerates all adapter projections in-memory and compares against on-disk files to detect drift. |
 | `verify_typst_formatting.py` | Utility | Validates and formats Markdown files according to Typst typesetting rules. |
 

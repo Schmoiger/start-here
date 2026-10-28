@@ -26,6 +26,9 @@ class CanonicalAgent:
     name: str
     description: str
     model: str
+    #: Tool names only. The loader normalises the frontmatter `tools:` form
+    #: (plain strings, `name: purpose` mappings, or a top-level mapping) to
+    #: a flat list of names — see context/templates/agent-template.md.
     mcp_tools: list[str] = field(default_factory=list)
     standards: list[str] = field(default_factory=list)
     rules: list[str] = field(default_factory=list)

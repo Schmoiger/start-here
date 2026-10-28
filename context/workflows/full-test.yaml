@@ -103,10 +103,6 @@ workflow_rules:
   - Failures are reported, not fixed (fixes belong in the appropriate sprint)
   - Run after the final sprint-review of a feature, before merging to master
   - Can also run on demand to verify system health
-  - "Python: uv run pytest"
-  - "TypeScript: yarn test --run"
-  - Use Write/Edit tools for file operations (not bash with echo/cat/sed)
-  - Estimate effort in tokens, not time
 
 # ---
 # Notes (human reference)

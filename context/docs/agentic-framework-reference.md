@@ -31,7 +31,6 @@
    - [Full-test (`full-test.yaml`)](#full-test-full-testyaml)
    - [Content (`content.yaml`)](#content-contentyaml)
    - [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml)
-   - [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml)
 10. [Orchestration Patterns](#orchestration-patterns)
 11. [Templates](#templates)
 12. [Scripts and Automation](#scripts-and-automation)
@@ -176,7 +175,7 @@ An agent executing a simple Python task needs the 15-token rule that says "run t
 
 ### Standards Catalogue
 
-`context/standards/README.md` is the lightweight index for humans navigating the folder. The tables below describe what each standard is for when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
+`context/README.md` is the single lightweight index for the whole `context/` tree — its Standards Map is the selection table. The tables below describe what each standard is for when you are editing behaviour or answering an agent's "where do I read more?" question. They intentionally omit the README itself, which is navigation—not a behavioural standard agents load from frontmatter.
 
 #### Foundational
 
@@ -256,7 +255,6 @@ Only a subset of rules currently have matching Python validators under `context/
 | `typescript-environment.md` | Enforces `yarn` for package management, `yarn dlx` for one-off tools |
 | `bash-environment.md` | Prevents unsafe or inconsistent shell usage; pushes work toward approved tools |
 | `mermaid-environment.md` | Constrains Mermaid diagram syntax, layout direction, and node label conventions |
-| `supabase.md` | Defines constraints around Supabase-related usage |
 
 #### Quality and Process
 
@@ -322,21 +320,23 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 |-------|---------|
 | `agent-sandbox.md` | Procedural constraints for running terminal commands inside agent sandboxes without triggering security blocks |
 | `agent-workflows.md` | Agent git commits, pull requests, and metrics logging patterns |
-| `api-designer.md` | RESTful and GraphQL API design with OpenAPI specifications |
 | `architecture-fidelity.md` | Adherence to architecture docs and API contracts during implementation |
 | `bootstrap-workflow.md` | Agent context setup, git-subrepo initialisation, and pre-commit hook activation |
+| `code-review.md` | PR-style code review focusing on bugs, edge cases, and maintainability, with an explicit `@security-tester` boundary |
 | `code-reviewer.md` | PR-style code review focusing on bugs, edge cases, and maintainability |
-| `database-designer.md` | Database schema design, relationships, and migrations |
+| `database-design.md` | Physical PostgreSQL schema design from the conceptual data model — keys, timestamps, indexes, ER diagram |
 | `documentation.md` | User-facing documentation, API references, and guide generation |
 | `functional-tester.md` | Detroit-school TDD: intent-first, tests before implementation |
+| `gcp-deployment.md` | Terraform validate/plan before apply, staging before production, rollback plan mandatory |
 | `git-subrepo-operations.md` | Procedural guidance for inspecting, pulling, cloning, and gated pushing with git-subrepo |
+| `harness-analyst.md` | Agent-facing harness ownership plus retrospective measurement: workflow efficiency and token economics lenses |
 | `intent-fidelity.md` | Ensures business intent is faithfully captured in requirements, TDD, and tests |
 | `mermaid-authoring.md` | Mermaid diagram syntax, layout constraints, and semantic guidance |
 | `multi-agent-workflows.md` | Orchestrator triage and handoff archival |
+| `openapi-authoring.md` | Canonical OpenAPI specification authoring, naming, responses, examples, and validation |
 | `orchestrator.md` | Workflow execution coordination, agent delegation, and quality gate management |
 | `principles-reviewer.md` | Review against LESS Engineering Principles |
-| `product-expert.md` | Eliciting clear requirements from vague ideas |
-| `product-owner.md` | Transforming vague requests into structured requirements and user stories |
+| `product-owner.md` | Eliciting and structuring requirements and user stories |
 | `python-coder.md` | Production Python code with testing in mind |
 | `python-scripting.md` | `uv`, PEP 723 inline metadata, and the `--with` pattern |
 | `security-tester.md` | Threat modelling, OWASP assessment, and vulnerability scanning |
@@ -345,7 +345,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `tdd-workflow.md` | Strict RED–GREEN–REFACTOR TDD cycle |
 | `tech-lead.md` | Architecture compliance, consistency, and engineering standards review |
 | `technical-authoring.md` | Technical whitepapers, architecture roadmaps, and book chapters using the AS persona |
-| `tokenomics-analyst.md` | Agent effectiveness, token economics, and context efficiency auditing |
+| `tokenomics-audit.md` | Agent effectiveness, token economics, model-tier conformance, and autonomy auditing (harness-analyst micro lens) |
 | `typescript-coder.md` | Frontend/backend TypeScript integrating with Python APIs |
 | `typescript-development.md` | TypeScript/JavaScript projects using Yarn Berry workspaces |
 | `typst-pipeline.md` | Authoring, building, and publishing PDFs via the project's Typst/Pandoc engine — covers Markdown formatting rules, `build.yaml` registration, brand/seed selection, and `make` commands |
@@ -353,7 +353,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 | `ui-development.md` | UI component and layout authoring |
 | `ui-tester.md` | End-to-end user workflow testing, screenshots, and accessibility checks |
 | `ui-testing.md` | UI testing and browser automation |
-| `workflow-analyst.md` | Workflow efficiency analysis across handoffs, git history, and token usage |
+| `workflow-analysis.md` | Workflow efficiency analysis across handoffs, git history, and token usage (harness-analyst macro lens) |
 
 ---
 
@@ -361,7 +361,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus nineteen delegatable specialists (twenty role files in total, excluding `README.md`). The roster below groups them by concern; `context/agents/README.md` lists the same roles with recommended model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships fifteen agent role files (excluding templates). The roster below groups them by concern; the Agent Inventory in `context/README.md` lists the same roles with model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -372,6 +372,8 @@ Every agent follows this structure:
 name: python-coder
 description: Writes production Python code with testing in mind.
 model: medium
+tools:
+  - context7 MCP: library documentation
 standards:
   - tech-standards.md
   - coding-standards.md
@@ -383,9 +385,9 @@ rules:
   - type-safety.md
   - git-commits.md
   # ... additional rules
-# Optional — see "Tool and MCP surfaces" below
-# mcp_tools:
-#   - context7
+skills:
+  - tdd-workflow.md
+  - python-scripting.md
 ---
 
 You are an expert Python engineer. Your job is to write clean,
@@ -393,19 +395,20 @@ testable, production-grade Python code.
 
 ---
 
-## Required Standards (Read First!)
-1. context/standards/tech-standards.md
-2. context/standards/coding-standards.md
-...
+## Context Acquisition
+
+Before executing any operations, consume the following required context files in sequence:
+1. Standards: tech-standards.md, coding-standards.md, security-standards.md, doc-standards.md
+2. Rules: python-environment.md, tdd-workflow.md, type-safety.md, git-commits.md
+3. Skills: tdd-workflow.md, python-scripting.md
 
 ---
 
 ## Workflow
-1. Read standards
-2. Read task context
-3. Implement
-4. Run tests
-5. Write handoff
+
+### 1. Intake Validation
+### 2. Execution
+### 3. Output Generation
 ```
 
 `name`: Identifier used in workflow YAML and spawn prompts.
@@ -418,15 +421,17 @@ testable, production-grade Python code.
 
 `rules`: List of rule files that apply to this agent's work. The orchestrator injects these into the spawn prompt.
 
-`mcp_tools` (optional, common on specialists here): MCP server identifiers the author expects the runtime to attach for that role (for example library docs or database inspection). Other products use `allowed_tools` or an equivalent allow-list instead. Neither field executes by itself—it documents intent for whoever configures the runtime.
+`skills`: List of skill files that give the agent procedural guidance for its domain. Like standards, these are loaded on demand rather than injected.
 
-The body below the frontmatter is the agent's system prompt: role definition, workflow steps, output expectations, and any role-specific constraints.
+`tools` (optional, common on specialists here): MCP servers or CLIs the author expects the runtime to attach for that role, annotated with what the agent uses them for (`- context7 MCP: library documentation`). The loader normalises every accepted shape — annotated mapping, plain string, or a top-level mapping — to tool names only, and the legacy `mcp_tools:` key still loads. Other products use `allowed_tools` or an equivalent allow-list instead. No field executes by itself; it documents intent for whoever configures the runtime.
+
+The body below the frontmatter is the agent's system prompt. It must open with `## Context Acquisition` — the section that tells the agent to read the standards, rules and skills declared in the frontmatter — followed by the role's workflow. `context/scripts/validators/agent_definitions.py` rejects any definition without that heading, and `context/scripts/tests/test_agent_validator.py` validates the template itself so the scaffold cannot drift from the validator.
 
 ### Tool and MCP surfaces (runtime vs frontmatter)
 
 Agent YAML declares what a role *should* be able to reach; the orchestrator runtime (Cursor, Claude Code, a headless worker, and so on) still decides which tools and MCP servers actually exist, which paths are writable, and which invocations require human approval. Those layers live outside `context/agents/`—often in workspace or user settings that are not committed. In Cursor, permissions and MCP wiring frequently sit in `.cursor/settings.local.json` (typically git-ignored), so two machines with the same checkout can behave differently.
 
-When frontmatter and local configuration diverge, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a deployment alignment problem: update the local settings (or your organisation’s standard Cursor profile) when you add `mcp_tools:` entries, add a new agent, or enable a new server—and keep frontmatter honest about what is truly required versus optional.
+When frontmatter and local configuration diverge, the failure mode is friction: endless approval prompts, subagents that cannot attach a listed MCP server, or specialists that appear “fully defined” in markdown but never receive the tools their prompt assumes. Treat that as a deployment alignment problem: update the local settings (or your organisation’s standard Cursor profile) when you add `tools:` entries, add a new agent, or enable a new server—and keep frontmatter honest about what is truly required versus optional.
 
 Rule injection and file scope (see `context/agents/orchestrator.md`) remain mandatory regardless of tool lists; missing rules cause as much pain as missing MCP entries.
 
@@ -445,7 +450,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines 19 specialised agents, organised by kind of judgement.
+The framework defines fifteen agents, organised by kind of judgement.
 
 #### Core Coordinator
 
@@ -457,16 +462,13 @@ The framework defines 19 specialised agents, organised by kind of judgement.
 
 | Agent | Purpose |
 |-------|---------|
-| `product-expert` | Elicits problem understanding and discovery insight from the user |
-| `product-owner` | Turns clarified needs into structured requirements and stories |
+| `product-owner` | Elicits problem understanding, then structures it into requirements and stories |
 
 #### Design
 
 | Agent | Purpose |
 |-------|---------|
-| `solution-architect` | Designs architecture, boundaries, and data flow |
-| `database-designer` | Designs schemas, relationships, and migrations |
-| `api-designer` | Designs APIs and contract artefacts |
+| `solution-architect` | Designs architecture, boundaries, data flow, and the canonical OpenAPI contract |
 | `ui-designer` | Designs UI structure, component behaviour, user flow, and visual assets |
 
 #### Implementation and Test
@@ -491,10 +493,9 @@ The framework defines 19 specialised agents, organised by kind of judgement.
 
 | Agent | Purpose |
 |-------|---------|
-| `devops` | Handles deployment and infrastructure-related work |
+| `devops` | Owns the physical data layer and every deployment target — physical schema design, migrations, Supabase local/staging, and GCP cloud/production |
 | `documentation` | Cleans up, archives, and maintains human-facing documentation |
-| `workflow-analyst` | Reviews process effectiveness and supports retrospectives |
-| `tokenomics-analyst` | Audits agent effectiveness, token economics, context efficiency, and model tiering |
+| `harness-analyst` | Owns the agent-facing harness (definitions, rules, skills, templates, workflows, validators, generators, model tiering) and reviews process effectiveness, token economics, and model tiering via the workflow-analysis and tokenomics-audit lenses |
 
 ### Creating a New Agent
 
@@ -582,8 +583,7 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 | bugfix | `bugfix.yaml` | Empirical reproduction, diagnosis, fix, verification |
 | full-test | `full-test.yaml` | Complete regression across all modules |
 | content | `content.yaml` | Human-facing writing with personas |
-| continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
-| retrospective | `retrospective.yaml` | Standalone process review and pattern identification |
+| continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (two modes; framework evolution) |
 
 ### Design (`design.yaml`)
 
@@ -593,9 +593,9 @@ Pattern: Six phases, one approval gate at the end (`design-review`).
 
 | Phase | Agents (pattern) | Role |
 |-------|------------------|------|
-| `discovery` | `product-expert` then `product-owner` (sequential) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
-| `design-architecture` | `solution-architect` | Architecture, logical API contracts, data model, component design docs |
-| `design-contracts` | `database-designer` and `api-designer` (parallel) | Physical schema and migrations; OpenAPI with HTTP semantics |
+| `discovery` | `product-owner` (elicitation then structuring) | Discovery notes → formal requirements and user stories in `artefacts/product/` |
+| `design-architecture` | `solution-architect` | Architecture, canonical OpenAPI specification, data model, component design docs |
+| `design-contracts` | `devops` | Physical schema and migrations from the architect's data model |
 | `design-ui` | `ui-designer` | Component specs, tokens, wireframes, user flows, and visual assets |
 | `design-review` | `tech-lead` → `code-reviewer` → `principles-reviewer` → `ui-designer` → `security-tester` (sequential gate) | Design approval; `tech-lead` must approve before the next reviewer runs |
 
@@ -657,7 +657,7 @@ flowchart TD
 
 Use design then build for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
-Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#prototype-prototypeyaml) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) when you want process or framework follow-up; they are not phases inside `build.yaml`.
+Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#prototype-prototypeyaml) instead. Run [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) (incident or retrospective mode) when you want process or framework follow-up; it is not a phase inside `build.yaml`.
 
 ### Prototype (`prototype.yaml`)
 
@@ -759,7 +759,7 @@ When to run: Before merging a long-running branch to main, after large refactors
 ### Content (`content.yaml`)
 
 File: `context/workflows/content.yaml`
-Pattern: Sequential chain — `product-expert` for research, then `documentation` with a different persona per phase (draft → editor → optional expert reviewer → finalize).
+Pattern: Sequential chain — `product-owner` in elicitation mode for research, then `documentation` with a different persona per phase (draft → editor → optional expert reviewer → finalize).
 Use for: External-facing prose: blogs, papers, guides, talks, marketing where voice matters.
 Do not use for: Technical handoffs, API or architecture reference, internal task or review artefacts, or anything that should stay neutral and repo-shaped — use [Design](#design-designyaml) then [Build](#build-buildyaml) with `doc-standards.md` without personas.
 
@@ -779,7 +779,7 @@ flowchart TD
     start([Start]) --> research
 
     subgraph research["Research"]
-        pe["product-expert"]
+        pe["product-owner (elicitation)"]
     end
 
     research --> draft
@@ -814,7 +814,7 @@ flowchart TD
 
 | Phase | Agent | Persona / role | Primary output |
 |-------|--------|----------------|------------------|
-| `research` | `product-expert` | Audience, purpose, key messages, sources | Research notes (see YAML `outputs`) |
+| `research` | `product-owner` (elicitation mode) | Audience, purpose, key messages, sources | Research notes (see YAML `outputs`) |
 | `draft` | `documentation` | `technical-writer` or `opinionated-blogger` | `artefacts/content/drafts/{title}-draft.md` |
 | `review` | `documentation` | `editor` | `artefacts/content/drafts/{title}-reviewed.md` |
 | `technical-review` | `documentation` | `expert-reviewer` (optional — skip for non-technical pieces) | `artefacts/content/drafts/{title}-tech-reviewed.md` |
@@ -824,7 +824,7 @@ Draft and review phases list concrete checks in YAML (persona voice, British Eng
 
 ### Continuous improvement (`continuous-improvement.yaml`)
 
-Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. The `workflow-analyst` agent appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states.
+Framework improvement and measurement are governed by `context/workflows/continuous-improvement.yaml`, not by ad hoc scorecards. That workflow defines two modes (incident and retrospective), explicit phases, what gets written to disk, and a quality gate in retrospective mode. Within that workflow, `harness-analyst` appears only in retrospective review; other phases are orchestrator- and human-led as the YAML states. Harness implementation work is dispatched to the same agent directly by the orchestrator, outside this workflow.
 
 #### Workflow file and modes
 
@@ -860,7 +860,7 @@ Sequential phases:
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `workflow-analyst` | Read artefacts/build/agent-interruptions.md (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
+| `review` | `harness-analyst` | Read artefacts/build/interruptions/*.jsonl (questions, tool approvals, escalations), artefacts/build/metrics/session-log.jsonl, artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
 | `discuss` | None (gate: human approval) | Present pattern → root cause → proposed fix; human chooses what to act on |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
 | `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
@@ -875,7 +875,8 @@ Validation highlights: git log parsed for session metrics; interruption and inci
 
 The YAML lists these sources explicitly:
 
-- `artefacts/build/agent-interruptions.md`: blocking moments (questions, approvals, escalations)
+- `artefacts/build/interruptions/*.jsonl`: blocking moments (questions, approvals, escalations), one rolling log per task, one JSON object per record
+- `artefacts/build/metrics/session-log.jsonl`: agent invocations, status, and token usage
 - `artefacts/build/agent-incidents.md`: prior framework failures
 - `git log` with `%H`, subject, body: reconstruct tokens=, duration=, agents=, dispatch=, interactions=, approvals= from commit trailers
 
@@ -885,9 +886,9 @@ From those, the analyst is expected to answer questions such as: total tokens pe
 
 #### Relationship to other artefacts
 
-Tasks and handoffs (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful secondary context when the orchestrator or `@workflow-analyst` widens an investigation, but they are not the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
+Tasks and handoffs (`artefacts/build/tasks.md`, `HANDOFF.md`, `artefacts/shared/handoffs/`) remain useful secondary context when the orchestrator or `@harness-analyst` widens an investigation, but they are not the primary contract of `continuous-improvement.yaml`; that contract is interruptions log, incidents log, and git telemetry as above.
 
-The agent definition `context/agents/workflow-analyst.md` still describes broader analysis habits (for example task and handoff mining). When in doubt, the workflow YAML wins for phase order, outputs, and validation.
+The lens skills `context/skills/workflow-analysis.md` and `context/skills/tokenomics-audit.md` still describe broader analysis habits (for example task and handoff mining). When in doubt, the workflow YAML wins for phase order, outputs, and validation.
 
 ---
 
@@ -899,19 +900,6 @@ These are examples of fixable gaps, not a separate scoring methodology:
 - Tooling drift: repeated bash-for-files or wrong package managers; tighten prompts or rules.
 - Integration cost: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
 - Parallel misuse: duplicated context without time savings; narrow parallel phases to truly independent work.
-
-### Retrospective (`retrospective.yaml`)
-
-Purpose: Standalone proactive review—`workflow-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. Not the same file as `continuous-improvement.yaml` (that file adds incident mode and git Agent-Session mining in its retrospective path).
-
-| Phase | Agents | Role |
-|-------|--------|------|
-| `review` | `workflow-analyst` | Read `agent-interruptions.md`, `agent-metrics.log`, `agent-incidents.md`; report patterns with file:line evidence |
-| `discuss` | None (human gate) | Human selects which findings to implement |
-| `fix` | `python-coder`, `typescript-coder` (parallel) | Approved framework changes |
-| `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
-
-See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recovery`.
 
 ---
 
@@ -948,9 +936,9 @@ Review-fix cycles until approval. Use at quality gates where output may be rejec
 
 `design.yaml`
 
-- Discovery: Sequential (`product-expert` then `product-owner`).
+- Discovery: Sequential (`product-owner` elicitation mode then structuring mode).
 - Architecture: Single agent (`solution-architect`).
-- Contracts: Parallel hive-like pair (`database-designer` and `api-designer` on the same architecture outputs).
+- Contracts: Single schema owner (`devops` builds the physical schema from the architect's data model; `solution-architect` owns the canonical OpenAPI specification in the preceding phase).
 - UI and visuals: Single phase (`ui-designer` — component specs, wireframes, and visual assets consolidated).
 - Design review: Sequential reviewers with iterative return to earlier phases when required.
 
@@ -982,7 +970,7 @@ Prefer parallel execution when time is critical, tasks are large (overhead is a 
 
 Templates are stored in `context/templates/` and define standard output shapes for recurring artefacts. The orchestrator selects the appropriate template when constructing a task prompt; the producing agent uses it to structure its output.
 
-`context/templates/README.md` indexes every template file, when to use it, and how it relates to workflows—use it when you are adding a new artefact shape rather than guessing from filenames alone.
+The Template Index in `context/README.md` lists every template file, when to use it, and how it relates to workflows—use it when you are adding a new artefact shape rather than guessing from filenames alone.
 
 ### Why Templates Exist
 
@@ -1001,11 +989,12 @@ The `commit-message-template.md` is not only for humans formatting commits: it d
 | `design-template.md` | Standard design document for complex features or screens |
 | `domain-rules-template.yaml` | Template for domain-specific constraints |
 | `handoff-template.md` | Standard agent handoff format |
+| `logging-template.md` | Canonical schema for the session metrics log and per-task interruption logs |
 | `pr-description-template.md` | Standard pull request description format |
 | `requirements-template.md` | Standard requirements structure |
 | `review-template.md` | Standard review finding format |
 | `task-prompt-template.md` | Orchestrator prompt scaffold for spawning agents correctly |
-| `tasks-template.md` | Standard task tracking format |
+| `tasks-doc-template.md` | Standard task tracking format |
 | `test-dashboard-template.md` | Standard structure for test dashboards |
 | `user-stories-template.md` | Standard user story format |
 
@@ -1035,10 +1024,10 @@ Validators are pre-commit hooks stored in `context/scripts/validators/`. Each va
 
 | Validator | Rule / Purpose | What It Checks |
 |-----------|----------------|---------------|
-| `workspace_conventions.py` | `workspace-conventions.md` | Commit message format, `Agent-Session` trailer, metrics JSONL schema, output paths |
+| `workspace_conventions.py` | `workspace-conventions.md` | Commit message format, `Agent-Session` trailer, metrics JSONL schema, interruption log schema and one-log-per-task naming, output paths |
 | `tech_writing.py` | `tech-writing.md` | British English spelling (`-ise`, `-our`, `-re`, `licence`, `artefact`), EARS requirements syntax |
 | `ui_dev.py` | `ui-dev.md` | Prohibits `!important`, raw hex colors, multiple CSS files, DaisyUI tokens, Heroicons barrel |
-| `supabase.py` | `supabase.md` | Supabase import boundary, `schema_migrations` audit row insert in SQL migrations |
+| `supabase.py` | `supabase-operations.md` (skill) | Supabase import boundary, `schema_migrations` audit row insert in SQL migrations |
 | `testing.py` | `testing.md` | Detroit-school outcome-based assertions, prohibits mock interaction assertions on internal collaborators |
 | `typescript_environment.py` | `typescript-environment.md` | Prohibits `package-lock.json` (enforces `yarn.lock`), strict `tsconfig.json` compiler options, workspaces |
 | `ui_testing.py` | `ui-testing.md` | Prohibits full `puppeteer` (enforces `puppeteer-core`), prohibits `playwright` and `cypress` |
@@ -1050,7 +1039,7 @@ Validators are pre-commit hooks stored in `context/scripts/validators/`. Each va
 
 #### `workspace_conventions.py`
 
-Enforces invariants from `context/rules/workspace-conventions.md`. Reads `.git/COMMIT_EDITMSG` at the `commit-msg` stage. Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped. Also validates JSONL entries under `metrics/` (`ts`, `task`, `agent`, `event`, `tokens`, ISO 8601 timestamps, valid events, `to` field on handoffs) and validates output paths and filenames (`artefacts/`, `secrets/`, `services/{name}/tests/`).
+Enforces invariants from `context/rules/workspace-conventions.md`. Reads `.git/COMMIT_EDITMSG` at the `commit-msg` stage. Regex-checks the subject line against `type(scope): description` — valid types are `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `perf`; scope must be lowercase alphanumeric with hyphens; max 72 characters. Imperative mood is checked heuristically (flags first words ending in `-ed` or `-ing`). If an `Agent-Session:` trailer is present, validates the `tool=`, `model=`, `agents=` triplet format and requires a `Co-Authored-By:` line. Merge and revert commits are skipped. Also validates JSONL entries under `artefacts/build/metrics/` (`ts`, `task`, `agent`, `event`, `tokens`, ISO 8601 timestamps, valid events, `to` field on handoffs), validates interruption logs under `artefacts/build/interruptions/` against the schema in `context/templates/logging-template.md` § Interruption Log (base fields `id`, `ts`, `agent`, `task_id`, `type`; per-type fields; nullable outcome fields; unique ids; resolvable `ref`; filename stem equal to `task_id`), and validates output paths and filenames (`artefacts/`, `secrets/`, `services/{name}/tests/`).
 
 #### `tech_writing.py`
 
@@ -1062,7 +1051,7 @@ Enforces invariants from `context/rules/ui-dev.md`. Scans frontend source files 
 
 #### `supabase.py`
 
-Enforces invariants from `context/rules/supabase.md`. Regex-checks source files to ensure `import supabase`, `from supabase`, or `@supabase/supabase-js` imports only occur within designated database services or stores. Also verifies that SQL migration files under `**/migrations/*.sql` contain an audit row insert into `schema_migrations`.
+Enforces invariants from `context/skills/supabase-operations.md` §1. Regex-checks source files to ensure `import supabase`, `from supabase`, or `@supabase/supabase-js` imports only occur within designated database services or stores. Also verifies that SQL migration files under `**/migrations/*.sql` contain an audit row insert into `schema_migrations`.
 
 #### `testing.py`
 
@@ -1087,6 +1076,8 @@ Does not receive file paths — runs with `pass_filenames: false`. Queries `git 
 #### `agent_definitions.py`
 
 Runs as a pre-commit hook on `context/agents/*.md` and can be run manually. Validates every `.md` file in `context/agents/` (excluding `README.md` and `TEMPLATE.md`). Checks: YAML frontmatter is present and parseable; required fields `name` and `model` exist; every entry in `standards:` points to a file that exists in `context/standards/`; every entry in `rules:` points to a file that exists in `context/rules/`; every entry in `skills:` points to a file that exists in `context/skills/`; the body contains no hardcoded absolute paths (`/Users/`, `/home/`). Existence checks are relative to the repo working directory at runtime.
+
+Body attributions are validated too, because the frontmatter checks cannot see a body that cites a file deleted last quarter. Two shapes are resolved: a `Source` cell in a body rule table, and an inline `file.md §section` citation. Both must name a file that exists under `context/` (searched in `rules/`, `skills/`, `standards/`, `agents/`, `templates/`, `workflows/`, `docs/`, or a `context/`-qualified path), and when a section is named, a heading that file actually carries. Section matching folds case and punctuation and accepts the abbreviation people write (`§1 British English` resolves to `1. British English Spelling & Invariants`), a bare section number (`§6`), and a citation that trails into prose. `file.md` is treated as the template's placeholder, not a reference. Unresolved attributions fail the run with the offending line number.
 
 #### `adapter_drift.py`
 
@@ -1327,11 +1318,11 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 
 ### Adding a New Agent
 
-1. `context/agents/README.md`
+1. The Agent Inventory in `context/README.md`
 2. `context/templates/agent-template.md`
 3. `context/agents/orchestrator.md`
 4. The workflow where the new agent should appear
-5. [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter) (this document) — align local runtime settings (for example Cursor `.cursor/settings.local.json`) with any `mcp_tools:` you add
+5. [Tool and MCP surfaces (runtime vs frontmatter)](#tool-and-mcp-surfaces-runtime-vs-frontmatter) (this document) — align local runtime settings (for example Cursor `.cursor/settings.local.json`) with any `tools:` you add
 
 ### Porting the Framework to Another Runtime
 
@@ -1359,7 +1350,7 @@ Every workflow YAML includes a `state_recovery` section listing the files an orc
 
 1. `context/workflows/continuous-improvement.yaml`
 2. [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) (this document — effectiveness and incident handling)
-3. `context/agents/workflow-analyst.md`
+3. `context/agents/harness-analyst.md`
 4. `context/standards/workflow-standards.md`
 
 ### Writing Human-Facing Content (Blogs, Papers, Guides)

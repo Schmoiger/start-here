@@ -5,32 +5,27 @@ phases:
   - id: discovery
     name: Requirements & Planning
     sequential: true
-    skills:
-      - superpowers:brainstorming
     agents:
-      - product-expert  # Interview user; produce discovery-notes.md
-      - product-owner   # Formalise discovery-notes.md into requirements.md and user-stories.md
+      - product-owner   # Mode 1: interview into discovery-notes.md; Mode 2: formalise into requirements.md and user-stories.md
     outputs:
       - artefacts/product/
 
   - id: design-architecture
     name: Architecture Design
     depends_on: [discovery]
-    skills:
-      - superpowers:brainstorming
     agents:
-      - solution-architect  # Output architecture.md, logical API contracts, data-model.md; produce design docs for complex components
+      - solution-architect  # Output architecture.md, data-model.md, api-catalogue.md, canonical openapi.yaml, and design docs for complex components
     outputs:
       - artefacts/architecture/
+      - artefacts/architecture/openapi.yaml  # Canonical API specification, owned by solution-architect
       - artefacts/design/  # Design docs for complex components (see design_doc_standard below)
 
   - id: design-contracts
-    name: Contract & Schema Design
+    name: Physical Schema Design
     depends_on: [design-architecture]
     parallel: true
     agents:
-      - database-designer  # Physical schema and migrations from solution-architect's data model
-      - api-designer       # Full OpenAPI spec with HTTP semantics from solution-architect's API contracts
+      - devops  # Physical schema and migrations from solution-architect's data model
     outputs:
       - artefacts/architecture/
       - artefacts/database/
@@ -38,8 +33,6 @@ phases:
   - id: design-ui
     name: UI & Visual Design
     depends_on: [design-contracts]
-    skills:
-      - frontend-design
     agents:
       - ui-designer  # Component specs, design tokens, wireframes, user flows, and visual assets
     outputs:
@@ -51,9 +44,6 @@ phases:
     depends_on: [design-ui]
     sequential: true
     gate: true
-    skills:
-      - superpowers:requesting-code-review
-      - superpowers:receiving-code-review
     agents:
       - tech-lead           # Architecture and standards gate; APPROVED unblocks remaining reviewers
       - code-reviewer       # Implementation feasibility and line-level issues
@@ -107,21 +97,11 @@ design_doc_standard:
   location: artefacts/design/{component-name}.md
 
 workflow_rules:
-  - Use Write/Edit tools for file operations (not bash with echo/cat/sed)
-  - "Python: `uv add` / `uv run` — never pip"
-  - "TypeScript: `yarn add` / `yarn dlx` — never npm / npx"
-  - Estimate effort in tokens, not time
-  # Compaction safety
-  - Subagents write artefacts incrementally — never accumulate in memory and flush at end
-  - Update HANDOFF.md Phase: field BEFORE spawning agents
   - For the parallel design-contracts phase, log each agent's output scope in HANDOFF.md before spawning
-  - database-designer owns artefacts/database/; api-designer owns artefacts/architecture/openapi.yaml — disjoint by default
+  - devops owns artefacts/database/; solution-architect owns artefacts/architecture/openapi.yaml — disjoint by phase
 
 state_recovery:
   after_compaction:
-    - "Re-read context/agents/orchestrator.md and each file in its rules: and standards: frontmatter"
-    - Run git log --oneline -5 to see recent changes
-    - Read HANDOFF.md Phase: field to identify which phase was in flight
     - Read artefacts/product/requirements.md for the requirements being designed against
     - Read artefacts/architecture/architecture.md if it exists — the solution-architect's output
   critical_files:
@@ -133,8 +113,8 @@ state_recovery:
 # Notes (human reference)
 #
 # PHASE DEPENDENCIES:
-#   discovery → design-architecture → design-contracts (parallel: database-designer + api-designer)
-#   → design-ui → design-review (sequential: tech-lead → code-reviewer → ...)
+#   discovery → design-architecture (architecture + canonical openapi.yaml)
+#   → design-contracts (devops) → design-ui → design-review (sequential: tech-lead → ...)
 #
 # design-review is a gate: CHANGES REQUIRED returns to the appropriate design phase.
 # Output: artefacts/product/, artefacts/architecture/, artefacts/database/, artefacts/design/

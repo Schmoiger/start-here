@@ -23,7 +23,7 @@ When committing on behalf of an agent (or yourself), verify the message:
    ```
    Agent-Session: tool={tool} model={model} agents={agent-role} duration={time} dispatch={human|orchestrator} interactions={N} approvals={N}
    ```
-   *Note: `tokens=` is appended automatically by the `prepare-commit-msg` hook — never include it manually.*
+   *Note: `tool=`, `model=`, and `tokens=` are written by the `prepare-commit-msg` hook from runtime session telemetry — never include them manually. The `commit-msg` validator rejects `model=`/`tool=` values the runtime session contradicts or cannot corroborate.*
 3. **Format**: Format source files (ruff/biome) before staging.
 4. **Commit**: Write the message to a temporary file (e.g., `/tmp/msg.txt`) and run `git add {files} && git commit -F /tmp/msg.txt`. Do NOT use `git commit -m "$(...)"`.
 5. **Push**: `git push` immediately to publish the commit.
@@ -42,30 +42,9 @@ git log main..HEAD --format='%b' | grep '^Agent-Session:'
 
 ## 3. Metrics Logging Schema
 
-Append events to `metrics/session-log.jsonl` using the following schema:
+Append events to `artefacts/build/metrics/session-log.jsonl` — `start`, `handoff`, `escalate`, `complete`, `blocked` — one JSON object per line, never rewriting a line already written.
 
-```json
-{
-  "ts": "ISO8601 timestamp",
-  "task": "task-id",
-  "agent": "agent-id",
-  "event": "start|handoff|escalate|complete|blocked",
-  "tokens": {
-    "in": 0,
-    "out": 0,
-    "source": "api_response|estimated|unavailable"
-  },
-  "to": "target-agent (for handoff/escalate)",
-  "notes": "optional context"
-}
-```
-
-### Token Estimation
-| Source | When | Accuracy |
-|--------|------|----------|
-| api_response | Platform provides usage metadata | Exact |
-| estimated | Calculate as chars/4 | ~80% accurate |
-| unavailable | Platform doesn't expose, can't estimate | Log anyway |
+The record schema (required fields, the `to` rule for handoffs, the token `source` values, and worked examples) is defined in `context/templates/logging-template.md` § Session Metrics Log. Read it before writing your first record; do not guess the shape.
 
 ---
 

@@ -10,37 +10,14 @@ Used by orchestrator when spawning agents. Agents must read their definition fro
 You are @{agent-name} running {task-id}.
 
 BEFORE starting, read:
-1. context/agents/{agent-name}.md
-{resolved-rules — orchestrator: resolve using Rule Resolution in orchestrator.md.
- List each rule as a numbered item with its full path, e.g.:
-  2. context/rules/bash-environment.md
-  3. context/rules/python-environment.md
-  4. context/rules/escalation.md
- Also add relevant standards:
-  - context/standards/coding-standards.md       (implementation tasks)
-  - context/standards/testing-standards.md      (test tasks)
-  - context/standards/doc-standards.md          (documentation tasks)
-  - context/templates/README.md                 (tasks that produce a templated artefact)}
-{resolved-skills — orchestrator: resolve using Skill Resolution in orchestrator.md.
- List matching procedural skills from the ## Skills index in AGENTS.md, e.g.:
-  5. context/skills/python-scripting.md         (tasks touching Python files or scripts)
-  6. context/skills/technical-authoring.md      (tasks involving human-facing documentation)}
-
-ESCALATION (MANDATORY):
-Log to `artefacts/build/agent-interruptions.md` under the current sprint section
-whenever the user's or orchestrator's attention was required:
-
-1. QUESTION — you cannot proceed without an external answer:
-   **Type**: Question | **Question**: ... | **Answered by**: _(blank)_ | **Resolution**: _(blank)_
-
-2. TOOL APPROVAL — user was prompted to approve a tool use:
-   **Type**: Tool approval | **Tool**: ... | **Approved by**: User | **Resolution**: Approved/Denied
-
-Do NOT log autonomous decisions or self-resolved issues.
+1. Your agent definition: context/agents/{agent-name}.md — its Context Acquisition section lists your full standards/rules/skills pool (mirrors your frontmatter); acquire the relevant members.
+2. Task context: {task-context — branch, working directory, current state. See Task Context below.}
+3. Standards sections for THIS task: {resolved-standards-sections — orchestrator: resolve using Standards Resolution in orchestrator.md. List each as `path — §Section, §Section`. Sections only; whole files only when the task genuinely requires them.}
+4. Task-specific rules or skills beyond your pool: {resolved-task-specific — orchestrator: normally empty. Only when the task needs a rule or procedural skill absent from the agent's frontmatter.}
 
 ---
 
-## IMMEDIATE CONTEXT
+## Task Context
 
 Branch: `{branch}`
 Working directory: `{project-root}`
@@ -52,7 +29,7 @@ Key files for this task:
 
 ---
 
-## FILE SCOPE
+## File Scope
 
 You may only write or edit files within this scope:
 - `{path}` — {what you are writing here}
@@ -63,99 +40,29 @@ Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf
 
 ---
 
-## TASK: {task-id}
+## Task
 
-{task-description}
+{task-id}: {task-description}
+
+### Acceptance Criteria
+
+{bulleted-acceptance-criteria}
+
+### Primary Output Path 
+
+`{project-root}/{output-path}`
 
 ---
 
-## IMPLEMENTATION
+## Implementation
 
 {numbered-implementation-steps}
 
 ---
 
-## ACCEPTANCE
+## Execution Reminders
 
-{bulleted-acceptance-criteria}
-
----
-
-## COMMIT
-
-Do NOT run `git add` or `git commit` — the orchestrator formats, commits, and pushes on your behalf.
-Before reporting back, **lint your own code** — the orchestrator only auto-formats, it will not fix lint errors:
-- Python: `uv run --project /abs/path/to/service ruff check {files}` (fix any errors yourself)
-- TypeScript: `yarn --cwd /abs/path/to/project-root biome check {files}` (fix any errors yourself)
-
-Write your commit message to `/tmp/{task-id}_commit_msg.txt` following `context/templates/commit-message-template.md`.
-{any task-specific commit notes, e.g. conventional commit type and scope}
-
----
-
-## REPORT BACK
-
-Include in your report:
-- **Files changed**: exact paths you wrote or edited (these become the `git add` list)
-- **Commit message**: path to your `/tmp/{task-id}_commit_msg.txt`
-
-{what the orchestrator needs to know when the agent finishes}
-```
-
----
-
-## Orchestrator Usage
-
-1. Read `artefacts/build/tasks.md` for the current task
-2. Fill ALL placeholders — never leave `{...}` in the prompt
-3. **Resolve rules** using the Rule Resolution procedure in `context/agents/orchestrator.md`:
-   - Read the agent's `rules:` frontmatter for the candidate pool
-   - Include all `alwaysApply: true` rules from the pool
-   - Include rules whose `globs` match the task's target files
-   - Omit rules whose `globs` don't match
-   - Add domain standards (coding, testing, doc, tech) as appropriate for the task type
-4. **Assign file scope** — list the exact paths the agent may write or edit (see `agent-standards.md` §6.2). For parallel dispatches, verify scopes are disjoint. For read-only agents, state `(read-only)`.
-5. Always include IMMEDIATE CONTEXT — agents have no inherited context
-6. Always include ESCALATION block — agents must know where to log blockers
-7. If the task produces an artefact, consult `context/templates/README.md` and reference the appropriate template in IMPLEMENTATION
-8. Spawn agent
-
-**Placeholders**:
-- `{agent-name}`: Without @ (e.g., `python-coder`)
-- `{task-id}`: From tasks.md (e.g., `TASK-001`)
-- `{branch}`: Current git branch
-- `{project-root}`: Absolute path to project root
-- `{path}`: Files/directories the agent may commit (from §6.2 scope assignment)
-- `{task-description}`: Brief context — what this agent is building and why
-- `{numbered-implementation-steps}`: Numbered list with specific file paths
-- `{acceptance-criteria}`: Bulleted list — what DONE looks like
-- `{report-back}`: What the orchestrator needs from the agent's summary
-
----
-
-## Phase Variants
-
-When running a workflow with defined phases, add a `MODE:` line in the TASK section to orient the agent. Examples:
-
-**TDD RED** — `MODE: TDD RED`
-- Implementation: write failing tests only, no production code
-- Acceptance: ALL tests fail on first run; confirm failure count
-
-**TDD GREEN** — `MODE: TDD GREEN`
-- Acceptance: ALL tests pass; no test file modifications
-
-**TDD BLUE** — `MODE: TDD BLUE`
-- Acceptance: ALL tests still pass; no new functionality added
-
-Add other workflow-specific mode annotations (e.g. `MODE: DESIGN`, `MODE: REVIEW`) as needed for the active workflow.
-
----
-
-## Anti-Patterns
-
-❌ Override agent definition inline — agents read it from `context/agents/`
-❌ Omit IMMEDIATE CONTEXT — agents have zero inherited state
-❌ Omit ESCALATION block — agents won't know where to log blockers
-✅ Reference agent definition: `Read: context/agents/{agent-name}.md`
-✅ Provide specific file paths in implementation steps
-✅ Tell the agent exactly what to report back
+- **State Recovery**: If context compaction occurs, execute your standard recovery protocol from your agent definition using the **Primary Output Path** above. Write findings incrementally.
+- **Escalation**: If blocked or requiring tool approval, append a record immediately to `artefacts/build/interruptions/{task-id}.jsonl` using the schema in `context/templates/logging-template.md` § Interruption Log.
+- **Linting**: Before reporting back, run your designated linter (`ruff` / `biome`) on modified files and fix any errors.
+- **Reporting Back**: Include the files changed, commit message, and status summary so that the orchestrator can commit on your behalf.

@@ -1,11 +1,26 @@
 """Tests for validation scripts."""
 
+import json
+import sys
 from pathlib import Path
 
 from context.scripts.validators.workspace_conventions import (
+    INTERRUPTION_BASE_FIELDS,
+    INTERRUPTION_TYPE_FIELDS,
+    REQUIRED_METRICS_FIELDS,
+    VALID_INTERRUPTION_DECISIONS,
+    VALID_INTERRUPTION_IMPACTS,
+    VALID_INTERRUPTION_TYPES,
+    VALID_METRICS_EVENTS,
+    VALID_TOKEN_SOURCES,
+    is_interruptions_log,
+    main as workspace_conventions_main,
     validate_commit_message,
+    validate_interruptions_entry,
+    validate_interruptions_file,
     validate_metrics_entry,
     validate_metrics_file,
+    validate_output_path,
     validate_output_paths,
 )
 from context.scripts.validators.tech_writing import (
@@ -128,6 +143,111 @@ Agent-Session: tool=cursor model=sonnet agents=python-coder duration=5m tokens=1
         is_valid, error = validate_commit_message(msg)
         assert not is_valid
         assert "require Co-Authored-By" in error
+
+    def test_agent_session_tokens_mega_suffix(self):
+        """prepare-commit-msg formats >=1M token counts with an M suffix."""
+        msg = """feat(test): valid subject
+
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=3.59M/7.4K
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert is_valid, f"expected M token suffix to pass: {error}"
+
+    def test_agent_session_tokens_lowercase_suffix(self):
+        """Lowercase k/m token suffixes are accepted."""
+        msg = """feat(test): valid subject
+
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=1m/2k
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert is_valid, f"expected lowercase token suffixes to pass: {error}"
+
+    def test_agent_session_hook_appended_form(self):
+        """prepare-commit-msg appends tool=/model=/tokens= when the author omits them."""
+        msg = """feat(test): valid subject
+
+Agent-Session: agents=python-coder dispatch=human interactions=2 approvals=0 tool=cursor model=sonnet tokens=35.01M/47.2K
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert is_valid, f"expected hook-appended trailer to pass: {error}"
+
+    def test_agent_session_malformed_tokens_fails(self):
+        """A tokens= value without the in/out slash is still rejected."""
+        msg = """feat(test): valid subject
+
+Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=35M
+Co-Authored-By: Agent <a@b.c>"""
+        is_valid, error = validate_commit_message(msg)
+        assert not is_valid
+        assert "Invalid Agent-Session format" in error
+
+
+class TestAgentSessionCorroboration:
+    """Tests for runtime-telemetry corroboration of Agent-Session tool=/model=.
+
+    Framework tools (cline, claude-code, antigravity, copilot, codex, ...) must be
+    corroborated by an active runtime session; unknown third-party tools (e.g.
+    cursor) are not adjudicated.
+    """
+
+    def _cline_session_for_repo(self, root: Path, session_id: str, repo: str, model: str):
+        sdir = root / "sessions" / session_id
+        sdir.mkdir(parents=True)
+        (sdir / f"{session_id}.json").write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "session_id": session_id,
+                    "provider": "openrouter",
+                    "model": model,
+                    "cwd": repo,
+                    "workspace_root": repo,
+                    "metadata": {},
+                }
+            )
+        )
+        (sdir / f"{session_id}.messages.json").write_text(json.dumps([]))
+
+    @staticmethod
+    def _agent_commit(tool: str, model: str) -> str:
+        return (
+            f"feat(test): subject\n\n"
+            f"Agent-Session: tool={tool} model={model} agents=python-coder\n\n"
+            f"Co-Authored-By: Agent <a@b.c>"
+        )
+
+    def test_model_corroborated_for_cline(self, tmp_path, monkeypatch):
+        """A cline session matching the runtime reports the declared model: valid."""
+        monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "cline"))
+        self._cline_session_for_repo(tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model")
+        is_valid, error = validate_commit_message(
+            self._agent_commit("cline", "test-model"), repo_root=str(tmp_path)
+        )
+        assert is_valid, f"expected corroborated model to pass: {error}"
+
+    def test_model_contradicting_runtime_fails(self, tmp_path, monkeypatch):
+        """A model that contradicts the runtime session is rejected."""
+        monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "cline"))
+        self._cline_session_for_repo(tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model")
+        is_valid, error = validate_commit_message(
+            self._agent_commit("cline", "sonnet"), repo_root=str(tmp_path)
+        )
+        assert not is_valid
+        assert "contradicts runtime telemetry" in error
+
+    def test_unconfirmable_model_fails(self, tmp_path, monkeypatch):
+        """A model the runtime cannot corroborate (no session) is rejected."""
+        monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "empty-cline"))
+        is_valid, error = validate_commit_message(
+            self._agent_commit("cline", "test-model"), repo_root=str(tmp_path)
+        )
+        assert not is_valid
+        assert "cannot be corroborated" in error
+
+    def test_third_party_tool_not_adjudicated(self):
+        """Unknown tool names without a canonical telemetry store are allowed."""
+        is_valid, error = validate_commit_message(self._agent_commit("cursor", "sonnet"))
+        assert is_valid, f"third-party tool should not be adjudicated: {error}"
 
 
 class TestEARSNotation:
@@ -279,6 +399,20 @@ class TestMetricsLogging:
         errors = validate_metrics_file(invalid_metrics)
         assert len(errors) > 0
 
+    def test_metrics_log_location_under_build(self):
+        """Test that metrics logs are build records at artefacts/build/metrics/."""
+        assert validate_output_path("artefacts/build/metrics/session-log.jsonl") == []
+
+    def test_metrics_log_requires_jsonl_suffix(self):
+        """Test that output path validation requires a .jsonl metrics log."""
+        errors = validate_output_path("artefacts/build/metrics/session-log.log")
+        assert any(".jsonl" in e for e in errors)
+
+    def test_metrics_log_rejects_repository_root(self):
+        """Test that a repository-root metrics/ directory is rejected."""
+        errors = validate_output_path("metrics/session-log.jsonl")
+        assert any("artefacts/build/metrics/" in e for e in errors)
+
     def test_missing_required_field(self):
         """Test that missing required field is caught."""
         entry = {
@@ -374,6 +508,246 @@ class TestMetricsLogging:
         errors = validate_metrics_file(bad_file)
         assert len(errors) > 0
         assert any("Invalid JSON" in e for e in errors)
+
+
+class TestInterruptionsLogging:
+    """Tests for interruption log validator (logging-template.md § Interruption Log)."""
+
+    @staticmethod
+    def _question(**overrides):
+        entry = {
+            "id": "a1f3",
+            "ts": "2026-10-23T14:05:11Z",
+            "agent": "python-coder",
+            "task_id": "TASK-004",
+            "type": "question",
+            "question": "Which schema applies to the audit fields?",
+            "blocker": "AC-2 cannot be met without it",
+            "answered_by": "orchestrator",
+            "resolution": "Use the schema in logging-template.md",
+        }
+        entry.update(overrides)
+        return entry
+
+    def test_valid_interruptions(self, valid_interruptions):
+        """Test that a valid per-task log passes validation."""
+        errors = validate_interruptions_file(valid_interruptions)
+        assert errors == [], f"Expected no errors, got: {errors}"
+
+    def test_invalid_interruptions(self, invalid_interruptions):
+        """Test that a malformed log fails validation."""
+        errors = validate_interruptions_file(invalid_interruptions)
+        assert len(errors) > 0
+
+    def test_missing_required_field(self):
+        """Test that a missing base field is caught."""
+        entry = self._question()
+        del entry["task_id"]
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("task_id" in e for e in errors)
+
+    def test_null_outcome_fields_allowed(self):
+        """Test that unresolved outcome fields may be null (log-at-blocking moment)."""
+        entry = self._question(answered_by=None, resolution=None)
+        assert validate_interruptions_entry(entry, 1) == []
+
+    def test_invalid_type(self):
+        """Test that an unknown record type is caught."""
+        entry = self._question(type="approval")
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("Invalid type" in e for e in errors)
+
+    def test_invalid_timestamp(self):
+        """Test that a non-UTC or non-ISO timestamp is caught."""
+        entry = self._question(ts="2026-10-23 14:05:11")
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("timestamp" in e.lower() for e in errors)
+
+    def test_agent_at_prefix_rejected(self):
+        """Test that the agent name must be recorded without '@'."""
+        entry = self._question(agent="@python-coder")
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("without '@'" in e for e in errors)
+
+    def test_invalid_decision(self):
+        """Test that a tool_approval decision must be approved or denied."""
+        entry = {
+            "id": "b7c2",
+            "ts": "2026-10-23T14:05:19Z",
+            "agent": "python-coder",
+            "task_id": "TASK-004",
+            "type": "tool_approval",
+            "tool": "supabase",
+            "action": "db push --linked",
+            "decision": "maybe",
+            "decision_by": "user",
+        }
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("Invalid decision" in e for e in errors)
+
+    def test_invalid_impact(self):
+        """Test that escalation impact is one of high, medium, low."""
+        entry = {
+            "id": "c9d4",
+            "ts": "2026-10-23T15:01:02Z",
+            "agent": "solution-architect",
+            "task_id": "TASK-004",
+            "type": "escalation",
+            "impact": "critical",
+            "escalated_to": "human",
+            "options": ["frontmatter-only", "body-table"],
+            "resolution": "frontmatter-only",
+            "decided_by": "human",
+        }
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("Invalid impact" in e for e in errors)
+
+    def test_options_must_be_array(self):
+        """Test that escalation options must be a non-empty array."""
+        entry = {
+            "id": "c9d4",
+            "ts": "2026-10-23T15:01:02Z",
+            "agent": "solution-architect",
+            "task_id": "TASK-004",
+            "type": "escalation",
+            "impact": "high",
+            "escalated_to": "human",
+            "options": "frontmatter-only",
+            "resolution": "frontmatter-only",
+            "decided_by": "human",
+        }
+        errors = validate_interruptions_entry(entry, 1)
+        assert any("'options'" in e for e in errors)
+
+
+    def test_mixed_tasks_rejected(self, tmp_path):
+        """Test that a log may not mix records from different tasks."""
+        log = tmp_path / "TASK-004.jsonl"
+        log.write_text(
+            json.dumps(self._question()) + "\n"
+            + json.dumps(self._question(id="a1f4", task_id="TASK-005")) + "\n"
+        )
+        errors = validate_interruptions_file(log)
+        assert any("multiple tasks" in e for e in errors)
+
+    def test_legacy_filename_rejected(self, tmp_path):
+        """Test that per-agent/per-timestamp log names are rejected as drift."""
+        legacy = tmp_path / "python-coder-TASK-004-20261023T140511Z.jsonl"
+        legacy.write_text(json.dumps(self._question()) + "\n")
+        errors = validate_interruptions_file(legacy)
+        assert any("one rolling log per task" in e for e in errors)
+
+    def test_duplicate_ids_rejected(self, tmp_path):
+        """Test that record ids must be unique within a log."""
+        log = tmp_path / "TASK-004.jsonl"
+        log.write_text(json.dumps(self._question()) + "\n" + json.dumps(self._question()) + "\n")
+        errors = validate_interruptions_file(log)
+        assert any("Duplicate record id" in e for e in errors)
+
+    def test_resolution_ref_must_resolve(self, tmp_path):
+        """Test that a resolution record must reference an existing record id."""
+        log = tmp_path / "TASK-004.jsonl"
+        log.write_text(
+            json.dumps(self._question()) + "\n"
+            + json.dumps(
+                {
+                    "id": "d5e6",
+                    "ts": "2026-10-23T15:10:00Z",
+                    "agent": "python-coder",
+                    "task_id": "TASK-004",
+                    "type": "resolution",
+                    "ref": "zzzz",
+                    "resolution": "Use the schema in logging-template.md",
+                    "decided_by": "orchestrator",
+                }
+            )
+            + "\n"
+        )
+        errors = validate_interruptions_file(log)
+        assert any("does not match any record id" in e for e in errors)
+
+    def test_resolution_record_resolves(self, tmp_path):
+        """Test that a resolution record referencing a real id passes."""
+        log = tmp_path / "TASK-004.jsonl"
+        log.write_text(
+            json.dumps(self._question(answered_by=None, resolution=None)) + "\n"
+            + json.dumps(
+                {
+                    "id": "d5e6",
+                    "ts": "2026-10-23T15:10:00Z",
+                    "agent": "python-coder",
+                    "task_id": "TASK-004",
+                    "type": "resolution",
+                    "ref": "a1f3",
+                    "resolution": "Use the schema in logging-template.md",
+                    "decided_by": "orchestrator",
+                }
+            )
+            + "\n"
+        )
+        assert validate_interruptions_file(log) == []
+
+    def test_empty_file_valid(self, tmp_path):
+        """Test that an empty log is valid."""
+        log = tmp_path / "TASK-004.jsonl"
+        log.write_text("")
+        assert validate_interruptions_file(log) == []
+
+    def test_invalid_json(self, tmp_path):
+        """Test that invalid JSON is caught."""
+        log = tmp_path / "TASK-004.jsonl"
+        log.write_text("not valid json\n")
+        errors = validate_interruptions_file(log)
+        assert any("Invalid JSON" in e for e in errors)
+
+    def test_interruptions_path_detection(self):
+        """Test that only artefacts/build/interruptions/ paths route to this validator."""
+        assert is_interruptions_log("artefacts/build/interruptions/TASK-004.jsonl")
+        assert not is_interruptions_log("artefacts/build/interruptions/nested/TASK-004.jsonl")
+        assert not is_interruptions_log("artefacts/build/metrics/session-log.jsonl")
+
+    def test_interruption_log_requires_jsonl_suffix(self):
+        """Test that output path validation requires a .jsonl interruption log."""
+        assert validate_output_path("artefacts/build/interruptions/TASK-004.jsonl") == []
+        errors = validate_output_path("artefacts/build/interruptions/TASK-004.log")
+        assert any(".jsonl" in e for e in errors)
+
+    def test_main_auto_detects_interruptions_log(self, tmp_path, monkeypatch, capsys):
+        """Test that a bare interruption log path routes to the interruption validator."""
+        log_dir = tmp_path / "artefacts" / "build" / "interruptions"
+        log_dir.mkdir(parents=True)
+        log = log_dir / "TASK-004.jsonl"
+        log.write_text(json.dumps(self._question()) + "\n")
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sys, "argv", ["workspace_conventions.py", str(log)])
+
+        assert workspace_conventions_main() == 0
+        assert "interruption logging format" in capsys.readouterr().out
+
+    def test_main_auto_detects_metrics_log(self, tmp_path, monkeypatch, capsys):
+        """Test that a bare metrics path still routes to the metrics validator."""
+        metrics_dir = tmp_path / "artefacts" / "build" / "metrics"
+        metrics_dir.mkdir(parents=True)
+        log = metrics_dir / "session-log.jsonl"
+        log.write_text(
+            json.dumps(
+                {
+                    "ts": "2025-01-28T09:00:00Z",
+                    "task": "DS-001",
+                    "agent": "python-coder",
+                    "event": "start",
+                    "tokens": {"in": 1200, "out": 450, "source": "api_response"},
+                }
+            )
+            + "\n"
+        )
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sys, "argv", ["workspace_conventions.py", str(log)])
+
+        assert workspace_conventions_main() == 0
+        assert "metrics logging format" in capsys.readouterr().out
 
 
 class TestTypstFormatting:
@@ -841,4 +1215,39 @@ class TestSubrepoFreshness:
             exit_code = subrepo_freshness_main()
             assert exit_code == 0
 
+
+class TestLoggingTemplateDocs:
+    """Tests that the canonical logging template matches the enforced schema.
+
+    context/templates/logging-template.md is the single home for both log
+    schemas. These tests fail when a validator gains a field or value that the
+    template does not document, so the docs cannot silently drift from code.
+    """
+
+    TEMPLATES = Path(__file__).resolve().parents[3] / "context" / "templates"
+
+    def test_template_documents_metrics_schema(self):
+        """Test that every enforced metrics field and value appears in the template."""
+        text = (self.TEMPLATES / "logging-template.md").read_text()
+        for token in REQUIRED_METRICS_FIELDS + VALID_METRICS_EVENTS + VALID_TOKEN_SOURCES:
+            assert f"`{token}`" in text, f"logging-template.md omits '{token}'"
+
+    def test_template_documents_interruption_schema(self):
+        """Test that every enforced interruption field and value appears in the template."""
+        text = (self.TEMPLATES / "logging-template.md").read_text()
+        tokens = (
+            INTERRUPTION_BASE_FIELDS
+            + VALID_INTERRUPTION_TYPES
+            + VALID_INTERRUPTION_IMPACTS
+            + VALID_INTERRUPTION_DECISIONS
+        )
+        for fields in INTERRUPTION_TYPE_FIELDS.values():
+            tokens += fields
+        for token in tokens:
+            assert f"`{token}`" in text, f"logging-template.md omits '{token}'"
+
+    def test_agent_template_references_logging_template(self):
+        """Test that the agent template points at the schema instead of restating it."""
+        text = (self.TEMPLATES / "agent-template.md").read_text()
+        assert "context/templates/logging-template.md" in text
 

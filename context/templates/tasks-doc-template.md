@@ -1,5 +1,7 @@
 # Tasks: {Feature Name}
 
+The tasks doc should be named `{project-root}/artefacts/build/tasks-{branch-name}.md`
+
 ---
 
 ## Header
@@ -28,18 +30,38 @@ Two formats are used depending on the scope of the task file:
 The task index is the single source of truth for task status. **Update status immediately** when
 a task transitions — do not batch status updates.
 
-- **Pri**: critical, high, medium, low
+- **Priority**: critical, high, medium, low
 - **Status**: pending, in_progress, blocked, completed
 - **Blocked By**: task/bug IDs or `-` if none
 
-| ID | Pri | Status | Blocked By | Task |
-|----|-----|--------|------------|------|
+| ID | Priority | Status | Blocked By | Task |
+|----|----------|--------|------------|------|
 | TASK-001 | critical | completed | - | {description} |
 | TASK-002 | high | in_progress | TASK-001 | {description} |
 | TASK-003 | medium | pending | TASK-001 | {description} |
 
-**Every task in the index must have a matching `### TASK-ID:` specification section** with
-acceptance criteria. Tasks without specifications cannot be dispatched.
+**Every task in the index must have a matching specification section** using the exact intake validation headers and defining a primary output path for state recovery:
+
+```markdown
+## File Scope
+
+- `{path}` — {what the agent may write here}
+
+## Task
+
+{TASK-ID}: {task-description}
+
+### Acceptance Criteria
+
+- {Criterion 1}
+- {Criterion 2}
+
+### Primary Output Path
+
+`{project-root}/{output-path}`
+```
+
+The headings must match `context/templates/agent-template.md` § Intake Validation exactly — heading level and case. An agent halts execution when any of `## File Scope`, `## Task`, `### Acceptance Criteria`, or `### Primary Output Path` is missing from its prompt.
 
 ### Checklist format — sprint-based feature task tracking
 

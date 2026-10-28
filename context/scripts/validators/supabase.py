@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-"""Validate Supabase invariants (context/rules/supabase.md).
+"""Validate Supabase invariants (context/skills/supabase-operations.md §1).
 
 Enforces:
 1. Supabase client imports (Python and TypeScript) restricted to database service / stores.
@@ -71,7 +71,7 @@ def check_migration_audit(files: list[Path]) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Validate Supabase invariants (context/rules/supabase.md)"
+        description="Validate Supabase invariants (context/skills/supabase-operations.md §1)"
     )
     parser.add_argument("files", nargs="*", help="Files to inspect")
     args = parser.parse_args()
@@ -97,7 +97,10 @@ def main() -> int:
     all_violations = import_violations + migration_violations
 
     if all_violations:
-        print("❌ Supabase invariant violations (context/rules/supabase.md):", file=sys.stderr)
+        print(
+            "❌ Supabase invariant violations (context/skills/supabase-operations.md §1):",
+            file=sys.stderr,
+        )
         for v in all_violations:
             print(f"  {v}", file=sys.stderr)
         return 1

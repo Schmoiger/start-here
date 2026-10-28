@@ -119,12 +119,12 @@ Update both project and monorepo-level documentation to reflect completed work.
 
 ### Escalation and Assumptions
 
-See `context/rules/escalation.md` for the authoritative escalation model:
+See `context/rules/multi-agent-collaboration.md` §1 Escalation for the authoritative escalation model:
 
 - **Decision matrix**: impact × confidence → assume / flag / escalate
 - **Impact classification**: distinguishes scope deferrals (low) from operational deferrals (high)
 - **Two-tier triage**: subagent → orchestrator (resolve or forward) → human
-- **Logging**: escalations are logged to `artefacts/build/agent-interruptions.md`
+- **Logging**: escalations are logged to `artefacts/build/interruptions/{task-id}.jsonl`
 
 Document assumptions in handoff with decision, confidence, rationale, and impact if wrong.
 
@@ -135,7 +135,7 @@ Document assumptions in handoff with decision, confidence, rationale, and impact
 Framework improvement uses the `continuous-improvement` workflow with two modes:
 
 - **Incident mode**: human reports a specific failure → diagnose root cause → fix → record in `agent-incidents.md` and `tasks-context-framework.md`
-- **Retrospective mode**: review `agent-interruptions.md`, `agent-incidents.md`, and git log `Agent-Session` metrics → identify patterns → discuss with human → fix → record
+- **Retrospective mode**: review `artefacts/build/interruptions/*.jsonl`, `agent-incidents.md`, and git log `Agent-Session` metrics → identify patterns → discuss with human → fix → record
 
 See `context/workflows/continuous-improvement.yaml` for the full phase definitions.
 
@@ -191,7 +191,7 @@ Agent-Session: tool=claude-code model=opus agents=python-coder duration=32m disp
 
 **Interaction tracking**: `interactions` and `approvals` measure the total human cost for the task — the orchestrator sums its own human touchpoints plus the subagent's. See `context/rules/git-commits.md` for the full counting rule and `context/templates/pr-description-template.md` for PR-level autonomy metrics.
 
-**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`, alongside the structured events in `metrics/session-log.jsonl`.
+**Consumption**: the `continuous-improvement` workflow reconstructs per-task, per-agent, and per-sprint token and autonomy data from `git log --format='%B' | grep Agent-Session`, alongside the structured events in `artefacts/build/metrics/session-log.jsonl`.
 
 ---
 
@@ -377,68 +377,12 @@ Agents do not commit — the orchestrator commits sequentially on their behalf t
 
 ---
 
-## 12. Claude Skills Alignment
+## 12. Workflow Phase Skills
 
-> **Context**: This section is specific to Claude Code as the orchestrator. The workflow is
-> framework-agnostic, but when Claude is running it the `skills` hints in `default.yaml` map
-> to named skills that sharpen agent behaviour at each phase. This section explains the intent
-> behind each mapping so the orchestrator knows when and why to invoke them.
-
-### What skills are and why they matter
-
-Skills are loaded prompt fragments that enforce a specific discipline. They are not tools — they
-are cognitive constraints. An agent without a skill hint will improvise; with the right skill it
-follows a proven pattern (TDD iron law, systematic debugging, parallel dispatch, etc.).
-
-The orchestrator MUST invoke relevant skills **before** generating any response or action at
-that phase. The `skills` field in `default.yaml` is a checklist, not a suggestion.
-
-### Phase-to-skill mapping
-
-| Workflow phase | Skill(s) | Why |
-|---|---|---|
-| `discovery` | `superpowers:brainstorming` | Explore problem space before formalising requirements; prevents premature lock-in |
-| `design` | `superpowers:brainstorming` | Evaluate design alternatives before committing; explore trade-offs |
-| `design` | `superpowers:brainstorming` | Explore design alternatives before committing to an approach |
-| `design` (UI work) | `frontend-design` | Produces polished, non-generic UI designs; avoids AI-default aesthetics |
-| `design-review`, `quality-review`, `final-holistic-review` | `superpowers:requesting-code-review` | Structures what reviewers focus on; prevents unfocused review passes |
-| `design-review`, `quality-review`, `final-holistic-review` | `superpowers:receiving-code-review` | Validates CHANGES REQUIRED feedback before acting; prevents performative compliance |
-| `tasks-review` | `superpowers:writing-plans` | Enforces bite-sized tasks with exact file paths, TDD steps, and commit cadence |
-| `tasks-review`, `tdd-green`, `tdd-blue`, `sprint-review`, `final-holistic-review` | `superpowers:dispatching-parallel-agents` | Ensures parallel agents are spawned simultaneously, not sequentially |
-| `tdd-red`, `test-plan-review`, `tdd-green`, `tdd-blue` | `superpowers:test-driven-development` | The iron law: no production code before a failing test; watch-it-fail is mandatory |
-| `tdd-green` (UI) | `frontend-design` | When TypeScript agent builds new components; raises visual quality bar |
-| `tdd-green`, `tdd-blue`, `coverage-gate`, `unit-regression`, `e2e-regression`, `deployment-review` | `superpowers:verification-before-completion` | Requires running commands and showing real output before claiming any phase complete |
-| `coverage-gate`, `integration-regression` | `superpowers:systematic-debugging` | If threshold not met or contract breaks: root-cause analysis before writing tests or patches |
-| `deployment`, `deployment-review` | `superpowers:finishing-a-development-branch` | Guided merge/PR/cleanup decision; prevents branches being left dangling |
-| `deployment` | `commit-commands:commit-push-pr` | Structured commit + push + PR in one invocation |
-
-### How the orchestrator passes skill hints to subagents
-
-Spawned subagents do **not** inherit the orchestrator's context. The `skills` field in the
-workflow yaml is a reminder to the **orchestrator** to include skill invocation instructions
-in the agent prompt. The pattern is:
-
-```
-@python-coder implement Task 2.9 (Phase A circuit breaker)
-
-BEFORE starting, invoke these skills:
-- superpowers:test-driven-development  (TDD GREEN phase)
-- superpowers:verification-before-completion  (run tests, show output before claiming done)
-
-Read context/standards/tech-standards.md first.
-[task details...]
-```
-
-Without explicit inclusion in the prompt, subagents will not see the `skills` field and will
-not invoke them. The workflow yaml serves as the orchestrator's checklist; the agent prompt
-is where the instruction actually reaches the subagent.
-
-### Skills not tied to a specific phase
-
-| Skill | When to invoke |
-|---|---|
-| `superpowers:systematic-debugging` | Any time a test fails unexpectedly or behaviour is wrong — invoke before proposing any fix |
-| `claude-md-management:claude-md-improver` | After a sprint cycle when project conventions have evolved |
-| `superpowers:writing-skills` | When encoding a new reusable pattern as a skill |
-| `commit-commands:clean_gone` | Periodically to remove stale local branches |
-| `superpowers:subagent-driven-development` | Alternative to dispatching: single session, one fresh subagent per task, review between each |
+Workflows declare **agents** and, rarely, orchestrator-facing constraints — they never list skills
+or rules. Each agent self-acquires the standards, rules, and skills in its frontmatter via its
+Context Acquisition block. The orchestrator adds a rule or skill pointer to a spawn prompt only
+when the task needs something outside the agent's pool (`orchestrator.md` §Rule & Skill
+Resolution). Technology-dependent mode switches (e.g. devops operating in GCP vs Supabase mode)
+are passed as one-line constraints at spawn; the skill behind the mode stays in `context/skills/`
+and is referenced only by the agent's frontmatter.
