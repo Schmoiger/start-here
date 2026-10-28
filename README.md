@@ -149,4 +149,58 @@ If variables are missing, check that you are in a **new** shell (the `eval` hook
 
 ## Agent Harness
 
+### Quickstart 
 
+This agent harness contains everything you need to build quality software in any of three DevX modes: dev as collaborator, dev as reviewer, dev as orchestrator.
+
+The harness is sourced into a ```context/``` folder and must be copied into the repo root to allow the LLM runtime to find and use the harness. This is taken care of in the initialisation script.
+
+```bash
+./init.sh
+```
+
+
+#### Quick commands
+
+1. Update harness: pull latest version of harness into your repo
+
+```bash
+git subrepo pull context
+```
+
+2. Smart update: updated local harness with only changed or new files (default)
+
+```bash
+uv run python context/scripts/generators/generate_adapters.py
+```
+
+3. Push local updates to the harness back upstream
+
+```bash
+git subrepo push context
+```
+
+
+#### What's included
+
+- **14 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
+- **13 standards** - Coding, testing, architecture, tech stack, documentation, security
+- **10 rules** - Enforceable constraints with automated validators
+- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
+- **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
+
+
+#### Runtime Telemetry & Session Token Tracking
+
+The framework tracks cumulative token consumption directly from the underlying AI development runtimes. However, this mechanism is brittle because no vendor provides a public, frozen API for local telemetry; extraction relies on internal storage patterns. The telemetry extraction silently fails rather than blocking commits.
+
+
+#### Further reading
+
+- **Getting started**: See `context/README.md` - Complete guide for agents and humans
+- **Workflow guide**: See `AGENTS.md` / `CLAUDE.md` - Auto-generated orchestration guides
+- **Agent reference**: See `context/agents/` - Individual agent definitions
+- **Standards**: See `context/standards/` - Coding, testing, tech stack guidance
+- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix)
+- **Validators**: See `context/scripts/validators/README.md` - Pre-commit consistency validators
