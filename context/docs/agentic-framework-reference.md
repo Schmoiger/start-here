@@ -31,7 +31,6 @@
    - [Full-test (`full-test.yaml`)](#full-test-full-testyaml)
    - [Content (`content.yaml`)](#content-contentyaml)
    - [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml)
-   - [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml)
 10. [Orchestration Patterns](#orchestration-patterns)
 11. [Templates](#templates)
 12. [Scripts and Automation](#scripts-and-automation)
@@ -584,8 +583,7 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 | bugfix | `bugfix.yaml` | Empirical reproduction, diagnosis, fix, verification |
 | full-test | `full-test.yaml` | Complete regression across all modules |
 | content | `content.yaml` | Human-facing writing with personas |
-| continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (framework evolution) |
-| retrospective | `retrospective.yaml` | Standalone process review and pattern identification |
+| continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (two modes; framework evolution) |
 
 ### Design (`design.yaml`)
 
@@ -659,7 +657,7 @@ flowchart TD
 
 Use design then build for production features and anything that will be maintained long-term. Duration scales with sprint count and scope.
 
-Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#prototype-prototypeyaml) instead. Run [Retrospective (`retrospective.yaml`)](#retrospective-retrospectiveyaml) or [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) when you want process or framework follow-up; they are not phases inside `build.yaml`.
+Do not use this path for throwaway spikes; use [Prototype (`prototype.yaml`)](#prototype-prototypeyaml) instead. Run [Continuous improvement (`continuous-improvement.yaml`)](#continuous-improvement-continuous-improvementyaml) (incident or retrospective mode) when you want process or framework follow-up; it is not a phase inside `build.yaml`.
 
 ### Prototype (`prototype.yaml`)
 
@@ -862,7 +860,7 @@ Sequential phases:
 
 | Phase | Agents | Role |
 |-------|--------|------|
-| `review` | `harness-analyst` | Read artefacts/build/interruptions/*.jsonl (questions, tool approvals, escalations), artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
+| `review` | `harness-analyst` | Read artefacts/build/interruptions/*.jsonl (questions, tool approvals, escalations), artefacts/build/metrics/session-log.jsonl, artefacts/build/agent-incidents.md, and git log bodies for Agent-Session telemetry (tokens, duration, agents, dispatch, interactions, approvals injected by `prepare-commit-msg` and orchestrator). Aggregate to find patterns with counts and examples; each finding must point at concrete files that would change |
 | `discuss` | None (gate: human approval) | Present pattern → root cause → proposed fix; human chooses what to act on |
 | `fix` | `python-coder`, `typescript-coder` (parallel) | Same as incident mode: implement agreed fixes |
 | `record` | None | Update incidents if relevant; append portability tasks to `artefacts/build/tasks-context-framework.md` when fixes should propagate to other repos |
@@ -878,6 +876,7 @@ Validation highlights: git log parsed for session metrics; interruption and inci
 The YAML lists these sources explicitly:
 
 - `artefacts/build/interruptions/*.jsonl`: blocking moments (questions, approvals, escalations), one rolling log per task, one JSON object per record
+- `artefacts/build/metrics/session-log.jsonl`: agent invocations, status, and token usage
 - `artefacts/build/agent-incidents.md`: prior framework failures
 - `git log` with `%H`, subject, body: reconstruct tokens=, duration=, agents=, dispatch=, interactions=, approvals= from commit trailers
 
@@ -901,19 +900,6 @@ These are examples of fixable gaps, not a separate scoring methodology:
 - Tooling drift: repeated bash-for-files or wrong package managers; tighten prompts or rules.
 - Integration cost: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
 - Parallel misuse: duplicated context without time savings; narrow parallel phases to truly independent work.
-
-### Retrospective (`retrospective.yaml`)
-
-Purpose: Standalone proactive review—`harness-analyst` reviews accumulated operational data, the orchestrator discusses findings with a human (gate), then coders fix and record portability tasks. Not the same file as `continuous-improvement.yaml` (that file adds incident mode and git Agent-Session mining in its retrospective path).
-
-| Phase | Agents | Role |
-|-------|--------|------|
-| `review` | `harness-analyst` (workflow-analysis lens) | Read `artefacts/build/interruptions/*.jsonl`, `artefacts/build/metrics/session-log.jsonl`, `agent-incidents.md`; report patterns with file:line evidence |
-| `discuss` | None (human gate) | Human selects which findings to implement |
-| `fix` | `python-coder`, `typescript-coder` (parallel) | Approved framework changes |
-| `record` | None | Append portability tasks to `artefacts/build/tasks-context-framework.md` |
-
-See `retrospective.yaml` for `quality_gates`, `workflow_rules`, and `state_recovery`.
 
 ---
 

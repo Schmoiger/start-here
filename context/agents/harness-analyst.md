@@ -124,7 +124,7 @@ Both lenses draw on the same telemetry. Collect from all available sources:
 
 #### Task Constraints
 - Base findings strictly on verifiable artefacts, git logs, and session records — do not speculate
-- Provide actionable recommendations ranked by impact; every finding must lead to a fixable gap — no vanity metrics or aggregate health scores (`context/workflows/retrospective.yaml` key `workflow_rules`)
+- Provide actionable recommendations ranked by impact; every finding must lead to a fixable gap — no vanity metrics or aggregate health scores (`context/workflows/continuous-improvement.yaml` key `workflow_rules`)
 - In analysis mode, do not modify source code, test files, or workflow definitions directly; present recommendations for human review or delegate to the appropriate agent. Harness mode is bounded by the write scope above
 - A harness change is not complete until `agent_definitions.py`, `generate_adapters.py`, `adapter_drift.py` and `pytest context/scripts/tests/` all pass, and no reference to a removed asset survives outside `artefacts/build/archive/`
 - Do not implement a quality gate; gate agents (`@tech-lead`, `@code-reviewer`, `@principles-reviewer`, `@security-tester`) review harness changes, they never author them

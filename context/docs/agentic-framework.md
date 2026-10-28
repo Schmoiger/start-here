@@ -171,7 +171,7 @@ This produces narrow, focused prompts with clear handoff boundaries. The roster 
 
 ## Workflow Architecture
 
-Workflows are YAML files encoding phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. The framework ships nine:
+Workflows are YAML files encoding phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. The framework ships eight:
 
 | Workflow | Purpose |
 |----------|---------|
@@ -182,8 +182,7 @@ Workflows are YAML files encoding phase dependencies, agent assignments, quality
 | **bugfix** | Empirical reproduction, diagnosis, fix, verification |
 | **full-test** | Complete regression across all modules |
 | **content** | Human-facing writing with personas |
-| **continuous-improvement** | Incident response and retrospective analysis |
-| **retrospective** | Process review and pattern identification |
+| **continuous-improvement** | Incident response and retrospective analysis (proactive review is a mode) |
 
 Per-file summaries, phase tables, and how **design → build → deploy** compose as default delivery: `context/docs/agentic-framework-reference.md` (Workflows).
 
@@ -210,7 +209,7 @@ Production workflows combine these. **Design** adds one parallel phase (database
 
 Context compaction during active work is a routine occurrence in long-running agent sessions: all accumulated state vanishes and the next agent starts from zero. The framework treats this systemised forgetfulness as a first-class design concern rather than an edge case.
 
-Every workflow YAML includes a `state_recovery` section listing the files an orchestrator should read to reconstruct its position. Every agent handoff writes durable state to disk. The `HANDOFF.md` file records the active phase *before* agents are spawned, not after they report back. This ensures the phase survives even if compaction occurs during execution.
+Workflow YAMLs include a `state_recovery` section with the workflow-specific files an orchestrator reads to reconstruct its position; the generic recovery steps live in `orchestrator.md` §State Recovery Protocol. Every agent handoff writes durable state to disk. The `HANDOFF.md` file records the active phase *before* agents are spawned, not after they report back. This ensures the phase survives even if compaction occurs during execution.
 
 Agent session telemetry is recorded in git commits via a `prepare-commit-msg` hook. This multi-runtime token extractor reads telemetry from Antigravity (SQLite protobuf), GitHub Copilot (JSONL), Claude Code (JSONL), and Codex, using per-runtime watermark files for incremental delta computation. It injects `tokens=<in>K/<out>K` into every `Agent-Session:` commit trailer, and never blocks the commit on extraction failure. Token usage, duration, and interaction count are all reconstructable from `git log`, eliminating the need for a separate metrics database.
 

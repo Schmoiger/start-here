@@ -12,6 +12,8 @@
 [ ] Committing is token-intesive. Investigate and rationalise.
 [ ] Do we need context/agents/cursor-workflow-helper.mdc? Is it created by the Cursor runtime projection? Check.
 [ ] How to project skills as Claude superpowers? Do we even need to, as skills will be available anyway.
+[ ] Add new small tasks workflow
+[ ] Add projection to OpenRouter runtime e.g. new telemetry location
 
 ## Done
 

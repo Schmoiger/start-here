@@ -27,12 +27,12 @@
 | TASK-018 | normal | completed | diagnose | @orchestrator | - | Extend `harness-analyst` spec — add `python-scripting`, `git-subrepo-operations`, `agent-sandbox` skills and `workflow-standards` standard |
 | TASK-019 | high | completed | refactor | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
 | TASK-020 | high | won't do | refactor | @harness-analyst | TASK-013 | Retire `@code-reviewer` into a coder-executed skill — won't do (breaks author/reviewer separation; REQ-WF-003). Done instead: create `code-review` skill; slim `code-reviewer.md` to reference it (§TASK-020) |
-| TASK-021 | high | pending | refactor | @harness-analyst | TASK-013 | Some workflows are not DRY: they are specifying skills and rules when they should only be specifying agents and rarely, additional constraints for the Orchestrator to pick up |
+| TASK-021 | high | completed | refactor | @harness-analyst | TASK-013 | Some workflows are not DRY: they are specifying skills and rules when they should only be specifying agents and rarely, additional constraints for the Orchestrator to pick up — done: workflows carry agents + orchestrator constraints only (§TASK-021) |
 | TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
-| TASK-010 | normal | pending | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
-| TASK-011 | low | pending | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |
+| TASK-010 | normal | won't do | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
+| TASK-011 | low | won't do | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |
 
-Detail map: TASK-001–TASK-013 → §Findings · TASK-014–TASK-020 → §Task detail.
+Detail map: TASK-001–TASK-013 → §Findings · TASK-014–TASK-021 → §Task detail.
 
 ---
 
@@ -399,6 +399,54 @@ references (DRY without losing independence):
 `agent_definitions.py` and its body no longer restates the skill's technique; the four validation commands
 pass; `code-reviewer` remains in `context/agents/`, the roster, `models.yaml`, and every workflow dispatch
 site unchanged.
+
+---
+
+### TASK-021 — Make workflows DRY (agents + orchestrator constraints only)
+
+**Completed 28 Oct 2026** by Cline (`@harness-analyst` role). Gate green: 15/15 agents valid,
+adapters in sync, 194 tests, YAML parses; `grep 'skills:' context/workflows/`, `grep 'superpowers'
+context/`, and `grep 'context/skills/' context/workflows/` all empty. Commits 22859a4 (merge),
+b0c450b (strip), 5132f8a (standards).
+
+**Premise verified**: workflows carried skills/rules content in three forms — 22 empty `skills:`
+phase keys (dead superpowers schema), inline skill-file citations (build/deploy/design), and
+`workflow_rules` bullets restating `context/rules/` and `context/skills/`; `state_recovery`
+blocks were copy-pasted across six workflows; `continuous-improvement.yaml` duplicated
+`retrospective.yaml` wholesale; `workflow-standards.md` §12 still mandated per-phase skill
+injection with non-existent `superpowers:*` skills.
+
+**Decisions** (human): (a) merge retrospective into continuous-improvement; (b) no technology
+assumptions in standards/rules — mode switches stay one-line spawn constraints, technology-
+dependent context lives in skills; (c) clean workflow-standards; (d) amend the two framework docs.
+
+**Files**
+
+- `context/workflows/retrospective.yaml` — deleted; `continuous-improvement.yaml` is the single
+  canonical workflow (incident + retrospective modes). Merged drift: `session-log.jsonl` added to
+  review data sources; "only approved fixes implemented" validation; explicit-human-approval
+  discuss note; orchestrator-drives-review and patterns-not-metrics rules.
+- All 8 remaining workflows — removed 22 empty `skills:` keys, inline skill citations
+  (supabase-operations/gcp-deployment/database-design), and `workflow_rules` restating rules and
+  skills; kept agents, validation, gates, and orchestrator-facing constraints (devops GCP vs
+  Supabase mode). `state_recovery.after_compaction` reduced to workflow-specific steps; generic
+  recovery lines moved to `orchestrator.md` §State Recovery Protocol.
+- `context/rules/workspace-conventions.md` — §5 Effort Estimation (canonical home for
+  "estimate effort in tokens, not time", previously restated in four workflows).
+- `context/standards/workflow-standards.md` — §12 replaced the superpowers phase-to-skill
+  doctrine with the self-acquisition model; dead `escalation.md` reference repointed to
+  `multi-agent-collaboration.md` §1.
+- `context/agents/orchestrator.md` — §State Recovery Protocol is now the canonical generic
+  recovery procedure.
+- `context/skills/workflow-analysis.md` — citation repointed to `continuous-improvement.yaml`.
+- `context/README.md`, `README.md`, `artefacts/product/requirements.md` (REQ-WF-004) — eight
+  workflows; retrospective is a mode.
+- `context/docs/agentic-framework.md`, `context/docs/agentic-framework-reference.md` — eight
+  workflows; retrospective section removed; session-log.jsonl added to review data sources.
+
+**Acceptance**: workflows specify only agents and orchestrator-facing constraints; no `skills:`
+keys, `superpowers`, or `context/skills/` references in `context/workflows/`; `retrospective.yaml`
+gone with no surviving references; the four validation commands pass.
 
 ---
 
