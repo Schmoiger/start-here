@@ -17,18 +17,28 @@ Hydration index. Read only the section a task needs. This is the single navigati
    - [Making Changes](#making-changes) — edit canonical files only, recompile projections, verify zero drift
      - [Adding New Rules](#adding-new-rules) — the three-question test before creating a rule
      - [Adding New Agents](#adding-new-agents) — template, frontmatter, and the mandatory recompile
+   - [Downstream Synchronisation](#downstream-synchronisation-1) — distributing `context/` as a `git-subrepo`
+     - [1. Prerequisites](#1-prerequisites) — required tooling
+     - [2. Initial Project Setup](#2-initial-project-setup) — `subrepo clone`, pre-commit hook, projection compile
+     - [3. Ongoing Synchronisation Workflows](#3-ongoing-synchronisation-workflows) — [pulling upstream](#pulling-upstream-updates) and [pushing improvements back](#pushing-improvements-back-upstream)
+     - [4. Testing Downstream Standards](#4-testing-downstream-standards) — running the bundled test suite on a clone
+     - [5. Upstream Maintenance & Automated Distribution (`agents-framework`)](#5-upstream-maintenance--automated-distribution-agents-framework) — CI checks: [freshness](#1-shift-left-freshness-checks-githubworkflowspr-subrepo-checksyml) · [reconciliation](#2-automated-reconciliation--push-githubworkflowspr-subrepo-pushyml) · [conflicts](#3-conflict-resolution--manual-fallback)
+   - [Runtime Telemetry & Session Token Tracking](#runtime-telemetry--session-token-tracking-1) — how the `Agent-Session:` trailer is populated at commit time
+     - [Multi-Runtime Comparison Matrix](#multi-runtime-comparison-matrix) — telemetry paths and token field names per runtime
+   - [Design Principles](#design-principles) — container versus model, incremental extraction, error surfacing
 2. [For Humans](#for-humans) — why the harness is shaped this way
-   - [Harness Design](#harness-design) — the iron triangle, and the criterion-to-design-choice table
+   - [Quickstart](#quickstart) — getting started, update, push commands
+   - [What's included](#whats-included) — agents, standards, rules, workflows, adapters, CLI counts
+   - [Runtime Telemetry & Session Token Tracking](#runtime-telemetry--session-token-tracking) — telemetry extraction from AI runtimes
+   - [Further reading](#further-reading) — links to key documentation
+   - [Context Architecture](#context-architecture) — mermaid diagram of agent/context/output layers
+   - [Non-Functional Requirements](#non-functional-requirements) — autonomy, intent, tokenomics iron triangle
    - [Context Hierarchy](#context-hierarchy) — the invariant layers, and why rules and standards duplicate
-3. [Downstream Synchronisation](#downstream-synchronisation) — distributing `context/` as a `git-subrepo`
-   - [1. Prerequisites](#1-prerequisites) — required tooling
-   - [2. Initial Project Setup](#2-initial-project-setup) — `subrepo clone`, pre-commit hook, projection compile
-   - [3. Ongoing Synchronisation Workflows](#3-ongoing-synchronisation-workflows) — [pulling upstream](#pulling-upstream-updates) and [pushing improvements back](#pushing-improvements-back-upstream)
-   - [4. Testing Downstream Standards](#4-testing-downstream-standards) — running the bundled test suite on a clone
-   - [5. Upstream Maintenance & Automated Distribution (`agents-framework`)](#5-upstream-maintenance--automated-distribution-agents-framework) — CI checks: [freshness](#1-shift-left-freshness-checks-githubworkflowspr-subrepo-checksyml) · [reconciliation](#2-automated-reconciliation--push-githubworkflowspr-subrepo-pushyml) · [conflicts](#3-conflict-resolution--manual-fallback)
-4. [Runtime Telemetry & Session Token Tracking](#runtime-telemetry--session-token-tracking) — how the `Agent-Session:` trailer is populated at commit time
-   - [Multi-Runtime Comparison Matrix](#multi-runtime-comparison-matrix) — telemetry paths and token field names per runtime
-   - [Architectural Principles](#architectural-principles) — container versus model, incremental extraction, error surfacing
+   - [Harness Architecture](#harness-architecture) — adapter architecture for portability across LLM runtimes
+   - [Downstream Synchronisation](#downstream-synchronisation) — distributing `context/` as a `git-subrepo`
+   - [Repo initialisation](#repo-initialisation) — new repo setup and reinitialisation
+   - [CLI Usage (`generate_adapters.py`)](#cli-usage-generate_adapterspy) — smart update, full regeneration, dry-run, target filtering
+   - [Automated Drift Enforcement (`adapter_drift.py`)](#automated-drift-enforcement-adapter_driftpy) — pre-commit drift validation
 
 ---
 
@@ -262,9 +272,280 @@ When a task domain needs repeated specialised work:
 6. Regenerate adapter projections: `uv run python context/scripts/generators/generate_adapters.py`
 
 
+### Downstream Synchronisation
+
+This context hierachy is distributed as a `git-subrepo`. The source repo is: `agents-framework` (`main` branch).
+
+The framework distributes canonical context as a self-contained directory (`context/`). Downstream repositories import standards, workflows, and agents without inheriting project-specific tracking state (`artefacts/build/`, `artefacts/product/`, or application code).
+
+Bi-directional synchronisation is managed via `git-subrepo` targeting an upstream `standards` distribution branch.
+
+
+#### 1. Prerequisites
+
+Downstream workstations and CI runners require:
+
+1. **Git** (version 2.30+)
+2. **`git-subrepo`**:
+
+   ```bash
+   brew install git-subrepo
+   ```
+
+   *Note: Ensure Bash 4+ is available in your PATH (`brew install bash`).*
+3. **`uv`**:
+
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+#### 2. Initial Project Setup
+
+To adopt the framework in a new or existing repository:
+
+##### Step 1: Import Canonical Context
+
+Run `git subrepo clone` targeting the upstream `standards` branch:
+
+```bash
+git subrepo clone https://github.com/Schmoiger/agents-framework.git context -b main
+```
+
+This creates a local `context/` directory with its own `.gitrepo` tracking file. To developers on your team, `context/` appears as regular files in git—no detached `HEAD` states or recursive submodule commands are needed.
+
+##### Step 2: Configure Pre-Commit Hooks
+
+Add the adapter drift validator to your downstream `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: adapter-drift
+        name: Validate Runtime Adapter Drift
+        entry: uv run python context/scripts/validators/adapter_drift.py
+        language: system
+        files: ^(context/|AGENTS\.md|GEMINI\.md|CLAUDE\.md|\.agents/|\.claude/|\.github/|\.openai/)
+```
+
+Install the pre-commit hook:
+
+```bash
+uv run pre-commit install
+```
+
+##### Step 3: Compile Runtime Projections
+
+Run the adapter generator to produce runtime projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.):
+
+```bash
+uv run python context/scripts/generators/generate_adapters.py
+```
+
+Commit the generated projections:
+
+```bash
+git add .
+git commit -m "chore(infra): import standards via git-subrepo and compile projections"
+```
+
+#### 3. Ongoing Synchronisation Workflows
+
+##### Pulling Upstream Updates
+
+When standards, rules, or agent definitions are updated in `agents-framework`, pull changes into your downstream repository:
+
+```bash
+# 1. Pull upstream changes into context/
+git subrepo pull context
+
+# 2. Re-compile runtime adapter projections
+uv run python context/scripts/generators/generate_adapters.py
+
+# 3. Verify zero drift
+uv run python context/scripts/validators/adapter_drift.py
+
+# 4. Commit updated projections
+git add -A
+git commit -m "chore(standards): update canonical context and regenerate adapters"
+```
+
+##### Pushing Improvements Back Upstream
+
+If your project enhances or fixes a standard, rule, or agent prompt inside `context/`, you can push the improvement back to the upstream `standards` branch:
+
+```bash
+# 1. Ensure tests and drift checks pass
+uv run python context/scripts/validators/adapter_drift.py
+uv run pytest context/scripts/tests -v
+
+# 2. Push context/ changes directly upstream
+git subrepo push context
+```
+
+Once pushed, changes are committed upstream to `agents-framework` `main`.
+
+#### 4. Testing Downstream Standards
+
+All validator, adapter, and compilation tests are packaged inside `context/scripts/tests/` and accompany `context/` when cloned via subrepo. Downstream projects can run the test suite at any time:
+
+```bash
+uv run pytest context/scripts/tests -v
+```
+
+#### 5. Upstream Maintenance & Automated Distribution (`agents-framework`)
+
+The project automatically maintains synchronisation with upstream canonical subrepos using two coordinated GitHub Actions workflows:
+
+##### 1. Shift-Left Freshness Checks (`.github/workflows/pr-subrepo-checks.yml`)
+
+During pull request review, before merging into `main`:
+- The workflow runs `context/scripts/validators/subrepo_freshness.py`.
+- If changes were made to `context/**` or `typst/**`, it queries the canonical upstream remote (`Schmoiger/agents-framework` or `Schmoiger/typst-engine`).
+- If upstream has newer commits that are not yet pulled, the check fails with an actionable warning, requiring the author to run `git subrepo pull <subdir>` on their feature branch prior to merging.
+
+##### 2. Automated Reconciliation & Push (`.github/workflows/pr-subrepo-push.yml`)
+
+Whenever pull requests touching `context/**` or `typst/**` are merged into `main`, the `pr-subrepo-push` workflow:
+
+1. Checks out the repository with complete commit history (`fetch-depth: 0`).
+2. Evaluates `UPSTREAM_PUSH_TOKEN` authentication secrets.
+3. Installs `git-subrepo` (v0.4.9).
+4. **Automated 3-Way Reconciliation**: Fetches the upstream tracking ref. If upstream has advanced ahead of local `.gitrepo`, it automatically performs `git subrepo pull <subdir>` to merge changes cleanly before pushing.
+5. Pushes reconciled changes upstream to canonical repositories (`Schmoiger/agents-framework` and `Schmoiger/typst-engine`).
+6. Pushes updated subrepo `.gitrepo` tracking commits back to `main`.
+7. Generates a structured status report in `$GITHUB_STEP_SUMMARY`.
+
+##### 3. Conflict Resolution & Manual Fallback
+
+If upstream and local changes conflict semantically and cannot be auto-merged:
+1. The CI workflow flags the conflict in `$GITHUB_STEP_SUMMARY` without corrupting working tree state.
+2. Maintainers resolve the conflict locally:
+
+```bash
+# 1. Ensure local main is up to date
+git checkout main && git pull
+
+# 2. Pull upstream into the subrepo and resolve conflicts
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo pull context
+
+# 3. Verify tests and commit resolved files
+git add context/
+git commit -m "fix(subrepo): resolve upstream merge conflicts"
+
+# 4. Push cleanly back upstream
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo push context
+
+# 5. Push updated tracking state back to main
+git push origin main
+```
+
+### Runtime Telemetry & Session Token Tracking
+
+The framework tracks cumulative token consumption directly from the underlying AI development runtimes and injects incremental deltas into the `Agent-Session:` git trailer at commit time via `.git/hooks/prepare-commit-msg` (delegating to `context/scripts/prepare-commit-msg.py`).
+
+#### Multi-Runtime Comparison Matrix
+
+| Runtime | Local Telemetry Path | Repo Mapping Mechanism | Storage Format | Extracted Token Fields |
+|---|---|---|---|---|
+| **Anthropic Claude Code** | `~/.claude/projects/{mangled}/` | Path hash: `repo.replace('/', '-')` | JSONL (`{session}.jsonl` & `subagents/*.jsonl`) | `message.usage.input_tokens` (+ cache creation/read) & `output_tokens` |
+| **Google Antigravity** | `~/.gemini/antigravity-ide/conversations/*.db` | SQLite `trajectory_metadata_blob` (`file://{repo}`) | SQLite + Protobuf binary in `gen_metadata` | Protobuf Field 1.4: Varint 2 (prompt), Varint 5 (cached), Varint 3 (output), Varint 9/10 (thinking/candidates) |
+| **GitHub Copilot Chat** | `Code/User/workspaceStorage/<id>/chatSessions/` | `workspace.json` (`"folder": "file://{repo}"`) | JSONL (`<session-id>.jsonl`) | `metadata.promptTokens`, `metadata.outputTokens` / `completionTokens`, `toolCallRounds[].thinking.tokens` |
+| **OpenAI Codex** | `~/.codex/` or API run logs | Project directory or API run trace | JSON / SQLite | `prompt_tokens`, `completion_tokens`, `reasoning_tokens` |
+
+
+### Design Principles
+
+1. **Separation of Runtime Container vs Model**:
+   - The `tool=` field in `Agent-Session:` dictates the **execution container** (e.g. `tool=antigravity`, `tool=copilot`, `tool=claude-code`).
+   - The `model=` field specifies the LLM (e.g. `model=gemini-flash`, `model=sonnet`, `model=gpt-5-mini`).
+   - For example, running Claude Sonnet inside Google Antigravity produces `tool=antigravity model=sonnet`, causing the hook to query Antigravity's local session DB rather than Claude Code CLI storage.
+
+2. **$O(\Delta)$ Incremental Token & Compute Efficiency**:
+   - Never re-parse entire conversational histories on each commit.
+   - **Antigravity**: Watermark stores `last_idx` and queries SQLite incrementally:
+     `SELECT idx, data FROM gen_metadata WHERE idx > ? ORDER BY idx ASC`
+   - **Copilot & Claude**: Watermark stores the file byte offset and `seek()`s directly to newly appended lines.
+
+3. **Transparent Error Surfacing over Silent Failure**:
+   - If an agent commit trailer (`Agent-Session:`) is present but telemetry extraction fails (e.g., unexpected schema change or missing session), the hook injects:
+
+     ```text
+     Agent-Session: tool=antigravity model=gemini-flash ... tokens=error(schema_drift)
+     ```
+
+   - Diagnostic warnings are written to `stderr`, and the commit is allowed to succeed with exit code 0.
+   
+4. **Brittleness & Maintenance**:
+   - No vendor provides a public, frozen API for local telemetry; extraction relies on internal storage patterns.
+   - The test suite in `context/scripts/tests/test_runtime_telemetry.py` includes live runtime sanity checks that run in local development:
+     - **Not installed**: Skipped cleanly.
+     - **Installed but idle**: Skipped with diagnostic note (`"Runtime installed but no active sessions found for validation"`).
+     - **Installed with active sessions**: Fails immediately if vendor schema changes or data formats drift.
+
+
 ---
 
 ## For Humans
+
+### Quickstart 
+
+This agent harness contains everything you need to build quality software in any of three DevX modes: dev as collaborator, dev as reviewer, dev as orchestrator.
+
+The harness is sourced into a ```context/``` folder and must be copied into the repo root to allow the LLM runtime to find and use the harness. This is taken care of in the initialisation script.
+
+```bash
+./init.sh
+```
+
+
+#### Quick commands
+
+1. Update harness: pull latest version of harness into your repo
+
+```bash
+git subrepo pull context
+```
+
+2. Smart update: updated local harness with only changed or new files (default)
+
+```bash
+uv run python context/scripts/generators/generate_adapters.py
+```
+
+3. Push local updates to the harness back upstream
+
+```bash
+git subrepo push context
+```
+
+
+#### What's included
+
+- **14 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
+- **13 standards** - Coding, testing, architecture, tech stack, documentation, security
+- **10 rules** - Enforceable constraints with automated validators
+- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
+- **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
+
+
+#### Runtime Telemetry & Session Token Tracking
+
+The framework tracks cumulative token consumption directly from the underlying AI development runtimes. However, this mechanism is brittle because no vendor provides a public, frozen API for local telemetry; extraction relies on internal storage patterns. The telemetry extraction silently fails rather than blocking commits.
+
+
+#### Further reading
+
+- **Getting started**: See `context/README.md` - Complete guide for agents and humans
+- **Workflow guide**: See `AGENTS.md` / `CLAUDE.md` - Auto-generated orchestration guides
+- **Agent reference**: See `context/agents/` - Individual agent definitions
+- **Standards**: See `context/standards/` - Coding, testing, tech stack guidance
+- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix)
+- **Validators**: See `context/scripts/validators/README.md` - Pre-commit consistency validators
+
+
+### Context Architecture
 
 ```mermaid
 flowchart TB
@@ -281,9 +562,9 @@ flowchart TB
 ```
 
 
-### Harness Design
+### Non-Functional Requirements
 
-This harness maps onto my formulation of the new iron triangle:
+This harness maps onto the new agentic iron triangle:
 
 - **Autonomy**: The harness should be **flexible** working equally well for multi-agent orchestrated workflows and single-agent vibing sessions. It should be **portable**, its function not contingent on proprietary features. It should be **self-improving**, because it won’t stay optimised because of how fast the domain is moving.
 
@@ -311,6 +592,7 @@ This harness maps onto my formulation of the new iron triangle:
 |  | Not all of every file needs to be ingested by agents: frontmatter to direct agents to applicable content within the file, terse text for agents, verbose text for humans at the bottom. |
 |  | Files are to be consumed just in time. |
 
+
 ### Context Hierarchy
 
 Each context window with an LLM, and each turn within each window, comprises context and thinking tokens.
@@ -330,13 +612,46 @@ Some duplication is intentional:
 
 An agent following a rule should succeed without reading standards. Standards exist for when someone asks "why?" or hits an edge case.
 
----
 
-## Downstream Synchronisation
+### Harness Architecture
+
+This framework ues an adapter architecture for portability across LLM runtimes.
+
+```mermaid
+flowchart TD
+    Canon["`**Canonical Context**
+*context/agents/
+context/workflows/
+context/rules/
+context/standards/
+context/models.yaml*`"]
+
+    Gen["*generate_adapters.py*
+(CLI)"]
+
+    Gemini["`**Antigravity / Gemini**
+*.agents/skills/
+GEMINI.md*`"]
+    Claude["`**Claude Code**
+*CLAUDE.md
+.claude/prompts/*`"]
+    Copilot["`**GitHub Copilot**
+*.github/prompts/
+.github/instructions/*`"]
+    Codex["`**OpenAI / Codex**
+*.openai/prompts/
+tools.json*`"]
+
+    Canon --> Gen
+    Gen --> Gemini
+    Gen --> Claude
+    Gen --> Copilot
+    Gen --> Codex
+```
+
+### Downstream Synchronisation
 
 This context hierachy is distributed as a `git-subrepo`. The source repo is: `agents-framework` (`main` branch).
-
-The framework distributes canonical context as a self-contained directory (`context/`). Downstream repositories import standards, workflows, and agents without inheriting project-specific tracking state (`artefacts/build/`, `artefacts/product/`, or application code).
 
 Bi-directional synchronisation is managed via `git-subrepo` targeting an upstream `standards` distribution branch:
 
@@ -360,202 +675,41 @@ graph LR
 ```
 
 
-### 1. Prerequisites
+### Repo initialisation
 
-Downstream workstations and CI runners require:
+New repos created by GitHub will automatically copy the entirity of this start-here repo during initialisation.
 
-1. **Git** (version 2.30+)
-2. **`git-subrepo`**:
+To reinitialise an existing repo, carefully follow the instructions for [downstream synchronisation](#downstream-synchronisation)
 
-   ```bash
-   brew install git-subrepo
-   ```
 
-   *Note: Ensure Bash 4+ is available in your PATH (`brew install bash`).*
-3. **`uv`**:
+### CLI Usage (`generate_adapters.py`)
 
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-### 2. Initial Project Setup
-
-To adopt the framework in a new or existing repository:
-
-#### Step 1: Import Canonical Context
-
-Run `git subrepo clone` targeting the upstream `standards` branch:
+After first sync, a CLI is also available for local sync tasks.
 
 ```bash
-git subrepo clone https://github.com/Schmoiger/agents-framework.git context -b main
-```
-
-This creates a local `context/` directory with its own `.gitrepo` tracking file. To developers on your team, `context/` appears as regular files in git—no detached `HEAD` states or recursive submodule commands are needed.
-
-#### Step 2: Configure Pre-Commit Hooks
-
-Add the adapter drift validator to your downstream `.pre-commit-config.yaml`:
-
-```yaml
-repos:
-  - repo: local
-    hooks:
-      - id: adapter-drift
-        name: Validate Runtime Adapter Drift
-        entry: uv run python context/scripts/validators/adapter_drift.py
-        language: system
-        files: ^(context/|AGENTS\.md|GEMINI\.md|CLAUDE\.md|\.agents/|\.claude/|\.github/|\.openai/)
-```
-
-Install the pre-commit hook:
-
-```bash
-uv run pre-commit install
-```
-
-#### Step 3: Compile Runtime Projections
-
-Run the adapter generator to produce runtime projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, etc.):
-
-```bash
-uv run python context/scripts/generators/generate_adapters.py
-```
-
-Commit the generated projections:
-
-```bash
-git add .
-git commit -m "chore(infra): import standards via git-subrepo and compile projections"
-```
-
-### 3. Ongoing Synchronisation Workflows
-
-#### Pulling Upstream Updates
-
-When standards, rules, or agent definitions are updated in `agents-framework`, pull changes into your downstream repository:
-
-```bash
-# 1. Pull upstream changes into context/
-git subrepo pull context
-
-# 2. Re-compile runtime adapter projections
+# Smart update: write only changed or new files (default)
 uv run python context/scripts/generators/generate_adapters.py
 
-# 3. Verify zero drift
+# Force full regeneration of all files
+uv run python context/scripts/generators/generate_adapters.py -a
+
+# Dry-run: preview files that would be modified without writing to disk
+uv run python context/scripts/generators/generate_adapters.py -d
+
+# Target filtering with convenience shortcuts
+uv run python context/scripts/generators/generate_adapters.py -g          # Gemini / Antigravity
+uv run python context/scripts/generators/generate_adapters.py -c          # Claude Code
+uv run python context/scripts/generators/generate_adapters.py -p          # GitHub Copilot
+uv run python context/scripts/generators/generate_adapters.py -o          # OpenAI / Codex
+```
+
+
+### Automated Drift Enforcement (`adapter_drift.py`)
+
+To prevent divergence between canonical context files and generated adapter projections, an automated drift validator runs during pre-commit checks:
+
+```bash
 uv run python context/scripts/validators/adapter_drift.py
-
-# 4. Commit updated projections
-git add -A
-git commit -m "chore(standards): update canonical context and regenerate adapters"
 ```
 
-#### Pushing Improvements Back Upstream
-
-If your project enhances or fixes a standard, rule, or agent prompt inside `context/`, you can push the improvement back to the upstream `standards` branch:
-
-```bash
-# 1. Ensure tests and drift checks pass
-uv run python context/scripts/validators/adapter_drift.py
-uv run pytest context/scripts/tests -v
-
-# 2. Push context/ changes directly upstream
-git subrepo push context
-```
-
-Once pushed, changes are committed upstream to `agents-framework` `main`.
-
-### 4. Testing Downstream Standards
-
-All validator, adapter, and compilation tests are packaged inside `context/scripts/tests/` and accompany `context/` when cloned via subrepo. Downstream projects can run the test suite at any time:
-
-```bash
-uv run pytest context/scripts/tests -v
-```
-
-### 5. Upstream Maintenance & Automated Distribution (`agents-framework`)
-
-The project automatically maintains synchronisation with upstream canonical subrepos using two coordinated GitHub Actions workflows:
-
-#### 1. Shift-Left Freshness Checks (`.github/workflows/pr-subrepo-checks.yml`)
-
-During pull request review, before merging into `main`:
-- The workflow runs `context/scripts/validators/subrepo_freshness.py`.
-- If changes were made to `context/**` or `typst/**`, it queries the canonical upstream remote (`Schmoiger/agents-framework` or `Schmoiger/typst-engine`).
-- If upstream has newer commits that are not yet pulled, the check fails with an actionable warning, requiring the author to run `git subrepo pull <subdir>` on their feature branch prior to merging.
-
-#### 2. Automated Reconciliation & Push (`.github/workflows/pr-subrepo-push.yml`)
-
-Whenever pull requests touching `context/**` or `typst/**` are merged into `main`, the `pr-subrepo-push` workflow:
-
-1. Checks out the repository with complete commit history (`fetch-depth: 0`).
-2. Evaluates `UPSTREAM_PUSH_TOKEN` authentication secrets.
-3. Installs `git-subrepo` (v0.4.9).
-4. **Automated 3-Way Reconciliation**: Fetches the upstream tracking ref. If upstream has advanced ahead of local `.gitrepo`, it automatically performs `git subrepo pull <subdir>` to merge changes cleanly before pushing.
-5. Pushes reconciled changes upstream to canonical repositories (`Schmoiger/agents-framework` and `Schmoiger/typst-engine`).
-6. Pushes updated subrepo `.gitrepo` tracking commits back to `main`.
-7. Generates a structured status report in `$GITHUB_STEP_SUMMARY`.
-
-#### 3. Conflict Resolution & Manual Fallback
-
-If upstream and local changes conflict semantically and cannot be auto-merged:
-1. The CI workflow flags the conflict in `$GITHUB_STEP_SUMMARY` without corrupting working tree state.
-2. Maintainers resolve the conflict locally:
-
-```bash
-# 1. Ensure local main is up to date
-git checkout main && git pull
-
-# 2. Pull upstream into the subrepo and resolve conflicts
-PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo pull context
-
-# 3. Verify tests and commit resolved files
-git add context/
-git commit -m "fix(subrepo): resolve upstream merge conflicts"
-
-# 4. Push cleanly back upstream
-PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" git subrepo push context
-
-# 5. Push updated tracking state back to main
-git push origin main
-```
-
----
-
-## Runtime Telemetry & Session Token Tracking
-
-The framework tracks cumulative token consumption directly from the underlying AI development runtimes and injects incremental deltas into the `Agent-Session:` git trailer at commit time via `.git/hooks/prepare-commit-msg` (delegating to `context/scripts/prepare-commit-msg.py`).
-
-### Multi-Runtime Comparison Matrix
-
-| Runtime | Local Telemetry Path | Repo Mapping Mechanism | Storage Format | Extracted Token Fields |
-|---|---|---|---|---|
-| **Anthropic Claude Code** | `~/.claude/projects/{mangled}/` | Path hash: `repo.replace('/', '-')` | JSONL (`{session}.jsonl` & `subagents/*.jsonl`) | `message.usage.input_tokens` (+ cache creation/read) & `output_tokens` |
-| **Google Antigravity** | `~/.gemini/antigravity-ide/conversations/*.db` | SQLite `trajectory_metadata_blob` (`file://{repo}`) | SQLite + Protobuf binary in `gen_metadata` | Protobuf Field 1.4: Varint 2 (prompt), Varint 5 (cached), Varint 3 (output), Varint 9/10 (thinking/candidates) |
-| **GitHub Copilot Chat** | `Code/User/workspaceStorage/<id>/chatSessions/` | `workspace.json` (`"folder": "file://{repo}"`) | JSONL (`<session-id>.jsonl`) | `metadata.promptTokens`, `metadata.outputTokens` / `completionTokens`, `toolCallRounds[].thinking.tokens` |
-| **OpenAI Codex** | `~/.codex/` or API run logs | Project directory or API run trace | JSON / SQLite | `prompt_tokens`, `completion_tokens`, `reasoning_tokens` |
-
-### Architectural Principles
-
-1. **Separation of Runtime Container vs Model**:
-   - The `tool=` field in `Agent-Session:` dictates the **execution container** (e.g. `tool=antigravity`, `tool=copilot`, `tool=claude-code`).
-   - The `model=` field specifies the LLM (e.g. `model=gemini-flash`, `model=sonnet`, `model=gpt-5-mini`).
-   - For example, running Claude Sonnet inside Google Antigravity produces `tool=antigravity model=sonnet`, causing the hook to query Antigravity's local session DB rather than Claude Code CLI storage.
-2. **$O(\Delta)$ Incremental Token & Compute Efficiency**:
-   - Never re-parse entire conversational histories on each commit.
-   - **Antigravity**: Watermark stores `last_idx` and queries SQLite incrementally:
-     `SELECT idx, data FROM gen_metadata WHERE idx > ? ORDER BY idx ASC`
-   - **Copilot & Claude**: Watermark stores the file byte offset and `seek()`s directly to newly appended lines.
-3. **Transparent Error Surfacing over Silent Failure**:
-   - If an agent commit trailer (`Agent-Session:`) is present but telemetry extraction fails (e.g., unexpected schema change or missing session), the hook injects:
-
-     ```text
-     Agent-Session: tool=antigravity model=gemini-flash ... tokens=error(schema_drift)
-     ```
-
-   - Diagnostic warnings are written to `stderr`, and the commit is allowed to succeed with exit code 0.
-4. **Brittleness & Maintenance**:
-   - Neither Antigravity nor Copilot provides a public, frozen API for local telemetry; extraction relies on internal storage patterns.
-   - The test suite in `context/scripts/tests/test_runtime_telemetry.py` includes live runtime sanity checks that run in local development:
-     - **Not installed**: Skipped cleanly.
-     - **Installed but idle**: Skipped with diagnostic note (`"Runtime installed but no active sessions found for validation"`).
-     - **Installed with active sessions**: Fails immediately if vendor schema changes or data formats drift.
+If any generated projection is missing, manually edited, or out of date, the validator fails with exit code `1` and actionable remediation instructions.
