@@ -361,7 +361,7 @@ Canonical skills in `context/skills/` are compiled into runtime projections (e.g
 
 Agent definitions are markdown files with YAML frontmatter and an instruction body, stored in `context/agents/`. They are the role catalogue of the framework: each file defines a single specialist with a bounded responsibility, a curated set of rules and standards, and clear instructions for how to execute its work.
 
-The repository ships one orchestrator plus fourteen delegatable specialists (fifteen role files in total, excluding templates). The roster below groups them by concern; the Agent Inventory in `context/README.md` lists the same roles with model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
+The repository ships fifteen agent role files (excluding templates). The roster below groups them by concern; the Agent Inventory in `context/README.md` lists the same roles with model tiers for operators who tune cost versus capability. Which agent runs in which phase is never implied by the roster alone; it is declared in `context/workflows/*.yaml` and reflected in regenerated `AGENTS.md`.
 
 ### Agent Definition Format
 
@@ -450,7 +450,7 @@ Agents do not commit to git. Only the orchestrator commits, one at a time, preve
 
 ### The Agent Roster
 
-The framework defines 17 specialised agents, organised by kind of judgement.
+The framework defines fifteen agents, organised by kind of judgement.
 
 #### Core Coordinator
 
