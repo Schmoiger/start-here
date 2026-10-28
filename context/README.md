@@ -522,7 +522,7 @@ git subrepo push context
 
 #### What's included
 
-- **14 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
+- **15 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
 - **13 standards** - Coding, testing, architecture, tech stack, documentation, security
 - **10 rules** - Enforceable constraints with automated validators
 - **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
