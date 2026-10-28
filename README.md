@@ -278,6 +278,6 @@ For complete setup instructions and pre-commit hook configuration, see [`context
 - **19 specialised agents** - Discovery, architecture, coding, review, testing, deployment, workflow analysis, tokenomics
 - **14 standards** - Coding, testing, architecture, tech stack, documentation, security
 - **18 rules** - Enforceable constraints with automated validators
-- **9 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, continuous-improvement, retrospective
+- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, and continuous-improvement (incident + retrospective modes)
 - **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
 - **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention

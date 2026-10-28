@@ -190,7 +190,7 @@ Grade each metric against its target; do not compute a composite score.
 
 **Priority mapping** (from Analysis Process Step 5): >20% waste → High; 10-20% → Medium; <10% → Low.
 
-Aggregate health scores and vanity metrics are prohibited (`context/workflows/retrospective.yaml` § workflow_rules, `context/workflows/continuous-improvement.yaml` § workflow_rules). A metric that cannot be attached to a fixable gap is dropped from the report.
+Aggregate health scores and vanity metrics are prohibited (`context/workflows/continuous-improvement.yaml` § workflow_rules). A metric that cannot be attached to a fixable gap is dropped from the report.
 
 ---
 

@@ -61,7 +61,7 @@ Hydration index. Read only the section a task needs. This is the single navigati
 
 **Agents**: [orchestrator](agents/orchestrator.md) · [product-owner](agents/product-owner.md) · [solution-architect](agents/solution-architect.md) · [ui-designer](agents/ui-designer.md) · [python-coder](agents/python-coder.md) · [typescript-coder](agents/typescript-coder.md) · [functional-tester](agents/functional-tester.md) · [tech-lead](agents/tech-lead.md) · [code-reviewer](agents/code-reviewer.md) · [principles-reviewer](agents/principles-reviewer.md) · [security-tester](agents/security-tester.md) · [ui-tester](agents/ui-tester.md) · [devops](agents/devops.md) · [documentation](agents/documentation.md) · [harness-analyst](agents/harness-analyst.md)
 
-**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) · [retrospective](workflows/retrospective.yaml)
+**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) (incident + retrospective modes)
 
 **Templates**: [agent](templates/agent-template.md) · [logging](templates/logging-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
 
