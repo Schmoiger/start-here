@@ -28,7 +28,7 @@
 | TASK-019 | high | completed | refactor | @harness-analyst | TASK-013, TASK-015 | Single `devops` — absorb `database-designer`, extract technology playbooks to skills, `small` → `medium` |
 | TASK-020 | high | won't do | refactor | @harness-analyst | TASK-013 | Retire `@code-reviewer` into a coder-executed skill — won't do (breaks author/reviewer separation; REQ-WF-003). Done instead: create `code-review` skill; slim `code-reviewer.md` to reference it (§TASK-020) |
 | TASK-021 | high | completed | refactor | @harness-analyst | TASK-013 | Some workflows are not DRY: they are specifying skills and rules when they should only be specifying agents and rarely, additional constraints for the Orchestrator to pick up — done: workflows carry agents + orchestrator constraints only (§TASK-021) |
-| TASK-009 | normal | pending | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
+| TASK-009 | normal | completed | fix | @devops | TASK-004, TASK-005, TASK-006, TASK-007 | Regenerate runtime projections, clear adapter drift, add the validator to `.github/workflows/pr-subrepo-checks.yml` |
 | TASK-010 | normal | won't do | fix | @tech-lead | TASK-008, TASK-009 | Gate: run `agent_definitions.py`, `pytest`, `adapter_drift.py`; verify acceptance; verdict to `artefacts/build/tech-review.md` |
 | TASK-011 | low | won't do | record | @orchestrator | TASK-010 | Record outcome — close `artefacts/build/todo.md` DRY items; log root cause, fix, commit hash in `artefacts/build/agent-incidents.md`; delete tasks file |
 
@@ -574,6 +574,30 @@ The orchestrator is rebuilt on the task-specific-context model rather than recon
 | Commit | `4a390c1` — `fix(harness): rebuild orchestrator on task-specific-context model` |
 | Gate | `agent_definitions.py` 15/15 (orchestrator validated for the first time), adapters in sync, 194 tests pass |
 | Follow-ups | TASK-009 (`@devops`): regenerate projections and wire the validator into `.github/workflows/pr-subrepo-checks.yml` — that now guards the orchestrator too. `context/docs/agentic-framework-reference.md` and the `tokenomics-audit` lens still describe the pre-rebuild injection model; re-review in TASK-008's layer-taxonomy decision. The user's local `artefacts/build/orchestrator-old.md` backup is redundant with git history and untracked. |
+
+### Resolution — TASK-009 (28 Oct 2026)
+
+The three sub-deliverables were verified in one pass — the pipeline was already converged, so this
+record confirms and closes them:
+
+- **Runtime projections regenerated**: `generate_adapters.py` runs clean — 0 created, 0 updated,
+  62 unchanged. The 15 agent prompts, skill projections, workflow files, `AGENTS.md`, `GEMINI.md`
+  and `.github/copilot-instructions.md` all match canonical `context/` exactly.
+- **Adapter drift cleared**: `adapter_drift.py` — "✅ All runtime adapter projections are in sync
+  with context/." The committed `.github/workflows/pr-subrepo-checks.yml` is byte-identical to
+  `context/templates/pr-subrepo-checks-template.yml` modulo the auto-generated header, so the
+  generator and the template cannot silently diverge.
+- **Validator wired into CI**: `.github/workflows/pr-subrepo-checks.yml` step "Validate Agent
+  Definitions" runs `uv run python context/scripts/validators/agent_definitions.py` after the
+  drift check. With `orchestrator.md` removed from `SKIPPED_FILES` (TASK-007), CI now guards
+  15/15 definitions including the orchestrator. The step lives in the template, so regeneration
+  preserves it.
+
+| Item | Detail |
+|------|--------|
+| Gate | `agent_definitions.py` 15/15 valid · `generate_adapters.py` 0/0/62 · `adapter_drift.py` in sync · 194 tests pass · ruff clean on `context/scripts/validators/` |
+| Acceptance | No reference to a deleted agent remains outside `artefacts/build/archive/` (grep empty across `context/`, `README.md`, `AGENTS.md`, `.github/`); the validator step is in the committed CI workflow and survives regeneration from the template. |
+| Deviation | None — the CI step already existed from the workflow canonicalisation (`b1c13e7`); TASK-009's remaining value was verification that it guards the orchestrator and that projections are in sync after the TASK-007 rebuild. No code change was required beyond this record. |
 
 
 ---
