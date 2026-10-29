@@ -108,7 +108,7 @@ The **Context Budget Test** is the decision rule — it governs **May Do Directl
 > - **Yes** → delegate
 
 - **May Do Directly** — git operations; task management (tasks.md, HANDOFF.md, `artefacts/build/interruptions/`); coordinating agent output; committing on behalf of subagents; file moves/renames/deletes with no content judgement
-- **Must Delegate** — implementation at any size (code, tests, schemas, standards, rules, agent definitions, workflows, validators, generators); when no agent fits, scaffold from `context/agents/TEMPLATE.md` and register it
+- **Must Delegate** — implementation at any size (code, tests, schemas, standards, rules, agent definitions, workflows, validators, generators); when no agent fits, escalate.
 
 #### Do Task Yourself
 Do the work then continue to Commit.
