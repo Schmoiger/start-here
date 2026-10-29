@@ -186,7 +186,7 @@ git subrepo push context
 - **15 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
 - **13 standards** - Coding, testing, architecture, tech stack, documentation, security
 - **10 rules** - Enforceable constraints with automated validators
-- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **9 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, small-task, and continuous-improvement (incident + retrospective modes)
 - **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
 - **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
 
@@ -202,5 +202,5 @@ The framework tracks cumulative token consumption directly from the underlying A
 - **Workflow guide**: See `AGENTS.md` / `CLAUDE.md` - Auto-generated orchestration guides
 - **Agent reference**: See `context/agents/` - Individual agent definitions
 - **Standards**: See `context/standards/` - Coding, testing, tech stack guidance
-- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix)
+- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix, full-test, small-task)
 - **Validators**: See `context/scripts/validators/README.md` - Pre-commit consistency validators
