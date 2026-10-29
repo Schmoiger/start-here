@@ -55,7 +55,7 @@ Agents have access to multiple tools for different purposes. To minimise user in
 #### 1. File Operations
 
 *   **Prefer Write/Edit tools** for creating and modifying files. These tools do not require user permission and provide immediate feedback.
-*   **Avoid Bash for file operations** such as `cat`, `echo >`, `sed`, `awk`, or heredoc redirection. These require user permission and slow down execution.
+*   **Avoid Bash for file operations** such as `cat`, `echo >`, `sed`, `awk`, or `heredoc` redirection. These require user permission and slow down execution.
 *   **Exception**: Bash may be used for file operations when the operation is part of a larger script that includes non-file operations (e.g., git commit with file creation).
 *   **Read immediately before each Edit**: The Edit tool validates its changes against a snapshot taken at the most recent Read. If another Edit has run since the last Read, the snapshot is stale and the Edit will fail. Always issue a Read immediately before each Edit — never batch a single Read with multiple subsequent Edits.
 
