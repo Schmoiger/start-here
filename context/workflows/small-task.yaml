@@ -1,0 +1,143 @@
+name: small-task
+description: Small implementation tasks done directly by the default agent — the orchestrator when it does not delegate — with human approval
+
+# Minimal workflow for fast human-in-the-loop (HITL) changes.
+# The orchestrator IS the default agent in this workflow: it implements directly,
+# loads the matching skill, and does NOT delegate to sub-agents.
+# The discriminator is FORMALISM NEED, not work type: any work with a matching
+# skill is eligible; work needing another workflow's formalism (task decomposition,
+# evidence gates, cross-phase outputs, parallel roles, production surfaces) is
+# re-routed by the fitness check (see fitness: below).
+# The human selects this workflow at intake (or it is recovered from HANDOFF.md);
+# it does not auto-select — the orchestrator asks which workflow to start when none is active.
+
+phases:
+  - id: hitl
+    name: Human In The Loop
+    agents:
+      - orchestrator  # The default agent: orchestrator acting in non-delegating, direct-implementation mode
+    scope: all
+    gate: true
+    notes:
+      # Mode
+      - The orchestrator IS the default agent here — implement directly, do not delegate, do not spawn sub-agents
+      - Do not combine with any other workflows in one run; promotion is the sanctioned exit (Overshoot Protocol below)
+      - All context artefacts except other workflows are available
+      # Skill duty — work type is not a discriminator
+      - Load and follow the matching skill before implementing; scan context/README.md §Inventory — e.g. python-scripting (Python), typescript-development (TypeScript/Yarn), database-design (schema), git-subrepo-operations (context/ subrepo), technical-authoring (docs/), typst-pipeline (typesetting), ui-development (UI)
+      - If no skill, standard, or rule covers the dominant work class, surface the harness gap to the human — do not improvise, do not auto-delegate
+      # Fitness (see fitness: block)
+      - Run the numeric heuristic (H1–H8) pre-flight; any RED defaults to the governing workflow unless the human overrides (record override in HANDOFF.md)
+      - On AMBER/GREEN weigh the inference rubric (R1–R7) with the human; when unsure default to the heavier workflow
+      # Overshoot — pause, never reset
+      - "If actuals cross the flags or a RED surfaces mid-run: PAUSE and present options to the human — (a) approve grown scope in-session, (b) split into logical units (approval + commit each), (c) promote via transfer package"
+      - Never discard the working tree; never spawn cold
+      - Commit after each human-approved logical unit — git history is the residual context
+      # Quality and gate
+      - LESS/TDD may be relaxed for the small scope — but the human MUST approve before commit
+      - "Human approval is the gate: present the diff, obtain an explicit APPROVED verdict before committing"
+      - You are the implementer; do not commit on behalf of a sub-agent (there are none)
+
+fitness:
+  heuristic:
+    # Numeric screen, applied pre-flight to the task estimate. Any RED → default to
+    # the governing workflow unless the human explicitly overrides (record in HANDOFF.md).
+    # AMBER → human sizing confirmation, then rubric. Thresholds are starting values
+    # for @harness-analyst to tune via continuous-improvement — do not over-fit here.
+    checks:
+      - id: H1
+        name: scale-amber
+        verdict: AMBER
+        apply: estimated_primary_files > 3 or estimated_changed_lines > 100
+        action: Ask the human to confirm the scale is acceptable for one approval session
+      - id: H1-red
+        name: scale-red
+        verdict: RED
+        apply: estimated_primary_files > 5 or estimated_changed_lines > 200
+        action: Re-route to the governing workflow, or explicit human sign-off to continue
+      - id: H2
+        name: task-decomposition
+        verdict: RED
+        apply: needs_task_decomposition
+        action: Requires tasks-<branch>.md decomposition with acceptance criteria → build / design
+      - id: H3
+        name: evidence-gate
+        verdict: RED
+        apply: requires_evidence_gate
+        action: Empirical repro → bugfix; failing test + coverage → build; deploy verification → deploy; full suite → full-test
+      - id: H4
+        name: consumed-output
+        verdict: RED
+        apply: output_consumed_by_later_phase
+        action: Output feeds another workflow's later phases → that workflow
+      - id: H5
+        name: parallel-roles
+        verdict: RED
+        apply: requires_multi_role_parallel
+        action: Disjoint-scope multi-role work → build (or per-phase workflow)
+      - id: H6
+        name: production-surface
+        verdict: RED
+        apply: touches_irreversible_surface
+        action: Deployed infra, prod schema/migrations, secrets, security boundary → build + security review
+      - id: H7
+        name: framework-improvement
+        verdict: AMBER
+        apply: framework_improvement_needing_measurement
+        action: continuous-improvement (incident/retrospective) unless the human explicitly chooses small-task
+      - id: H8
+        name: logical-units
+        verdict: RED
+        apply: bundled_logical_units > 1
+        action: Split into one-unit tasks, or promote
+    policy: RED → governing workflow by default (human may override, recorded in HANDOFF.md); AMBER → human sizing confirmation then rubric; GREEN → rubric.
+  rubric:
+    # Inference-based; answered by human + default agent together pre-flight.
+    # Lean-away → heavier workflow. When unsure, default heavier.
+    questions:
+      - id: R1
+        question: Is this ONE coherent change with a decided end state?
+        lean_away: End state emergent or several changes entangled → design / prototype
+      - id: R2
+        question: Would an independent reviewer materially change the outcome?
+        lean_away: Yes → build / review path
+      - id: R3
+        question: Is this part of an effort already in flight under another workflow?
+        lean_away: "Yes → that workflow (HANDOFF.md Workflow: field)"
+      - id: R4
+        question: Durable keep, or throwaway exploration?
+        lean_away: Throwaway → prototype
+      - id: R5
+        question: Does the human want it in this session (HITL), or async/independent?
+        lean_away: Async → delegate
+      - id: R6
+        question: Could git + human + no task file rebuild this in minutes if context were lost?
+        lean_away: No → needs tasks-<branch>.md formalism → heavier workflow
+      - id: R7
+        question: Does a skill, standard, or rule cover the dominant work class?
+        lean_away: No → surface a harness gap
+    policy: The human arbitrates the rubric; when unsure default to the heavier workflow — over-formalism is cheap, under-formalism is expensive.
+
+quality_gates:
+  - phase: hitl
+    gate: true
+    approval: human
+    description: The human explicitly approves the diff before commit — the only gate, always required
+
+workflow_rules:
+  - The orchestrator implements directly as the default agent — the only workflow that lifts the 'never authorises implementation' boundary
+  - Never delegate within this workflow; never combine it with any other workflow in one run — promotion is the sanctioned exit
+  - Any work type is eligible provided the matching skill exists — skill duty replaces specialist delegation
+  - Run the fitness heuristic and rubric at intake; RED defaults to the governing workflow unless the human overrides (recorded)
+  - "Overshoot protocol: PAUSE and let the human choose approve-grown-scope, split, or promote — never reset the working tree"
+  - "Promote = transfer package: update HANDOFF.md (Workflow:, Phase:, progress) and write a tasks-<branch>.md stub (goal, acceptance criteria, done/in-flight/known-unknowns) for the target workflow's intake"
+  - Commit after each human-approved logical unit — git history is residual context
+  - Discover skills first and follow the matching skill (e.g. agent-sandbox for small terminal scripts)
+  - Human approval before commit is mandatory and cannot be waived
+  - Keep each change scoped and reviewable; conventional commit message per unit
+
+state_recovery:
+  after_compaction:
+    - "Read HANDOFF.md — Workflow: small-task identifies this mode; the in-flight change is the state"
+    - If HANDOFF.md records a promotion, resume in the target workflow's intake phase instead
+    - Run git status and git diff to resume the change; continue until the human approves

@@ -71,7 +71,7 @@ Hydration index. Read only the section a task needs. This is the single navigati
 
 **Agents**: [orchestrator](agents/orchestrator.md) · [product-owner](agents/product-owner.md) · [solution-architect](agents/solution-architect.md) · [ui-designer](agents/ui-designer.md) · [python-coder](agents/python-coder.md) · [typescript-coder](agents/typescript-coder.md) · [functional-tester](agents/functional-tester.md) · [tech-lead](agents/tech-lead.md) · [code-reviewer](agents/code-reviewer.md) · [principles-reviewer](agents/principles-reviewer.md) · [security-tester](agents/security-tester.md) · [ui-tester](agents/ui-tester.md) · [devops](agents/devops.md) · [documentation](agents/documentation.md) · [harness-analyst](agents/harness-analyst.md)
 
-**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) (incident + retrospective modes)
+**Workflows**: [build](workflows/build.yaml) · [design](workflows/design.yaml) · [prototype](workflows/prototype.yaml) · [deploy](workflows/deploy.yaml) · [bugfix](workflows/bugfix.yaml) · [full-test](workflows/full-test.yaml) · [content](workflows/content.yaml) · [continuous-improvement](workflows/continuous-improvement.yaml) (incident + retrospective modes) · [small-task](workflows/small-task.yaml)
 
 **Templates**: [agent](templates/agent-template.md) · [logging](templates/logging-template.md) · [task](templates/task-prompt-template.md) · [handoff](templates/handoff-template.md) · [review](templates/review-template.md) · [pr](templates/pr-description-template.md)
 
@@ -525,7 +525,7 @@ git subrepo push context
 - **15 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
 - **13 standards** - Coding, testing, architecture, tech stack, documentation, security
 - **10 rules** - Enforceable constraints with automated validators
-- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **9 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, small-task, and continuous-improvement (incident + retrospective modes)
 - **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
 - **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
 
@@ -541,7 +541,7 @@ The framework tracks cumulative token consumption directly from the underlying A
 - **Workflow guide**: See `AGENTS.md` / `CLAUDE.md` - Auto-generated orchestration guides
 - **Agent reference**: See `context/agents/` - Individual agent definitions
 - **Standards**: See `context/standards/` - Coding, testing, tech stack guidance
-- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix)
+- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix, full-test, small-task)
 - **Validators**: See `context/scripts/validators/README.md` - Pre-commit consistency validators
 
 
