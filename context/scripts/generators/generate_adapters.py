@@ -29,6 +29,11 @@ from context.scripts.generators.adapters.claude.generator import (
     generate_claude_md,
     generate_subagent_prompts,
 )
+from context.scripts.generators.adapters.cline.generator import (
+    generate_cline_md,
+    generate_cline_rules,
+    generate_cline_skills,
+)
 from context.scripts.generators.adapters.core.agents_md import generate_agents_md
 from context.scripts.generators.adapters.core.loader import load_canonical_context
 from context.scripts.generators.adapters.gemini.generator import (
@@ -47,7 +52,7 @@ from context.scripts.generators.adapters.openai.generator import (
     generate_tool_schemas,
 )
 
-SUPPORTED_TARGETS = {"all", "gemini", "claude", "github", "copilot", "codex", "openai"}
+SUPPORTED_TARGETS = {"all", "gemini", "claude", "cline", "github", "copilot", "codex", "openai"}
 
 TARGET_ALIASES = {
     "all": "all",
@@ -55,6 +60,8 @@ TARGET_ALIASES = {
     "g": "gemini",
     "claude": "claude",
     "c": "claude",
+    "cline": "cline",
+    "l": "cline",
     "github": "github",
     "gh": "github",
     "copilot": "github",
@@ -68,13 +75,16 @@ IGNORED_BLOCK = """
 # Programmatically generated agent projections
 .agents/skills/
 .claude/prompts/
+.clinerules/
+.cline/skills/
 .github/instructions/
 .github/prompts/
 .github/copilot-instructions.md
 .openai/prompts/
-CLAUDE.md
-GEMINI.md
 AGENTS.md
+CLAUDE.md
+CLINE.md
+GEMINI.md
 """
 
 
@@ -205,6 +215,11 @@ def get_adapter_projections(
         projections.update(generate_tool_schemas(context, repo_root, dry_run=True))
         projections.update(generate_runner_harness(repo_root, dry_run=True))
 
+    if "cline" in active_targets:
+        projections.update(generate_cline_md(context, repo_root, dry_run=True))
+        projections.update(generate_cline_rules(context, repo_root, dry_run=True))
+        projections.update(generate_cline_skills(context, repo_root, dry_run=True))
+
     return projections
 
 
@@ -305,6 +320,7 @@ examples:
   python generate_adapters.py -t COPILOT -a        # Force-regenerate GitHub Copilot projections
   python generate_adapters.py -g -d                # Dry-run preview for Gemini / Antigravity
   python generate_adapters.py -c -v                # Verbose update for Claude Code projections
+  python generate_adapters.py -l -d                # Dry-run preview for Cline
 """,
     )
 
@@ -316,7 +332,8 @@ examples:
         metavar="TARGET",
         help=(
             "Target runtime to project: 'all', 'gemini' (or 'g'), 'claude' (or 'c'), "
-            "'github'/'copilot' (or 'gh'/'p'), 'codex'/'openai' (or 'o'). Case-insensitive. "
+            "'cline' (or 'l'), 'github'/'copilot' (or 'gh'/'p'), "
+            "'codex'/'openai' (or 'o'). Case-insensitive. "
             "(default: all)"
         ),
     )
@@ -345,6 +362,13 @@ examples:
         action="store_true",
         dest="codex",
         help="Convenience flag: project OpenAI / Codex runtime",
+    )
+    target_group.add_argument(
+        "-l",
+        "--cline",
+        action="store_true",
+        dest="cline",
+        help="Convenience flag: project Cline runtime",
     )
 
     # Generation mode (mutually exclusive)
@@ -418,6 +442,8 @@ def main() -> None:
         selected_targets.add("github")
     if args.codex:
         selected_targets.add("openai")
+    if args.cline:
+        selected_targets.add("cline")
 
     if not selected_targets:
         repo_root = args.repo_root or (Path.cwd() if (Path.cwd() / "context").is_dir() else _REPO_ROOT)
