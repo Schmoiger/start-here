@@ -166,17 +166,25 @@ def get_adapter_projections(
         Mapping of target Path -> generated string content.
     """
     if targets is None or "all" in targets:
-        active_targets = {"core", "gemini", "claude", "github", "openai"}
+        active_targets = {"core", "gemini", "claude", "github", "openai", "cline"}
     else:
         active_targets = set(targets)
-        # Gemini and Claude reference @AGENTS.md, so include core if either is targeted
-        if "gemini" in active_targets or "claude" in active_targets:
+        # Gemini, Claude, and Cline reference @AGENTS.md, so include core if
+        # any of them is targeted.
+        if (
+            "gemini" in active_targets
+            or "claude" in active_targets
+            or "cline" in active_targets
+        ):
             active_targets.add("core")
 
     projections: dict[Path, str] = {}
 
     if "core" in active_targets:
-        projections.update(generate_agents_md(context, repo_root, dry_run=True))
+        runtime_entry = "CLINE.md" if "cline" in active_targets else None
+        projections.update(
+            generate_agents_md(context, repo_root, dry_run=True, runtime_entry=runtime_entry)
+        )
 
     if "gemini" in active_targets:
         projections.update(generate_skills(context, repo_root, dry_run=True))
