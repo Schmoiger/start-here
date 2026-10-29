@@ -584,6 +584,7 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 | full-test | `full-test.yaml` | Complete regression across all modules |
 | content | `content.yaml` | Human-facing writing with personas |
 | continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (two modes; framework evolution) |
+| small-task | `small-task.yaml` | Small implementation done directly by the default agent; human approval gate; no delegation |
 
 ### Design (`design.yaml`)
 
@@ -900,6 +901,30 @@ These are examples of fixable gaps, not a separate scoring methodology:
 - Tooling drift: repeated bash-for-files or wrong package managers; tighten prompts or rules.
 - Integration cost: missing fixtures or slow local setup; add shared fixtures or documented setup in standards.
 - Parallel misuse: duplicated context without time savings; narrow parallel phases to truly independent work.
+
+---
+
+### Small-task (`small-task.yaml`)
+
+Purpose: Fast human-in-the-loop (HITL) changes — small implementation done **directly by the default agent** with the human as the mandatory approval gate. No sub-agents are spawned.
+
+File: `context/workflows/small-task.yaml`
+
+The default agent is the orchestrator acting in non-delegating mode — `small-task` is the only workflow that lifts the orchestrator's "never authorises implementation" boundary (`context/agents/orchestrator.md` §Decide: Direct or Delegate).
+
+Selection is a **fitness check, not a domain filter**: any work type is eligible provided the matching skill exists. The workflow YAML's `fitness:` block defines a numeric heuristic (H1–H8) and an inference rubric (R1–R7). The heuristic screens pre-flight — scale (H1: AMBER ~3 files / ~100 lines, RED above ~5 / ~200), task decomposition need (H2 → `tasks-{branch}.md` work goes to build/design), evidence gates (H3 → bugfix/build/deploy/full-test), consumed outputs (H4), parallel roles (H5), production/irreversible surfaces (H6), the framework-improvement loop (H7, AMBER → continuous-improvement), and bundled logical units (H8). Any RED defaults to the governing workflow unless the human explicitly overrides; AMBER triggers human sizing confirmation. The rubric (R1–R7) is answered with the human and covers coherence, reviewer value, in-flight efforts, throwaway vs durable intent, session boundaries, reconstruction cost, and skill coverage — when unsure, default to the heavier workflow.
+
+On mid-run overshoot the workflow **pauses, never resets**: the human chooses between approving the grown scope in-session, splitting into logical units, or promoting to a governing workflow. Promotion writes a transfer package — an updated `HANDOFF.md` plus a `artefacts/build/tasks-{branch}.md` stub (goal, acceptance criteria, done/in-flight/known-unknowns) — so the target workflow's intake resumes from recorded state, not scratch.
+
+Single phase with a single mandatory human gate:
+
+| Phase | Agent | Mode | Gate |
+|-------|-------|------|------|
+| `hitl` | `orchestrator` (as the default agent) | Direct implementation; no delegation | Human **APPROVED** before commit |
+
+Use for: housekeeping, harness edits, and small scoped implementations of any work type where the fitness heuristic and rubric lean in and the change fits one human review pass.
+
+Do not use for: work that triggers a RED heuristic flag without human override, work whose output feeds another workflow's later phases, or changes needing another workflow's evidence gates.
 
 ---
 

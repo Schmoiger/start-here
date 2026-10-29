@@ -108,7 +108,19 @@ The **Context Budget Test** is the decision rule — it governs **May Do Directl
 > - **Yes** → delegate
 
 - **May Do Directly** — git operations; task management (tasks.md, HANDOFF.md, `artefacts/build/interruptions/`); coordinating agent output; committing on behalf of subagents; file moves/renames/deletes with no content judgement
-- **Must Delegate** — implementation at any size (code, tests, schemas, standards, rules, agent definitions, workflows, validators, generators); when no agent fits, scaffold from `context/agents/TEMPLATE.md` and register it
+- **Must Delegate** — implementation at any size (code, tests, schemas, standards, rules, agent definitions, workflows, validators, generators); when no agent fits, escalate.
+
+#### Small-Task Mode (The Default Agent)
+
+`context/workflows/small-task.yaml` is the single explicit exception to the rules above — you are the **default agent** in that workflow (chosen by the human at intake or recovered from `HANDOFF.md`):
+
+- **Implement directly** — the "never authorises implementation" boundary is lifted; nothing outside `small-task` re-opens it
+- **Do not delegate** — do not spawn sub-agents for any part of the task
+- **Apply the fitness check** (`fitness:` in the workflow YAML) — run the numeric heuristic (H1–H8) at intake; any RED defaults to the governing workflow unless the human explicitly overrides (record the override in `HANDOFF.md`); weigh the inference rubric (R1–R7) with the human and default to the heavier workflow when unsure. Work type is not a discriminator — any work whose matching skill exists is eligible
+- **Skills are a duty, not a veto** — scan the skills catalogue (`context/README.md` §Inventory) and follow the matching skill before implementing (e.g. `python-scripting` for small Python scripts, `typescript-development` for TypeScript/Yarn work, `git-subrepo-operations` when editing the `context/` subrepo). If no skill, standard, or rule covers the work, surface the harness gap to the human
+- **Overshoot protocol — pause, never reset** — if actuals cross the heuristic flags or a RED surfaces mid-run: stop and present the human with three options — approve the grown scope in-session, split into logical units (approval + commit each), or promote to the governing workflow. Never discard the working tree; never spawn cold. Promotion writes a transfer package: update `HANDOFF.md` (`Workflow:`, `Phase:`, progress) and write a `artefacts/build/tasks-{branch}.md` stub (goal, acceptance criteria, done/in-flight/known-unknowns) that the target workflow's intake can consume
+- **Commit per approved unit** — each human-approved logical unit is committed immediately so git history is the residual context
+- **Human approval is the mandatory gate** — present the diff and do not commit without an explicit APPROVED verdict
 
 #### Do Task Yourself
 Do the work then continue to Commit.
@@ -183,6 +195,8 @@ For parallel dispatches, record each agent's task and acceptance criterion in a 
 ## Quality Gates
 
 Gates marked `gate: true` require an explicit **APPROVED** verdict before proceeding. **CHANGES REQUIRED** means return to the phase specified in the verdict — do not proceed.
+
+In the `small-task` workflow the `hitl` gate is asserted by the **human**, never by a sub-agent — there are no sub-agents in that workflow. Present the change and record the human's APPROVED verdict before committing.
 
 When a subagent reports back, validate its output against the `validation:` block in the workflow YAML for that phase — do not accept a report at face value. The workflow YAML is the durable spec; the subagent's self-assessment is not.
 

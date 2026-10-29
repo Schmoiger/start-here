@@ -171,7 +171,7 @@ This produces narrow, focused prompts with clear handoff boundaries. The roster 
 
 ## Workflow Architecture
 
-Workflows are YAML files encoding phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. The framework ships eight:
+Workflows are YAML files encoding phase dependencies, agent assignments, quality gates, validation criteria, state recovery procedures, and execution rules. The framework ships nine:
 
 | Workflow | Purpose |
 |----------|---------|
@@ -183,6 +183,7 @@ Workflows are YAML files encoding phase dependencies, agent assignments, quality
 | **full-test** | Complete regression across all modules |
 | **content** | Human-facing writing with personas |
 | **continuous-improvement** | Incident response and retrospective analysis (proactive review is a mode) |
+| **small-task** | Small implementation done directly by the default agent (the orchestrator when it does not delegate), gated on human approval |
 
 Per-file summaries, phase tables, and how **design → build → deploy** compose as default delivery: `context/docs/agentic-framework-reference.md` (Workflows).
 

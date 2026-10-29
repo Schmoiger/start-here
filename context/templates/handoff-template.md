@@ -3,7 +3,7 @@
 **From**: @{agent-name}
 **To**: @{agent-name}
 **Date**: {YYYY-MM-DD}
-**Workflow**: {build|design|prototype|deploy|full-test|content|retrospective}
+**Workflow**: {build|design|prototype|deploy|bugfix|full-test|content|continuous-improvement|small-task}
 **Phase**: {phase-id from workflow YAML}
 **Status**: {ready|blocked|needs_review|failed}
 

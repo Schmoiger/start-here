@@ -202,5 +202,5 @@ The framework tracks cumulative token consumption directly from the underlying A
 - **Workflow guide**: See `AGENTS.md` / `CLAUDE.md` - Auto-generated orchestration guides
 - **Agent reference**: See `context/agents/` - Individual agent definitions
 - **Standards**: See `context/standards/` - Coding, testing, tech stack guidance
-- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix)
+- **Workflows**: See `context/workflows/` - Structured delivery pipelines (TDD, design, prototype, content, deploy, bugfix, full-test, small-task)
 - **Validators**: See `context/scripts/validators/README.md` - Pre-commit consistency validators
