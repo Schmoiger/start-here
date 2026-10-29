@@ -19,7 +19,7 @@
 #   -h, --help                Show this help message and exit
 #   -r, --runtime <targets>   Target runtimes: 'all', or comma-separated list
 #                             (e.g. 'claude,gemini'). Supported: gemini, claude,
-#                             github, openai, all.
+#                             cline, github, openai, all.
 #   -t, --typst               Enable Typst typesetting engine (clones/pulls typst/)
 #   --no-typst                Disable Typst typesetting engine (prunes typst/)
 #   -p, --project-name <name> Set project name in pyproject.toml and README.md
@@ -78,7 +78,7 @@ Options:
   -h, --help                Show this help message and exit
   -r, --runtime <targets>   Target runtimes: 'all', or comma-separated list
                             (e.g. 'claude,gemini'). Supported: gemini, claude,
-                            github, openai, all.
+                            cline, github, openai, all.
   -t, --typst               Enable Typst typesetting engine (clones/pulls typst/)
   --no-typst                Disable Typst typesetting engine (prunes typst/)
   -p, --project-name <name> Set project name in pyproject.toml and README.md
@@ -242,7 +242,8 @@ else
   echo "  2) Claude Code"
   echo "  3) GitHub Copilot"
   echo "  4) OpenAI / Codex"
-  echo "  5) All runtimes (recommended default)"
+  echo "  5) Cline"
+  echo "  6) All runtimes (recommended default)"
   echo -n "  Select runtimes (comma-separated, e.g. 1,2 or 5) [current: $EXISTING_TARGETS]: "
   read -r user_rt
 
@@ -261,8 +262,9 @@ else
         2) targets_arr+=("claude") ;;
         3) targets_arr+=("github") ;;
         4) targets_arr+=("openai") ;;
-        5|all) targets_arr+=("all") ;;
-        gemini|claude|github|openai) targets_arr+=("$trimmed") ;;
+        5) targets_arr+=("cline") ;;
+        6|all) targets_arr+=("all") ;;
+        gemini|claude|cline|github|openai) targets_arr+=("$trimmed") ;;
         *) log_warn "Ignoring unknown runtime choice: $trimmed" ;;
       esac
     done
@@ -362,6 +364,7 @@ declare -A ACTIVE_TARGETS=()
 if [[ "$SELECTED_RUNTIMES" == "all" ]]; then
   ACTIVE_TARGETS["gemini"]=1
   ACTIVE_TARGETS["claude"]=1
+  ACTIVE_TARGETS["cline"]=1
   ACTIVE_TARGETS["github"]=1
   ACTIVE_TARGETS["openai"]=1
 else
@@ -371,11 +374,13 @@ else
     case "$cleaned" in
       gemini|g) ACTIVE_TARGETS["gemini"]=1 ;;
       claude|c) ACTIVE_TARGETS["claude"]=1 ;;
+      cline|l) ACTIVE_TARGETS["cline"]=1 ;;
       github|gh|copilot|p) ACTIVE_TARGETS["github"]=1 ;;
       openai|codex|o) ACTIVE_TARGETS["openai"]=1 ;;
       all)
         ACTIVE_TARGETS["gemini"]=1
         ACTIVE_TARGETS["claude"]=1
+        ACTIVE_TARGETS["cline"]=1
         ACTIVE_TARGETS["github"]=1
         ACTIVE_TARGETS["openai"]=1
         ;;
@@ -403,6 +408,11 @@ fi
 if [[ -z "${ACTIVE_TARGETS["openai"]:-}" ]]; then
   log_info "Pruning unselected OpenAI / Codex projections..."
   rm -rf .openai
+fi
+
+if [[ -z "${ACTIVE_TARGETS["cline"]:-}" ]]; then
+  log_info "Pruning unselected Cline projections..."
+  rm -rf .clinerules CLINE.md .cline/skills
 fi
 
 # Run generator to project all active targets fresh
