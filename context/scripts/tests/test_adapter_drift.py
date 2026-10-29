@@ -133,3 +133,39 @@ def test_adapter_drift_with_agent_targets_file(tmp_path: Path):
     )
 
     assert is_synced, f"Expected drift check to pass with .agent-targets, got: {drift_issues}"
+
+
+def test_adapter_drift_cline_managed_dirs(tmp_path: Path):
+    """Verify cline projections are tracked: clean generation passes, mutation is caught."""
+    repo_root = Path(__file__).resolve().parent.parent.parent.parent
+    context_dir = repo_root / "context"
+
+    shutil.copytree(
+        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
+    )
+
+    from context.scripts.generators.generate_adapters import run_generation
+
+    run_generation(
+        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"cline"}
+    )
+
+    # Clean state: cline projections on disk match expectations.
+    is_synced, drift_issues = check_adapter_drift(
+        repo_root=tmp_path,
+        context_dir=tmp_path / "context",
+        targets={"cline"},
+    )
+    assert is_synced, f"Expected clean cline drift, got: {drift_issues}"
+
+    # Mutate the generated cline core rule and expect MODIFIED drift.
+    core_rule = tmp_path / ".clinerules" / "00-core.md"
+    core_rule.write_text("Corrupted content that causes drift")
+
+    is_synced, drift_issues = check_adapter_drift(
+        repo_root=tmp_path,
+        context_dir=tmp_path / "context",
+        targets={"cline"},
+    )
+    assert not is_synced
+    assert any("MODIFIED" in issue and "00-core.md" in issue for issue in drift_issues)

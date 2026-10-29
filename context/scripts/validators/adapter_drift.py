@@ -76,6 +76,7 @@ def check_adapter_drift(
     target_managed_dirs = {
         "gemini": [repo_root / ".agents" / "skills"],
         "claude": [repo_root / ".claude" / "prompts"],
+        "cline": [repo_root / ".clinerules", repo_root / ".cline" / "skills"],
         "github": [repo_root / ".github" / "prompts", repo_root / ".github" / "instructions"],
         "openai": [repo_root / ".openai"],
     }

@@ -12,7 +12,7 @@ THIS SECTION IS POPULATED AS AN EXAMPLE. THIS IS THE ARCHITECTURE FOR THE AGENTI
 
 ## 1. System Purpose
 
-The Agentic Orchestration Harness is a multi-agent coordination framework that decouples engineering workflows, rules, and agent definitions from specific LLM runtimes. It provides a canonical source of truth — the `context/` directory — for how software is delivered, and a suite of runtime adapters that compile this truth into platform-specific configurations for Claude Code, Google Gemini/Antigravity, GitHub Copilot, and OpenAI Codex. The framework is distributed to downstream projects as a portable directory that can be copied, templated, or packaged.
+The Agentic Orchestration Harness is a multi-agent coordination framework that decouples engineering workflows, rules, and agent definitions from specific LLM runtimes. It provides a canonical source of truth — the `context/` directory — for how software is delivered, and a suite of runtime adapters that compile this truth into platform-specific configurations for Claude Code, Cline, Google Gemini/Antigravity, GitHub Copilot, and OpenAI Codex. The framework is distributed to downstream projects as a portable directory that can be copied, templated, or packaged.
 
 ---
 
@@ -70,7 +70,7 @@ The Agentic Orchestration Harness is a multi-agent coordination framework that d
 
 **Decision**: Runtime adapters are maintained exclusively as Python generator scripts (compiler plugins) rather than static target files. Each adapter compiles the canonical `context/` directory into a target runtime's native configuration format.
 
-**Rationale**: Target formats (`CLAUDE.md`, `.github/copilot-instructions.md`, Gemini `.agents/skills/*/SKILL.md`) require maintenance as vendors update their syntax and capabilities. Manually maintaining these files invites drift and human error. The generator approach means platform engineers update the Python compilation logic once and regenerate deterministically. An `adapter_drift.py` pre-commit validator enforces that no manual edits survive in target files.
+**Rationale**: Target formats (`CLAUDE.md`, `CLINE.md`, `.clinerules/`, `.cline/skills/`, `.github/copilot-instructions.md`, Gemini `.agents/skills/*/SKILL.md`) require maintenance as vendors update their syntax and capabilities. Manually maintaining these files invites drift and human error. The generator approach means platform engineers update the Python compilation logic once and regenerate deterministically. An `adapter_drift.py` pre-commit validator enforces that no manual edits survive in target files.
 
 **Consequences**: Manual edits to target files are strictly forbidden. Adding a new runtime target requires writing a new adapter plugin and updating the unified CLI dispatcher.
 

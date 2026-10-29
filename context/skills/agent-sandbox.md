@@ -45,6 +45,15 @@ Terminal sandboxes often block `$(...)` and `<(...)` constructs, as well as comp
   - *Bad*: `printf "Message" | git commit -F -`
   - *Good*: Write "Message" to `/tmp/msg.txt`, then run `git commit -F /tmp/msg.txt`
 
+### Non-Interactive Command Execution
+
+Agent terminal sessions can hang or lose result reporting when a command emits animated progress, opens an interactive prompt, or receives multi-line arguments inline. Keep commands deterministic and non-interactive:
+
+- **Streaming test runners**: Animated progress spinners (e.g. Vitest) rewrite the terminal buffer with carriage returns, garbling result reporting. Run such tests as `CI=1 yarn test > /tmp/test-out.txt 2>&1` — `CI=1` disables the animated reporter and watch mode; read the file in a separate step. Prefer the env-prefix form over `CI=1 && ...` (see `bash-environment.md` banned patterns). `yarn` is the mandated package manager (`context/standards/tech-standards.md`); never substitute `npm`.
+- **Interactive CLI tools**: Prompts, editors, and browser confirmations stall automation. Prefer non-interactive forms: `gh pr create --no-browser --body-file /tmp/body.md`; for issues, `gh api repos/{owner}/{repo}/issues --method POST --field title="..." --field body=@/tmp/body.md` instead of the interactive `gh issue create`.
+- **Multi-line arguments**: Multi-line or long values passed inline to a command can be re-parsed as incomplete input. Write them to a temp file first and pass them file-based: `git commit -F /tmp/msg.txt`, `--body-file`, `--field body=@file` — the same discipline as the heredoc ban above.
+- **Verify state before retrying**: An apparently failed command may have actually succeeded with broken result reporting. Before retrying or "correcting", verify true state with `git -C <repo> log --oneline -3`, `git -C <repo> status`, `git -C <repo> diff --stat`, or by reading the command's redirect file. Treat "no result signal" as unknown, not failed — never re-run mutating commands on assumption.
+
 ### File Modification and Reading
 Do not use bash streams (`echo "..." > file`, `cat`, `sed -i`) if dedicated agent tools (e.g., `replace_file_content`, `read_file`) are available. Dedicated tools provide precision diffing and native permission handling that bash streams lack.
 

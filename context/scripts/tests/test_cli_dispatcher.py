@@ -28,6 +28,8 @@ def test_target_normalization():
     assert normalize_target("o") == "openai"
     assert normalize_target("CLAUDE") == "claude"
     assert normalize_target("COPILOT") == "github"
+    assert normalize_target("cline") == "cline"
+    assert normalize_target("l") == "cline"
 
     with pytest.raises(ValueError, match="Unknown target"):
         normalize_target("nonexistent")
@@ -54,6 +56,9 @@ def test_cli_parser_flags():
 
     args_o = parser.parse_args(["-o"])
     assert args_o.codex is True
+
+    args_l = parser.parse_args(["-l"])
+    assert args_l.cline is True
 
 
 def test_dry_run_leaves_disk_untouched(tmp_path: Path):

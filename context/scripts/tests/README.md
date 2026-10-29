@@ -67,22 +67,22 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Body rule-table `Source` cells must resolve to an existing file, and to an existing heading when a section is named
 - Inline `file.md §section` citations must resolve the same way; tables without a `Source` column are ignored
 
-### Generator & Adapter Projections (27 tests)
+### Generator & Adapter Projections (44 tests)
 
-**generate_adapters.py & test_cli_dispatcher.py** (5 tests)
-- Target normalization and aliases (all, gemini, claude, github, copilot, codex, openai)
-- CLI parser flags and shortcuts (`-g`, `-c`, `-p`, `-o`, `-d`, `-a`, `-n`)
+**generate_adapters.py & test_cli_dispatcher.py** (7 tests)
+- Target normalization and aliases (all, gemini, claude, cline, github, copilot, codex, openai)
+- CLI parser flags and shortcuts (`-g`, `-c`, `-l`, `-p`, `-o`, `-d`, `-a`, `-n`)
 - Dry-run mode (`-d`) filesystem isolation
 - Smart change detection (`--new` default) preserving mtimes on unchanged files
 - Benchmark assertion: projection compilation in < 2.0s
 
-**test_adapters_core.py** (5 tests)
+**test_adapters_core.py** (12 tests)
 - CanonicalAgent and WorkflowDAG dataclasses
 - Loader validation and error handling for missing definitions
 - Capability registry extensibility
 - Token estimator budgeting
 
-**test_gemini_adapter.py** (2 tests)
+**test_gemini_adapter.py** (3 tests)
 - Antigravity SKILL.md generation with standards and rules
 - GEMINI.md generation with system instructions and model tier mappings
 
@@ -90,7 +90,7 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - CLAUDE.md generation with system instructions and subagent spawning
 - Subagent prompt generation in `.claude/prompts/`
 
-**test_github_adapter.py** (3 tests)
+**test_github_adapter.py** (5 tests)
 - `.github/copilot-instructions.md` generation
 - Custom prompts in `.github/prompts/*.prompt.md`
 - Scoped instructions in `.github/instructions/*.instructions.md` via `applyTo` parsing
@@ -100,14 +100,20 @@ Comprehensive tests for validation and generation scripts in `context/scripts/`.
 - Function calling schemas in `.openai/tools.json`
 - Lightweight execution runner harness `.openai/runner.py`
 
-**test_adapter_drift.py** (4 tests)
+**test_cline_adapter.py** (3 tests)
+- CLINE.md generation with system instructions, runtime tool mappings, and model tier mappings
+- Always-on `.clinerules/00-core.md` generation (frontmatter-free)
+- `.cline/skills/*/SKILL.md` projection with frontmatter name/description preserved
+
+**test_adapter_drift.py** (6 tests)
 - Clean repository zero-drift verification
 - Drift detection on modified projections
 - Drift detection on missing projections
 - Drift detection on orphaned files
+- Cline managed directories: clean sync passes, mutation reports MODIFIED
 
 **test_e2e_compilation.py** (3 tests)
-- End-to-end multi-target compilation in an isolated directory (86+ files)
+- End-to-end multi-target compilation in an isolated directory (120+ files)
 - Deterministic byte-for-byte reproducibility across repeated forced compilations
 - Minimal synthetic context compilation verifying end-to-end pipeline
 
@@ -164,6 +170,7 @@ tests/
 ├── test_claude_adapter.py    # Claude Code adapter tests
 ├── test_github_adapter.py    # GitHub Copilot adapter tests
 ├── test_openai_adapter.py    # OpenAI/Codex adapter tests
+├── test_cline_adapter.py     # Cline adapter tests
 ├── test_cli_dispatcher.py    # generate_adapters.py CLI tests
 ├── test_adapter_drift.py     # adapter_drift.py validator tests
 ├── test_e2e_compilation.py   # End-to-end multi-target compilation tests

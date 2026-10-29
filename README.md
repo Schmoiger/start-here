@@ -32,7 +32,7 @@ When seeding a new project from `start-here` or freshening the current repositor
 
 `init.sh` interactively:
 - Prompts for project metadata (`pyproject.toml` name/description)
-- Configures target AI coding runtimes (Gemini/Antigravity, Claude Code, GitHub Copilot, OpenAI/Codex) and prunes unselected projections
+- Configures target AI coding runtimes (Gemini/Antigravity, Claude Code, Cline, GitHub Copilot, OpenAI/Codex) and prunes unselected projections
 - Syncs or clones standard subrepositories (`context/`, and optionally `typst/` for PDF typesetting)
 - Regenerates adapter projections and updates lockfiles (`uv.lock`)
 - Sets up `.pre-commit-config.yaml` and activates git hooks
@@ -186,8 +186,8 @@ git subrepo push context
 - **15 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
 - **13 standards** - Coding, testing, architecture, tech stack, documentation, security
 - **10 rules** - Enforceable constraints with automated validators
-- **9 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, small-task, and continuous-improvement (incident + retrospective modes)
-- **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
+- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **5 runtime adapters** - Antigravity/Gemini, Claude Code, Cline, GitHub Copilot, OpenAI/Codex
 - **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
 
 

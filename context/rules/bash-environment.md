@@ -45,4 +45,5 @@ Dedicated Write/Edit/Glob/Grep tools execute with higher precision, structured d
 | `python -c "..."` multiline with `#` lines | `#`-prefixed lines inside quoted blocks trigger injection heuristics | Write script to `/tmp/script.py`; run as file |
 | Consecutive `''` at word start | Flagged as potential shell obfuscation | Write script to temp file |
 | Batch Edit then report without verifying | Edits can silently fail if snapshot is stale | After batch edits, run `git diff --stat` to confirm changes are on disk before reporting back; re-read and re-apply any missing edits |
+| Retrying or "correcting" after an apparent command failure without first verifying true state | Duplicate side effects (double commits, double issues) when the first command actually succeeded but result-reporting broke; wasted retries | After any apparent failure, verify true state with `git -C <root> log --oneline -3`, `git -C <root> status`, `git -C <root> diff --stat`, or by reading the command's redirect/output temp file before retrying. Treat "no result signal" as unknown, not failed |
 

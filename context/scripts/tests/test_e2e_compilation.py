@@ -80,7 +80,19 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     assert (tmp_path / ".openai" / "tools.json").is_file()
     assert (tmp_path / ".openai" / "runner.py").is_file()
 
-    # 6. Verify zero drift against validator
+    # 6. Cline verification
+    assert (tmp_path / "CLINE.md").is_file()
+    cline_content = (tmp_path / "CLINE.md").read_text()
+    assert "@AGENTS.md" in cline_content
+    assert "execute_command" in cline_content
+    assert (tmp_path / ".clinerules" / "00-core.md").is_file()
+    cline_skills_dir = tmp_path / ".cline" / "skills"
+    assert cline_skills_dir.is_dir()
+    cline_skill_files = list(cline_skills_dir.glob("*/SKILL.md"))
+    canonical_skill_count = len(load_canonical_context(str(context_dir))["skills"])
+    assert len(cline_skill_files) >= canonical_skill_count
+
+    # 7. Verify zero drift against validator
     is_synced, drift_issues = check_adapter_drift(
         repo_root=tmp_path,
         context_dir=tmp_path / "context",
@@ -192,6 +204,8 @@ def test_e2e_synthetic_context_compilation(tmp_path: Path):
     assert (output_dir / "AGENTS.md").is_file()
     assert (output_dir / "GEMINI.md").is_file()
     assert (output_dir / "CLAUDE.md").is_file()
+    assert (output_dir / "CLINE.md").is_file()
+    assert (output_dir / ".clinerules" / "00-core.md").is_file()
     assert (output_dir / ".agents" / "skills" / "custom-bot" / "SKILL.md").is_file()
     assert (output_dir / ".claude" / "prompts" / "custom-bot.md").is_file()
     assert (output_dir / ".github" / "prompts" / "custom-bot.prompt.md").is_file()

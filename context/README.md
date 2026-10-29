@@ -187,7 +187,7 @@ The orchestrator consults this index when constructing a task prompt, references
 
 - Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
 - Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
-- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `##` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md`. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `##` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md` and `.cline/skills/<name>/SKILL.md`, plus runtime rules in `.clinerules/`. Verify with `adapter_drift.py`.
 
 #### Context Definition Files
 
@@ -452,6 +452,7 @@ The framework tracks cumulative token consumption directly from the underlying A
 | **Google Antigravity** | `~/.gemini/antigravity-ide/conversations/*.db` | SQLite `trajectory_metadata_blob` (`file://{repo}`) | SQLite + Protobuf binary in `gen_metadata` | Protobuf Field 1.4: Varint 2 (prompt), Varint 5 (cached), Varint 3 (output), Varint 9/10 (thinking/candidates) |
 | **GitHub Copilot Chat** | `Code/User/workspaceStorage/<id>/chatSessions/` | `workspace.json` (`"folder": "file://{repo}"`) | JSONL (`<session-id>.jsonl`) | `metadata.promptTokens`, `metadata.outputTokens` / `completionTokens`, `toolCallRounds[].thinking.tokens` |
 | **OpenAI Codex** | `~/.codex/` or API run logs | Project directory or API run trace | JSON / SQLite | `prompt_tokens`, `completion_tokens`, `reasoning_tokens` |
+| **Cline** | `~/.cline/data/sessions/{id}/{id}.json` + `{id}.messages.json` | Session meta `cwd` / `workspace_root` | JSON (`{id}.json` meta + `{id}.messages.json`) | `metrics.inputTokens`, `metrics.outputTokens`, `metrics.cacheReadTokens`, `metrics.cacheWriteTokens`; model from meta `model` / `modelInfo.id` |
 
 
 ### Design Principles
@@ -525,8 +526,8 @@ git subrepo push context
 - **15 specialised agents** - Product discovery, architecture, coding, ui, review, testing, deployment, harness analysis and (multi-agent) orchestration
 - **13 standards** - Coding, testing, architecture, tech stack, documentation, security
 - **10 rules** - Enforceable constraints with automated validators
-- **9 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, full-test, small-task, and continuous-improvement (incident + retrospective modes)
-- **4 runtime adapters** - Antigravity/Gemini, Claude Code, GitHub Copilot, OpenAI/Codex
+- **8 workflows** - Including build (Detroit TDD), design, prototype, content, deploy, bugfix, small tasks, and continuous-improvement (incident + retrospective modes)
+- **5 runtime adapters** - Antigravity/Gemini, Claude Code, Cline, GitHub Copilot, OpenAI/Codex
 - **1 unified generator CLI** - Deterministic compilation with smart change detection and drift prevention
 
 
@@ -641,13 +642,19 @@ GEMINI.md*`"]
     Codex["`**OpenAI / Codex**
 *.openai/prompts/
 tools.json*`"]
+    Cline["`**Cline**
+*CLINE.md
+.clinerules/
+.cline/skills/*`"]
 
     Canon --> Gen
     Gen --> Gemini
     Gen --> Claude
     Gen --> Copilot
     Gen --> Codex
+    Gen --> Cline
 ```
+
 
 ### Downstream Synchronisation
 
@@ -701,6 +708,7 @@ uv run python context/scripts/generators/generate_adapters.py -g          # Gemi
 uv run python context/scripts/generators/generate_adapters.py -c          # Claude Code
 uv run python context/scripts/generators/generate_adapters.py -p          # GitHub Copilot
 uv run python context/scripts/generators/generate_adapters.py -o          # OpenAI / Codex
+uv run python context/scripts/generators/generate_adapters.py -l          # Cline
 ```
 
 

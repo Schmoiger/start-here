@@ -185,3 +185,20 @@ telemetry_sources:
       output: "completion_tokens"
       reasoning: "completion_tokens_details.reasoning_tokens"
 
+  cline:
+    name: "Cline IDE Telemetry"
+    description: "Cline session metadata and per-message usage metrics under the Cline data directory."
+    local_session_path: "~/.cline/data/sessions/{session-id}/"
+    session_files:
+      meta: "{session-id}.json"
+      messages: "{session-id}.messages.json"
+    storage_type: "json"
+    repository_mapping:
+      key: "cwd / workspace_root in the session meta JSON"
+    token_fields:
+      input: "assistant message metrics.inputTokens"
+      output: "assistant message metrics.outputTokens"
+      cache_read: "assistant message metrics.cacheReadTokens"
+      cache_write: "assistant message metrics.cacheWriteTokens"
+      model: "meta 'model' or assistant message modelInfo.id"
+
