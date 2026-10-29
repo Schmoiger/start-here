@@ -6,7 +6,7 @@ THIS SECTION IS POPULATED AS AN EXAMPLE. THESE ARE THE PRODUCT REQUIREMENTS FOR 
 
 ## Overview
 
-The Agentic Orchestration Harness is a vendor-neutral, portable framework designed to coordinate teams of specialised AI agents across heterogeneous development runtimes (Claude Code, GitHub Copilot, Codex/OpenAI, and Gemini/Antigravity). The system enforces a strict architectural separation between a portable, authoritative **Core Harness** (canonical agents, rules, standards, workflows, and templates) and **Runtime Adapters** (compilation targets projecting canonical assets into platform-specific instructions, skills, hooks, and tool schemas).
+The Agentic Orchestration Harness is a vendor-neutral, portable framework designed to coordinate teams of specialised AI agents across heterogeneous development runtimes (Claude Code, Cline, GitHub Copilot, Codex/OpenAI, and Gemini/Antigravity). The system enforces a strict architectural separation between a portable, authoritative **Core Harness** (canonical agents, rules, standards, workflows, and templates) and **Runtime Adapters** (compilation targets projecting canonical assets into platform-specific instructions, skills, hooks, and tool schemas).
 
 The framework answers five coordination questions: **who** does work (agents), **how** work should be done (standards and rules), **when** work happens (workflows), **what** gets produced (templates), and **how quality is maintained** (review gates, validators, and telemetry).
 
@@ -108,6 +108,7 @@ Runtime Adapters compile or project the canonical core harness into target platf
 | REQ-ADP-009 | P | THE codex-adapter SHALL project canonical agent definitions and workflows into OpenAI-compatible system prompts and JSON schema tool definitions. | Generates structured prompt bundles and tool declarations compatible with OpenAI Assistants API and execution harnesses. |
 | REQ-ADP-010 | M | THE claude-adapter SHALL inject session token telemetry into git commit trailers via a `prepare-commit-msg` hook. | Every commit created by the orchestrator records Agent-Session, model, and token metrics. |
 | REQ-ADP-011 | P | THE adapter-system SHALL adapt context delivery depth based on runtime context window capacities. | Runtimes with >1M context (Gemini) receive preloaded reference standards; runtimes with compact budgets (Claude/Codex) receive on-demand reference links. |
+| REQ-ADP-012 | P | THE cline-adapter SHALL project canonical agents, skills, and rules into Cline-native configuration (CLINE.md, .clinerules/, .cline/skills/) and rely on Cline's on-demand skill loading for procedural guidance. | Generates CLINE.md runtime entry, always-on .clinerules/00-core.md, and .cline/skills/<name>/SKILL.md projections; prepare-commit-msg ClineExtractor already covers telemetry. |
 
 ### 7. Framework Distribution
 

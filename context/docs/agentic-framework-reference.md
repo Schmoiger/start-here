@@ -95,7 +95,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 | Tier | Examples | Role |
 |------|----------|------|
 | Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
-| Derived projection | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
+| Derived projection | `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, `.agents/skills/`, `.clinerules/`, `.cline/skills/`, `.github/prompts/`, `.openai/` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
 | Operator guidance | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
 | Enforcement | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
 
@@ -111,7 +111,7 @@ The source of truth hierarchy above governs files inside the repository. But age
 |------------|--------|---------------|
 | 1 (highest) | User memories (auto-accumulated) | Runtime |
 | 2 | User-level config (`~/.claude/CLAUDE.md`, `~/.cursor/rules/`) | Individual contributor |
-| 3 | Project-level derived files (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`) | Framework (generated) |
+| 3 | Project-level derived files (`CLAUDE.md`, `CLINE.md`, `GEMINI.md`, `AGENTS.md`) | Framework (generated) |
 | 4 | Authoritative sources (`context/`) | Framework (versioned) |
 
 Anything at precedence 1 or 2 that contradicts precedence 3 or 4 wins — and the framework has no mechanism to detect or prevent it.
@@ -1144,10 +1144,11 @@ To run these on specific platforms, the `generate_adapters.py` CLI compiles thes
 
 ### Supported Runtime Adapters
 
-The framework ships with deterministic compiler support for four runtimes:
+The framework ships with deterministic compiler support for five runtimes:
 
 - **Google Antigravity/Gemini**: Generates structured `.agents/skills/` directories, complete with `SKILL.md` frontmatter, and `GEMINI.md`.
 - **Claude Code**: Projects context into `CLAUDE.md` and `.claude/`.
+- **Cline**: Projects context into `CLINE.md`, always-on rules in `.clinerules/`, and on-demand procedural skills in `.cline/skills/` (loaded by description match).
 - **GitHub Copilot**: Projects instructions into `.github/copilot-instructions.md` and custom prompts into `.github/prompts/`.
 - **OpenAI/Codex**: Generates OpenAI-compatible system prompt bundles and JSON schema tool declarations in `.openai/`.
 

@@ -58,7 +58,7 @@ Three strategic ideas shape every structural decision: if it matters, it should 
 
 **The constraint keeps moving.** Accelerating code generation does not eliminate bottlenecks; it relocates them. The binding constraint will migrate from code to review, from review to deployment, from deployment to intent clarity. The operating model must follow the constraint, not defend a fixed process. The `continuous-improvement` workflow is the mechanism for this: in incident mode, failures are traced through a causal chain (symptom, mechanism, file, gap) to a fixable defect in the framework itself; in retrospective mode, commit telemetry, interruption logs, and incident patterns are parsed to surface recurring weaknesses in rules, standards, or templates. Both modes target the coordination and verification systems, not just the code those systems govern.
 
-**Portability is a structural requirement.** Agent definitions are markdown files. Workflows are YAML. The framework includes deterministic adapter generators for Antigravity/Gemini, Claude Code, GitHub Copilot, and OpenAI/Codex. Illustrative guidance for LangGraph, CrewAI, AutoGen, and IDE-based systems is maintained in the reference document for runtimes without a built adapter. The design ensures that no single tool is a hard dependency. See `context/docs/agentic-framework-reference.md` (Portability and Framework Adapters) for cross-runtime integration guidance.
+**Portability is a structural requirement.** Agent definitions are markdown files. Workflows are YAML. The framework includes deterministic adapter generators for Antigravity/Gemini, Claude Code, Cline, GitHub Copilot, and OpenAI/Codex. Illustrative guidance for LangGraph, CrewAI, AutoGen, and IDE-based systems is maintained in the reference document for runtimes without a built adapter. The design ensures that no single tool is a hard dependency. See `context/docs/agentic-framework-reference.md` (Portability and Framework Adapters) for cross-runtime integration guidance.
 
 ---
 
@@ -121,7 +121,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 | Tier | Examples | Action |
 |------|----------|--------|
 | **Authoritative** | `context/workflows/*.yaml`, `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/models.yaml` | Edit these to change framework behaviour |
-| **Derived** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/skills/`, `.github/prompts/`, `.openai/` | Read for orientation; never hand-edit. Regenerate from source. |
+| **Derived** | `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, `.agents/skills/`, `.clinerules/`, `.cline/skills/`, `.github/prompts/`, `.openai/` | Read for orientation; never hand-edit. Regenerate from source. |
 | **Operator guidance** | `context/docs/*.md`, `README.md`, this document | Use to understand and apply the framework |
 | **Enforcement** | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | Use to keep the repository aligned with the design |
 
@@ -165,7 +165,7 @@ Each agent's frontmatter declares which rules and standards it requires. The orc
 
 This produces narrow, focused prompts with clear handoff boundaries. The roster is extensible: copy the agent template, fill in the frontmatter, add the agent to a workflow phase, and regenerate.
 
-**Adapters are generated, not authored.** The `generate_adapters.py` CLI compiles all four native runtime projections (Antigravity/Gemini, Claude Code, GitHub Copilot, and OpenAI/Codex) from the same canonical sources in a single invocation, with smart change detection and per-target filtering. This is a unified CLI, not a single-file generator. It produces `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and runtime-specific prompts and skills. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing derived projections by hand is always wrong; editing the sources and regenerating is the only valid path.
+**Adapters are generated, not authored.** The `generate_adapters.py` CLI compiles all five native runtime projections (Antigravity/Gemini, Claude Code, Cline, GitHub Copilot, and OpenAI/Codex) from the same canonical sources in a single invocation, with smart change detection and per-target filtering. This is a unified CLI, not a single-file generator. It produces `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, and runtime-specific prompts and skills. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing derived projections by hand is always wrong; editing the sources and regenerating is the only valid path.
 
 ---
 
