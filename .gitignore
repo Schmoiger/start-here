@@ -70,3 +70,17 @@ context/scripts/uv.lock
 CLAUDE.md
 GEMINI.md
 AGENTS.md
+
+# Programmatically generated agent projections
+.agents/skills/
+.claude/prompts/
+.clinerules/
+.cline/skills/
+.github/instructions/
+.github/prompts/
+.github/copilot-instructions.md
+.openai/prompts/
+AGENTS.md
+CLAUDE.md
+CLINE.md
+GEMINI.md

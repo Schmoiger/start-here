@@ -111,16 +111,16 @@ These replace the build workflow's agent-based review gates (`tasks-review`, `te
 |----|----------|--------|------------|------|
 | T-001 | critical | done | - | Add non-interactive terminal-execution guidance to `agent-sandbox.md` skill |
 | T-002 | critical | done | T-001 | Add verify-before-retry invariant to `bash-environment.md` rule |
-| T-003 | high | pending | T-001 | Register `cline` telemetry source in `context/models.yaml` |
-| T-004 | critical | pending | T-003 | Write failing `test_cline_adapter.py` (TDD red) |
-| T-005 | critical | pending | T-004 | Implement `adapters/cline/generator.py` (CLINE.md, rules, skills) |
-| T-006 | high | pending | T-005 | Add `@CLINE.md` runtime-entry pointer to generated `AGENTS.md` |
-| T-007 | critical | pending | T-005 | Register `cline` target in `generate_adapters.py` CLI |
-| T-008 | high | pending | T-007 | Track cline projections in `adapter_drift.py` |
-| T-009 | high | pending | T-006,T-008 | Update dispatcher/e2e/drift tests for cline |
-| T-010 | medium | pending | T-003 | Document cline telemetry + adapter inventory in `context/README.md` |
-| T-011 | medium | pending | T-010 | Update framework docs, requirements, architecture, root README |
-| T-012 | low | pending | T-011 | Update `context/scripts/tests/README.md` + validators README counts |
+| T-003 | high | done | T-001 | Register `cline` telemetry source in `context/models.yaml` |
+| T-004 | critical | done | T-003 | Write failing `test_cline_adapter.py` (TDD red) |
+| T-005 | critical | done | T-004 | Implement `adapters/cline/generator.py` (CLINE.md, rules, skills) |
+| T-006 | high | done | T-005 | Add `@CLINE.md` runtime-entry pointer to generated `AGENTS.md` |
+| T-007 | critical | done | T-005 | Register `cline` target in `generate_adapters.py` CLI |
+| T-008 | high | done | T-007 | Track cline projections in `adapter_drift.py` |
+| T-009 | high | done | T-006,T-008 | Update dispatcher/e2e/drift tests for cline |
+| T-010 | medium | done | T-003 | Document cline telemetry + adapter inventory in `context/README.md` |
+| T-011 | medium | done | T-010 | Update framework docs, requirements, architecture, root README |
+| T-012 | low | done | T-011 | Update `context/scripts/tests/README.md` + validators README counts |
 | T-013 | high | pending | T-008 | Add `cline` runtime option + pruning to `init.sh` |
 | T-014 | critical | pending | T-013 | Add cline to `.agent-targets`, regenerate projections, verify zero drift |
 | T-015 | critical | pending | T-014 | Full generator/adapter test suite green + benchmark |
