@@ -1,11 +1,11 @@
 # Tasks: Cline Runtime Projection
 
 **Branch**: `feat/cline-projection`
-**Status**: Planning
+**Status**: In Progress
 **Scope**: Add a fifth runtime adapter projecting the canonical harness (`context/`) into Cline-native configuration (`CLINE.md`, `.clinerules/`, `.cline/skills/`), plus canonical guidance rules distilled from observed terminal stall patterns, telemetry metadata, wiring, tests, and documentation.
 **Design**: N/A — the adapter mirrors the existing `claude/` and `gemini/` adapters (`context/scripts/generators/adapters/`). Prior evidence `artefacts/build/CLINE-STALL-PATTERNS.md` is archived by the human and must **not** be read by agents; its runtime-agnostic lessons are authored directly into this doc.
 **Created**: 2026-10-29
-**Amended**: —
+**Amended**: 2026-10-29 — T-001, T-002 complete; status vocabulary aligned to `pending/doing/blocked/done`
 
 ---
 
@@ -104,13 +104,13 @@ These replace the build workflow's agent-based review gates (`tasks-review`, `te
 ## Task Index
 
 - **Priority**: critical, high, medium, low
-- **Status**: pending, in_progress, blocked, completed
+- **Status**: pending, doing, blocked, done
 - **Blocked By**: task IDs or `-` if none
 
 | ID | Priority | Status | Blocked By | Task |
 |----|----------|--------|------------|------|
-| T-001 | critical | pending | - | Add non-interactive terminal-execution guidance to `agent-sandbox.md` skill |
-| T-002 | critical | pending | T-001 | Add verify-before-retry invariant to `bash-environment.md` rule |
+| T-001 | critical | done | - | Add non-interactive terminal-execution guidance to `agent-sandbox.md` skill |
+| T-002 | critical | done | T-001 | Add verify-before-retry invariant to `bash-environment.md` rule |
 | T-003 | high | pending | T-001 | Register `cline` telemetry source in `context/models.yaml` |
 | T-004 | critical | pending | T-003 | Write failing `test_cline_adapter.py` (TDD red) |
 | T-005 | critical | pending | T-004 | Implement `adapters/cline/generator.py` (CLINE.md, rules, skills) |
