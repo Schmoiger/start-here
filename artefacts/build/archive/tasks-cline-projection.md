@@ -121,9 +121,9 @@ These replace the build workflow's agent-based review gates (`tasks-review`, `te
 | T-010 | medium | done | T-003 | Document cline telemetry + adapter inventory in `context/README.md` |
 | T-011 | medium | done | T-010 | Update framework docs, requirements, architecture, root README |
 | T-012 | low | done | T-011 | Update `context/scripts/tests/README.md` + validators README counts |
-| T-013 | high | pending | T-008 | Add `cline` runtime option + pruning to `init.sh` |
-| T-014 | critical | pending | T-013 | Add cline to `.agent-targets`, regenerate projections, verify zero drift |
-| T-015 | critical | pending | T-014 | Full generator/adapter test suite green + benchmark |
+| T-013 | high | done | T-008 | Add `cline` runtime option + pruning to `init.sh` |
+| T-014 | critical | done | T-013 | Add cline to `.agent-targets`, regenerate projections, verify zero drift |
+| T-015 | critical | done | T-014 | Full generator/adapter test suite green + benchmark |
 
 ---
 
