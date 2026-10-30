@@ -1,113 +1,210 @@
 # Tasks: Derive Product and Technical Specifications from Repo
 
 **Branch**: feat/spec-agent
-**Status**: Planning
-**Scope**: Create a new harness capability to derive product and/or technical specifications from an existing codebase using a single workflow with mode switches.
+**Status**: In Progress
+**Scope**: New harness capability: derive product and/or technical specifications from an existing codebase (organised or not) via a single mode-switched workflow, backed by a deterministic zero-LLM indexer (`spec_indexer.py`) and agent synthesis with confidence tiers.
+**Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/spec_indexer.py` (schema documented in README § 4.2)
 **Created**: 2026-10-29
-**Amended**: 2026-10-29
+**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-013; T-011 (workflows README) and T-012 (indexer) completed
 
 ## Task Index
 
 | ID | Priority | Status | Blocked By | Task |
-|----|----------|--------|------------|-------|
-| Q0 | critical | pending | - | Answer the clarifying questions in §Questions below |
-| T-001 | critical | pending | Q0 | Create skill `context/skills/derive-spec.md` with modes: product, technical, both |
-| T-002 | high | pending | Q0 | Create workflow `context/workflows/derive-spec.yaml` with modes, shared phases, and mode-specific phases |
+|----|----------|--------|------------|------|
+| Q0 | critical | completed | - | Answer clarifying questions (recommended decisions below) |
+| T-012 | high | completed | - | Write `context/scripts/spec_indexer.py` (`scan` / `verify` subcommands) |
+| T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
+| T-001 | critical | pending | Q0 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
+| T-002 | high | pending | Q0 | Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery) |
+| T-003 | high | pending | T-001 | Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill) |
+| T-004 | high | pending | T-001 | Extend `context/agents/solution-architect.md` — derive mode (drafts only) |
+| T-005 | high | pending | T-001 | Add confirmation mode to `context/skills/requirements-elicitation.md` |
+| T-006 | medium | pending | T-001 | Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix) |
+| T-007 | high | pending | T-001,T-002,T-006 | Regenerate adapters; run validators green |
+| T-010 | high | pending | T-007 | Unit tests: skill/workflow schema, indexer extraction + verify |
+| T-008 | critical | pending | T-010 | Pilot: run derive-spec (`mode=both`) on this repo; measure token ledger before/after |
+| T-009 | low | pending | T-008 | Optional: register derive-spec as a `build.yaml` precursor phase |
+| T-013 | high | pending | T-002,T-012 | Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges) |
 
 ## File Scope
 
 - `artefacts/build/tasks-spec-agent.md` — task definition and workflow specification
 - `context/skills/derive-spec.md` — new skill with mode switches: product, technical, both
 - `context/workflows/derive-spec.yaml` — new workflow YAML supporting all three modes
-- `context/workflows/build.yaml` — optional phase dependency
-- `context/agents/product-owner.md` — extends agent for product-spec synthesis modes
-- `context/agents/solution-architect.md` — extends agent for technical-spec synthesis modes
-- `artefacts/product/product-spec.md` — generated product specification output
-- `artefacts/architecture/architecture.md` — generated architecture documentation output
-- `artefacts/architecture/data-model.md` — generated data model documentation output
-- `artefacts/architecture/api-catalogue.md` — generated API catalogue output
+- `context/workflows/README.md` — workflow index, derive-spec diagrams, runtime/tool wiring, token ledger *(completed)*
+- `context/README.md` — brief pointer to the workflows index *(completed)*
+- `context/scripts/spec_indexer.py` — deterministic indexer (`scan` / `verify`) *(completed)*
+- `context/agents/product-owner.md` — adds derive mode for product-spec synthesis
+- `context/agents/solution-architect.md` — adds derive mode for technical-spec synthesis
+- `context/skills/requirements-elicitation.md` — adds confirmation mode
+- `context/templates/derived-spec-template.md` — derived spec output format
+- `context/workflows/build.yaml` — optional precursor-phase dependency
+- Derived outputs (drafts, then promoted on approval): `artefacts/product/`, `artefacts/architecture/`
+
+## Recommended Decisions (Q0)
+
+Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
+
+| Q | Question | Decision | Rationale |
+|---|----------|----------|-----------|
+| Q1 | Output location for generated specs | **C** — per-run choice via workflow input; default drafts `artefacts/product/product-spec.derived.md`, `artefacts/architecture/*.derived.md`; promoted only on approval | Never clobbers canonical docs; matches artefacts layout |
+| Q2 | Question format for confirmation | **A** — numbered multiple-choice with “Other”, each citing files (reverse-spec Step 3) | One batched round; highest completion rate |
+| Q3 | Repo organisation scope | **C** — configurable `spec-docs-glob` (defaults: `artefacts/product/**`, `artefacts/architecture/**`, `docs/**`, `**/README.md`, `PRD*`, `*spec*.md`, `openapi*.yaml`) | Structured + unstructured repos; candidates confirmed by human, never silent |
+| Q4 | Confidence model | **B** — tier (Verified / Needs Confirmation / Assumed) + % per subsection + `file:line` evidence | Auditable; citations originate from the indexer |
+| Q5 | Agent for technical synthesis | **A** — reuse `@solution-architect` via a derive mode | Modes are the harness pattern; no roster bloat |
+| Q6 | Elicitation skill for technical confirmation | **B** — add a confirmation mode to `requirements-elicitation.md` | One elicitation skill; product-owner already loads it; discipline identical |
+| Q7 | Integration with build workflow | **B** — standalone first; optional precursor phase in `build.yaml` later (T-009) | Bootstrap capability, then wire in |
+| Q8 | Maximum repo size / scan limit | **B** — line/file-count threshold; large repos flagged for human scoping (`scan_too_large` meta flag) | A size-bound agent reads an index, so bounds are cheap |
+| Q9 | Mode selection mechanism | **A** — workflow input (`--mode product \| technical \| both`); recorded in `index.meta.mode` | Deterministic, reproducible, testable |
+| Q10 | Combined output format | **B** — separate docs per artefacts category (product-spec, architecture, data model, api catalogue) | Matches the canonical artefacts layout 1:1 |
+
+---
 
 ## Task
 
-### Q0: Answer the clarifying questions in §Questions below
-- **Priority**: critical
-- **Status**: pending
-- **Blocked By**: none
-- **Description**: Answer Q1 through Q10. These questions block all implementation work for both product and technical spec derivation modes.
+### T-001: Create skill `context/skills/derive-spec.md`
 
-### T-001: Create new skill `context/skills/derive-spec.md`
-- **Priority**: critical
-- **Status**: pending
-- **Blocked By**: Q0
-- **Description**: Create a new skill with mode switches. Product mode phases: repo-analysis, spec-discovery, feature-inventory, ux-flow-analysis, spec-draft, confirmation-questions, elicit-answers, spec-finalise. Technical mode phases: repo-analysis, architecture-analysis, api-analysis, data-model-analysis, spec-draft, confirmation-questions, elicit-answers, spec-finalise. Both mode runs product then technical sequentially.
+#### Acceptance Criteria
 
-### T-002: Create new workflow `context/workflows/derive-spec.yaml`
-- **Priority**: high
-- **Status**: pending
-- **Blocked By**: Q0
-- **Description**: Define phases with agent assignments, validation criteria, quality gates, state recovery, and mode selection. Shared phases run across all modes; mode-specific phases run only when relevant mode is selected. Quality gate requires human review before commit.
+- Frontmatter matches skill schema: `name`, `description`, `globs` (target: `**/*.py`, `**/*.ts`, `**/*.tsx`, `**/*.sql`, `**/openapi*.yaml`, `repo-index.json`)
+- Covers procedural steps for both modes: discovery (glob candidates + human confirmation), evidence consumption from `repo-index.json`, product derivation (UI inventory → candidate features → UX flows), technical derivation (architecture / API draft / data-model draft), confidence model (tier + % + citation), open-question batching, verification via `spec_indexer.py verify`
+- States output lifecycle: derived drafts only, promotion behind approval; drift section vs canonical docs
+- References the workflows README § 4 (runtime/tools) without duplicating the schema table
 
-## §Questions — Clarifying Decisions Required Before Implementation
+#### Primary Output Path
 
-These questions block progress on Q0, T-001 and T-002.
+`context/skills/derive-spec.md`
 
-### Q1 — Output Location for the Generated Specification
-Options:
-A. `artefacts/product/product-spec.md` (single canonical product spec)
-B. `artefacts/product/[service-name]-product-spec.md` (per-service, matches `PRD-[service-name].md` convention in reverse-spec.md)
-C. Let the human choose per-run via a `--spec-name` flag
+### T-002: Create workflow `context/workflows/derive-spec.yaml`
 
-### Q2 — Question Format for Confirmation Step
-Options:
-A. Multiple-choice with 2–3 options plus "Other" (matches reverse-spec.md Step 3)
-B. Yes/No confirmation only
-C. Open-ended text answers
+#### Acceptance Criteria
 
-### Q3 — Repo Organization Scope
-Options:
-A. Repos "organised like mine" (build/product folder, artefacts/product/) only
-B. Any repo with generic heuristics (discover spec docs anywhere)
-C. Configurable via a `spec-docs-glob` setting in workflow YAML
+- Phases 0–8 per workflows README; mode conditional on 4a/4b; shared phases single-run
+- Each phase declares `agents`, `outputs`, `validation:`; gate phases (`verification` pass, `final review`) marked `gate: true` with APPROVED semantics
+- `state_recovery:` reads `artefacts/build/spec-scan.md` and `repo-index.json`; critical files listed
+- Phase 6 invokes `spec_indexer.py verify --index`; Phase 8 invokes `verify --doc` on drafts
 
-### Q4 — Confidence Model
-Options:
-A. Confidence % per subsection only (your original idea)
-B. Tiered confidence labels + % (Verified / Needs Confirmation / Assumed from reverse-spec.md, displayed as %)
-C. Tiered labels only, no %
+#### Primary Output Path
 
-### Q5 — Agent for Technical Spec Synthesis
-Options:
-A. Reuse `@solution-architect` agent (recommended)
-B. Create a new `@tech-spec-architect` agent
-C. Have `@solution-architect` plus `@ui-designer` co-derive
+`context/workflows/derive-spec.yaml`
 
-### Q6 — Elicitation Skill for Technical Spec
-Options:
-A. Reuse `requirements-elicitation` skill (for problem discovery, not architectural clarification)
-B. Add a **code-confirmation** mode to `requirements-elicitation.md`
-C. Create a new separate skill (e.g. `code-confirmation.md`) distinct from requirements-elicitation
-D. Create a new `architecture-elicitation.md` skill for technical clarification
+### T-003: Extend `context/agents/product-owner.md` with derive mode
 
-### Q7 — Integration with Build Workflow
-Options:
-A. Standalone workflow only (`derive-spec.yaml`)
-B. Standalone + added as an optional precursor phase to `build.yaml` task-planning
-C. Auto-trigger whenever `artefacts/product/product-spec.md` or `artefacts/architecture/architecture.md` is missing
+#### Acceptance Criteria
 
-### Q8 — Maximum Repo Size / Scan Limit
-Options:
-A. No limit (scan everything)
-B. Max lines-of-code threshold (flag large repos for manual scoping)
-C. Max file count for UI scanning; human must scope large repos first
+- New Mode (derive) declared alongside existing modes: loads `derive-spec.md`, runs product derivation, writes drafts, bats MC questions (Q2 format), updates per answers
+- Intake, escalation, reporting, state-recovery protocols unchanged; derives never promote
 
-### Q9 — Mode Selection Mechanism
-Options:
-A. CLI arg / workflow input (`--mode product | technical | both`)
-B. Environment variable / config flag
-C. Human prompt at workflow entry
+#### Primary Output Path
 
-### Q10 — Combined Output Format
-Options:
-A. Single spec doc with Product and Technical sections
-B. Two separate docs (product-spec.md and architecture.md/data-model.md/api-catalogue.md)
-C. Single doc with mode-appropriate sections depending on mode selected
+`context/agents/product-owner.md`
+
+### T-004: Extend `context/agents/solution-architect.md` with derive mode
+
+#### Acceptance Criteria
+
+- Derive mode: architecture / API / data-model drafting from index evidence, drafts only (`*.derived.md`), canonical ownership boundary preserved (`openapi.yaml` untouched)
+- Runs Review Mode trace checks against index call chains
+
+#### Primary Output Path
+
+`context/agents/solution-architect.md`
+
+### T-005: Add confirmation mode to `context/skills/requirements-elicitation.md`
+
+#### Acceptance Criteria
+
+- Confirmation mode documented distinctly from problem-discovery: batched MC + Other, evidence-cited, one/two questions at a time, stop-and-wait
+- Exit criteria: every Assumed claim has a question; confirmed answers update drafts
+
+#### Primary Output Path
+
+`context/skills/requirements-elicitation.md`
+
+### T-006: Add `context/templates/derived-spec-template.md`
+
+#### Acceptance Criteria
+
+- Subsection skeletons for product-spec / architecture / data model / api catalogue with confidence fields (tier + % + evidence `path:line`)
+- Open-question appendix format (per subsection, priority, MC options), drift section header
+
+#### Primary Output Path
+
+`context/templates/derived-spec-template.md`
+
+### T-007: Regenerate adapters and validators
+
+#### Acceptance Criteria
+
+- `uv run python context/scripts/generators/generate_adapters.py` reflects the new skill/workflow in AGENTS.md/CLINE.md/GEMINI.md registries (if projection applies)
+- `uv run pytest context/scripts/tests/` green; `adapter_drift.py` and `tech_writing.py` green on changed files
+
+#### Primary Output Path
+
+Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
+
+### T-010: Unit tests
+
+#### Acceptance Criteria
+
+- Skill frontmatter schema test; workflow YAML phase-schema test (unique ids, resolvable `depends_on`, known agents, gates defined)
+- Indexer tests: Python extraction (symbols, routes, constants), TS/TSX extraction (components, props, usage counts — fixture per smoke test), SQL table parsing, `verify` pass/fail on synthetic repo
+- `uv run pytest context/scripts/tests/test_spec_indexer.py` green
+
+#### Primary Output Path
+
+`context/scripts/tests/test_spec_indexer.py`
+
+### T-008: Pilot run (mode=both, this repo)
+
+#### Acceptance Criteria
+
+- `scan` + draft + confirmation + review run end-to-end on start-here
+- Every generated subsection carries tier + % + citation; `verify --doc` on all drafts passes
+- Drift section present where derived behaviour differs from `requirements.md` / `architecture.md`
+- Token ledger filled with measured before/after (README § 5)
+
+#### Primary Output Path
+
+`artefacts/build/spec-pilot-report.md`
+
+### T-009: Optional build.yaml precursor integration
+
+#### Acceptance Criteria
+
+- derive-spec gate completes before build `task-planning` when specs missing; disabled otherwise
+
+#### Primary Output Path
+
+`context/workflows/build.yaml`
+
+### T-013: Wire indexer into derive-spec workflow
+
+#### Acceptance Criteria
+
+- Phases 1/3 consume `repo-index.json` + `spec-scan.md`; agent `tool_scope` restricted to index + cited line ranges
+- Re-scan rule documented (index refresh before `verify`)
+
+#### Primary Output Path
+
+`context/workflows/derive-spec.yaml` (with T-002)
+
+---
+
+## Orchestrator Notes
+
+### Parallelism Strategy
+
+**Sprint 1** (critical path after Q0): T-011 → T-012 (both completed) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 → T-007 → T-010 → T-008 → T-009, T-013.
+file_scope: `context/skills/` (T-001, T-005), `context/agents/` (T-003, T-004), `context/templates/` (T-006)
+
+### Commit Strategy
+
+One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): …`, `docs(workflows): …`, `test(spec): …`). Push after every commit.
+
+### Backlog Cleanup
+
+- `todo.md`: no overlapping items identified; the workflows README (T-011) reduces the “AGENTS.md distribution” backlog item tension by centralising workflow documentation.
+
+
+

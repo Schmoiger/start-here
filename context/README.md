@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-Hydration index. Read only the section a task needs. This is the single navigational README for the whole `context/` tree — sub-directories are not individually documented.
+Hydration index. Read only the section a task needs. This is the single navigational README for the whole `context/` tree. Two scoped index files exist as exceptions: `context/workflows/README.md` (workflow selection, derive-spec runtime, token ledger) and `context/scripts/tests/README.md` (test conventions).
 
 1. [For Agents](#for-agents) — where everything lives, and how to change it safely
    - [Quick Reference](#quick-reference) — which directory holds what, and when to consult it
