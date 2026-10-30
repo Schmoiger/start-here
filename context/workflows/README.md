@@ -313,15 +313,15 @@ sequenceDiagram
 
 ```bash
 # Phase 1/3 — build the index and the compact evidence map (zero LLM tokens)
-uv run context/scripts/spec_indexer.py scan --repo . --mode both
+uv run scripts/code-specs/spec_indexer.py scan --repo . --mode both
 # → artefacts/build/repo-index.json  (structured index)
 # → artefacts/build/spec-scan.md      (human/agent-readable evidence map)
 
 # Phase 6 — every citation in the index resolves
-uv run context/scripts/spec_indexer.py verify --index artefacts/build/repo-index.json
+uv run scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json
 
 # Phase 8 — every file:line cited by a drafted spec doc resolves
-uv run context/scripts/spec_indexer.py verify --doc artefacts/product/product-spec.derived.md
+uv run scripts/code-specs/spec_indexer.py verify --doc artefacts/product/product-spec.derived.md
 ```
 
 ### Repository Index (`repo-index.json`)

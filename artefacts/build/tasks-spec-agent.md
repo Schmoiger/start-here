@@ -3,7 +3,7 @@
 **Branch**: feat/spec-agent
 **Status**: In Progress
 **Scope**: New harness capability: derive product and/or technical specifications from an existing codebase (organised or not) via a single mode-switched workflow, backed by a deterministic zero-LLM indexer (`spec_indexer.py`) and agent synthesis with confidence tiers.
-**Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/spec_indexer.py` (schema documented in README § 4.2)
+**Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `scripts/code-specs/spec_indexer.py` (schema documented in README Commands / Repository Index)
 **Created**: 2026-10-29
 **Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-014; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added
 
@@ -13,7 +13,7 @@
 |----|----------|--------|------------|------|
 | Q0 | critical | completed | - | Answer clarifying questions (recommended decisions below) |
 | T-SETUP | critical | pending | - | Install / verify toolchain dependencies (human-run) before implementation starts |
-| T-012 | high | completed | - | Write `context/scripts/spec_indexer.py` (`scan` / `verify` subcommands) |
+| T-012 | high | completed | - | Write `scripts/code-specs/spec_indexer.py` (`scan` / `verify` subcommands) |
 | T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
 | T-014 | high | pending | T-SETUP | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (per README reference) |
 | T-001 | critical | pending | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
@@ -36,7 +36,7 @@
 - `context/workflows/derive-spec.yaml` — new workflow YAML supporting all three modes
 - `context/workflows/README.md` — workflow index, derive-spec diagrams, runtime/tool wiring, token ledger *(completed)*
 - `context/README.md` — brief pointer to the workflows index *(completed)*
-- `context/scripts/spec_indexer.py` — deterministic indexer (`scan` / `verify`) *(completed)*
+- `scripts/code-specs/spec_indexer.py` — deterministic indexer (`scan` / `verify`) *(completed)*
 - `context/agents/product-owner.md` — adds derive mode for product-spec synthesis
 - `context/agents/solution-architect.md` — adds derive mode for technical-spec synthesis
 - `context/skills/requirements-elicitation.md` — adds confirmation mode
@@ -219,8 +219,8 @@ before/after comparison is the acceptance metric):
   - `brew install universal-ctags ast-grep`, then `ctags --version` and `sg --version` succeed
 - Confirmation that the harness is green before implementation work starts:
   - `uv run pytest context/scripts/tests/ -q` → all pass
-  - `uv run context/scripts/spec_indexer.py scan --repo . --mode both` succeeds
-  - `uv run context/scripts/spec_indexer.py verify --index artefacts/build/repo-index.json` → OK
+  - `uv run scripts/code-specs/spec_indexer.py scan --repo . --mode both` succeeds
+  - `uv run scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json` → OK
 
 #### Primary Output Path
 

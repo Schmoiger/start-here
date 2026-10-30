@@ -843,7 +843,7 @@ def render_spec_scan(index: dict[str, Any]) -> str:
         out.append("None collected (no pytest/jest marker detected).")
 
     out.append(
-        "\n---\nGenerated deterministically by `context/scripts/spec_indexer.py scan` "
+        "\n---\nGenerated deterministically by `scripts/code-specs/spec_indexer.py scan` "
         "(zero LLM tokens). Consume via `repo-index.json`."
     )
     return "\n".join(out) + "\n"
