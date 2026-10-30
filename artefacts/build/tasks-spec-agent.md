@@ -266,6 +266,50 @@ before/after comparison is the acceptance metric):
 
 Environment only — verify via the acceptance criteria; record completion in HANDOFF.md (`Workflow: derive-spec`, note "deps installed").
 
+---
+
+### T-015: Tool-backed extraction backends with graceful fallback
+
+#### Acceptance Criteria
+
+- Add `--extractors` CLI flag: `auto|stdlib|ctags|tree-sitter|ast-grep|ts-morph` (default `auto`)
+- Implement universal-ctags JSON extraction (parse JSON) for foreign langs (Go, Rust, Java, etc.) via `--output-format=json --fields=+n`
+- Implement tree-sitter backend for Python/TS/JS/TSX using `tree-sitter-language-pack` (auto-probe, fallback to stdlib)
+- Implement ast-grep backend (`sg`) for TS/JS/JSX quick extractions (patterns via `sg run -p <pat> --json`)
+- Provide optional `ts_extract.mjs` helper for ts-morph (Node.js) — invoked on demand, skip gracefully if unavailable
+- Record provenance in `meta.extractors` and per-file `extractor` field in `FileRecord`
+- Degraded-mode (missing tool) warnings when needed tool is unavailable for target language
+- Parities validation against existing `repo-index.json` (stdlib) to ensure backward compatibility
+
+#### Primary Output Path
+
+`context/scripts/code-specs/spec_indexer.py` (modified with `--extractors` flag and backends)
+`context/scripts/code-specs/ts_extract.mjs` (optional ts-morph Node helper, T-015)
+`artefacts/build/tasks-spec-agent.md` (index entry updated)
+
+---
+
+#### Orchestrator Notes
+
+**Parallelism Strategy**
+
+- T-015 (extraction backends) runs critical path after Q0
+- T-014 (analyse-repo skill) depends on T-015 backends being implemented
+- T-001 → T-002 → T-003 + T-004 + T-005 run in parallel (file-scope disjoint)
+- T-006 → T-007 → T-010 → T-008 → T-009, T-013
+
+**Commit Strategy**
+
+One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): …`, `docs(workflows): …`, `test(spec): …`). Push after every commit.
+
+**Backlog Cleanup**
+
+- Verify `uv run pytest context/scripts/tests/ -q` → all pass before implementation
+- Confirm ctags/ast-grep/tree-sitter binaries available if targeting those extractors
+- Document any degraded-mode warnings encountered during pilot run
+
+---
+
 ### T-014: Wrap indexer tool usage in skill `context/skills/analyse-repo.md`
 
 #### Acceptance Criteria
