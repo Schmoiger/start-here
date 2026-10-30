@@ -1,0 +1,6458 @@
+{
+  "meta": {
+    "repo": "start-here",
+    "repo_abs": "/Users/avi/Repos/start-here",
+    "generated_at": "2026-10-30T14:12:07Z",
+    "mode": "both",
+    "scanned_files": 57,
+    "languages": {
+      "python": 57
+    },
+    "loc": 10808,
+    "scan_too_large": false
+  },
+  "warnings": [
+    "pytest: 198 collected (uv)"
+  ],
+  "docs": [
+    {
+      "path": ".githooks/README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "artefacts/README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "artefacts/api/api-design-guide.md",
+      "kind": "api"
+    },
+    {
+      "path": "artefacts/architecture/api-catalogue.md",
+      "kind": "architecture"
+    },
+    {
+      "path": "artefacts/architecture/architecture-decision.md",
+      "kind": "architecture"
+    },
+    {
+      "path": "artefacts/architecture/architecture.md",
+      "kind": "architecture"
+    },
+    {
+      "path": "artefacts/architecture/data-model.md",
+      "kind": "architecture"
+    },
+    {
+      "path": "artefacts/design/accessibility.md",
+      "kind": "design"
+    },
+    {
+      "path": "artefacts/design/components.md",
+      "kind": "design"
+    },
+    {
+      "path": "artefacts/design/user-flows.md",
+      "kind": "design"
+    },
+    {
+      "path": "artefacts/design/visuals-manifest.md",
+      "kind": "design"
+    },
+    {
+      "path": "artefacts/design/wireframes.md",
+      "kind": "design"
+    },
+    {
+      "path": "artefacts/product/open-questions.md",
+      "kind": "requirements"
+    },
+    {
+      "path": "artefacts/product/requirements.md",
+      "kind": "requirements"
+    },
+    {
+      "path": "artefacts/product/user-stories.md",
+      "kind": "requirements"
+    },
+    {
+      "path": "context/README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "context/scripts/tests/README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "context/scripts/validators/README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "context/skills/requirements-elicitation.md",
+      "kind": "requirements"
+    },
+    {
+      "path": "context/templates/requirements-template.md",
+      "kind": "requirements"
+    },
+    {
+      "path": "context/workflows/README.md",
+      "kind": "readme"
+    },
+    {
+      "path": "tests/context-unit-tests/README.md",
+      "kind": "readme"
+    }
+  ],
+  "files": [
+    {
+      "path": "context/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/code-specs/spec_indexer.py",
+      "language": "python",
+      "line_count": 1112,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "LANG_BY_SUFFIX",
+          "signature": "",
+          "line": 54,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "DOC_GLOBS",
+          "signature": "",
+          "line": 65,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "DOC_BASENAME_PATTERNS",
+          "signature": "",
+          "line": 77,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EXCLUDED_DIRS",
+          "signature": "",
+          "line": 88,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "ROUTE_METHOD_ATTRS",
+          "signature": "",
+          "line": 111,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_JSX_TAG_RE",
+          "signature": "",
+          "line": 115,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_IMPORT_NAMED",
+          "signature": "",
+          "line": 118,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_IMPORT_DEFAULT",
+          "signature": "",
+          "line": 121,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_FUNC",
+          "signature": "",
+          "line": 124,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_ARROW",
+          "signature": "",
+          "line": 127,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_CLASS",
+          "signature": "",
+          "line": 131,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_IFACE",
+          "signature": "",
+          "line": 132,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_TYPE",
+          "signature": "",
+          "line": 133,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_REQUIRE",
+          "signature": "",
+          "line": 134,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "Symbol",
+          "signature": "",
+          "line": 144,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "Symbol.to_jsonb",
+          "signature": "(self)",
+          "line": 152,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "FileRecord",
+          "signature": "",
+          "line": 164,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "FileRecord.to_jsonb",
+          "signature": "(self)",
+          "line": 171,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "ApiEntry",
+          "signature": "",
+          "line": 182,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ApiEntry.to_jsonb",
+          "signature": "(self)",
+          "line": 189,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "ColumnDef",
+          "signature": "",
+          "line": 200,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ColumnDef.to_jsonb",
+          "signature": "(self)",
+          "line": 204,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TableDef",
+          "signature": "",
+          "line": 209,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TableDef.to_jsonb",
+          "signature": "(self)",
+          "line": 215,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "UiComponent",
+          "signature": "",
+          "line": 225,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "UiComponent.to_jsonb",
+          "signature": "(self)",
+          "line": 233,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestNode",
+          "signature": "",
+          "line": 245,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestNode.to_jsonb",
+          "signature": "(self)",
+          "line": 249,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "DocRecord",
+          "signature": "",
+          "line": 254,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "DocRecord.to_jsonb",
+          "signature": "(self)",
+          "line": 258,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "rel",
+          "signature": "(repo: Path, path: Path)",
+          "line": 267,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "language_of",
+          "signature": "(name: str)",
+          "line": 272,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "find_target_files",
+          "signature": "(repo: Path, max_files: int)",
+          "line": 277,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_unparse",
+          "signature": "(node: ast.AST | None)",
+          "line": 335,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_decorator_names",
+          "signature": "(decorators: list[ast.expr])",
+          "line": 342,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_route_from_decorator",
+          "signature": "(dec: ast.expr)",
+          "line": 350,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_method_body",
+          "signature": "(owner: str, node: ast.FunctionDef | ast.AsyncFunctionDef)",
+          "line": 375,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_python",
+          "signature": "(abs_path: Path, rel_path: str)",
+          "line": 386,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_destructured_props",
+          "signature": "(signature: str)",
+          "line": 458,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_is_component",
+          "signature": "(name: str, kind: str)",
+          "line": 471,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_tsjs",
+          "signature": "(abs_path: Path, rel_path: str, language: str)",
+          "line": 475,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_SQL_CREATE",
+          "signature": "",
+          "line": 562,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_SQL_SKIP_COLUMN",
+          "signature": "",
+          "line": 566,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_sql",
+          "signature": "(abs_path: Path, rel_path: str)",
+          "line": 573,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_run",
+          "signature": "(cmd: list[str], cwd: Path, timeout: int=60)",
+          "line": 611,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "collect_tests",
+          "signature": "(repo: Path)",
+          "line": 619,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "discover_docs",
+          "signature": "(repo: Path)",
+          "line": 677,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_openapi",
+          "signature": "(docs: list[DocRecord], repo: Path)",
+          "line": 709,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MAX_MAP_ROWS",
+          "signature": "",
+          "line": 747,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MAX_API_ROWS",
+          "signature": "",
+          "line": 748,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MAX_UI_ROWS",
+          "signature": "",
+          "line": 749,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MAX_TEST_ROWS",
+          "signature": "",
+          "line": 750,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MAX_SCHEMA_ROWS",
+          "signature": "",
+          "line": 751,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_default_out_dir",
+          "signature": "(repo: Path)",
+          "line": 754,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "render_spec_scan",
+          "signature": "(index: dict[str, Any])",
+          "line": 759,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "run_scan",
+          "signature": "(repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool)",
+          "line": 852,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CITATION_RE",
+          "signature": "",
+          "line": 952,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_line_text",
+          "signature": "(abs_file: Path, line: int)",
+          "line": 957,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "run_verify",
+          "signature": "(index_path: Path | None, repo_path: Path, doc_path: Path | None, verbose: bool)",
+          "line": 971,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "(argv: list[str] | None=None)",
+          "line": 1039,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "ast",
+        "json",
+        "os",
+        "re",
+        "subprocess",
+        "dataclasses",
+        "datetime",
+        "pathlib",
+        "typing"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/__init__.py",
+      "language": "python",
+      "line_count": 4,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/claude/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/claude/generator.py",
+      "language": "python",
+      "line_count": 92,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "_extract_model_mappings",
+          "signature": "(repo_root: Path, provider_name: str)",
+          "line": 8,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_claude_md",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 34,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_subagent_prompts",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 60,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pathlib",
+        "typing",
+        "yaml",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/cline/__init__.py",
+      "language": "python",
+      "line_count": 1,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/cline/generator.py",
+      "language": "python",
+      "line_count": 151,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "_extract_cline_model_mappings",
+          "signature": "(repo_root: Path)",
+          "line": 10,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_cline_md",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 39,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_cline_rules",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 71,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_cline_skills",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 97,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pathlib",
+        "typing",
+        "json",
+        "yaml",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/core/__init__.py",
+      "language": "python",
+      "line_count": 4,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/core/agents_md.py",
+      "language": "python",
+      "line_count": 149,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "_trim_purpose",
+          "signature": "(text: str)",
+          "line": 11,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_workflow_table",
+          "signature": "(workflows: dict[str, WorkflowDAG])",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_agent_dispatch_all",
+          "signature": "(agents: dict[str, CanonicalAgent])",
+          "line": 31,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_skill_table",
+          "signature": "(skills: dict[str, CanonicalSkill])",
+          "line": 60,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_agents_md",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False, runtime_entry: str | None=None)",
+          "line": 73,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pathlib",
+        "typing",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/core/budget.py",
+      "language": "python",
+      "line_count": 31,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "DeliveryStrategy",
+          "signature": "",
+          "line": 4,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TokenEstimator",
+          "signature": "",
+          "line": 10,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TokenEstimator.__init__",
+          "signature": "(self, chars_per_token: float=4.0)",
+          "line": 15,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TokenEstimator.estimate_tokens",
+          "signature": "(self, text: str)",
+          "line": 18,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TokenEstimator.recommend_strategy",
+          "signature": "(self, tokens: int, budget: int)",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "enum"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/core/loader.py",
+      "language": "python",
+      "line_count": 125,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "extract_frontmatter",
+          "signature": "(content: str)",
+          "line": 14,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "normalise_tools",
+          "signature": "(raw: Any)",
+          "line": 22,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "load_canonical_context",
+          "signature": "(context_dir_path: str)",
+          "line": 49,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pathlib",
+        "typing",
+        "yaml",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/core/models.py",
+      "language": "python",
+      "line_count": 58,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "CanonicalRule",
+          "signature": "",
+          "line": 5,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "CanonicalStandard",
+          "signature": "",
+          "line": 11,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "CanonicalSkill",
+          "signature": "",
+          "line": 17,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "CanonicalAgent",
+          "signature": "",
+          "line": 25,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "CanonicalPersona",
+          "signature": "",
+          "line": 39,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "Phase",
+          "signature": "",
+          "line": 46,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "WorkflowDAG",
+          "signature": "",
+          "line": 54,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "dataclasses"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/core/tools.py",
+      "language": "python",
+      "line_count": 22,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "CapabilityRegistry",
+          "signature": "",
+          "line": 1,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CapabilityRegistry.__init__",
+          "signature": "(self)",
+          "line": 6,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CapabilityRegistry.register_capability",
+          "signature": "(self, abstract_capability: str, target_mappings: dict[str, str])",
+          "line": 9,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CapabilityRegistry.get_mapping",
+          "signature": "(self, abstract_capability: str)",
+          "line": 17,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/gemini/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/gemini/generator.py",
+      "language": "python",
+      "line_count": 135,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "generate_skills",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 9,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_extract_model_mappings",
+          "signature": "(repo_root: Path, provider_name: str)",
+          "line": 85,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_gemini_md",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 111,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "json",
+        "os",
+        "pathlib",
+        "typing",
+        "context.scripts.generators.adapters.core.models",
+        "yaml"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/github/__init__.py",
+      "language": "python",
+      "line_count": 8,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/github/generator.py",
+      "language": "python",
+      "line_count": 180,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "generate_prompts",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 8,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_copilot_instructions",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 44,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_scoped_instructions",
+          "signature": "(output_dir: Path, dry_run: bool=False)",
+          "line": 66,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_workflows",
+          "signature": "(output_dir: Path, dry_run: bool=False)",
+          "line": 143,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "re",
+        "pathlib",
+        "typing",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/adapters/openai/__init__.py",
+      "language": "python",
+      "line_count": 8,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/generators/adapters/openai/generator.py",
+      "language": "python",
+      "line_count": 133,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "generate_system_prompts",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 8,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_tool_schemas",
+          "signature": "(context: dict[str, Any], output_dir: Path, dry_run: bool=False)",
+          "line": 46,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "generate_runner_harness",
+          "signature": "(output_dir: Path, dry_run: bool=False)",
+          "line": 75,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "json",
+        "pathlib",
+        "typing",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/generators/generate_adapters.py",
+      "language": "python",
+      "line_count": 468,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "_REPO_ROOT",
+          "signature": "",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "SUPPORTED_TARGETS",
+          "signature": "",
+          "line": 55,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TARGET_ALIASES",
+          "signature": "",
+          "line": 57,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "IGNORED_BLOCK",
+          "signature": "",
+          "line": 74,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "ensure_root_gitignore",
+          "signature": "(repo_root: Path, dry_run: bool=False, verbose: bool=False, quiet: bool=False)",
+          "line": 91,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "normalize_target",
+          "signature": "(target: str)",
+          "line": 128,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "load_configured_targets",
+          "signature": "(repo_root: Path)",
+          "line": 137,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_adapter_projections",
+          "signature": "(context: dict[str, Any], repo_root: Path, targets: set[str] | None=None)",
+          "line": 163,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "run_generation",
+          "signature": "(repo_root: Path | None=None, context_dir: Path | None=None, targets: set[str] | None=None, force: bool=False, dry_run: bool=False, verbose: bool=False, quiet: bool=False)",
+          "line": 226,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "build_parser",
+          "signature": "()",
+          "line": 308,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 428,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "sys",
+        "pathlib",
+        "typing",
+        "context.scripts.generators.adapters.claude.generator",
+        "context.scripts.generators.adapters.cline.generator",
+        "context.scripts.generators.adapters.core.agents_md",
+        "context.scripts.generators.adapters.core.loader",
+        "context.scripts.generators.adapters.gemini.generator",
+        "context.scripts.generators.adapters.github.generator",
+        "context.scripts.generators.adapters.openai.generator"
+      ]
+    },
+    {
+      "path": "context/scripts/prepare-commit-msg.py",
+      "language": "python",
+      "line_count": 848,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ExtractionResult",
+          "signature": "",
+          "line": 40,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "format_tokens",
+          "signature": "(count: int)",
+          "line": 51,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "short_model",
+          "signature": "(model: Optional[str])",
+          "line": 60,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_git_repo_root",
+          "signature": "()",
+          "line": 68,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_watermark_path",
+          "signature": "(repo_root: str, runtime_name: str)",
+          "line": 79,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "read_watermark",
+          "signature": "(watermark_path: str)",
+          "line": 84,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "write_watermark",
+          "signature": "(watermark_path: str, data: dict[str, Any])",
+          "line": 95,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_decode_varint",
+          "signature": "(data: bytes, offset: int)",
+          "line": 109,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "parse_protobuf_fields",
+          "signature": "(data: bytes)",
+          "line": 125,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "BaseExtractor",
+          "signature": "",
+          "line": 163,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "BaseExtractor.is_available",
+          "signature": "(self)",
+          "line": 167,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "BaseExtractor.find_active_session",
+          "signature": "(self, repo_root: str)",
+          "line": 171,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "BaseExtractor.extract_delta",
+          "signature": "(self, repo_root: str, watermark: dict[str, Any])",
+          "line": 175,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "AntigravityExtractor",
+          "signature": "",
+          "line": 180,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "AntigravityExtractor.__init__",
+          "signature": "(self)",
+          "line": 184,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "AntigravityExtractor.is_available",
+          "signature": "(self)",
+          "line": 191,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "AntigravityExtractor.find_active_session",
+          "signature": "(self, repo_root: str)",
+          "line": 194,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "AntigravityExtractor.extract_delta",
+          "signature": "(self, repo_root: str, watermark: dict[str, Any])",
+          "line": 219,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "CopilotExtractor",
+          "signature": "",
+          "line": 298,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CopilotExtractor.__init__",
+          "signature": "(self)",
+          "line": 302,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CopilotExtractor.is_available",
+          "signature": "(self)",
+          "line": 311,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CopilotExtractor.find_active_session",
+          "signature": "(self, repo_root: str)",
+          "line": 314,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CopilotExtractor.extract_delta",
+          "signature": "(self, repo_root: str, watermark: dict[str, Any])",
+          "line": 349,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "ClaudeExtractor",
+          "signature": "",
+          "line": 421,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClaudeExtractor.is_available",
+          "signature": "(self)",
+          "line": 425,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClaudeExtractor.find_active_session",
+          "signature": "(self, repo_root: str)",
+          "line": 428,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClaudeExtractor.extract_delta",
+          "signature": "(self, repo_root: str, watermark: dict[str, Any])",
+          "line": 443,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "CodexExtractor",
+          "signature": "",
+          "line": 514,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CodexExtractor.is_available",
+          "signature": "(self)",
+          "line": 518,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CodexExtractor.find_active_session",
+          "signature": "(self, repo_root: str)",
+          "line": 521,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "CodexExtractor.extract_delta",
+          "signature": "(self, repo_root: str, watermark: dict[str, Any])",
+          "line": 524,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "ClineExtractor",
+          "signature": "",
+          "line": 528,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClineExtractor.__init__",
+          "signature": "(self)",
+          "line": 546,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClineExtractor.is_available",
+          "signature": "(self)",
+          "line": 560,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClineExtractor._load_session_meta",
+          "signature": "(meta_path: str)",
+          "line": 564,
+          "decorators": [
+            "staticmethod"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClineExtractor.find_active_session",
+          "signature": "(self, repo_root: str)",
+          "line": 572,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ClineExtractor.extract_delta",
+          "signature": "(self, repo_root: str, watermark: dict[str, Any])",
+          "line": 597,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EXTRACTORS",
+          "signature": "",
+          "line": 681,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "select_extractor",
+          "signature": "(declared_tool: Optional[str], repo_root: str)",
+          "line": 694,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_set_trailer_field",
+          "signature": "(line: str, key: str, value: str)",
+          "line": 724,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "update_commit_message",
+          "signature": "(msg_file: str, token_str: Optional[str], tool: Optional[str]=None, model: Optional[str]=None)",
+          "line": 731,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 779,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "json",
+        "glob",
+        "os",
+        "re",
+        "sqlite3",
+        "subprocess",
+        "sys",
+        "dataclasses",
+        "pathlib",
+        "typing"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/__init__.py",
+      "language": "python",
+      "line_count": 1,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/tests/conftest.py",
+      "language": "python",
+      "line_count": 125,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "fixtures_dir",
+          "signature": "()",
+          "line": 8,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_commit",
+          "signature": "(fixtures_dir)",
+          "line": 14,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_commit_no_scope",
+          "signature": "(fixtures_dir)",
+          "line": 20,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_commit_too_long",
+          "signature": "(fixtures_dir)",
+          "line": 26,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_commit_past_tense",
+          "signature": "(fixtures_dir)",
+          "line": 32,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_commit_with_agent_session",
+          "signature": "(fixtures_dir)",
+          "line": 38,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "merge_commit",
+          "signature": "(fixtures_dir)",
+          "line": 44,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_requirements",
+          "signature": "(fixtures_dir)",
+          "line": 50,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_requirements",
+          "signature": "(fixtures_dir)",
+          "line": 56,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_british_english",
+          "signature": "(fixtures_dir)",
+          "line": 62,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_british_english",
+          "signature": "(fixtures_dir)",
+          "line": 68,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_metrics",
+          "signature": "(fixtures_dir)",
+          "line": 74,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_metrics",
+          "signature": "(fixtures_dir)",
+          "line": 80,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_interruptions",
+          "signature": "(fixtures_dir)",
+          "line": 86,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_interruptions",
+          "signature": "(fixtures_dir)",
+          "line": 92,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_workflow",
+          "signature": "(fixtures_dir)",
+          "line": 98,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "valid_agent",
+          "signature": "(fixtures_dir)",
+          "line": 104,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_agent_no_frontmatter",
+          "signature": "(fixtures_dir)",
+          "line": 110,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_agent_hardcoded_paths",
+          "signature": "(fixtures_dir)",
+          "line": 116,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_agent_missing_sections",
+          "signature": "(fixtures_dir)",
+          "line": 122,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pytest",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_adapter_drift.py",
+      "language": "python",
+      "line_count": 172,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_adapter_drift_clean_repo",
+          "signature": "()",
+          "line": 8,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_adapter_drift_detects_modified_file",
+          "signature": "(tmp_path: Path)",
+          "line": 16,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_adapter_drift_detects_missing_file",
+          "signature": "(tmp_path: Path)",
+          "line": 47,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_adapter_drift_detects_orphaned_file",
+          "signature": "(tmp_path: Path)",
+          "line": 76,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_adapter_drift_with_agent_targets_file",
+          "signature": "(tmp_path: Path)",
+          "line": 110,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_adapter_drift_cline_managed_dirs",
+          "signature": "(tmp_path: Path)",
+          "line": 138,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "shutil",
+        "pathlib",
+        "pytest",
+        "context.scripts.validators.adapter_drift"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_adapters_core.py",
+      "language": "python",
+      "line_count": 219,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "TestAdaptersCoreModels",
+          "signature": "",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreModels.test_canonical_agent_dataclass",
+          "signature": "(self)",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreModels.test_canonical_skill_dataclass",
+          "signature": "(self)",
+          "line": 34,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAdaptersCoreLoader",
+          "signature": "",
+          "line": 52,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreLoader.setUp",
+          "signature": "(self)",
+          "line": 53,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreLoader.tearDown",
+          "signature": "(self)",
+          "line": 107,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreLoader.test_load_canonical_context",
+          "signature": "(self)",
+          "line": 110,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreLoader.test_missing_agent_validation",
+          "signature": "(self)",
+          "line": 130,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestToolNormalisation",
+          "signature": "",
+          "line": 145,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation._load_tools",
+          "signature": "(self, frontmatter: str)",
+          "line": 148,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation.test_annotated_mapping_form",
+          "signature": "(self)",
+          "line": 158,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation.test_plain_string_form",
+          "signature": "(self)",
+          "line": 166,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation.test_scalar_string_form",
+          "signature": "(self)",
+          "line": 170,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation.test_top_level_mapping_form",
+          "signature": "(self)",
+          "line": 174,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation.test_legacy_mcp_tools_key",
+          "signature": "(self)",
+          "line": 178,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestToolNormalisation.test_absent_tools",
+          "signature": "(self)",
+          "line": 183,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAdaptersCoreTools",
+          "signature": "",
+          "line": 187,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreTools.test_capability_registry_extensibility",
+          "signature": "(self)",
+          "line": 188,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAdaptersCoreBudget",
+          "signature": "",
+          "line": 202,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAdaptersCoreBudget.test_token_estimator",
+          "signature": "(self)",
+          "line": 203,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "unittest",
+        "pathlib",
+        "context.scripts.generators.adapters.core.budget",
+        "context.scripts.generators.adapters.core.loader",
+        "context.scripts.generators.adapters.core.models",
+        "context.scripts.generators.adapters.core.tools",
+        "tempfile",
+        "yaml"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_agent_validator.py",
+      "language": "python",
+      "line_count": 471,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "CONTEXT_ACQUISITION_BODY",
+          "signature": "",
+          "line": 11,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAgentValidator",
+          "signature": "",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_valid_agent",
+          "signature": "(self, valid_agent)",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_no_frontmatter",
+          "signature": "(self, invalid_agent_no_frontmatter)",
+          "line": 29,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_hardcoded_paths",
+          "signature": "(self, invalid_agent_hardcoded_paths)",
+          "line": 35,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_missing_required_sections",
+          "signature": "(self, invalid_agent_missing_sections)",
+          "line": 41,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_context_acquisition_section_passes",
+          "signature": "(self, tmp_path)",
+          "line": 47,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_legacy_required_sections_rejected",
+          "signature": "(self, tmp_path)",
+          "line": 75,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_agent_template_scaffold_passes_validation",
+          "signature": "(self, tmp_path)",
+          "line": 96,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_invalid_yaml_frontmatter",
+          "signature": "(self, tmp_path)",
+          "line": 128,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_missing_required_fields",
+          "signature": "(self, tmp_path)",
+          "line": 143,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_relative_paths_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 156,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_reminders_without_attribution",
+          "signature": "(self, tmp_path)",
+          "line": 174,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_proper_attribution_passes",
+          "signature": "(self, tmp_path)",
+          "line": 193,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_project_root_placeholders_allowed",
+          "signature": "(self, tmp_path)",
+          "line": 215,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_nonexistent_standards_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 235,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_nonexistent_rules_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 249,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_nonexistent_skills_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 262,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_canonical_interruption_log_path_passes",
+          "signature": "(self, tmp_path)",
+          "line": 275,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_legacy_interruption_log_path_rejected",
+          "signature": "(self, tmp_path)",
+          "line": 291,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_interruption_log_wildcard_allowed",
+          "signature": "(self, tmp_path)",
+          "line": 307,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_table_source_should_fail_when_file_does_not_exist",
+          "signature": "(self, tmp_path)",
+          "line": 323,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_table_source_should_fail_when_section_does_not_exist",
+          "signature": "(self, tmp_path)",
+          "line": 343,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_table_source_should_pass_when_citations_resolve",
+          "signature": "(self, tmp_path)",
+          "line": 363,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_citation_should_fail_when_file_does_not_exist",
+          "signature": "(self, tmp_path)",
+          "line": 383,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_citation_should_fail_when_section_does_not_exist",
+          "signature": "(self, tmp_path)",
+          "line": 401,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_citation_should_pass_when_section_resolves",
+          "signature": "(self, tmp_path)",
+          "line": 419,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_citation_error_should_report_file_line_number_when_it_fails",
+          "signature": "(self, tmp_path)",
+          "line": 435,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentValidator.test_body_table_without_source_column_should_be_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 456,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "context.scripts.validators.agent_definitions"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_claude_adapter.py",
+      "language": "python",
+      "line_count": 45,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_generate_claude_md",
+          "signature": "(tmp_path: Path)",
+          "line": 10,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_subagent_prompts",
+          "signature": "(tmp_path: Path)",
+          "line": 23,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pathlib",
+        "context.scripts.generators.adapters.core.models",
+        "context.scripts.generators.adapters.claude.generator"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_cli_dispatcher.py",
+      "language": "python",
+      "line_count": 189,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_target_normalization",
+          "signature": "()",
+          "line": 15,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cli_parser_flags",
+          "signature": "()",
+          "line": 38,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_dry_run_leaves_disk_untouched",
+          "signature": "(tmp_path: Path)",
+          "line": 64,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_smart_update_preserves_unchanged_files",
+          "signature": "(tmp_path: Path)",
+          "line": 86,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generation_execution_speed_benchmark",
+          "signature": "()",
+          "line": 132,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_ensure_root_gitignore",
+          "signature": "(tmp_path: Path)",
+          "line": 146,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_load_configured_targets",
+          "signature": "(tmp_path: Path)",
+          "line": 175,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "time",
+        "shutil",
+        "pathlib",
+        "pytest",
+        "context.scripts.generators.generate_adapters",
+        "context.scripts.generators.adapters.core.loader"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_cline_adapter.py",
+      "language": "python",
+      "line_count": 84,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "TestClineAdapter",
+          "signature": "",
+          "line": 16,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestClineAdapter.setUp",
+          "signature": "(self)",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestClineAdapter.tearDown",
+          "signature": "(self)",
+          "line": 41,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestClineAdapter.test_generate_cline_md",
+          "signature": "(self)",
+          "line": 44,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestClineAdapter.test_generate_cline_rules",
+          "signature": "(self)",
+          "line": 55,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestClineAdapter.test_generate_cline_skills",
+          "signature": "(self)",
+          "line": 67,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "shutil",
+        "tempfile",
+        "unittest",
+        "pathlib",
+        "yaml",
+        "context.scripts.generators.adapters.cline.generator",
+        "context.scripts.generators.adapters.core.models"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_e2e_compilation.py",
+      "language": "python",
+      "line_count": 213,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_e2e_full_compilation_all_targets",
+          "signature": "(tmp_path: Path)",
+          "line": 13,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_e2e_deterministic_reproducibility",
+          "signature": "(tmp_path: Path)",
+          "line": 104,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_e2e_synthetic_context_compilation",
+          "signature": "(tmp_path: Path)",
+          "line": 146,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "shutil",
+        "pathlib",
+        "pytest",
+        "context.scripts.generators.generate_adapters",
+        "context.scripts.validators.adapter_drift",
+        "context.scripts.generators.adapters.core.loader"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_gemini_adapter.py",
+      "language": "python",
+      "line_count": 81,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "TestGeminiAdapter",
+          "signature": "",
+          "line": 15,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestGeminiAdapter.setUp",
+          "signature": "(self)",
+          "line": 16,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestGeminiAdapter.tearDown",
+          "signature": "(self)",
+          "line": 33,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestGeminiAdapter.test_generate_skills",
+          "signature": "(self)",
+          "line": 36,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestGeminiAdapter.test_generate_skills_escapes_colon_in_description",
+          "signature": "(self)",
+          "line": 53,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestGeminiAdapter.test_generate_gemini_md",
+          "signature": "(self)",
+          "line": 68,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "shutil",
+        "tempfile",
+        "unittest",
+        "pathlib",
+        "yaml",
+        "context.scripts.generators.adapters.core.models",
+        "context.scripts.generators.adapters.gemini.generator"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_github_adapter.py",
+      "language": "python",
+      "line_count": 128,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_generate_copilot_instructions",
+          "signature": "(tmp_path: Path)",
+          "line": 12,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_prompts",
+          "signature": "(tmp_path: Path)",
+          "line": 25,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_scoped_instructions",
+          "signature": "(tmp_path: Path)",
+          "line": 49,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_scoped_instructions_with_exclude_agent",
+          "signature": "(tmp_path: Path)",
+          "line": 80,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_workflows",
+          "signature": "(tmp_path: Path)",
+          "line": 108,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pathlib",
+        "context.scripts.generators.adapters.core.models",
+        "context.scripts.generators.adapters.github.generator"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_openai_adapter.py",
+      "language": "python",
+      "line_count": 61,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_generate_system_prompts",
+          "signature": "(tmp_path: Path)",
+          "line": 12,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_tool_schemas",
+          "signature": "(tmp_path: Path)",
+          "line": 38,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generate_runner_harness",
+          "signature": "(tmp_path: Path)",
+          "line": 51,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "json",
+        "pathlib",
+        "context.scripts.generators.adapters.core.models",
+        "context.scripts.generators.adapters.openai.generator"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_packaging.py",
+      "language": "python",
+      "line_count": 49,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "test_pyproject_toml_exists",
+          "signature": "()",
+          "line": 8,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_generator_entrypoint_parser",
+          "signature": "()",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_drift_validator_callable",
+          "signature": "()",
+          "line": 38,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "pathlib",
+        "context.scripts.generators.generate_adapters",
+        "context.scripts.validators.adapter_drift"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_runtime_telemetry.py",
+      "language": "python",
+      "line_count": 620,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "EXTRACTORS",
+          "signature": "",
+          "line": 45,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_format_tokens",
+          "signature": "()",
+          "line": 54,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_protobuf_wire_format_parsing",
+          "signature": "()",
+          "line": 63,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_encode_varint",
+          "signature": "(value: int)",
+          "line": 76,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_encode_field",
+          "signature": "(field_num: int, wire_type: int, payload: bytes)",
+          "line": 90,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_antigravity_synthetic_extraction",
+          "signature": "(tmp_path)",
+          "line": 101,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_copilot_synthetic_extraction",
+          "signature": "(tmp_path)",
+          "line": 161,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_commit_message_updating",
+          "signature": "(tmp_path)",
+          "line": 217,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_live_antigravity_storage_sanity",
+          "signature": "()",
+          "line": 244,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_live_copilot_storage_sanity",
+          "signature": "()",
+          "line": 285,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_live_claude_storage_sanity",
+          "signature": "()",
+          "line": 322,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_make_cline_session",
+          "signature": "(root: Path, session_id: str, cwd: str, messages, model='deepseek/test-model', provider='openrouter')",
+          "line": 360,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_extract_delta_counts_assistant_metrics",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 380,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_extract_delta_accepts_wrapped_messages",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 414,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_extract_delta_session_switch_resets",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 438,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_extract_delta_falls_back_to_session_model",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 462,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_extract_delta_error_paths",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 478,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_find_active_session_matches_repo_and_picks_newest",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 502,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_cline_registry_and_selection",
+          "signature": "(tmp_path, monkeypatch)",
+          "line": 529,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_short_model_strips_provider_prefix",
+          "signature": "()",
+          "line": 540,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_update_commit_message_injects_tool_and_model",
+          "signature": "(tmp_path)",
+          "line": 547,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_update_commit_message_removes_stale_tokens",
+          "signature": "(tmp_path)",
+          "line": 562,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "test_live_cline_storage_sanity",
+          "signature": "()",
+          "line": 577,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "json",
+        "os",
+        "sqlite3",
+        "tempfile",
+        "pytest",
+        "pathlib",
+        "importlib.util",
+        "sys"
+      ]
+    },
+    {
+      "path": "context/scripts/tests/test_validators.py",
+      "language": "python",
+      "line_count": 1254,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "TestConventionalCommits",
+          "signature": "",
+          "line": 65,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_valid_commit",
+          "signature": "(self, valid_commit)",
+          "line": 68,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_invalid_no_scope",
+          "signature": "(self, invalid_commit_no_scope)",
+          "line": 75,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_invalid_too_long",
+          "signature": "(self, invalid_commit_too_long)",
+          "line": 82,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_invalid_past_tense",
+          "signature": "(self, invalid_commit_past_tense)",
+          "line": 89,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_valid_with_agent_session",
+          "signature": "(self, valid_commit_with_agent_session)",
+          "line": 96,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_merge_commit_allowed",
+          "signature": "(self, merge_commit)",
+          "line": 102,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_empty_commit_fails",
+          "signature": "(self)",
+          "line": 108,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_invalid_type",
+          "signature": "(self)",
+          "line": 115,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_invalid_scope_uppercase",
+          "signature": "(self)",
+          "line": 122,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_coauthor_format",
+          "signature": "(self)",
+          "line": 129,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_agent_session_requires_coauthor",
+          "signature": "(self)",
+          "line": 138,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_agent_session_tokens_mega_suffix",
+          "signature": "(self)",
+          "line": 147,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_agent_session_tokens_lowercase_suffix",
+          "signature": "(self)",
+          "line": 156,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_agent_session_hook_appended_form",
+          "signature": "(self)",
+          "line": 165,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConventionalCommits.test_agent_session_malformed_tokens_fails",
+          "signature": "(self)",
+          "line": 174,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAgentSessionCorroboration",
+          "signature": "",
+          "line": 185,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentSessionCorroboration._cline_session_for_repo",
+          "signature": "(self, root: Path, session_id: str, repo: str, model: str)",
+          "line": 193,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentSessionCorroboration._agent_commit",
+          "signature": "(tool: str, model: str)",
+          "line": 212,
+          "decorators": [
+            "staticmethod"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentSessionCorroboration.test_model_corroborated_for_cline",
+          "signature": "(self, tmp_path, monkeypatch)",
+          "line": 219,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentSessionCorroboration.test_model_contradicting_runtime_fails",
+          "signature": "(self, tmp_path, monkeypatch)",
+          "line": 228,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentSessionCorroboration.test_unconfirmable_model_fails",
+          "signature": "(self, tmp_path, monkeypatch)",
+          "line": 238,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentSessionCorroboration.test_third_party_tool_not_adjudicated",
+          "signature": "(self)",
+          "line": 247,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestEARSNotation",
+          "signature": "",
+          "line": 253,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_valid_requirements",
+          "signature": "(self, valid_requirements)",
+          "line": 256,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_invalid_requirements",
+          "signature": "(self, invalid_requirements)",
+          "line": 261,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_ubiquitous_pattern",
+          "signature": "(self)",
+          "line": 267,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_event_pattern",
+          "signature": "(self)",
+          "line": 272,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_state_pattern",
+          "signature": "(self)",
+          "line": 276,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_optional_pattern",
+          "signature": "(self)",
+          "line": 280,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_forbidden_pattern",
+          "signature": "(self)",
+          "line": 284,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_complex_pattern",
+          "signature": "(self)",
+          "line": 288,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_non_ears_requirement",
+          "signature": "(self)",
+          "line": 294,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestEARSNotation.test_code_blocks_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 299,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestBritishEnglish",
+          "signature": "",
+          "line": 315,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_valid_british_english",
+          "signature": "(self, valid_british_english)",
+          "line": 318,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_invalid_american_english",
+          "signature": "(self, invalid_british_english)",
+          "line": 323,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_color_vs_colour",
+          "signature": "(self)",
+          "line": 330,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_behavior_vs_behaviour",
+          "signature": "(self)",
+          "line": 342,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_organize_vs_organise",
+          "signature": "(self)",
+          "line": 353,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_code_blocks_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 364,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestBritishEnglish.test_inline_code_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 379,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestMetricsLogging",
+          "signature": "",
+          "line": 389,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_valid_metrics",
+          "signature": "(self, valid_metrics)",
+          "line": 392,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_invalid_metrics",
+          "signature": "(self, invalid_metrics)",
+          "line": 397,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_metrics_log_location_under_build",
+          "signature": "(self)",
+          "line": 402,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_metrics_log_requires_jsonl_suffix",
+          "signature": "(self)",
+          "line": 406,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_metrics_log_rejects_repository_root",
+          "signature": "(self)",
+          "line": 411,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_missing_required_field",
+          "signature": "(self)",
+          "line": 416,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_invalid_timestamp",
+          "signature": "(self)",
+          "line": 429,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_invalid_event",
+          "signature": "(self)",
+          "line": 442,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_invalid_token_source",
+          "signature": "(self)",
+          "line": 455,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_missing_tokens_fields",
+          "signature": "(self)",
+          "line": 468,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_handoff_requires_to_field",
+          "signature": "(self)",
+          "line": 481,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_empty_file_valid",
+          "signature": "(self, tmp_path)",
+          "line": 495,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMetricsLogging.test_invalid_json",
+          "signature": "(self, tmp_path)",
+          "line": 503,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestInterruptionsLogging",
+          "signature": "",
+          "line": 513,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging._question",
+          "signature": "(**overrides)",
+          "line": 517,
+          "decorators": [
+            "staticmethod"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_valid_interruptions",
+          "signature": "(self, valid_interruptions)",
+          "line": 532,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_invalid_interruptions",
+          "signature": "(self, invalid_interruptions)",
+          "line": 537,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_missing_required_field",
+          "signature": "(self)",
+          "line": 542,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_null_outcome_fields_allowed",
+          "signature": "(self)",
+          "line": 549,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_invalid_type",
+          "signature": "(self)",
+          "line": 554,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_invalid_timestamp",
+          "signature": "(self)",
+          "line": 560,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_agent_at_prefix_rejected",
+          "signature": "(self)",
+          "line": 566,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_invalid_decision",
+          "signature": "(self)",
+          "line": 572,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_invalid_impact",
+          "signature": "(self)",
+          "line": 588,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_options_must_be_array",
+          "signature": "(self)",
+          "line": 605,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_mixed_tasks_rejected",
+          "signature": "(self, tmp_path)",
+          "line": 623,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_legacy_filename_rejected",
+          "signature": "(self, tmp_path)",
+          "line": 633,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_duplicate_ids_rejected",
+          "signature": "(self, tmp_path)",
+          "line": 640,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_resolution_ref_must_resolve",
+          "signature": "(self, tmp_path)",
+          "line": 647,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_resolution_record_resolves",
+          "signature": "(self, tmp_path)",
+          "line": 669,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_empty_file_valid",
+          "signature": "(self, tmp_path)",
+          "line": 690,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_invalid_json",
+          "signature": "(self, tmp_path)",
+          "line": 696,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_interruptions_path_detection",
+          "signature": "(self)",
+          "line": 703,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_interruption_log_requires_jsonl_suffix",
+          "signature": "(self)",
+          "line": 709,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_main_auto_detects_interruptions_log",
+          "signature": "(self, tmp_path, monkeypatch, capsys)",
+          "line": 715,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestInterruptionsLogging.test_main_auto_detects_metrics_log",
+          "signature": "(self, tmp_path, monkeypatch, capsys)",
+          "line": 728,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestTypstFormatting",
+          "signature": "",
+          "line": 753,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypstFormatting.test_valid_formatting",
+          "signature": "(self, tmp_path)",
+          "line": 756,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypstFormatting.test_mermaid_insufficient_blank_lines",
+          "signature": "(self, tmp_path)",
+          "line": 772,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypstFormatting.test_section_heading_without_separator",
+          "signature": "(self, tmp_path)",
+          "line": 793,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypstFormatting.test_typst_skip_blocks_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 812,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypstFormatting.test_headings_in_code_blocks_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 824,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestWorkspaceOutputLocations",
+          "signature": "",
+          "line": 842,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkspaceOutputLocations.test_valid_output_paths",
+          "signature": "(self)",
+          "line": 845,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkspaceOutputLocations.test_invalid_artefact_subdir",
+          "signature": "(self)",
+          "line": 856,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkspaceOutputLocations.test_invalid_test_result_name",
+          "signature": "(self)",
+          "line": 863,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestUIDev",
+          "signature": "",
+          "line": 871,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestUIDev.test_important_forbidden",
+          "signature": "(self, tmp_path)",
+          "line": 874,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestUIDev.test_raw_hex_forbidden",
+          "signature": "(self, tmp_path)",
+          "line": 882,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestUIDev.test_css_files_restriction",
+          "signature": "(self, tmp_path)",
+          "line": 890,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestSupabase",
+          "signature": "",
+          "line": 901,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSupabase.test_supabase_import_outside_database_service",
+          "signature": "(self, tmp_path)",
+          "line": 904,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSupabase.test_supabase_import_inside_database_service_allowed",
+          "signature": "(self, tmp_path)",
+          "line": 913,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSupabase.test_migration_audit_row_required",
+          "signature": "(self, tmp_path)",
+          "line": 921,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestTestingInvariants",
+          "signature": "",
+          "line": 939,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTestingInvariants.test_forbidden_interaction_mock",
+          "signature": "(self, tmp_path)",
+          "line": 942,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTestingInvariants.test_exempt_interaction_mock",
+          "signature": "(self, tmp_path)",
+          "line": 950,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestTypeScriptEnvironment",
+          "signature": "",
+          "line": 958,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypeScriptEnvironment.test_package_lock_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 961,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypeScriptEnvironment.test_tsconfig_strictness",
+          "signature": "(self, tmp_path)",
+          "line": 969,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTypeScriptEnvironment.test_workspaces_validation",
+          "signature": "(self, tmp_path)",
+          "line": 982,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestUITesting",
+          "signature": "",
+          "line": 996,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestUITesting.test_banned_dependencies_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 999,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestUITesting.test_puppeteer_core_allowed",
+          "signature": "(self, tmp_path)",
+          "line": 1013,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestSecrets",
+          "signature": "",
+          "line": 1025,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSecrets.test_private_key_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 1028,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSecrets.test_env_file_with_secret_flagged",
+          "signature": "(self, tmp_path)",
+          "line": 1036,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestSubrepoFreshness",
+          "signature": "",
+          "line": 1045,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_find_subrepos",
+          "signature": "(self, tmp_path)",
+          "line": 1048,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_query_upstream_head_success",
+          "signature": "(self)",
+          "line": 1070,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_query_upstream_head_failure",
+          "signature": "(self)",
+          "line": 1081,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_subrepo_fresh_when_commit_matches",
+          "signature": "(self, tmp_path)",
+          "line": 1092,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_subrepo_stale_with_changes_fails",
+          "signature": "(self, tmp_path)",
+          "line": 1112,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_subrepo_stale_without_changes_passes",
+          "signature": "(self, tmp_path)",
+          "line": 1134,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_subrepo_check_all_forces_stale_detection",
+          "signature": "(self, tmp_path)",
+          "line": 1154,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_subrepo_unreachable_network_handling",
+          "signature": "(self, tmp_path)",
+          "line": 1174,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSubrepoFreshness.test_main_cli_success",
+          "signature": "(self, tmp_path, monkeypatch)",
+          "line": 1197,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestLoggingTemplateDocs",
+          "signature": "",
+          "line": 1219,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLoggingTemplateDocs.test_template_documents_metrics_schema",
+          "signature": "(self)",
+          "line": 1229,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLoggingTemplateDocs.test_template_documents_interruption_schema",
+          "signature": "(self)",
+          "line": 1235,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLoggingTemplateDocs.test_agent_template_references_logging_template",
+          "signature": "(self)",
+          "line": 1249,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "json",
+        "sys",
+        "pathlib",
+        "context.scripts.validators.workspace_conventions",
+        "context.scripts.validators.tech_writing",
+        "context.scripts.validators.ui_dev",
+        "context.scripts.validators.supabase",
+        "context.scripts.validators.testing",
+        "context.scripts.validators.typescript_environment",
+        "context.scripts.validators.ui_testing",
+        "context.scripts.validators.secrets",
+        "context.scripts.validators.verify_typst_formatting",
+        "context.scripts.validators.subrepo_freshness",
+        "unittest.mock",
+        "subprocess"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "context/scripts/validators/adapter_drift.py",
+      "language": "python",
+      "line_count": 164,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "_REPO_ROOT",
+          "signature": "",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_adapter_drift",
+          "signature": "(repo_root: Path | None=None, context_dir: Path | None=None, targets: set[str] | None=None)",
+          "line": 31,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 116,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "sys",
+        "pathlib",
+        "context.scripts.generators.adapters.core.loader",
+        "context.scripts.generators.generate_adapters"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/agent_definitions.py",
+      "language": "python",
+      "line_count": 355,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 32,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "CONTEXT_DIR",
+          "signature": "",
+          "line": 33,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "AGENTS_DIR",
+          "signature": "",
+          "line": 34,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "SKIPPED_FILES",
+          "signature": "",
+          "line": 36,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "CONTEXT_ACQUISITION_HEADING",
+          "signature": "",
+          "line": 39,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTIONS_PATH_PATTERN",
+          "signature": "",
+          "line": 43,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTION_LOG_NAME_PATTERN",
+          "signature": "",
+          "line": 44,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "SOURCE_COLUMN_NAME",
+          "signature": "",
+          "line": 51,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "PLACEHOLDER_CITATIONS",
+          "signature": "",
+          "line": 54,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "CITATION_PATTERN",
+          "signature": "",
+          "line": 55,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "CITATION_SEARCH_DIRS",
+          "signature": "",
+          "line": 58,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "HEADING_PATTERN",
+          "signature": "",
+          "line": 67,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TABLE_SEPARATOR_PATTERN",
+          "signature": "",
+          "line": 68,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_normalise_title",
+          "signature": "(text: str)",
+          "line": 71,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_without_number",
+          "signature": "(title: str)",
+          "line": 77,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_headings",
+          "signature": "(path: Path)",
+          "line": 82,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_is_prefix",
+          "signature": "(short: str, long: str)",
+          "line": 95,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_section_resolves",
+          "signature": "(section: str, headings: list[str])",
+          "line": 100,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_resolve_context_file",
+          "signature": "(name: str, ctx: Path)",
+          "line": 124,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_source_cells",
+          "signature": "(body: str)",
+          "line": 137,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_validate_body_citations",
+          "signature": "(body: str, ctx: Path, line_offset: int=0)",
+          "line": 160,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_agent_definition",
+          "signature": "(file_path: Path, context_root: Path | None=None)",
+          "line": 200,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 311,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "re",
+        "sys",
+        "pathlib",
+        "yaml"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/framework_docs_staleness.py",
+      "language": "python",
+      "line_count": 98,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "REFERENCE_DOC",
+          "signature": "",
+          "line": 18,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "BRIEF_DOC",
+          "signature": "",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "FRAMEWORK_DOCS",
+          "signature": "",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "BYPASS_MARKER",
+          "signature": "",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_staged_files",
+          "signature": "()",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_commit_message",
+          "signature": "()",
+          "line": 34,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_context_change",
+          "signature": "(path: str)",
+          "line": 41,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 47,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "subprocess",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/secrets.py",
+      "language": "python",
+      "line_count": 110,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 17,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "RESTRICTED_PATTERNS",
+          "signature": "",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EXEMPT_DIRS",
+          "signature": "",
+          "line": 29,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EXEMPT_MARKERS",
+          "signature": "",
+          "line": 30,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_exempt_path",
+          "signature": "(path: Path)",
+          "line": 33,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "scan_file_for_secrets",
+          "signature": "(file_path: Path)",
+          "line": 39,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 78,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "re",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/subrepo_freshness.py",
+      "language": "python",
+      "line_count": 236,
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "SubrepoConfig",
+          "signature": "",
+          "line": 23,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "find_subrepos",
+          "signature": "(repo_root: Path)",
+          "line": 33,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_modified_files",
+          "signature": "(repo_root: Path)",
+          "line": 65,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "query_upstream_head",
+          "signature": "(remote: str, branch: str, timeout_seconds: int=15)",
+          "line": 109,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_subrepo_freshness",
+          "signature": "(repo_root: Path | None=None, check_all: bool=False, subrepo_names: list[str] | None=None, allow_offline: bool=False)",
+          "line": 131,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 196,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "configparser",
+        "os",
+        "subprocess",
+        "sys",
+        "dataclasses",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/supabase.py",
+      "language": "python",
+      "line_count": 114,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "PYTHON_IMPORT_PATTERN",
+          "signature": "",
+          "line": 17,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TS_IMPORT_PATTERN",
+          "signature": "",
+          "line": 18,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "ALLOWED_IMPORT_DIRS",
+          "signature": "",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MIGRATION_AUDIT_PATTERN",
+          "signature": "",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_allowed_supabase_location",
+          "signature": "(path: Path)",
+          "line": 30,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_supabase_imports",
+          "signature": "(files: list[Path])",
+          "line": 36,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_migration_audit",
+          "signature": "(files: list[Path])",
+          "line": 56,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 72,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "re",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/tech_writing.py",
+      "language": "python",
+      "line_count": 245,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "SPELLING_RULES",
+          "signature": "",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "DATE_PATTERN",
+          "signature": "",
+          "line": 36,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_british_english",
+          "signature": "(file_path: Path)",
+          "line": 42,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EARS_PATTERNS",
+          "signature": "",
+          "line": 104,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_ears_requirement",
+          "signature": "(line: str)",
+          "line": 114,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_requirements_file",
+          "signature": "(file_path: Path)",
+          "line": 123,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 165,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "re",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/testing.py",
+      "language": "python",
+      "line_count": 138,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "PY_INTERACTION_PATTERNS",
+          "signature": "",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TS_INTERACTION_PATTERNS",
+          "signature": "",
+          "line": 27,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EXEMPT_MARKERS",
+          "signature": "",
+          "line": 33,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "IGNORED_DIRS",
+          "signature": "",
+          "line": 34,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_test_file",
+          "signature": "(path: Path)",
+          "line": 37,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_forbidden_mocks",
+          "signature": "(path: Path, content: str)",
+          "line": 50,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_test_files",
+          "signature": "(files: list[Path])",
+          "line": 88,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 106,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "re",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/typescript_environment.py",
+      "language": "python",
+      "line_count": 176,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_package_lock",
+          "signature": "(root_dir: Path)",
+          "line": 22,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_parse_json_with_comments",
+          "signature": "(text: str)",
+          "line": 35,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_tsconfig_strictness",
+          "signature": "(tsconfig_path: Path)",
+          "line": 50,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_workspaces",
+          "signature": "(root_dir: Path)",
+          "line": 76,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_banned_npm_in_scripts",
+          "signature": "(package_json_path: Path)",
+          "line": 116,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 134,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "re",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/ui_dev.py",
+      "language": "python",
+      "line_count": 210,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "FRONTEND_SRC",
+          "signature": "",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "IMPORTANT_PATTERN",
+          "signature": "",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "RAW_HEX_PATTERN",
+          "signature": "",
+          "line": 27,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "ALLOWED_SPACING",
+          "signature": "",
+          "line": 30,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "CONCRETE_COLOUR_PATTERN",
+          "signature": "",
+          "line": 42,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "HEROICONS_IMPORT_PATTERN",
+          "signature": "",
+          "line": 50,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "DISALLOWED_SPACING_PATTERN",
+          "signature": "",
+          "line": 53,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_important",
+          "signature": "(path: Path, content: str)",
+          "line": 61,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_raw_hex",
+          "signature": "(path: Path, content: str)",
+          "line": 72,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_css_files",
+          "signature": "(src_dir: Path | None=None)",
+          "line": 90,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_concrete_colours",
+          "signature": "(path: Path, content: str)",
+          "line": 107,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_heroicons_import",
+          "signature": "(path: Path, content: str)",
+          "line": 118,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_spacing",
+          "signature": "(path: Path, content: str)",
+          "line": 131,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_test_or_spec",
+          "signature": "(path: Path)",
+          "line": 146,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 150,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "re",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/ui_testing.py",
+      "language": "python",
+      "line_count": 99,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 16,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "BANNED_PACKAGES",
+          "signature": "",
+          "line": 18,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_exempt_package",
+          "signature": "(package_json_path: Path)",
+          "line": 26,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_forbidden_ui_test_deps",
+          "signature": "(package_json_path: Path)",
+          "line": 38,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 64,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/verify_typst_formatting.py",
+      "language": "python",
+      "line_count": 230,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "get_repo_root",
+          "signature": "()",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TYPST_DIRS",
+          "signature": "",
+          "line": 38,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_typst_doc",
+          "signature": "(rel_path: str)",
+          "line": 41,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_staged_markdown_files",
+          "signature": "(repo_root: Path)",
+          "line": 46,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "get_tracked_markdown_files",
+          "signature": "(repo_root: Path)",
+          "line": 61,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "check_and_fix_file",
+          "signature": "(path: Path, fix: bool=False)",
+          "line": 71,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 180,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "subprocess",
+        "sys",
+        "pathlib"
+      ]
+    },
+    {
+      "path": "context/scripts/validators/workspace_conventions.py",
+      "language": "python",
+      "line_count": 674,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "VALID_OUTPUT_TOP_DIRS",
+          "signature": "",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_ARTEFACT_SUBDIRS",
+          "signature": "",
+          "line": 25,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TEST_RESULT_PATTERN",
+          "signature": "",
+          "line": 27,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "REVIEW_PATTERN",
+          "signature": "",
+          "line": 28,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "IMPL_DOC_PATTERN",
+          "signature": "",
+          "line": 29,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_output_path",
+          "signature": "(path: str | Path)",
+          "line": 32,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_output_paths",
+          "signature": "(paths: list[str | Path])",
+          "line": 88,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_COMMIT_TYPES",
+          "signature": "",
+          "line": 98,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "COMMIT_SUBJECT_PATTERN",
+          "signature": "",
+          "line": 99,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "COAUTHOR_PATTERN",
+          "signature": "",
+          "line": 100,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "AGENT_SESSION_PATTERN",
+          "signature": "",
+          "line": 103,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TOOL_FIELD_PATTERN",
+          "signature": "",
+          "line": 125,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MODEL_FIELD_PATTERN",
+          "signature": "",
+          "line": 126,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_RUNTIME_TELEMETRY_MODULE",
+          "signature": "",
+          "line": 133,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_load_runtime_telemetry",
+          "signature": "()",
+          "line": 136,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "corroborate_agent_session",
+          "signature": "(declared_tool: str, declared_model: str, repo_root: str)",
+          "line": 150,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_commit_message",
+          "signature": "(msg: str, repo_root: str | None=None)",
+          "line": 196,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "REQUIRED_METRICS_FIELDS",
+          "signature": "",
+          "line": 271,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_METRICS_EVENTS",
+          "signature": "",
+          "line": 272,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_TOKEN_SOURCES",
+          "signature": "",
+          "line": 273,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_metrics_entry",
+          "signature": "(entry: dict[str, Any], line_num: int)",
+          "line": 276,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_metrics_file",
+          "signature": "(file_path: Path)",
+          "line": 324,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTIONS_DIRNAME",
+          "signature": "",
+          "line": 354,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTION_BASE_FIELDS",
+          "signature": "",
+          "line": 356,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_INTERRUPTION_TYPES",
+          "signature": "",
+          "line": 357,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_INTERRUPTION_IMPACTS",
+          "signature": "",
+          "line": 358,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "VALID_INTERRUPTION_DECISIONS",
+          "signature": "",
+          "line": 359,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTION_TYPE_FIELDS",
+          "signature": "",
+          "line": 361,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTION_NULLABLE_FIELDS",
+          "signature": "",
+          "line": 370,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "INTERRUPTION_TS_PATTERN",
+          "signature": "",
+          "line": 372,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "is_interruptions_log",
+          "signature": "(path: str | Path)",
+          "line": 375,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_interruptions_entry",
+          "signature": "(entry: dict[str, Any], line_num: int)",
+          "line": 381,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "validate_interruptions_file",
+          "signature": "(file_path: Path)",
+          "line": 461,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_auto_detect",
+          "signature": "(args: list[str])",
+          "line": 538,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "main",
+          "signature": "()",
+          "line": 585,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "argparse",
+        "importlib.util",
+        "json",
+        "re",
+        "sys",
+        "pathlib",
+        "typing"
+      ]
+    },
+    {
+      "path": "tests/context-unit-tests/__init__.py",
+      "language": "python",
+      "line_count": 2,
+      "symbols": [],
+      "imports": []
+    },
+    {
+      "path": "tests/context-unit-tests/conftest.py",
+      "language": "python",
+      "line_count": 13,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "pytest_configure",
+          "signature": "(config)",
+          "line": 8,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/context-unit-tests/test_doc_format.py",
+      "language": "python",
+      "line_count": 247,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "DOCS_ROOT",
+          "signature": "",
+          "line": 14,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "AGENTS_DIR",
+          "signature": "",
+          "line": 15,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAgentFrontmatter",
+          "signature": "",
+          "line": 18,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentFrontmatter.agent_files",
+          "signature": "(self)",
+          "line": 22,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentFrontmatter.test_all_agents_have_frontmatter",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 30,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentFrontmatter.test_frontmatter_is_valid_yaml",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 41,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentFrontmatter.test_required_frontmatter_fields",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 64,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentFrontmatter.test_name_matches_filename",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 93,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAgentStructure",
+          "signature": "",
+          "line": 123,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentStructure.agent_files",
+          "signature": "(self)",
+          "line": 127,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentStructure.test_has_task_placeholder",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 135,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentStructure.test_has_constraints_section",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 155,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestStandardsFormat",
+          "signature": "",
+          "line": 174,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestStandardsFormat.standards_files",
+          "signature": "(self)",
+          "line": 178,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestStandardsFormat.test_standards_have_introduction",
+          "signature": "(self, standards_files: list[Path], capsys)",
+          "line": 182,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestRulesFormat",
+          "signature": "",
+          "line": 197,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestRulesFormat.rules_files",
+          "signature": "(self)",
+          "line": 201,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestRulesFormat.test_rules_have_frontmatter",
+          "signature": "(self, rules_files: list[Path], capsys)",
+          "line": 205,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestMarkdownLinks",
+          "signature": "",
+          "line": 221,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMarkdownLinks.all_markdown_files",
+          "signature": "(self)",
+          "line": 225,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestMarkdownLinks.test_no_broken_link_syntax",
+          "signature": "(self, all_markdown_files: list[Path])",
+          "line": 229,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "re",
+        "pathlib",
+        "pytest",
+        "yaml"
+      ]
+    },
+    {
+      "path": "tests/context-unit-tests/test_llm_consistency.py",
+      "language": "python",
+      "line_count": 180,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "collect_docs",
+          "signature": "()",
+          "line": 22,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "build_consistency_prompt",
+          "signature": "(docs: dict[str, str])",
+          "line": 48,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "call_llm",
+          "signature": "(prompt: str)",
+          "line": 89,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestLLMConsistency",
+          "signature": "",
+          "line": 117,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLLMConsistency.consistency_result",
+          "signature": "(self)",
+          "line": 121,
+          "decorators": [
+            "pytest.fixture(scope='class')"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLLMConsistency.test_no_errors",
+          "signature": "(self, consistency_result: dict[str, Any])",
+          "line": 127,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLLMConsistency.test_status_pass",
+          "signature": "(self, consistency_result: dict[str, Any])",
+          "line": 141,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestLLMConsistency.test_print_warnings",
+          "signature": "(self, consistency_result: dict[str, Any], capsys)",
+          "line": 152,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "json",
+        "os",
+        "pathlib",
+        "typing",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/context-unit-tests/test_references.py",
+      "language": "python",
+      "line_count": 264,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "BASE_DIR",
+          "signature": "",
+          "line": 18,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "DOCS_ROOT",
+          "signature": "",
+          "line": 19,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "AGENTS_DIR",
+          "signature": "",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "extract_file_references",
+          "signature": "(content: str)",
+          "line": 23,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "resolve_path",
+          "signature": "(ref: str, source_file: Path)",
+          "line": 48,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAgentReferences",
+          "signature": "",
+          "line": 86,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentReferences.agent_files",
+          "signature": "(self)",
+          "line": 90,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentReferences.test_context_path_references",
+          "signature": "(self, agent_files: list[Path])",
+          "line": 98,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestStandardsReferences",
+          "signature": "",
+          "line": 142,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestStandardsReferences.standards_files",
+          "signature": "(self)",
+          "line": 146,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestStandardsReferences.test_doc_references_exist",
+          "signature": "(self, standards_files: list[Path], capsys)",
+          "line": 150,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAgentDomainConsistency",
+          "signature": "",
+          "line": 184,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAgentDomainConsistency.test_all_domain_agents_exist",
+          "signature": "(self)",
+          "line": 187,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestReadmeLinks",
+          "signature": "",
+          "line": 225,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestReadmeLinks.test_docs_readme_links",
+          "signature": "(self)",
+          "line": 228,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "re",
+        "pathlib",
+        "typing",
+        "pytest",
+        "yaml"
+      ]
+    }
+  ],
+  "api": [],
+  "schema": [],
+  "ui": [],
+  "tests": [
+    {
+      "node_id": "context/scripts/tests/test_adapter_drift.py::test_adapter_drift_clean_repo",
+      "file": "context/scripts/tests/test_adapter_drift.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapter_drift.py::test_adapter_drift_detects_modified_file",
+      "file": "context/scripts/tests/test_adapter_drift.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapter_drift.py::test_adapter_drift_detects_missing_file",
+      "file": "context/scripts/tests/test_adapter_drift.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapter_drift.py::test_adapter_drift_detects_orphaned_file",
+      "file": "context/scripts/tests/test_adapter_drift.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapter_drift.py::test_adapter_drift_with_agent_targets_file",
+      "file": "context/scripts/tests/test_adapter_drift.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapter_drift.py::test_adapter_drift_cline_managed_dirs",
+      "file": "context/scripts/tests/test_adapter_drift.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestAdaptersCoreModels::test_canonical_agent_dataclass",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestAdaptersCoreModels::test_canonical_skill_dataclass",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestAdaptersCoreLoader::test_load_canonical_context",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestAdaptersCoreLoader::test_missing_agent_validation",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestToolNormalisation::test_absent_tools",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestToolNormalisation::test_annotated_mapping_form",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestToolNormalisation::test_legacy_mcp_tools_key",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestToolNormalisation::test_plain_string_form",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestToolNormalisation::test_scalar_string_form",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestToolNormalisation::test_top_level_mapping_form",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestAdaptersCoreTools::test_capability_registry_extensibility",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_adapters_core.py::TestAdaptersCoreBudget::test_token_estimator",
+      "file": "context/scripts/tests/test_adapters_core.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_valid_agent",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_no_frontmatter",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_hardcoded_paths",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_missing_required_sections",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_context_acquisition_section_passes",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_legacy_required_sections_rejected",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_agent_template_scaffold_passes_validation",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_invalid_yaml_frontmatter",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_missing_required_fields",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_relative_paths_flagged",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_reminders_without_attribution",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_proper_attribution_passes",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_project_root_placeholders_allowed",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_nonexistent_standards_flagged",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_nonexistent_rules_flagged",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_nonexistent_skills_flagged",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_canonical_interruption_log_path_passes",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_legacy_interruption_log_path_rejected",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_interruption_log_wildcard_allowed",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_table_source_should_fail_when_file_does_not_exist",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_table_source_should_fail_when_section_does_not_exist",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_table_source_should_pass_when_citations_resolve",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_citation_should_fail_when_file_does_not_exist",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_citation_should_fail_when_section_does_not_exist",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_citation_should_pass_when_section_resolves",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_citation_error_should_report_file_line_number_when_it_fails",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_agent_validator.py::TestAgentValidator::test_body_table_without_source_column_should_be_ignored",
+      "file": "context/scripts/tests/test_agent_validator.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_claude_adapter.py::test_generate_claude_md",
+      "file": "context/scripts/tests/test_claude_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_claude_adapter.py::test_generate_subagent_prompts",
+      "file": "context/scripts/tests/test_claude_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_target_normalization",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_cli_parser_flags",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_dry_run_leaves_disk_untouched",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_smart_update_preserves_unchanged_files",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_generation_execution_speed_benchmark",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_ensure_root_gitignore",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cli_dispatcher.py::test_load_configured_targets",
+      "file": "context/scripts/tests/test_cli_dispatcher.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cline_adapter.py::TestClineAdapter::test_generate_cline_md",
+      "file": "context/scripts/tests/test_cline_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cline_adapter.py::TestClineAdapter::test_generate_cline_rules",
+      "file": "context/scripts/tests/test_cline_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_cline_adapter.py::TestClineAdapter::test_generate_cline_skills",
+      "file": "context/scripts/tests/test_cline_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_e2e_compilation.py::test_e2e_full_compilation_all_targets",
+      "file": "context/scripts/tests/test_e2e_compilation.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_e2e_compilation.py::test_e2e_deterministic_reproducibility",
+      "file": "context/scripts/tests/test_e2e_compilation.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_e2e_compilation.py::test_e2e_synthetic_context_compilation",
+      "file": "context/scripts/tests/test_e2e_compilation.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_gemini_adapter.py::TestGeminiAdapter::test_generate_gemini_md",
+      "file": "context/scripts/tests/test_gemini_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_gemini_adapter.py::TestGeminiAdapter::test_generate_skills",
+      "file": "context/scripts/tests/test_gemini_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_gemini_adapter.py::TestGeminiAdapter::test_generate_skills_escapes_colon_in_description",
+      "file": "context/scripts/tests/test_gemini_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_github_adapter.py::test_generate_copilot_instructions",
+      "file": "context/scripts/tests/test_github_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_github_adapter.py::test_generate_prompts",
+      "file": "context/scripts/tests/test_github_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_github_adapter.py::test_generate_scoped_instructions",
+      "file": "context/scripts/tests/test_github_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_github_adapter.py::test_generate_scoped_instructions_with_exclude_agent",
+      "file": "context/scripts/tests/test_github_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_github_adapter.py::test_generate_workflows",
+      "file": "context/scripts/tests/test_github_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_openai_adapter.py::test_generate_system_prompts",
+      "file": "context/scripts/tests/test_openai_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_openai_adapter.py::test_generate_tool_schemas",
+      "file": "context/scripts/tests/test_openai_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_openai_adapter.py::test_generate_runner_harness",
+      "file": "context/scripts/tests/test_openai_adapter.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_packaging.py::test_pyproject_toml_exists",
+      "file": "context/scripts/tests/test_packaging.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_packaging.py::test_generator_entrypoint_parser",
+      "file": "context/scripts/tests/test_packaging.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_packaging.py::test_drift_validator_callable",
+      "file": "context/scripts/tests/test_packaging.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_format_tokens",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_protobuf_wire_format_parsing",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_antigravity_synthetic_extraction",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_copilot_synthetic_extraction",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_commit_message_updating",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_live_antigravity_storage_sanity",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_live_copilot_storage_sanity",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_live_claude_storage_sanity",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_extract_delta_counts_assistant_metrics",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_extract_delta_accepts_wrapped_messages",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_extract_delta_session_switch_resets",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_extract_delta_falls_back_to_session_model",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_extract_delta_error_paths",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_find_active_session_matches_repo_and_picks_newest",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_cline_registry_and_selection",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_short_model_strips_provider_prefix",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_update_commit_message_injects_tool_and_model",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_update_commit_message_removes_stale_tokens",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_live_cline_storage_sanity",
+      "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_valid_commit",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_no_scope",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_too_long",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_past_tense",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_valid_with_agent_session",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_merge_commit_allowed",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_empty_commit_fails",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_type",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_scope_uppercase",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_coauthor_format",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_requires_coauthor",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_tokens_mega_suffix",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_tokens_lowercase_suffix",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_hook_appended_form",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_malformed_tokens_fails",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_model_corroborated_for_cline",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_model_contradicting_runtime_fails",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_unconfirmable_model_fails",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_third_party_tool_not_adjudicated",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_valid_requirements",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_invalid_requirements",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_ubiquitous_pattern",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_event_pattern",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_state_pattern",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_optional_pattern",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_forbidden_pattern",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_complex_pattern",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_non_ears_requirement",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestEARSNotation::test_code_blocks_ignored",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_valid_british_english",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_invalid_american_english",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_color_vs_colour",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_behavior_vs_behaviour",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_organize_vs_organise",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_code_blocks_ignored",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestBritishEnglish::test_inline_code_ignored",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_valid_metrics",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_metrics",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_metrics_log_location_under_build",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_metrics_log_requires_jsonl_suffix",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_metrics_log_rejects_repository_root",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_missing_required_field",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_timestamp",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_event",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_token_source",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_missing_tokens_fields",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_handoff_requires_to_field",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_empty_file_valid",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_json",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_valid_interruptions",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_invalid_interruptions",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_missing_required_field",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_null_outcome_fields_allowed",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_invalid_type",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_invalid_timestamp",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_agent_at_prefix_rejected",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_invalid_decision",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_invalid_impact",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_options_must_be_array",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_mixed_tasks_rejected",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_legacy_filename_rejected",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_duplicate_ids_rejected",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_resolution_ref_must_resolve",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_resolution_record_resolves",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_empty_file_valid",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_invalid_json",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_interruptions_path_detection",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_interruption_log_requires_jsonl_suffix",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_main_auto_detects_interruptions_log",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestInterruptionsLogging::test_main_auto_detects_metrics_log",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypstFormatting::test_valid_formatting",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypstFormatting::test_mermaid_insufficient_blank_lines",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypstFormatting::test_section_heading_without_separator",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypstFormatting::test_typst_skip_blocks_ignored",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypstFormatting::test_headings_in_code_blocks_ignored",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestWorkspaceOutputLocations::test_valid_output_paths",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestWorkspaceOutputLocations::test_invalid_artefact_subdir",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestWorkspaceOutputLocations::test_invalid_test_result_name",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestUIDev::test_important_forbidden",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestUIDev::test_raw_hex_forbidden",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestUIDev::test_css_files_restriction",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSupabase::test_supabase_import_outside_database_service",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSupabase::test_supabase_import_inside_database_service_allowed",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSupabase::test_migration_audit_row_required",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTestingInvariants::test_forbidden_interaction_mock",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTestingInvariants::test_exempt_interaction_mock",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypeScriptEnvironment::test_package_lock_flagged",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypeScriptEnvironment::test_tsconfig_strictness",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestTypeScriptEnvironment::test_workspaces_validation",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestUITesting::test_banned_dependencies_flagged",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestUITesting::test_puppeteer_core_allowed",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSecrets::test_private_key_flagged",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSecrets::test_env_file_with_secret_flagged",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_find_subrepos",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_query_upstream_head_success",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_query_upstream_head_failure",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_subrepo_fresh_when_commit_matches",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_subrepo_stale_with_changes_fails",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_subrepo_stale_without_changes_passes",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_subrepo_check_all_forces_stale_detection",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_subrepo_unreachable_network_handling",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestSubrepoFreshness::test_main_cli_success",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestLoggingTemplateDocs::test_template_documents_metrics_schema",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestLoggingTemplateDocs::test_template_documents_interruption_schema",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestLoggingTemplateDocs::test_agent_template_references_logging_template",
+      "file": "context/scripts/tests/test_validators.py"
+    }
+  ]
+}
