@@ -3,3 +3,4 @@
 {"ts":"2026-10-30T12:01:25Z","task":"T-011","agent":"orchestrator","event":"complete","tokens":{"in":0,"out":0,"source":"unavailable"},"notes":"README finished: per-workflow sections (mermaid + agent notes) and derive-spec runtime sequence §3.2; commit bca58b8"}
 {"ts":"2026-10-30T14:00:24Z","task":"T-SETUP+T-014","agent":"orchestrator","event":"complete","tokens":{"in":0,"out":0,"source":"unavailable"},"notes":"T-SETUP and T-014 defined in tasks-spec-agent.md; commit e4a7dbf"}
 {"ts":"2026-10-30T14:09:34Z","task":"T-012","agent":"orchestrator","event":"complete","tokens":{"in":0,"out":0,"source":"unavailable"},"notes":"indexer relocated to scripts/code-specs (rename preserved); refs updated; commit 35655e8"}
+{"ts":"2026-10-30T14:12:52Z","task":"T-012","agent":"orchestrator","event":"complete","tokens":{"in":0,"out":0,"source":"unavailable"},"notes":"indexer final location context/scripts/code-specs; refs updated, re-scan+verify OK; commits 05b396b, bfcc79e"}
