@@ -1,0 +1,2 @@
+{"ts":"2026-10-30T11:34:16Z","task":"T-012","agent":"orchestrator","event":"complete","tokens":{"in":0,"out":0,"source":"unavailable"},"notes":"spec_indexer.py scan/verify authored, validated (596/596 citations), commit f535182"}
+{"ts":"2026-10-30T11:34:16Z","task":"T-011","agent":"orchestrator","event":"complete","tokens":{"in":0,"out":0,"source":"unavailable"},"notes":"workflows README + context README note, commit 63607f5"}
