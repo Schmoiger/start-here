@@ -5,16 +5,18 @@
 **Scope**: New harness capability: derive product and/or technical specifications from an existing codebase (organised or not) via a single mode-switched workflow, backed by a deterministic zero-LLM indexer (`spec_indexer.py`) and agent synthesis with confidence tiers.
 **Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/spec_indexer.py` (schema documented in README § 4.2)
 **Created**: 2026-10-29
-**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-013; T-011 (workflows README) and T-012 (indexer) completed
+**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-014; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added
 
 ## Task Index
 
 | ID | Priority | Status | Blocked By | Task |
 |----|----------|--------|------------|------|
 | Q0 | critical | completed | - | Answer clarifying questions (recommended decisions below) |
+| T-SETUP | critical | pending | - | Install / verify toolchain dependencies (human-run) before implementation starts |
 | T-012 | high | completed | - | Write `context/scripts/spec_indexer.py` (`scan` / `verify` subcommands) |
 | T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
-| T-001 | critical | pending | Q0 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
+| T-014 | high | pending | T-SETUP | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (per README reference) |
+| T-001 | critical | pending | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
 | T-002 | high | pending | Q0 | Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery) |
 | T-003 | high | pending | T-001 | Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill) |
 | T-004 | high | pending | T-001 | Extend `context/agents/solution-architect.md` — derive mode (drafts only) |
@@ -29,6 +31,7 @@
 ## File Scope
 
 - `artefacts/build/tasks-spec-agent.md` — task definition and workflow specification
+- `context/skills/analyse-repo.md` — analysis-tool skill wrapping `spec_indexer.py` usage (T-014)
 - `context/skills/derive-spec.md` — new skill with mode switches: product, technical, both
 - `context/workflows/derive-spec.yaml` — new workflow YAML supporting all three modes
 - `context/workflows/README.md` — workflow index, derive-spec diagrams, runtime/tool wiring, token ledger *(completed)*
@@ -162,7 +165,21 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 - `scan` + draft + confirmation + review run end-to-end on start-here
 - Every generated subsection carries tier + % + citation; `verify --doc` on all drafts passes
 - Drift section present where derived behaviour differs from `requirements.md` / `architecture.md`
-- Token ledger filled with measured before/after (README § 5)
+- Token ledger filled with measured before/after
+
+##### Token Ledger (derive-spec pilots)
+
+Measured during the T-008 pilot on this repo (`mode=both` skeleton figures;
+before/after comparison is the acceptance metric):
+
+| Work | Zero-LLM tools | Agent LLM (rough) |
+|------|----------------|-------------------|
+| Scan + inventory (198 pytest node-ids in 0.09s, `ast`, route/schema/UI extractors) | ~0 tokens | ~0 |
+| Synthesis: features, UX flows, architecture, API, data model | — | ~25–60k |
+| Elicitation (batched MC) + finalise | — | ~10–25k |
+| **Naive alternative** (agent reads the repository itself) | — | ~200–500k, bounded by repo size |
+
+`@harness-analyst` may audit this with the `tokenomics-audit` lens (glob `artefacts/build/**`).
 
 #### Primary Output Path
 
@@ -189,13 +206,51 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 `context/workflows/derive-spec.yaml` (with T-002)
 
+### T-SETUP: Install and verify toolchain dependencies (human-run)
+
+#### Acceptance Criteria
+
+- Required runtime present and versioned:
+  - `uv --version` (Python package manager)
+  - `git --version` · `node --version` · `yarn --version` · `jq --version`
+- `pyyaml` importable in the project environment (already declared in `pyproject.toml`):
+  - `uv run python -c "import yaml; print(yaml.__version__)"`
+- Recommended (optional, improves UI/TS extraction at pilot time):
+  - `brew install universal-ctags ast-grep`, then `ctags --version` and `sg --version` succeed
+- Confirmation that the harness is green before implementation work starts:
+  - `uv run pytest context/scripts/tests/ -q` → all pass
+  - `uv run context/scripts/spec_indexer.py scan --repo . --mode both` succeeds
+  - `uv run context/scripts/spec_indexer.py verify --index artefacts/build/repo-index.json` → OK
+
+#### Primary Output Path
+
+Environment only — verify via the acceptance criteria; record completion in HANDOFF.md (`Workflow: derive-spec`, note "deps installed").
+
+### T-014: Wrap indexer tool usage in skill `context/skills/analyse-repo.md`
+
+#### Acceptance Criteria
+
+- Frontmatter matches the skill schema: `name: analyse-repo`, `description` (procedural guidance for analysing a repository with the deterministic spec-indexer tools before agent synthesis), `globs` covering `**/repo-index.json`, `**/spec-scan.md`, `**/*.py`, `**/*.ts`
+- Documents, with exact commands and flags:
+  - `scan` invocation per derive-spec phases 1/3 (`--repo`, `--mode`, `--max-files`, `--out`), and `verify --index` / `verify --doc` per phases 6/8
+  - consuming `repo-index.json` (schema summary) and `spec-scan.md`
+  - evidence citation discipline (`file:line` per claim) and confidence tiers
+  - re-scan rule: refresh the index before `verify` after any edit
+  - token rationale: extraction is zero-LLM; the agent reads the index and cited line ranges only
+- States that agents must invoke the tools rather than reading the repository directly (README derive-spec note: "invoke tools analyse the repo using the analyse-repo skill")
+- `context/workflows/README.md` derive-spec `## Commands` and `## Repository Index` sections reduced to a pointer to the skill (no duplicated procedure)
+
+#### Primary Output Path
+
+`context/skills/analyse-repo.md` (+ pointer edit in `context/workflows/README.md`)
+
 ---
 
 ## Orchestrator Notes
 
 ### Parallelism Strategy
 
-**Sprint 1** (critical path after Q0): T-011 → T-012 (both completed) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 → T-007 → T-010 → T-008 → T-009, T-013.
+**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-014 (analyse-repo skill) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 → T-007 → T-010 → T-008 → T-009, T-013.
 file_scope: `context/skills/` (T-001, T-005), `context/agents/` (T-003, T-004), `context/templates/` (T-006)
 
 ### Commit Strategy
