@@ -13,6 +13,7 @@
 [ ] How to project skills as Claude superpowers? Do we even need to, as skills will be available anyway.
 [ ] Add projection to OpenRouter runtime e.g. new telemetry location
 [ ] Model selection should be per-task, not per-agent. Model should persist for task to make use of cached context economies.
+[ ] Update harness to work with Intent Driven Design
 
 ## Done
 
