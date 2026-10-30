@@ -5,7 +5,7 @@
 **Scope**: New harness capability: derive product and/or technical specifications from an existing codebase (organised or not) via a single mode-switched workflow, backed by a deterministic zero-LLM indexer (`spec_indexer.py`) and agent synthesis with confidence tiers.
 **Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/code-specs/spec_indexer.py` (schema documented in README Commands / Repository Index)
 **Created**: 2026-10-29
-**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-014; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added
+**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
 
 ## Task Index
 
@@ -15,7 +15,8 @@
 | T-SETUP | critical | pending | - | Install / verify toolchain dependencies (human-run) before implementation starts |
 | T-012 | high | completed | - | Write `context/scripts/code-specs/spec_indexer.py` (`scan` / `verify` subcommands) |
 | T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
-| T-014 | high | pending | T-SETUP | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (per README reference) |
+| T-015 | high | pending | T-SETUP | Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph) |
+| T-014 | high | pending | T-SETUP,T-015 | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (documents the actual backends) |
 | T-001 | critical | pending | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
 | T-002 | high | pending | Q0 | Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery) |
 | T-003 | high | pending | T-001 | Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill) |
@@ -32,6 +33,8 @@
 
 - `artefacts/build/tasks-spec-agent.md` — task definition and workflow specification
 - `context/skills/analyse-repo.md` — analysis-tool skill wrapping `spec_indexer.py` usage (T-014)
+- `context/scripts/code-specs/spec_indexer.py` — indexer with multi-backend extraction (T-015)
+- `context/scripts/code-specs/ts_extract.mjs` — optional ts-morph Node helper (T-015)
 - `context/skills/derive-spec.md` — new skill with mode switches: product, technical, both
 - `context/workflows/derive-spec.yaml` — new workflow YAML supporting all three modes
 - `context/workflows/README.md` — workflow index, derive-spec diagrams, runtime/tool wiring, token ledger *(completed)*
@@ -152,6 +155,12 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 - Skill frontmatter schema test; workflow YAML phase-schema test (unique ids, resolvable `depends_on`, known agents, gates defined)
 - Indexer tests: Python extraction (symbols, routes, constants), TS/TSX extraction (components, props, usage counts — fixture per smoke test), SQL table parsing, `verify` pass/fail on synthetic repo
+- **T-015 backend parity tests**:
+  - `--extractors stdlib` on this repo reproduces the `auto` symbol/api/schema counts exactly (determinism contract)
+  - TS/JSX fixture scan with `--extractors tree-sitter` yields strictly richer output than `--extractors stdlib` (captures multiline destructured props, accurate JSX usage counts, decorator annotations) — asserted as a diff delta
+  - `--extractors ctags` available when `ctags` on PATH; `ast-grep` when `sg` on PATH; `ts-morph` when `node` + `ts-morph` resolvable — all degraded cleanly when absent
+  - `meta.extractors` provenance populated; per-file `extractor` field populated; `meta.confidence` tier set correctly
+  - invalid `--extractors bad` exits non-zero with a clear message
 - `uv run pytest context/scripts/tests/test_spec_indexer.py` green
 
 #### Primary Output Path
@@ -206,6 +215,34 @@ before/after comparison is the acceptance metric):
 
 `context/workflows/derive-spec.yaml` (with T-002)
 
+### T-015: Tool-backed extraction backends with graceful fallback
+
+#### Acceptance Criteria
+
+- `--extractors` flag honoured with choices `auto` (default), `stdlib`, `ctags`, `tree-sitter`, `ast-grep`, `ts-morph`:
+  - `auto` probes the toolchain and prefers the richest backend available per language, degrading deterministically with a recorded provenance entry; selecting a backend that is absent errors clearly (non-zero exit with a message naming the missing tool)
+  - `stdlib` is the zero-dependency portability mode (stdlib `ast` + regex for TS/JS + PyYAML + SQL heuristics; no external CLI)
+- Backends implemented, each wrapped so an absent/broken tool never aborts the scan:
+  - **universal-ctags**: `--output-format=json --fields=+n`; primary symbol source for languages without a dedicated parser and cross-check for Python/TS; `path`/`kind`/`line`/`language` mapped to the spec symbol model (`function`/`class`/`module`/`variable`/etc.)
+  - **tree-sitter**: via `uv run --with tree-sitter --with tree-sitter-language-pack`; real AST pass for TS/TSX delivering named imports, multiline destructured props, JSX usage counts, and decorator annotations (replaces regex heuristics for those fields)
+  - **ast-grep** (`sg run -p PATTERN --json`): rule-driven TS/JS pass used when tree-sitter is absent but `sg` is on PATH
+  - **ts-morph**: optional Node helper `context/scripts/code-specs/ts_extract.mjs` (guarded by `node` + resolvable `ts-morph`); skipped quietly when absent
+  - **Python stdlib `ast`** + regex + PyYAML + SQL heuristics retained as the permanent fallback tier for all languages
+- **Provenance & confidence** (additive schema, no consumer changes):
+  - `meta.extractors`: per-tool `{available, used, reason}` map + `meta.warnings` entries for any degraded backend
+  - per-file `extractor` field on each `FileRecord` (`stdlib.ast`, `tree-sitter`, `ctags`, `ast-grep`, `ts-morph`)
+  - `confidence` tier in `meta` (full when a real AST backend was used for a language; lower when regex fallback)
+- **Parity & integrity**:
+  - `auto` scan of this repo (Python-only) produces the same symbol set as the current zero-dependency index (no regression in `files`/`symbols`/`api`/`schema`)
+  - a synthetic TS/JSX fixture demonstrates richer output vs the regex backend (extra props via multiline destructure, accurate `Header` usage count, decorator capture) — captured as a fixture + assertion in the test suite
+  - `--extractors stdlib` reproduces the zero-dependency result exactly (determinism contract)
+  - `verify --index` remains green; `--extractors bad` exits non-zero
+- Docstring and `context/workflows/README.md` (§ derive-spec Commands) reflect the real backends and the `--extractors` flag
+
+#### Primary Output Path
+
+`context/scripts/code-specs/spec_indexer.py` + `context/scripts/code-specs/ts_extract.mjs` (+ docs: `context/workflows/README.md` § derive-spec Commands, `artefacts/build/tasks-spec-agent.md`)
+
 ### T-SETUP: Install and verify toolchain dependencies (human-run)
 
 #### Acceptance Criteria
@@ -215,11 +252,14 @@ before/after comparison is the acceptance metric):
   - `git --version` · `node --version` · `yarn --version` · `jq --version`
 - `pyyaml` importable in the project environment (already declared in `pyproject.toml`):
   - `uv run python -c "import yaml; print(yaml.__version__)"`
-- Recommended (optional, improves UI/TS extraction at pilot time):
+- Recommended (optional, enables the T-015 backends at pilot time):
   - `brew install universal-ctags ast-grep`, then `ctags --version` and `sg --version` succeed
+  - `uv run --with tree-sitter --with tree-sitter-language-pack python -c "from tree_sitter_language_pack import get_parser; get_parser('typescript')"` succeeds (T-015 tree-sitter backend)
+  - `node -e "require.resolve('ts-morph')"` resolves in the project (T-015 ts-morph backend; otherwise skipped quietly)
 - Confirmation that the harness is green before implementation work starts:
   - `uv run pytest context/scripts/tests/ -q` → all pass
   - `uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both` succeeds
+  - `uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both --extractors stdlib` matches the `auto` output (T-015 parity)
   - `uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json` → OK
 
 #### Primary Output Path
@@ -232,8 +272,9 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 - Frontmatter matches the skill schema: `name: analyse-repo`, `description` (procedural guidance for analysing a repository with the deterministic spec-indexer tools before agent synthesis), `globs` covering `**/repo-index.json`, `**/spec-scan.md`, `**/*.py`, `**/*.ts`
 - Documents, with exact commands and flags:
-  - `scan` invocation per derive-spec phases 1/3 (`--repo`, `--mode`, `--max-files`, `--out`), and `verify --index` / `verify --doc` per phases 6/8
-  - consuming `repo-index.json` (schema summary) and `spec-scan.md`
+  - `scan` invocation per derive-spec phases 1/3 (`--repo`, `--mode`, `--max-files`, `--out`, `--extractors`), and `verify --index` / `verify --doc` per phases 6/8
+  - consuming `repo-index.json` (schema summary incl. `meta.extractors` provenance and per-file `extractor` field) and `spec-scan.md`
+  - documents the actual T-015 backends (tree-sitter / ast-grep / ctags / ts-morph / stdlib fallback) and their `--extractors` choices, with degradation semantics
   - evidence citation discipline (`file:line` per claim) and confidence tiers
   - re-scan rule: refresh the index before `verify` after any edit
   - token rationale: extraction is zero-LLM; the agent reads the index and cited line ranges only
@@ -250,8 +291,8 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 ### Parallelism Strategy
 
-**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-014 (analyse-repo skill) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 → T-007 → T-010 → T-008 → T-009, T-013.
-file_scope: `context/skills/` (T-001, T-005), `context/agents/` (T-003, T-004), `context/templates/` (T-006)
+**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-015 (extraction backends) → T-014 (analyse-repo skill, documents the backends) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 → T-007 → T-010 → T-008 → T-009, T-013.
+file_scope: `context/skills/` (T-001, T-005), `context/agents/` (T-003, T-004), `context/templates/` (T-006), `context/scripts/code-specs/` (T-015)
 
 ### Commit Strategy
 
