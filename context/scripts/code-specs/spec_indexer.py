@@ -16,11 +16,15 @@ scan   Build <repo>/artefacts/build/repo-index.json and spec-scan.md.
 verify Validate that every cited file:line in an index (or in a markdown spec
        document) resolves to an existing line in the repository.
 
-Extraction backends (all deterministic, ~0 LLM tokens):
+Extraction backends (all deterministic, ~0 LLM tokens) selected via ``--extractors``:
+  * auto (default) - probe the toolchain and prefer the richest backend per
+              language; provenance is recorded in ``meta.extractors``.
   * Python  - stdlib ``ast``: imports, classes, functions, decorators, route
               registrations (FastAPI/Flask style), constants.
-  * TS/JS   - conservative line regexes (v1). A tree-sitter / ts-morph backend
-              can replace this without changing the output schema.
+  * TS/JS   - tree-sitter (tsx/typescript/javascript) when available; ast-grep
+              rules; the optional ts-morph Node helper; conservative line
+              regexes (v1) as the permanent stdlib fallback.
+  * Foreign - universal-ctags JSON (Go, Rust, Java, C, C++, Ruby, PHP, Swift).
   * SQL     - CREATE TABLE parsing from migrations.
   * OpenAPI - PyYAML parse of openapi*.yaml/json.
   * Tests   - pytest --collect-only / yarn test --listTests when available:
@@ -60,6 +64,25 @@ LANG_BY_SUFFIX: dict[str, str] = {
     ".mjs": "javascript",
     ".sql": "sql",
 }
+
+# Foreign languages handled by the universal-ctags backend (T-015) when available.
+FOREIGN_LANG_SUFFIXES: dict[str, str] = {
+    ".go": "go",
+    ".rs": "rust",
+    ".java": "java",
+    ".kt": "kotlin",
+    ".cs": "csharp",
+    ".c": "c",
+    ".h": "c",
+    ".cpp": "cpp",
+    ".cc": "cpp",
+    ".hpp": "cpp",
+    ".rb": "ruby",
+    ".php": "php",
+    ".swift": "swift",
+}
+FOREIGN_LANGS: frozenset[str] = frozenset(FOREIGN_LANG_SUFFIXES.values())
+TS_LANGS: tuple[str, ...] = ("typescript", "javascript")
 
 # (relative glob, kind) pairs for the Phase-1 existing-document discovery.
 DOC_GLOBS: list[tuple[str, str]] = [
@@ -167,6 +190,7 @@ class FileRecord:
     line_count: int = 0
     symbols: list[Symbol] = field(default_factory=list)
     imports: list[str] = field(default_factory=list)
+    extractor: str = ""  # T-015: backend that produced this record (e.g. "tree-sitter")
 
     def to_jsonb(self) -> dict[str, Any]:
         return {
@@ -175,6 +199,7 @@ class FileRecord:
             "line_count": self.line_count,
             "symbols": [s.to_jsonb() for s in self.symbols],
             "imports": self.imports,
+            "extractor": self.extractor,
         }
 
 
@@ -271,7 +296,9 @@ def rel(repo: Path, path: Path) -> str:
 
 def language_of(name: str) -> str | None:
     suffix = Path(name).suffix.lower()
-    return LANG_BY_SUFFIX.get(suffix)
+    if suffix in LANG_BY_SUFFIX:
+        return LANG_BY_SUFFIX[suffix]
+    return FOREIGN_LANG_SUFFIXES.get(suffix)
 
 
 def find_target_files(repo: Path, max_files: int) -> tuple[list[str], list[str], bool]:
@@ -385,7 +412,7 @@ def _method_body(owner: str, node: ast.FunctionDef | ast.AsyncFunctionDef) -> Sy
 
 def analyze_python(abs_path: Path, rel_path: str) -> tuple[FileRecord, list[ApiEntry]]:
     """Parse a Python module with stdlib ast; return record plus API routes."""
-    record = FileRecord(path=rel_path, language="python")
+    record = FileRecord(path=rel_path, language="python", extractor="stdlib.ast")
     api: list[ApiEntry] = []
     try:
         source = abs_path.read_text(encoding="utf-8", errors="replace")
@@ -474,7 +501,7 @@ def _is_component(name: str, kind: str) -> bool:
 
 def analyze_tsjs(abs_path: Path, rel_path: str, language: str) -> tuple[FileRecord, list[str]]:
     """Return record plus jsx-tag usage list for UI aggregation."""
-    record = FileRecord(path=rel_path, language=language)
+    record = FileRecord(path=rel_path, language=language, extractor="stdlib.regex")
     usages: list[str] = []
     try:
         lines = abs_path.read_text(encoding="utf-8", errors="replace").splitlines()
@@ -552,6 +579,576 @@ def analyze_tsjs(abs_path: Path, rel_path: str, language: str) -> tuple[FileReco
         if _is_component(sym.name, sym.kind) and sym.kind in ("function", "const_arrow"):
             if not sym.props:
                 sym.props = _destructured_props(sym.signature)
+    return record, usages
+
+
+# ---------------------------------------------------------------------------
+# Backend selection (T-015): --extractors flag, probing, provenance
+# ---------------------------------------------------------------------------
+
+
+EXTRACTOR_CHOICES: tuple[str, ...] = (
+    "auto",
+    "stdlib",
+    "ctags",
+    "tree-sitter",
+    "ast-grep",
+    "ts-morph",
+)
+
+# Which backends can cover which languages.
+BACKEND_LANG_COVERAGE: dict[str, tuple[str, ...]] = {
+    "ctags": ("python", *TS_LANGS, *FOREIGN_LANGS),
+    "tree-sitter": TS_LANGS,
+    "ast-grep": TS_LANGS,
+    "ts-morph": TS_LANGS,
+    "stdlib": ("python", *TS_LANGS, "sql"),
+}
+
+_EXTRACTOR_LABEL: dict[str, str] = {
+    "stdlib.ast": "stdlib ast (Python)",
+    "stdlib.regex": "regex heuristics (TS/JS)",
+    "stdlib.sql": "SQL CREATE TABLE parser",
+    "ctags": "universal-ctags JSON",
+    "tree-sitter": "tree-sitter (language pack)",
+    "ast-grep": "ast-grep rules",
+    "ts-morph": "ts-morph (Node)",
+    "none": "no backend for language",
+}
+
+
+def _cmd_ok(cmd: list[str], cwd: Path, timeout: int = 20) -> bool:
+    try:
+        proc = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True, timeout=timeout)
+        return proc.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
+def probe_backends(repo: Path) -> dict[str, bool]:
+    """Report which external extractors are available. Every probe is wrapped; never raises.
+
+    tree-sitter is provided on demand via
+    ``uv run --with tree-sitter --with tree-sitter-language-pack``.
+    """
+    out: dict[str, bool] = {}
+    out["ctags"] = _cmd_ok(["ctags", "--version"], repo)
+    out["ast-grep"] = _cmd_ok(["ast-grep", "--version"], repo) or _cmd_ok(
+        ["sg", "--version"], repo
+    )
+    out["ts-morph"] = _cmd_ok(["node", "-e", "require.resolve('ts-morph')"], repo)
+    try:
+        import tree_sitter_language_pack  # type: ignore  # noqa: F401
+
+        out["tree-sitter"] = True
+    except ImportError:
+        out["tree-sitter"] = False
+    return out
+
+
+def _likely_backend(lang: str, avail: dict[str, bool]) -> tuple[str, str]:
+    """Auto-mode per-language choice: (backend, reason)."""
+    if lang == "python":
+        return "stdlib.ast", "stdlib ast handles routes/decorators/API — richest for Python"
+    if lang in TS_LANGS:
+        if avail["tree-sitter"]:
+            return "tree-sitter", "tree-sitter AST is the richest TS/TSX backend"
+        if avail["ast-grep"]:
+            return "ast-grep", "ast-grep rules (tree-sitter unavailable)"
+        if avail["ts-morph"]:
+            return "ts-morph", "ts-morph helper (tree-sitter/ast-grep unavailable)"
+        return "stdlib.regex", "no AST backend available; regex heuristics"
+    if lang in FOREIGN_LANGS:
+        if avail["ctags"]:
+            return "ctags", "universal-ctags JSON (no dedicated parser)"
+        return "none", f"ctags unavailable — {lang} symbols not extracted"
+    if lang == "sql":
+        return "stdlib.sql", "SQL CREATE TABLE parser"
+    return "none", f"no extractor for {lang}"
+
+
+def _stdlib_for(lang: str, reason_note: str) -> str:
+    if lang == "python":
+        return "stdlib.ast"
+    if lang in TS_LANGS:
+        return "stdlib.regex"
+    if lang == "sql":
+        return "stdlib.sql"
+    return "none"
+
+
+def resolve_plan(
+    choice: str, avail: dict[str, bool], languages: set[str]
+) -> tuple[dict[str, str], dict[str, str], list[str], list[str]]:
+    """Map each present language to an extractor.
+
+    Returns (plan, reasons, errors, warnings). A non-auto selection of an
+    unavailable backend is an error (the CLI exits non-zero), except ts-morph
+    which degrades quietly by design.
+    """
+    plan: dict[str, str] = {}
+    reasons: dict[str, str] = {}
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    if choice == "auto":
+        for lang in sorted(languages):
+            plan[lang], reasons[lang] = _likely_backend(lang, avail)
+        return plan, reasons, errors, warnings
+
+    if choice == "stdlib":
+        for lang in sorted(languages):
+            plan[lang] = _stdlib_for(lang, "")
+            reasons[lang] = "explicit --extractors stdlib"
+        return plan, reasons, errors, warnings
+
+    if choice not in BACKEND_LANG_COVERAGE:
+        errors.append(f"unknown extractor: {choice}")
+        return plan, reasons, errors, warnings
+
+    if not avail[choice]:
+        if choice == "ts-morph":
+            warnings.append("ts-morph requested but unavailable; using stdlib fallback")
+            for lang in sorted(languages):
+                plan[lang] = _stdlib_for(lang, "")
+                reasons[lang] = "ts-morph unavailable; stdlib fallback"
+            return plan, reasons, errors, warnings
+        errors.append(f"selected extractor '{choice}' is not available on this machine")
+        return plan, reasons, errors, warnings
+
+    for lang in sorted(languages):
+        if lang in BACKEND_LANG_COVERAGE[choice]:
+            plan[lang] = choice
+            reasons[lang] = f"explicit --extractors {choice}"
+        else:
+            plan[lang] = _stdlib_for(lang, "")
+            reasons[lang] = f"{choice} does not cover {lang}; stdlib fallback"
+    return plan, reasons, errors, warnings
+
+
+def _extractor_meta(
+    avail: dict[str, bool], plan: dict[str, str], reasons: dict[str, str]
+) -> dict[str, dict[str, Any]]:
+    tools = ("ctags", "tree-sitter", "ast-grep", "ts-morph")
+    meta: dict[str, dict[str, Any]] = {}
+    for tool in tools:
+        used_langs = [lang for lang, backend in plan.items() if backend == tool]
+        meta[tool] = {
+            "available": avail[tool],
+            "used": bool(used_langs),
+            "reason": "; ".join(reasons.get(lang, "") for lang in sorted(used_langs))
+            if used_langs
+            else "not selected",
+        }
+    meta["stdlib"] = {
+        "available": True,
+        "used": any(b.startswith("stdlib") for b in plan.values()),
+        "reason": "zero-dependency fallback tier (stdlib ast + regex + PyYAML + SQL heuristics)",
+    }
+    return meta
+
+
+def _ctags_kind(kind: str) -> str:
+    k = (kind or "").lower()
+    mapping = {
+        "function": "function",
+        "func": "function",
+        "class": "class",
+        "struct": "class",
+        "trait": "class",
+        "enum": "class",
+        "interface": "interface",
+        "method": "method",
+        "alias": "type",
+        "typedef": "type",
+        "type": "type",
+        "constant": "const",
+    }
+    return mapping.get(k, "const" if k in ("variable", "field", "member", "property") else k)
+
+
+def analyze_ctags(abs_path: Path, rel_path: str, language: str) -> FileRecord:
+    """universal-ctags JSON backend (primary for languages without a dedicated parser)."""
+    record = FileRecord(path=rel_path, language=language, extractor="ctags")
+    try:
+        source = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return record
+    record.line_count = source.count("\n") + 1
+    proc = subprocess.run(
+        ["ctags", "--output-format=json", "--fields=+nKS", str(abs_path)],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    if proc.returncode != 0 or not proc.stdout:
+        return record
+    seen: set[tuple[str, int, str]] = set()
+    for raw in proc.stdout.splitlines():
+        raw = raw.strip()
+        if not raw.startswith("{"):
+            continue
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(data, dict) or data.get("_type") != "tag":
+            continue
+        raw_kind = str(data.get("kind", ""))
+        if raw_kind in ("property",):  # interface-member noise; skip
+            continue
+        name = data.get("name")
+        line = data.get("line")
+        if not name or not isinstance(line, int) or line <= 0:
+            continue
+        kind = _ctags_kind(raw_kind)
+        if kind == "method" and data.get("scope"):
+            name = f"{data['scope']}.{name}"
+        key = (name, line, kind)
+        if key in seen:
+            continue
+        seen.add(key)
+        sig = ""
+        pattern = data.get("pattern") or ""
+        if kind in ("function", "method", "const") and pattern:
+            m = re.search(r"\(([^)]*)\)", pattern)
+            if m:
+                sig = f"({m.group(1)})"
+        record.symbols.append(Symbol(kind=kind, name=str(name), signature=sig, line=line))
+    return record
+
+
+_TS_PACK_LANG: dict[str, str] = {
+    ".ts": "typescript",
+    ".tsx": "tsx",
+    ".js": "javascript",
+    ".jsx": "jsx",
+    ".mjs": "javascript",
+}
+
+
+def analyze_tsjs_treesitter(
+    abs_path: Path, rel_path: str, language: str
+) -> tuple[FileRecord, list[str]]:
+    """Real-AST pass for TS/TSX via tree-sitter. Richer than the regex backend:
+    multiline destructured props, JSX usage counts, decorators, named imports.
+
+    Requires tree-sitter, provided on demand via
+    ``uv run --with tree-sitter --with tree-sitter-language-pack``.
+    """
+    from tree_sitter_language_pack import get_parser  # type: ignore
+
+    record = FileRecord(path=rel_path, language=language, extractor="tree-sitter")
+    usages: list[str] = []
+    try:
+        source = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return record, usages
+    record.line_count = source.count("\n") + 1
+    pack_key = _TS_PACK_LANG.get(
+        abs_path.suffix.lower(), "typescript" if language == "typescript" else "javascript"
+    )
+    parser = get_parser(pack_key)
+    tree = parser.parse(bytes(source, "utf-8"))
+
+    def node_line(node: Any) -> int:
+        return node.start_point[0] + 1
+
+    def field_text(node: Any, field: str) -> str:
+        child = node.child_by_field_name(field)
+        return child.text.decode("utf-8", errors="replace") if child is not None else ""
+
+    def decorators_before(node: Any) -> list[str]:
+        parent = node.parent
+        if parent is None:
+            return []
+        out: list[str] = []
+        for child in parent.named_children:
+            if child == node:
+                break
+            if child.type == "decorator":
+                out.append(child.text.decode("utf-8", errors="replace")[:120])
+        return out
+
+    def prop_names_from_object(obj: Any) -> list[str]:
+        names: list[str] = []
+        for child in obj.named_children:
+            if child.type == "shorthand_property_identifier_pattern":
+                names.append(child.text.decode("utf-8", errors="replace"))
+            elif child.type == "object_assignment_pattern":
+                first = child.named_children[0] if child.named_children else None
+                if first is not None:
+                    names.append(first.text.decode("utf-8", errors="replace"))
+            elif child.type == "pair_pattern":
+                key = child.child_by_field_name("key")
+                if key is not None:
+                    names.append(key.text.decode("utf-8", errors="replace"))
+        return names
+
+    def params_from(fn_params: Any) -> tuple[str, list[str]]:
+        """Return (signature, destructured props) from a formal_parameters node."""
+        if fn_params is None:
+            return "", []
+        sig = fn_params.text.decode("utf-8", errors="replace").replace("\n", " ")
+        props: list[str] = []
+        for child in fn_params.named_children:
+            for sub in child.named_children:
+                if sub.type == "object_pattern":
+                    props.extend(prop_names_from_object(sub))
+        return sig, props
+
+    def walk(node: Any, class_owner: str | None = None) -> None:
+        ntype = node.type
+        if ntype == "import_statement":
+            module = ""
+            for child in node.named_children:
+                if child.type == "string":
+                    frag = child.child_by_field_name("text")
+                    if frag is None and child.named_children:
+                        frag = child.named_children[0]
+                    if frag is not None:
+                        module = frag.text.decode("utf-8", errors="replace")
+            if module and module not in record.imports:
+                record.imports.append(module)
+            for child in node.named_children:
+                if child.type == "named_imports":
+                    for spec in child.named_children:
+                        if spec.type == "import_specifier":
+                            name = spec.child_by_field_name("name")
+                            if name is not None:
+                                record.imports.append(
+                                    name.text.decode("utf-8", errors="replace")
+                                )
+            return
+        if ntype in ("program", "export_statement"):
+            for child in node.named_children:
+                walk(child, class_owner)
+            return
+        if ntype == "function_declaration":
+            name = field_text(node, "name")
+            params = node.child_by_field_name("parameters")
+            sig, props = params_from(params)
+            record.symbols.append(
+                Symbol(
+                    kind="function",
+                    name=name,
+                    signature=sig,
+                    line=node_line(node),
+                    decorators=decorators_before(node),
+                    props=props,
+                )
+            )
+            # fall through: walk the body so JSX inside functions is captured
+        if ntype == "class_declaration":
+            name = field_text(node, "name")
+            record.symbols.append(
+                Symbol(
+                    kind="class",
+                    name=name,
+                    line=node_line(node),
+                    decorators=decorators_before(node),
+                )
+            )
+            for child in node.named_children:
+                walk(child, name)
+            return
+        if ntype == "method_definition":
+            mname = field_text(node, "name")
+            mparams = node.child_by_field_name("parameters")
+            msig, _ = params_from(mparams)
+            display = f"{class_owner}.{mname}" if class_owner else mname
+            record.symbols.append(
+                Symbol(
+                    kind="method",
+                    name=display,
+                    signature=msig,
+                    line=node_line(node),
+                    decorators=decorators_before(node),
+                )
+            )
+            # fall through to walk the method body (JSX)
+        if ntype == "interface_declaration":
+            record.symbols.append(
+                Symbol(kind="interface", name=field_text(node, "name"), line=node_line(node))
+            )
+            return
+        if ntype == "type_alias_declaration":
+            record.symbols.append(
+                Symbol(kind="type", name=field_text(node, "name"), line=node_line(node))
+            )
+            return
+        if ntype == "lexical_declaration":
+            for decl in node.named_children:
+                if decl.type != "variable_declarator":
+                    continue
+                dname = decl.child_by_field_name("name")
+                value = decl.child_by_field_name("value")
+                name = (
+                    dname.text.decode("utf-8", errors="replace") if dname is not None else ""
+                )
+                if value is not None and value.type in ("arrow_function", "function_expression"):
+                    params = value.child_by_field_name("parameters")
+                    sig, props = params_from(params)
+                    record.symbols.append(
+                        Symbol(
+                            kind="const_arrow",
+                            name=name,
+                            signature=sig,
+                            line=node_line(decl),
+                            props=props,
+                            decorators=decorators_before(decl),
+                        )
+                    )
+                else:
+                    record.symbols.append(Symbol(kind="const", name=name, line=node_line(decl)))
+            # fall through to walk the initializers (arrow bodies contain JSX)
+        if ntype in ("jsx_opening_element", "jsx_self_closing_element"):
+            first = node.named_children[0] if node.named_children else None
+            if first is not None:
+                tag = first.text.decode("utf-8", errors="replace")
+                if first.type == "member_expression":
+                    tag = tag.split(".")[-1]
+                usages.append(tag)
+            # keep walking: opening elements can nest further JSX
+        for child in node.named_children:
+            walk(child, class_owner)
+    walk(tree.root_node)
+    return record, usages
+
+
+# ast-grep rule patterns for TS/JS (degraded-mode backend; tree-sitter preferred).
+_ASTGREP_PATTERNS: list[tuple[str, str]] = [
+    ("function", "function $F($$$PARAMS) { $$$BODY }"),
+    ("class", "class $C"),
+    ("interface", "interface $I { $$$ }"),
+    ("type", "type $T = $V"),
+    ("const_arrow", "const $N = ($ARGS) => $$$"),
+    ("const_arrow", "const $N = $ARGS => $$$"),
+]
+_ASTGREP_KIND_RE: dict[str, re.Pattern[str]] = {
+    "function": re.compile(r"function\s+(\w+)"),
+    "class": re.compile(r"class\s+(\w+)"),
+    "interface": re.compile(r"interface\s+(\w+)"),
+    "type": re.compile(r"type\s+(\w+)"),
+    "const_arrow": re.compile(
+        r"const\s+(\w+)\s*=\s*(?:async\s*)?(?:\(([^)]*)\)|([A-Za-z_$][\w$]*))\s*=>"
+    ),
+}
+_ASTGREP_LANG_FLAG: dict[str, str] = {
+    ".ts": "ts",
+    ".tsx": "tsx",
+    ".js": "javascript",
+    ".jsx": "jsx",
+    ".mjs": "javascript",
+}
+
+
+def analyze_tsjs_astgrep(
+    abs_path: Path, rel_path: str, language: str
+) -> tuple[FileRecord, list[str]]:
+    """Rule-driven TS/JS pass via ast-grep, used when tree-sitter is unavailable."""
+    record = FileRecord(path=rel_path, language=language, extractor="ast-grep")
+    usages: list[str] = []
+    try:
+        source = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return record, usages
+    record.line_count = source.count("\n") + 1
+    lang_flag = _ASTGREP_LANG_FLAG.get(
+        abs_path.suffix.lower(), "ts" if language == "typescript" else "javascript"
+    )
+    seen: set[tuple[str, str]] = set()
+    for kind, pattern in _ASTGREP_PATTERNS:
+        proc = subprocess.run(
+            ["ast-grep", "run", "--lang", lang_flag, "-p", pattern, str(abs_path), "--json"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if proc.returncode != 0 or not proc.stdout:
+            continue
+        try:
+            matches = json.loads(proc.stdout)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(matches, list):
+            continue
+        for match in matches:
+            text = match.get("text") or "" if isinstance(match, dict) else ""
+            if not text:
+                continue
+            first_line = text.splitlines()[0]
+            rm = _ASTGREP_KIND_RE[kind].search(first_line)
+            if not rm:
+                continue
+            line = 0
+            rng = match.get("range") or {}
+            start = (rng.get("start") or {}) if isinstance(rng, dict) else {}
+            if isinstance(start, dict) and isinstance(start.get("line"), int):
+                line = start["line"] + 1
+            key = (kind, rm.group(1))
+            if key in seen:
+                continue
+            seen.add(key)
+            sig = ""
+            props: list[str] = []
+            if kind == "function":
+                m = re.search(r"\(([^)]*)\)", first_line)
+                if m:
+                    sig = f"({m.group(1).strip()})"
+                props = _destructured_props(sig)
+            elif kind == "const_arrow":
+                sig = f"({rm.group(2) or rm.group(3) or ''})"
+                props = _destructured_props(sig)
+            record.symbols.append(
+                Symbol(kind=kind, name=rm.group(1), signature=sig, line=line, props=props)
+            )
+
+    # JSX usage via the cheap line scan (ast-grep has no reliable JSX pattern set).
+    for raw in source.splitlines():
+        for tag in _JSX_TAG_RE.findall(raw):
+            usages.append(tag)
+    return record, usages
+
+
+def analyze_tsjs_tsmorph(
+    abs_path: Path, rel_path: str, language: str, helper: Path
+) -> tuple[FileRecord, list[str]]:
+    """Optional Node/ts-morph backend; skipped quietly when node or ts-morph is absent."""
+    record = FileRecord(path=rel_path, language=language, extractor="ts-morph")
+    usages: list[str] = []
+    try:
+        source = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return record, usages
+    record.line_count = source.count("\n") + 1
+    proc = subprocess.run(
+        ["node", str(helper), str(abs_path)],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    if proc.returncode != 0 or not proc.stdout:
+        return record, usages
+    try:
+        data = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return record, usages
+    record.imports.extend(data.get("imports", []))
+    for sym in data.get("symbols", []):
+        if not isinstance(sym, dict):
+            continue
+        record.symbols.append(
+            Symbol(
+                kind=str(sym.get("kind", "const")),
+                name=str(sym.get("name", "")),
+                signature=str(sym.get("signature", "")),
+                line=int(sym.get("line", 0) or 0),
+                decorators=list(sym.get("decorators", [])),
+                props=list(sym.get("props", [])),
+            )
+        )
+    usages.extend(str(tag) for tag in data.get("usages", []))
     return record, usages
 
 
@@ -849,9 +1446,20 @@ def render_spec_scan(index: dict[str, Any]) -> str:
     return "\n".join(out) + "\n"
 
 
-def run_scan(repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool) -> int:
+def run_scan(
+    repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool, extractors: str = "auto"
+) -> int:
     repo = repo.resolve()
     paths, warnings, too_large = find_target_files(repo, max_files)
+
+    languages_present: set[str] = {lang for p in paths if (lang := language_of(p)) is not None}
+    avail = probe_backends(repo)
+    plan, reasons, errors, plan_warnings = resolve_plan(extractors, avail, languages_present)
+    warnings.extend(plan_warnings)
+    if errors:
+        for error in errors:
+            print(f"error: {error}")
+        return 2
 
     records: list[FileRecord] = []
     api: list[ApiEntry] = []
@@ -869,12 +1477,24 @@ def run_scan(repo: Path, mode: str, out_json: Path, max_files: int, verbose: boo
             continue
         language_counts[lang] = language_counts.get(lang, 0) + 1
 
+        backend = plan.get(lang, "stdlib.ast")
         if lang == "python":
-            record, api_hits = analyze_python(abs_path, rel_path)
-            records.append(record)
-            api.extend(api_hits)
-        elif lang in ("typescript", "javascript"):
-            record, usages = analyze_tsjs(abs_path, rel_path, lang)
+            if backend == "ctags":
+                records.append(analyze_ctags(abs_path, rel_path, lang))
+            else:
+                record, api_hits = analyze_python(abs_path, rel_path)
+                records.append(record)
+                api.extend(api_hits)
+        elif lang in TS_LANGS:
+            if backend == "tree-sitter":
+                record, usages = analyze_tsjs_treesitter(abs_path, rel_path, lang)
+            elif backend == "ast-grep":
+                record, usages = analyze_tsjs_astgrep(abs_path, rel_path, lang)
+            elif backend == "ts-morph":
+                helper = Path(__file__).with_name("ts_extract.mjs")
+                record, usages = analyze_tsjs_tsmorph(abs_path, rel_path, lang, helper)
+            else:  # stdlib.regex (permanent fallback)
+                record, usages = analyze_tsjs(abs_path, rel_path, lang)
             records.append(record)
             for tag in usages:
                 jsx_usage[tag] = jsx_usage.get(tag, 0) + 1
@@ -889,6 +1509,10 @@ def run_scan(repo: Path, mode: str, out_json: Path, max_files: int, verbose: boo
                             props=sym.props,
                             kind=sym.kind,
                         )
+        elif lang in FOREIGN_LANGS:
+            if backend == "ctags":
+                records.append(analyze_ctags(abs_path, rel_path, lang))
+            # else: stdlib has no foreign-language parser — skip symbols, keep count
         elif lang == "sql":
             table_hits = analyze_sql(abs_path, rel_path)
             tables.extend(table_hits)
@@ -908,6 +1532,13 @@ def run_scan(repo: Path, mode: str, out_json: Path, max_files: int, verbose: boo
         tables.append(TableDef(table=schema_name, columns=[], file="", line=0))
 
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    confidence = (
+        "degraded"
+        if "none" in plan.values()
+        else "regex"
+        if any(b == "stdlib.regex" for b in plan.values())
+        else "full"
+    )
     index: dict[str, Any] = {
         "meta": {
             "repo": repo.name,
@@ -918,6 +1549,8 @@ def run_scan(repo: Path, mode: str, out_json: Path, max_files: int, verbose: boo
             "languages": language_counts,
             "loc": sum(r.line_count for r in records),
             "scan_too_large": too_large,
+            "extractors": _extractor_meta(avail, plan, reasons),
+            "confidence": confidence,
         },
         "warnings": warnings,
         "docs": [d.to_jsonb() for d in docs],
@@ -1061,6 +1694,13 @@ def main(argv: list[str] | None = None) -> int:
         "--max-files", type=int, default=2000, help="scan size flag (default: 2000)"
     )
     p_scan.add_argument("--verbose", action="store_true", help="print warnings")
+    p_scan.add_argument(
+        "--extractors",
+        choices=list(EXTRACTOR_CHOICES),
+        default="auto",
+        help="extraction backend: auto probes and prefers the richest per language "
+        "(default: auto); stdlib is the zero-dependency fallback tier",
+    )
 
     p_verify = sub.add_parser("verify", help="validate file:line citations")
     p_verify.add_argument(
@@ -1082,7 +1722,9 @@ def main(argv: list[str] | None = None) -> int:
         out = (
             Path(args.out) if args.out else (_default_out_dir(Path(args.repo)) / "repo-index.json")
         )
-        return run_scan(Path(args.repo), args.mode, out, args.max_files, args.verbose)
+        return run_scan(
+            Path(args.repo), args.mode, out, args.max_files, args.verbose, args.extractors
+        )
 
     if not args.index and not args.doc:
         parser.error("verify requires --index or --doc")

@@ -2,17 +2,46 @@
   "meta": {
     "repo": "start-here",
     "repo_abs": "/Users/avi/Repos/start-here",
-    "generated_at": "2026-10-30T14:12:07Z",
+    "generated_at": "2026-11-01T19:57:13Z",
     "mode": "both",
-    "scanned_files": 57,
+    "scanned_files": 59,
     "languages": {
-      "python": 57
+      "python": 58,
+      "javascript": 1
     },
-    "loc": 10808,
-    "scan_too_large": false
+    "loc": 11821,
+    "scan_too_large": false,
+    "extractors": {
+      "ctags": {
+        "available": true,
+        "used": false,
+        "reason": "not selected"
+      },
+      "tree-sitter": {
+        "available": false,
+        "used": false,
+        "reason": "not selected"
+      },
+      "ast-grep": {
+        "available": true,
+        "used": true,
+        "reason": "ast-grep rules (tree-sitter unavailable)"
+      },
+      "ts-morph": {
+        "available": false,
+        "used": false,
+        "reason": "not selected"
+      },
+      "stdlib": {
+        "available": true,
+        "used": true,
+        "reason": "zero-dependency fallback tier (stdlib ast + regex + PyYAML + SQL heuristics)"
+      }
+    },
+    "confidence": "full"
   },
   "warnings": [
-    "pytest: 198 collected (uv)"
+    "pytest: 213 collected (py3)"
   ],
   "docs": [
     {
@@ -114,25 +143,51 @@
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/__init__.py",
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/code-specs/spec_indexer.py",
       "language": "python",
-      "line_count": 1112,
+      "line_count": 1754,
       "symbols": [
         {
           "kind": "const",
           "name": "LANG_BY_SUFFIX",
           "signature": "",
-          "line": 54,
+          "line": 58,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "FOREIGN_LANG_SUFFIXES",
+          "signature": "",
+          "line": 69,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "FOREIGN_LANGS",
+          "signature": "",
+          "line": 84,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TS_LANGS",
+          "signature": "",
+          "line": 85,
           "decorators": [],
           "props": []
         },
@@ -140,7 +195,7 @@
           "kind": "const",
           "name": "DOC_GLOBS",
           "signature": "",
-          "line": 65,
+          "line": 88,
           "decorators": [],
           "props": []
         },
@@ -148,7 +203,7 @@
           "kind": "const",
           "name": "DOC_BASENAME_PATTERNS",
           "signature": "",
-          "line": 77,
+          "line": 100,
           "decorators": [],
           "props": []
         },
@@ -156,7 +211,7 @@
           "kind": "const",
           "name": "EXCLUDED_DIRS",
           "signature": "",
-          "line": 88,
+          "line": 111,
           "decorators": [],
           "props": []
         },
@@ -164,7 +219,7 @@
           "kind": "const",
           "name": "ROUTE_METHOD_ATTRS",
           "signature": "",
-          "line": 111,
+          "line": 134,
           "decorators": [],
           "props": []
         },
@@ -172,7 +227,7 @@
           "kind": "const",
           "name": "_JSX_TAG_RE",
           "signature": "",
-          "line": 115,
+          "line": 138,
           "decorators": [],
           "props": []
         },
@@ -180,7 +235,7 @@
           "kind": "const",
           "name": "_TS_IMPORT_NAMED",
           "signature": "",
-          "line": 118,
+          "line": 141,
           "decorators": [],
           "props": []
         },
@@ -188,7 +243,7 @@
           "kind": "const",
           "name": "_TS_IMPORT_DEFAULT",
           "signature": "",
-          "line": 121,
+          "line": 144,
           "decorators": [],
           "props": []
         },
@@ -196,7 +251,7 @@
           "kind": "const",
           "name": "_TS_FUNC",
           "signature": "",
-          "line": 124,
+          "line": 147,
           "decorators": [],
           "props": []
         },
@@ -204,7 +259,7 @@
           "kind": "const",
           "name": "_TS_ARROW",
           "signature": "",
-          "line": 127,
+          "line": 150,
           "decorators": [],
           "props": []
         },
@@ -212,7 +267,7 @@
           "kind": "const",
           "name": "_TS_CLASS",
           "signature": "",
-          "line": 131,
+          "line": 154,
           "decorators": [],
           "props": []
         },
@@ -220,7 +275,7 @@
           "kind": "const",
           "name": "_TS_IFACE",
           "signature": "",
-          "line": 132,
+          "line": 155,
           "decorators": [],
           "props": []
         },
@@ -228,7 +283,7 @@
           "kind": "const",
           "name": "_TS_TYPE",
           "signature": "",
-          "line": 133,
+          "line": 156,
           "decorators": [],
           "props": []
         },
@@ -236,7 +291,7 @@
           "kind": "const",
           "name": "_TS_REQUIRE",
           "signature": "",
-          "line": 134,
+          "line": 157,
           "decorators": [],
           "props": []
         },
@@ -244,7 +299,7 @@
           "kind": "class",
           "name": "Symbol",
           "signature": "",
-          "line": 144,
+          "line": 167,
           "decorators": [],
           "props": []
         },
@@ -252,7 +307,7 @@
           "kind": "method",
           "name": "Symbol.to_jsonb",
           "signature": "(self)",
-          "line": 152,
+          "line": 175,
           "decorators": [],
           "props": []
         },
@@ -260,7 +315,7 @@
           "kind": "class",
           "name": "FileRecord",
           "signature": "",
-          "line": 164,
+          "line": 187,
           "decorators": [],
           "props": []
         },
@@ -268,7 +323,7 @@
           "kind": "method",
           "name": "FileRecord.to_jsonb",
           "signature": "(self)",
-          "line": 171,
+          "line": 195,
           "decorators": [],
           "props": []
         },
@@ -276,7 +331,7 @@
           "kind": "class",
           "name": "ApiEntry",
           "signature": "",
-          "line": 182,
+          "line": 207,
           "decorators": [],
           "props": []
         },
@@ -284,7 +339,7 @@
           "kind": "method",
           "name": "ApiEntry.to_jsonb",
           "signature": "(self)",
-          "line": 189,
+          "line": 214,
           "decorators": [],
           "props": []
         },
@@ -292,7 +347,7 @@
           "kind": "class",
           "name": "ColumnDef",
           "signature": "",
-          "line": 200,
+          "line": 225,
           "decorators": [],
           "props": []
         },
@@ -300,7 +355,7 @@
           "kind": "method",
           "name": "ColumnDef.to_jsonb",
           "signature": "(self)",
-          "line": 204,
+          "line": 229,
           "decorators": [],
           "props": []
         },
@@ -308,7 +363,7 @@
           "kind": "class",
           "name": "TableDef",
           "signature": "",
-          "line": 209,
+          "line": 234,
           "decorators": [],
           "props": []
         },
@@ -316,7 +371,7 @@
           "kind": "method",
           "name": "TableDef.to_jsonb",
           "signature": "(self)",
-          "line": 215,
+          "line": 240,
           "decorators": [],
           "props": []
         },
@@ -324,7 +379,7 @@
           "kind": "class",
           "name": "UiComponent",
           "signature": "",
-          "line": 225,
+          "line": 250,
           "decorators": [],
           "props": []
         },
@@ -332,7 +387,7 @@
           "kind": "method",
           "name": "UiComponent.to_jsonb",
           "signature": "(self)",
-          "line": 233,
+          "line": 258,
           "decorators": [],
           "props": []
         },
@@ -340,7 +395,7 @@
           "kind": "class",
           "name": "TestNode",
           "signature": "",
-          "line": 245,
+          "line": 270,
           "decorators": [],
           "props": []
         },
@@ -348,7 +403,7 @@
           "kind": "method",
           "name": "TestNode.to_jsonb",
           "signature": "(self)",
-          "line": 249,
+          "line": 274,
           "decorators": [],
           "props": []
         },
@@ -356,7 +411,7 @@
           "kind": "class",
           "name": "DocRecord",
           "signature": "",
-          "line": 254,
+          "line": 279,
           "decorators": [],
           "props": []
         },
@@ -364,7 +419,7 @@
           "kind": "method",
           "name": "DocRecord.to_jsonb",
           "signature": "(self)",
-          "line": 258,
+          "line": 283,
           "decorators": [],
           "props": []
         },
@@ -372,7 +427,7 @@
           "kind": "function",
           "name": "rel",
           "signature": "(repo: Path, path: Path)",
-          "line": 267,
+          "line": 292,
           "decorators": [],
           "props": []
         },
@@ -380,7 +435,7 @@
           "kind": "function",
           "name": "language_of",
           "signature": "(name: str)",
-          "line": 272,
+          "line": 297,
           "decorators": [],
           "props": []
         },
@@ -388,7 +443,7 @@
           "kind": "function",
           "name": "find_target_files",
           "signature": "(repo: Path, max_files: int)",
-          "line": 277,
+          "line": 304,
           "decorators": [],
           "props": []
         },
@@ -396,7 +451,7 @@
           "kind": "function",
           "name": "_unparse",
           "signature": "(node: ast.AST | None)",
-          "line": 335,
+          "line": 362,
           "decorators": [],
           "props": []
         },
@@ -404,7 +459,7 @@
           "kind": "function",
           "name": "_decorator_names",
           "signature": "(decorators: list[ast.expr])",
-          "line": 342,
+          "line": 369,
           "decorators": [],
           "props": []
         },
@@ -412,7 +467,7 @@
           "kind": "function",
           "name": "_route_from_decorator",
           "signature": "(dec: ast.expr)",
-          "line": 350,
+          "line": 377,
           "decorators": [],
           "props": []
         },
@@ -420,7 +475,7 @@
           "kind": "function",
           "name": "_method_body",
           "signature": "(owner: str, node: ast.FunctionDef | ast.AsyncFunctionDef)",
-          "line": 375,
+          "line": 402,
           "decorators": [],
           "props": []
         },
@@ -428,7 +483,7 @@
           "kind": "function",
           "name": "analyze_python",
           "signature": "(abs_path: Path, rel_path: str)",
-          "line": 386,
+          "line": 413,
           "decorators": [],
           "props": []
         },
@@ -436,7 +491,7 @@
           "kind": "function",
           "name": "_destructured_props",
           "signature": "(signature: str)",
-          "line": 458,
+          "line": 485,
           "decorators": [],
           "props": []
         },
@@ -444,7 +499,7 @@
           "kind": "function",
           "name": "_is_component",
           "signature": "(name: str, kind: str)",
-          "line": 471,
+          "line": 498,
           "decorators": [],
           "props": []
         },
@@ -452,7 +507,151 @@
           "kind": "function",
           "name": "analyze_tsjs",
           "signature": "(abs_path: Path, rel_path: str, language: str)",
-          "line": 475,
+          "line": 502,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "EXTRACTOR_CHOICES",
+          "signature": "",
+          "line": 590,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "BACKEND_LANG_COVERAGE",
+          "signature": "",
+          "line": 600,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_EXTRACTOR_LABEL",
+          "signature": "",
+          "line": 608,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_cmd_ok",
+          "signature": "(cmd: list[str], cwd: Path, timeout: int=20)",
+          "line": 620,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "probe_backends",
+          "signature": "(repo: Path)",
+          "line": 628,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_likely_backend",
+          "signature": "(lang: str, avail: dict[str, bool])",
+          "line": 649,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_stdlib_for",
+          "signature": "(lang: str, reason_note: str)",
+          "line": 670,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "resolve_plan",
+          "signature": "(choice: str, avail: dict[str, bool], languages: set[str])",
+          "line": 680,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_extractor_meta",
+          "signature": "(avail: dict[str, bool], plan: dict[str, str], reasons: dict[str, str])",
+          "line": 729,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_ctags_kind",
+          "signature": "(kind: str)",
+          "line": 751,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_ctags",
+          "signature": "(abs_path: Path, rel_path: str, language: str)",
+          "line": 770,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_TS_PACK_LANG",
+          "signature": "",
+          "line": 821,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_tsjs_treesitter",
+          "signature": "(abs_path: Path, rel_path: str, language: str)",
+          "line": 830,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_ASTGREP_PATTERNS",
+          "signature": "",
+          "line": 1020,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_ASTGREP_KIND_RE",
+          "signature": "",
+          "line": 1028,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_ASTGREP_LANG_FLAG",
+          "signature": "",
+          "line": 1037,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_tsjs_astgrep",
+          "signature": "(abs_path: Path, rel_path: str, language: str)",
+          "line": 1046,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "analyze_tsjs_tsmorph",
+          "signature": "(abs_path: Path, rel_path: str, language: str, helper: Path)",
+          "line": 1114,
           "decorators": [],
           "props": []
         },
@@ -460,7 +659,7 @@
           "kind": "const",
           "name": "_SQL_CREATE",
           "signature": "",
-          "line": 562,
+          "line": 1159,
           "decorators": [],
           "props": []
         },
@@ -468,7 +667,7 @@
           "kind": "const",
           "name": "_SQL_SKIP_COLUMN",
           "signature": "",
-          "line": 566,
+          "line": 1163,
           "decorators": [],
           "props": []
         },
@@ -476,7 +675,7 @@
           "kind": "function",
           "name": "analyze_sql",
           "signature": "(abs_path: Path, rel_path: str)",
-          "line": 573,
+          "line": 1170,
           "decorators": [],
           "props": []
         },
@@ -484,7 +683,7 @@
           "kind": "function",
           "name": "_run",
           "signature": "(cmd: list[str], cwd: Path, timeout: int=60)",
-          "line": 611,
+          "line": 1208,
           "decorators": [],
           "props": []
         },
@@ -492,7 +691,7 @@
           "kind": "function",
           "name": "collect_tests",
           "signature": "(repo: Path)",
-          "line": 619,
+          "line": 1216,
           "decorators": [],
           "props": []
         },
@@ -500,7 +699,7 @@
           "kind": "function",
           "name": "discover_docs",
           "signature": "(repo: Path)",
-          "line": 677,
+          "line": 1274,
           "decorators": [],
           "props": []
         },
@@ -508,7 +707,7 @@
           "kind": "function",
           "name": "analyze_openapi",
           "signature": "(docs: list[DocRecord], repo: Path)",
-          "line": 709,
+          "line": 1306,
           "decorators": [],
           "props": []
         },
@@ -516,7 +715,7 @@
           "kind": "const",
           "name": "MAX_MAP_ROWS",
           "signature": "",
-          "line": 747,
+          "line": 1344,
           "decorators": [],
           "props": []
         },
@@ -524,7 +723,7 @@
           "kind": "const",
           "name": "MAX_API_ROWS",
           "signature": "",
-          "line": 748,
+          "line": 1345,
           "decorators": [],
           "props": []
         },
@@ -532,7 +731,7 @@
           "kind": "const",
           "name": "MAX_UI_ROWS",
           "signature": "",
-          "line": 749,
+          "line": 1346,
           "decorators": [],
           "props": []
         },
@@ -540,7 +739,7 @@
           "kind": "const",
           "name": "MAX_TEST_ROWS",
           "signature": "",
-          "line": 750,
+          "line": 1347,
           "decorators": [],
           "props": []
         },
@@ -548,7 +747,7 @@
           "kind": "const",
           "name": "MAX_SCHEMA_ROWS",
           "signature": "",
-          "line": 751,
+          "line": 1348,
           "decorators": [],
           "props": []
         },
@@ -556,7 +755,7 @@
           "kind": "function",
           "name": "_default_out_dir",
           "signature": "(repo: Path)",
-          "line": 754,
+          "line": 1351,
           "decorators": [],
           "props": []
         },
@@ -564,15 +763,15 @@
           "kind": "function",
           "name": "render_spec_scan",
           "signature": "(index: dict[str, Any])",
-          "line": 759,
+          "line": 1356,
           "decorators": [],
           "props": []
         },
         {
           "kind": "function",
           "name": "run_scan",
-          "signature": "(repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool)",
-          "line": 852,
+          "signature": "(repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool, extractors: str='auto')",
+          "line": 1449,
           "decorators": [],
           "props": []
         },
@@ -580,7 +779,7 @@
           "kind": "const",
           "name": "_CITATION_RE",
           "signature": "",
-          "line": 952,
+          "line": 1585,
           "decorators": [],
           "props": []
         },
@@ -588,7 +787,7 @@
           "kind": "function",
           "name": "_line_text",
           "signature": "(abs_file: Path, line: int)",
-          "line": 957,
+          "line": 1590,
           "decorators": [],
           "props": []
         },
@@ -596,7 +795,7 @@
           "kind": "function",
           "name": "run_verify",
           "signature": "(index_path: Path | None, repo_path: Path, doc_path: Path | None, verbose: bool)",
-          "line": 971,
+          "line": 1604,
           "decorators": [],
           "props": []
         },
@@ -604,7 +803,7 @@
           "kind": "function",
           "name": "main",
           "signature": "(argv: list[str] | None=None)",
-          "line": 1039,
+          "line": 1672,
           "decorators": [],
           "props": []
         }
@@ -621,28 +820,49 @@
         "datetime",
         "pathlib",
         "typing"
-      ]
+      ],
+      "extractor": "stdlib.ast"
+    },
+    {
+      "path": "context/scripts/code-specs/ts_extract.mjs",
+      "language": "javascript",
+      "line_count": 122,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "push",
+          "signature": "(kind, name, signature, line, decorators, props)",
+          "line": 35,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [],
+      "extractor": "ast-grep"
     },
     {
       "path": "context/scripts/generators/__init__.py",
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/__init__.py",
       "language": "python",
       "line_count": 4,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/claude/__init__.py",
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/claude/generator.py",
@@ -679,14 +899,16 @@
         "typing",
         "yaml",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/cline/__init__.py",
       "language": "python",
       "line_count": 1,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/cline/generator.py",
@@ -732,14 +954,16 @@
         "json",
         "yaml",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/core/__init__.py",
       "language": "python",
       "line_count": 4,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/core/agents_md.py",
@@ -791,7 +1015,8 @@
         "pathlib",
         "typing",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/core/budget.py",
@@ -841,7 +1066,8 @@
       ],
       "imports": [
         "enum"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/core/loader.py",
@@ -878,7 +1104,8 @@
         "typing",
         "yaml",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/core/models.py",
@@ -944,7 +1171,8 @@
       ],
       "imports": [
         "dataclasses"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/core/tools.py",
@@ -984,14 +1212,16 @@
           "props": []
         }
       ],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/gemini/__init__.py",
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/gemini/generator.py",
@@ -1030,14 +1260,16 @@
         "typing",
         "context.scripts.generators.adapters.core.models",
         "yaml"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/github/__init__.py",
       "language": "python",
       "line_count": 8,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/github/generator.py",
@@ -1082,14 +1314,16 @@
         "pathlib",
         "typing",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/openai/__init__.py",
       "language": "python",
       "line_count": 8,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/adapters/openai/generator.py",
@@ -1126,7 +1360,8 @@
         "pathlib",
         "typing",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/generators/generate_adapters.py",
@@ -1235,7 +1470,8 @@
         "context.scripts.generators.adapters.gemini.generator",
         "context.scripts.generators.adapters.github.generator",
         "context.scripts.generators.adapters.openai.generator"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/prepare-commit-msg.py",
@@ -1593,14 +1829,16 @@
         "dataclasses",
         "pathlib",
         "typing"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/__init__.py",
       "language": "python",
       "line_count": 1,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/conftest.py",
@@ -1811,7 +2049,8 @@
       "imports": [
         "pytest",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_adapter_drift.py",
@@ -1872,7 +2111,8 @@
         "pathlib",
         "pytest",
         "context.scripts.validators.adapter_drift"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_adapters_core.py",
@@ -2049,7 +2289,8 @@
         "context.scripts.generators.adapters.core.tools",
         "tempfile",
         "yaml"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_agent_validator.py",
@@ -2291,7 +2532,8 @@
       ],
       "imports": [
         "context.scripts.validators.agent_definitions"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_claude_adapter.py",
@@ -2319,7 +2561,8 @@
         "pathlib",
         "context.scripts.generators.adapters.core.models",
         "context.scripts.generators.adapters.claude.generator"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_cli_dispatcher.py",
@@ -2390,7 +2633,8 @@
         "pytest",
         "context.scripts.generators.generate_adapters",
         "context.scripts.generators.adapters.core.loader"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_cline_adapter.py",
@@ -2454,7 +2698,8 @@
         "yaml",
         "context.scripts.generators.adapters.cline.generator",
         "context.scripts.generators.adapters.core.models"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_e2e_compilation.py",
@@ -2493,7 +2738,8 @@
         "context.scripts.generators.generate_adapters",
         "context.scripts.validators.adapter_drift",
         "context.scripts.generators.adapters.core.loader"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_gemini_adapter.py",
@@ -2557,7 +2803,8 @@
         "yaml",
         "context.scripts.generators.adapters.core.models",
         "context.scripts.generators.adapters.gemini.generator"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_github_adapter.py",
@@ -2609,7 +2856,8 @@
         "pathlib",
         "context.scripts.generators.adapters.core.models",
         "context.scripts.generators.adapters.github.generator"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_openai_adapter.py",
@@ -2646,7 +2894,8 @@
         "pathlib",
         "context.scripts.generators.adapters.core.models",
         "context.scripts.generators.adapters.openai.generator"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_packaging.py",
@@ -2683,7 +2932,8 @@
         "pathlib",
         "context.scripts.generators.generate_adapters",
         "context.scripts.validators.adapter_drift"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_runtime_telemetry.py",
@@ -2884,7 +3134,231 @@
         "pathlib",
         "importlib.util",
         "sys"
-      ]
+      ],
+      "extractor": "stdlib.ast"
+    },
+    {
+      "path": "context/scripts/tests/test_spec_indexer_extractors.py",
+      "language": "python",
+      "line_count": 249,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "INDEXER_PATH",
+          "signature": "",
+          "line": 14,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 15,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TSX_FIXTURE",
+          "signature": "",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_scan",
+          "signature": "(repo: Path, extractors: str, out_dir: Path)",
+          "line": 54,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_all_symbols",
+          "signature": "(index: dict)",
+          "line": 62,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_python_symbols",
+          "signature": "(index: dict)",
+          "line": 70,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestProbeAndPlan",
+          "signature": "",
+          "line": 74,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_probe_backends_never_raises",
+          "signature": "(self)",
+          "line": 75,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_auto_plan_python_uses_stdlib_ast",
+          "signature": "(self)",
+          "line": 80,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_auto_plan_ts_prefers_treesitter_when_available",
+          "signature": "(self)",
+          "line": 87,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_auto_plan_ts_degrades_to_astgrep_then_regex",
+          "signature": "(self)",
+          "line": 93,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_explicit_unavailable_backend_is_an_error",
+          "signature": "(self)",
+          "line": 104,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_explicit_ts_morph_unavailable_degrades_quietly",
+          "signature": "(self)",
+          "line": 111,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestProbeAndPlan.test_cli_rejects_unknown_extractor",
+          "signature": "(self)",
+          "line": 118,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestParity",
+          "signature": "",
+          "line": 124,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestParity.test_auto_and_stdlib_python_symbols_identical",
+          "signature": "(self, tmp_path)",
+          "line": 125,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestParity.test_auto_is_superset_of_stdlib",
+          "signature": "(self, tmp_path)",
+          "line": 134,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestParity.test_meta_provenance_fields_present",
+          "signature": "(self, tmp_path)",
+          "line": 143,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestCtagsBackend",
+          "signature": "",
+          "line": 162,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestCtagsBackend.test_python_file_yields_symbols",
+          "signature": "(self, tmp_path)",
+          "line": 163,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestCtagsBackend.test_ts_file_method_scoped_names",
+          "signature": "(self, tmp_path)",
+          "line": 175,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestTreeSitterBackend",
+          "signature": "",
+          "line": 186,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTreeSitterBackend.test_fixture_richer_than_regex",
+          "signature": "(self, tmp_path)",
+          "line": 187,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTreeSitterBackend.test_fixture_symbols_kinds",
+          "signature": "(self, tmp_path)",
+          "line": 217,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestAstGrepBackend",
+          "signature": "",
+          "line": 232,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestAstGrepBackend.test_fixture_interfaces_types_and_consts",
+          "signature": "(self, tmp_path)",
+          "line": 233,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "importlib.util",
+        "json",
+        "sys",
+        "pathlib",
+        "pytest"
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/tests/test_validators.py",
@@ -3904,14 +4378,16 @@
         "context.scripts.validators.subrepo_freshness",
         "unittest.mock",
         "subprocess"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/__init__.py",
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/adapter_drift.py",
@@ -3950,7 +4426,8 @@
         "pathlib",
         "context.scripts.generators.adapters.core.loader",
         "context.scripts.generators.generate_adapters"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/agent_definitions.py",
@@ -4149,7 +4626,8 @@
         "sys",
         "pathlib",
         "yaml"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/framework_docs_staleness.py",
@@ -4225,7 +4703,8 @@
         "subprocess",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/secrets.py",
@@ -4295,7 +4774,8 @@
         "re",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/subrepo_freshness.py",
@@ -4360,7 +4840,8 @@
         "sys",
         "dataclasses",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/supabase.py",
@@ -4438,7 +4919,8 @@
         "re",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/tech_writing.py",
@@ -4508,7 +4990,8 @@
         "re",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/testing.py",
@@ -4586,7 +5069,8 @@
         "re",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/typescript_environment.py",
@@ -4657,7 +5141,8 @@
         "re",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/ui_dev.py",
@@ -4799,7 +5284,8 @@
         "re",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/ui_testing.py",
@@ -4853,7 +5339,8 @@
         "json",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/verify_typst_formatting.py",
@@ -4923,7 +5410,8 @@
         "subprocess",
         "sys",
         "pathlib"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "context/scripts/validators/workspace_conventions.py",
@@ -5220,14 +5708,16 @@
         "sys",
         "pathlib",
         "typing"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "tests/context-unit-tests/__init__.py",
       "language": "python",
       "line_count": 2,
       "symbols": [],
-      "imports": []
+      "imports": [],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "tests/context-unit-tests/conftest.py",
@@ -5245,7 +5735,8 @@
       ],
       "imports": [
         "pytest"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "tests/context-unit-tests/test_doc_format.py",
@@ -5436,7 +5927,8 @@
         "pathlib",
         "pytest",
         "yaml"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "tests/context-unit-tests/test_llm_consistency.py",
@@ -5516,7 +6008,8 @@
         "pathlib",
         "typing",
         "pytest"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     },
     {
       "path": "tests/context-unit-tests/test_references.py",
@@ -5655,7 +6148,8 @@
         "typing",
         "pytest",
         "yaml"
-      ]
+      ],
+      "extractor": "stdlib.ast"
     }
   ],
   "api": [],
@@ -6033,6 +6527,66 @@
     {
       "node_id": "context/scripts/tests/test_runtime_telemetry.py::test_live_cline_storage_sanity",
       "file": "context/scripts/tests/test_runtime_telemetry.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_probe_backends_never_raises",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_auto_plan_python_uses_stdlib_ast",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_auto_plan_ts_prefers_treesitter_when_available",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_auto_plan_ts_degrades_to_astgrep_then_regex",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_explicit_unavailable_backend_is_an_error",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_explicit_ts_morph_unavailable_degrades_quietly",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_cli_rejects_unknown_extractor",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestParity::test_auto_and_stdlib_python_symbols_identical",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestParity::test_auto_is_superset_of_stdlib",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestParity::test_meta_provenance_fields_present",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestCtagsBackend::test_python_file_yields_symbols",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestCtagsBackend::test_ts_file_method_scoped_names",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestTreeSitterBackend::test_fixture_richer_than_regex",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestTreeSitterBackend::test_fixture_symbols_kinds",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestAstGrepBackend::test_fixture_interfaces_types_and_consts",
+      "file": "context/scripts/tests/test_spec_indexer_extractors.py"
     },
     {
       "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_valid_commit",

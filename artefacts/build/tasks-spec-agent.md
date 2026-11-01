@@ -8,6 +8,7 @@
 **Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
 **Amended**: 2026-01-11 (follow-up) — detail headings aligned to the task index; duplicate short T-015 section removed; T-021 (comment/docstring extraction) added after the AST-discard gap was identified
 **Amended**: 2026-01-11 (T-SETUP done) — T-SETUP marked completed (ctags 6.2.1, ast-grep 0.51.0, tree-sitter via uv, ts-morph skipped); T-015 ast-grep backend reworded to the `ast-grep` binary (`sg` deprecated as of 0.51)
+**Amended**: 2026-01-11 (T-015 done) — T-015 completed: `--extractors` backends (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph), `meta.extractors` + `meta.confidence` + per-file `extractor`, `ts_extract.mjs` helper, parity + fixture tests (15/15 with tree-sitter); README Commands notes the flag
 
 ## Task Index
 
@@ -17,7 +18,7 @@
 | T-SETUP | critical | completed | - | Install / verify toolchain dependencies (human-run) before implementation starts — verified 2026-01-11: ctags 6.2.1, ast-grep 0.51.0, tree-sitter OK via `uv run --with`, ts-morph skipped (absent) |
 | T-012 | high | completed | - | Write `context/scripts/code-specs/spec_indexer.py` (`scan` / `verify` subcommands) |
 | T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
-| T-015 | high | pending | T-SETUP | Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph) |
+| T-015 | high | completed | T-SETUP | Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph) |
 | T-014 | high | pending | T-SETUP,T-015 | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (documents the actual backends) |
 | T-001 | critical | pending | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
 | T-002 | high | pending | Q0 | Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery) |
@@ -303,6 +304,8 @@ before/after comparison is the acceptance metric):
 `context/workflows/derive-spec.yaml` (with T-002)
 
 ### T-015: Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph)
+
+**Status**: completed 2026-01-11 — `--extractors` (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph) implemented in `spec_indexer.py`; tree-sitter TS/TSX walker (multiline props, JSX usage, decorators); ast-grep rule patterns; ctags JSON for foreign langs; `ts_extract.mjs` ts-morph helper (skipped quietly when absent); `meta.extractors` provenance + `meta.confidence` tier + per-file `extractor` field. Tests: auto/stdlib Python parity + auto⊇stdlib superset + fixtures (13 passed, 2 skipped without tree-sitter; 15/15 with `uv run --with tree-sitter --with tree-sitter-language-pack`).
 
 #### Acceptance Criteria
 

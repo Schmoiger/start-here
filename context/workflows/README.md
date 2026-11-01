@@ -333,6 +333,14 @@ uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both
 # → artefacts/build/repo-index.json   (structured index)
 # → artefacts/build/spec-scan.md      (human/agent-readable evidence map)
 # → artefacts/build/repo-profile.md   (agent synthesis: app type, entry points, module boundaries)
+#
+# Extraction backends (T-015, --extractors):
+#   auto (default) — probe and prefer the richest backend per language:
+#     python → stdlib ast; TS/JS → tree-sitter (when available) → ast-grep → ts-morph → regex
+#   stdlib       — zero-dependency fallback tier (deterministic, reproduces the baseline exactly)
+#   ctags        — universal-ctags JSON (foreign langs: Go, Rust, Java, C, C++, Ruby, …)
+#   tree-sitter  — requires: uv run --with tree-sitter --with tree-sitter-language-pack python context/scripts/code-specs/spec_indexer.py scan …
+#   ast-grep | ts-morph — forced backends; an absent forced backend exits non-zero (ts-morph degrades quietly)
 
 # Phase 6 — every citation in the index resolves
 uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json
@@ -347,7 +355,7 @@ Produced by `scan`; consumed by every derive-spec agent.
 
 | Key | Contents |
 |-----|----------|
-| `meta` | repo, absolute root (`repo_abs`), UTC `generated_at`, mode, file/language counts, LOC, `scan_too_large` flag; `extractors` provenance (T-015) and `history` (T-017) when present |
+| `meta` | repo, absolute root (`repo_abs`), UTC `generated_at`, mode, file/language counts, LOC, `scan_too_large` flag, `confidence` tier, `extractors` provenance; `history` (T-017) when present |
 | `warnings` | scan-level warnings (e.g. size threshold, collection method) |
 | `docs` | existing spec documents: `[ {path, kind} ]` — `requirements │ architecture │ api │ design │ docs │ discovery │ prd │ tsd │ spec │ readme │ openapi` |
 | `files` | per file: path, language, line count, `symbols` (kind, name, signature, line, decorators, props), imports |
