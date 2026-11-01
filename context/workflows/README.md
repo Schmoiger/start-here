@@ -20,7 +20,7 @@ three things: **when to pick a workflow** (§2), **what each workflow contains**
 | `continuous-improvement` | `continuous-improvement.yaml` | Framework improvement — reactive (incident) or proactive (retrospective) | Retrospective discuss gate |
 | `deploy` | `deploy.yaml` | GCP cloud deployment and deployment review, after build local-deployment | deployment-review gate |
 | `design` | `design.yaml` | Discovery through design review — run before build | design-review gate |
-| `derive-spec` | `derive-spec.yaml` *(planned)* | Derive product and technical specifications from a codebase (organised or not) via deterministic indexing + agent synthesis | final review before promotion |
+| `derive-spec` | `derive-spec.yaml` *(planned)* | Derive product and technical specifications from a codebase (organised or not) via deterministic indexing + agent synthesis | final review before promotion to `derived/` |
 | `full-test` | `full-test.yaml` | Full-suite testing across all modules — run before merge to main or on demand | quality-check gate |
 | `prototype` | `prototype.yaml` | Fast iteration workflow for prototyping and experimentation | None (skip on promotion) |
 | `small-task` | `small-task.yaml` | Small, single-change, human-approved tasks done directly by the default agent | The approval is the gate (always) |
@@ -216,33 +216,33 @@ tech-lead (gate)`"]
 
 ```mermaid
 flowchart TD
-    A["`Intake & Scope
-mode · target · limits`"] --> B["`Repo & Doc Discovery
-indexer + spec-doc glob`"]
+    A["`Phase 0 · Intake & Scope
+mode · target · limits · output (derived/)`"] --> B["`Phase 1 · Repo & Doc Discovery
+indexer scan + repo profile + spec-doc glob`"]
     B --> C{"`Existing
 docs?`"}
-    C -- yes --> D["`Extract Existing Specs
-product · arch · api · data`"]
-    C -- no --> E["`Pure Code-Derived
+    C -- yes --> D["`Phase 2 · Extract Existing Specs
+product · arch · api · data + drift candidates`"]
+    C -- no --> E["`Phase 2 · Pure Code-Derived
 empty-extraction`"]
-    D --> F["`Evidence Gathering
+    D --> F["`Phase 3 · Evidence Gathering
 indexer: symbols · routes · UI · schema · tests`"]
     E --> F
     F --> G{"Mode"}
-    G -- product --> H["`Product Derivation
-UI inventory → features → UX flows`"]
-    G -- technical --> I["`Technical Derivation
-architecture · api draft · data model`"]
+    G -- product --> H["`Phase 4a · Product Derivation
+UI inventory → features → roles → UX flows`"]
+    G -- technical --> I["`Phase 4b · Technical Derivation
+architecture · api-catalogue draft · data model`"]
     G -- both --> H --> I
-    H --> J["`Draft with Confidence
-tier + % + file:line per subsection`"]
+    H --> J["`Phase 5 · Draft with Confidence
+tier + banded % + file:line · open questions · drift`"]
     I --> J
-    J --> K["`Verification Pass
+    J --> K["`Phase 6 · Verification Pass
 evidence vs claims · question coverage`"]
-    K --> L["`Batched Human Confirmation
+    K --> L["`Phase 7 · Batched Human Confirmation
 product-owner · MC questions`"]
-    L --> M["`Finalise & Review Gate
-human APPROVED → promote to canonical`"]
+    L --> M["`Phase 8 · Finalise & Review Gate
+human APPROVED → promote to artefacts/{category}/derived/`"]
 ```
 
 ### Runtime Sequence
@@ -256,72 +256,89 @@ sequenceDiagram
     participant T as Tool (spec_indexer.py)
     participant D as Disk (artefacts/)
 
-    loop Initialise
-    H->>O: run derive-spec (mode=product, technical, both)
-    O->>D: orchestrator: write HANDOFF.md (Workflow: derive-spec, Phase: discovery)
+    loop Phase 0 — Intake & Scope
+    H->>O: run derive-spec (mode=product | technical | both, target, limits)
+    O->>D: orchestrator: write HANDOFF.md (Workflow: derive-spec, Phase: 1)
     end
-    loop Discovery
-    O->>A: spawn agent (intake scope, confirm doc-discovery list)
-    A->>T: scan --repo --mode
+    loop Phase 1 — Repo & Doc Discovery
+    O->>A: spawn agent (confirm intake scope + doc-discovery list)
+    A->>T: scan --repo --mode (extractors, scope target per repo)
     T->>D: output (repo-index.json, spec-scan.md)
+    A->>D: write repo-profile.md (app type, entry points, boundaries)
     end
-    loop Synthesise
-    D->>A: read existing specs (requirements.md, architecture.md), read tool output
-    A->>A: infer features, UX flows, architecture, API, data model
-    A->>D: draft specs, with: confidence (%, choice: validated, unvalidated), citations, open questions
+    loop Phase 2 — Baseline & Drift
+    D->>A: read existing specs (requirements.md, architecture.md) + index
+    A->>D: drift candidates (existing-doc vs code deltas)
+    end
+    loop Phase 3 — Evidence Gathering
+    A->>T: scan (evidence pass: symbols · routes · UI · schema · tests)
+    A->>A: cross-index reasoning over repo-index.json, targeted line-range reads only
+    end
+    loop Phase 4 — Derivation
+    A->>A: 4a product: UI inventory → features → roles/actors → UX flows
+    A->>A: 4b technical: architecture · api-catalogue draft · data-model draft
+    end
+    loop Phase 5 — Draft with Confidence
+    A->>D: draft specs staged in artefacts/build/spec-drafts/ (tier + banded % + file:line, open questions, drift section)
+    end
+    loop Phase 6 — Verification Pass
     A->>T: verify --index (citation resolution re-check)
     T-->>A: OK / FAIL list
     A->>O: signal preliminary analysis complete, commit-msg.txt
     O->>O: interim commit, update HANDOFF.md
     end
-    loop HITL Verify
-    A->>H: one round of batched, multiple-choice questions
-    H->>A: answers ("skip questions" → stated assumptions)
+    loop Phase 7 — Human Confirmation
+    A->>H: one round of batched, multiple-choice questions (drift items first)
+    H->>A: answers ("skip questions" → stated assumptions, unanswered → stay Assumed)
     end
-    loop Finalise
-    A->>D: update drafts, resolve questions, report drift
+    loop Phase 8 — Finalise & Review Gate
+    A->>D: update drafts + confidence bands, resolve questions, report drift
     A->>T: verify --doc on final drafts
     A->>O: signal final draft complete, commit-msg.txt
     O->>H: review gate — APPROVED?
     H->>O: APPROVED
-    O->>D: promote drafts to canonical artefacts and commit
+    O->>D: promote drafts to artefacts/{category}/derived/ and commit
     end
 ```
 
 | Action | Tool (@ zero token cost) | Agent (@ token spend) |
 |-------|----------------|-------------------|
-| Discovery + scan | `git ls-files`, language detection, doc globs | Confirms the discovered doc list |
-| Existing-spec extraction | doc classification | Reads the prose docs (small) |
-| Evidence gathering | stdlib `ast` (Python), TS/JSX heuristics, SQL `CREATE TABLE` parser, PyYAML OpenAPI, `pytest --collect-only`, `yarn test --listTests` | Cross-index reasoning over `repo-index.json`; targeted line-range reads only |
-| Product derivation | component/prop inventory (UI) | Features from UI inventory; UX flows via call chains |
-| Technical derivation | route/schema/API inventory | Architecture, API draft, data-model draft |
-| Draft + confidence | — | Subsections: tier + % + citations; open questions |
-| Verification | citation resolution re-check using `verify` subcommand | Fixes unresolved or uncovered claims |
-| Human confirmation | — | Batched MC questions (reverse-spec format) |
-| Finalise + review gate | `verify --doc` on the final drafts | Human APPROVED, then promotion + commit |
+| Phase 1 · Discovery + scan | `git ls-files`, language detection, doc globs | Confirms the discovered doc list; writes `repo-profile.md` |
+| Phase 2 · Existing-spec extraction | doc classification | Reads the prose docs (small); builds drift candidates |
+| Phase 3 · Evidence gathering | stdlib `ast` (Python), TS/JSX heuristics, SQL `CREATE TABLE` parser, PyYAML OpenAPI, `pytest --collect-only`, `yarn test --listTests` (+ `config`/`history` keys, T-016/T-017) | Cross-index reasoning over `repo-index.json`; targeted line-range reads only |
+| Phase 4a · Product derivation | component/prop inventory (UI) | Features from UI inventory; roles/actors (`reverse-spec.md` §1.1); UX flows via call chains |
+| Phase 4b · Technical derivation | route/schema/API inventory | Architecture, api-catalogue draft, data-model draft |
+| Phase 5 · Draft + confidence | — | Subsections: tier + banded % + citations; open questions; drift |
+| Phase 6 · Verification | citation resolution re-check using `verify` subcommand | Fixes unresolved or uncovered claims |
+| Phase 7 · Human confirmation | — | Batched MC questions (reverse-spec format), drift items first |
+| Phase 8 · Finalise + review gate | `verify --doc` on the final drafts | Human APPROVED, then promotion to `artefacts/{category}/derived/` + commit |
 
 ### Notes for agents
 
 - Be token-efficient: invoke tools analyse the repo using the analyse-repo skill rather than doing the work yourself
-- 3 modes: `product` / `technical` / `both`; set at intake. Shared phases run once; product/technical phases branch after evidence gathering
+- 3 modes: `product` / `technical` / `both`; set at intake. Shared phases (0–3, 5–8) run once; product/technical phases branch after evidence gathering (4a/4b)
 - Do not assume a directory structure, find candidates by searching globs
-- Batch the human interactions. Use requirements-elicitation skill to question the human. If the answers are not known, the confidence does not improve.
-- Do not rewrite existing docs; analysis produces new docs only
+- Monorepo / multi-repo: run once per repo or service — scope the scan with `--repo <service-root>`; one HANDOFF per run. Products spanning several repos get one derived spec set per repo; cross-repo questions go to the elicitation round
+- Batch the human interactions. Use requirements-elicitation skill to question the human; ask drift items (existing-doc vs code deltas) before pure code facts. If the answers are not known, the confidence does not improve.
+- Confidence bands: Verified 85–100 · Needs Confirmation 50–85 · Assumed <50. Confirmed answers raise the band/%; unanswered questions stay Assumed and remain in the open-questions appendix
+- Product derivation includes actor/role discovery from auth/permission evidence
+- Outputs land in `derived/`: drafts are staged in `artefacts/build/spec-drafts/`, approval promotes to `artefacts/{category}/derived/`; canonical docs are never rewritten
 - Respect scope limits to bound token burn; `max-files` flag surfaces large repos; read the index to target file reads
 
 ### Commands
 
 ```bash
-# Phase 1/3 — build the index and the compact evidence map (zero LLM tokens)
+# Phases 1 & 3 — build the index and the compact evidence map (zero LLM tokens); the agent writes repo-profile.md from it
 uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both
-# → artefacts/build/repo-index.json  (structured index)
+# → artefacts/build/repo-index.json   (structured index)
 # → artefacts/build/spec-scan.md      (human/agent-readable evidence map)
+# → artefacts/build/repo-profile.md   (agent synthesis: app type, entry points, module boundaries)
 
 # Phase 6 — every citation in the index resolves
 uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json
 
-# Phase 8 — every file:line cited by a drafted spec doc resolves
-uv run context/scripts/code-specs/spec_indexer.py verify --doc artefacts/product/product-spec.derived.md
+# Phase 8 — every file:line cited by a final draft resolves
+uv run context/scripts/code-specs/spec_indexer.py verify --doc artefacts/product/derived/product-spec.md
 ```
 
 ### Repository Index (`repo-index.json`)
@@ -330,7 +347,7 @@ Produced by `scan`; consumed by every derive-spec agent.
 
 | Key | Contents |
 |-----|----------|
-| `meta` | repo, absolute root (`repo_abs`), UTC `generated_at`, mode, file/language counts, LOC, `scan_too_large` flag |
+| `meta` | repo, absolute root (`repo_abs`), UTC `generated_at`, mode, file/language counts, LOC, `scan_too_large` flag; `extractors` provenance (T-015) and `history` (T-017) when present |
 | `warnings` | scan-level warnings (e.g. size threshold, collection method) |
 | `docs` | existing spec documents: `[ {path, kind} ]` — `requirements │ architecture │ api │ design │ docs │ discovery │ prd │ tsd │ spec │ readme │ openapi` |
 | `files` | per file: path, language, line count, `symbols` (kind, name, signature, line, decorators, props), imports |
@@ -338,6 +355,8 @@ Produced by `scan`; consumed by every derive-spec agent.
 | `schema` | `[ {table, columns:[{name,type}], file, line} ]` from SQL migrations plus OpenAPI schema names |
 | `ui` | `[ {component, file, line, props, usages, kind} ]` from TS/JSX component definitions, aggregated with JSX-tag usage counts |
 | `tests` | `[ {node_id, file} ]` from pytest collection / jest listTests — each test name is a candidate feature |
+| `config` | *(planned · T-016)* `[ {key, source(file:line), value-hint} ]` env/config/feature-flag keys and defaults — user-facing constraints for product spec + TSD constraints |
+| `meta.history` | *(planned · T-017)* capped git history: recent commit subjects + renames — zero-LLM feature descriptions, esp. for unorganised repos |
 
 The index is deterministic: re-running the scan on the same tree is idempotent,
 and `verify` will fail any citation that no longer resolves after edits.

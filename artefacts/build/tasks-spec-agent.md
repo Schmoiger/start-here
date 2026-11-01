@@ -6,6 +6,7 @@
 **Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/code-specs/spec_indexer.py` (schema documented in README Commands / Repository Index)
 **Created**: 2026-10-29
 **Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
+**Amended**: 2026-01-11 — Decisions A1–A4 recorded (outputs land in `derived/`; fixed confidence bands; monorepo handled per-repo via `--repo <service-root>`; pilot B repo per human choice); tasks T-016…T-020 added; T-001/T-002/T-003/T-005/T-006/T-008/T-013/T-014 acceptance criteria amended; workflows README derive-spec diagrams phase-aligned (0–8)
 
 ## Task Index
 
@@ -25,9 +26,14 @@
 | T-006 | medium | pending | T-001 | Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix) |
 | T-007 | high | pending | T-001,T-002,T-006 | Regenerate adapters; run validators green |
 | T-010 | high | pending | T-007 | Unit tests: skill/workflow schema, indexer extraction + verify |
-| T-008 | critical | pending | T-010 | Pilot: run derive-spec (`mode=both`) on this repo; measure token ledger before/after |
+| T-008 | critical | pending | T-010 | Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/` |
 | T-009 | low | pending | T-008 | Optional: register derive-spec as a `build.yaml` precursor phase |
 | T-013 | high | pending | T-002,T-012 | Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges) |
+| T-016 | high | pending | T-015 | Indexer: env/config/feature-flag extraction into `config` key — user-facing constraints for product spec + TSD constraints |
+| T-017 | medium | pending | T-015 | Indexer: capped git-history evidence into `meta.history` (commit subjects + renames; zero LLM) |
+| T-018 | high | pending | T-006 | Confidence bands + promotion DoD in `derived-spec-template.md` (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50; unanswered stays Assumed) |
+| T-019 | critical | pending | T-008 | Pilot B: derive-spec on the human-chosen foreign/unorganised repo; validate Phases 1–2 + `derived/` landing |
+| T-020 | low | pending | T-010 | Extend `verify` with `--require-coverage` (deterministic Phase 6 gate: tier + % + citation per subsection) |
 
 ## File Scope
 
@@ -45,24 +51,25 @@
 - `context/skills/requirements-elicitation.md` — adds confirmation mode
 - `context/templates/derived-spec-template.md` — derived spec output format
 - `context/workflows/build.yaml` — optional precursor-phase dependency
-- Derived outputs (drafts, then promoted on approval): `artefacts/product/`, `artefacts/architecture/`
+- Derived outputs (staged drafts, then promoted on approval): `artefacts/build/spec-drafts/` → `artefacts/{product,architecture}/derived/`; plus `artefacts/build/repo-profile.md`
 
 ## Recommended Decisions (Q0)
 
-Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
+Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-11 — Q1 (A1: land in `derived/`), Q4 (A2: fixed confidence bands), Q11 (A3: monorepo per-repo), and T-019 (A4: pilot B repo, human-chosen). Chosen options bind T-001 and T-002.
 
 | Q | Question | Decision | Rationale |
 |---|----------|----------|-----------|
-| Q1 | Output location for generated specs | **C** — per-run choice via workflow input; default drafts `artefacts/product/product-spec.derived.md`, `artefacts/architecture/*.derived.md`; promoted only on approval | Never clobbers canonical docs; matches artefacts layout |
+| Q1 | Output location for generated specs | **C** — per-run choice via workflow input; drafts staged in `artefacts/build/spec-drafts/`, approval promotes to `artefacts/{category}/derived/` (e.g. `artefacts/product/derived/product-spec.md`) | Decision **A1**: land in `derived/`; derive-spec never rewrites canonical docs |
 | Q2 | Question format for confirmation | **A** — numbered multiple-choice with “Other”, each citing files (reverse-spec Step 3) | One batched round; highest completion rate |
 | Q3 | Repo organisation scope | **C** — configurable `spec-docs-glob` (defaults: `artefacts/product/**`, `artefacts/architecture/**`, `docs/**`, `**/README.md`, `PRD*`, `*spec*.md`, `openapi*.yaml`) | Structured + unstructured repos; candidates confirmed by human, never silent |
-| Q4 | Confidence model | **B** — tier (Verified / Needs Confirmation / Assumed) + % per subsection + `file:line` evidence | Auditable; citations originate from the indexer |
+| Q4 | Confidence model | **B** — tier (Verified / Needs Confirmation / Assumed) + banded % per subsection + `file:line` evidence: **Verified 85–100 · Needs Confirmation 50–85 · Assumed <50** | Decision **A2**: fixed bands; confirmed answers raise band/%; unanswered questions stay Assumed (still-open appendix) |
 | Q5 | Agent for technical synthesis | **A** — reuse `@solution-architect` via a derive mode | Modes are the harness pattern; no roster bloat |
 | Q6 | Elicitation skill for technical confirmation | **B** — add a confirmation mode to `requirements-elicitation.md` | One elicitation skill; product-owner already loads it; discipline identical |
 | Q7 | Integration with build workflow | **B** — standalone first; optional precursor phase in `build.yaml` later (T-009) | Bootstrap capability, then wire in |
 | Q8 | Maximum repo size / scan limit | **B** — line/file-count threshold; large repos flagged for human scoping (`scan_too_large` meta flag) | A size-bound agent reads an index, so bounds are cheap |
 | Q9 | Mode selection mechanism | **A** — workflow input (`--mode product \| technical \| both`); recorded in `index.meta.mode` | Deterministic, reproducible, testable |
 | Q10 | Combined output format | **B** — separate docs per artefacts category (product-spec, architecture, data model, api catalogue) | Matches the canonical artefacts layout 1:1 |
+| Q11 | Monorepo / multi-repo handling | **A** — run once per repo or service; `--repo <service-root>` scopes the scan; one HANDOFF per run | Decision **A3**: products spanning multiple repos get one derived spec set per repo; cross-repo questions go to the elicitation round |
 
 ---
 
@@ -73,8 +80,10 @@ Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
 #### Acceptance Criteria
 
 - Frontmatter matches skill schema: `name`, `description`, `globs` (target: `**/*.py`, `**/*.ts`, `**/*.tsx`, `**/*.sql`, `**/openapi*.yaml`, `repo-index.json`)
-- Covers procedural steps for both modes: discovery (glob candidates + human confirmation), evidence consumption from `repo-index.json`, product derivation (UI inventory → candidate features → UX flows), technical derivation (architecture / API draft / data-model draft), confidence model (tier + % + citation), open-question batching, verification via `spec_indexer.py verify`
-- States output lifecycle: derived drafts only, promotion behind approval; drift section vs canonical docs
+- Covers procedural steps for both modes: discovery (glob candidates + human confirmation), evidence consumption from `repo-index.json` + `repo-profile.md`, product derivation (UI inventory → candidate features → roles/actors → UX flows), technical derivation (architecture / API draft / data-model draft), confidence model (tier + banded % + citation), open-question batching, verification via `spec_indexer.py verify`
+- Includes repo-profiling guidance (Phase 1: app type, entry points, module boundaries from the index) for unorganised repositories
+- Question ordering: drift candidates (existing-doc vs code deltas) before pure code facts; product derivation names the actor/role per UX flow
+- States output lifecycle: drafts staged in `artefacts/build/spec-drafts/`, promotion to `artefacts/{category}/derived/` behind approval (T-018 DoD); canonical docs never rewritten; drift section vs canonical docs
 - References the workflows README § 4 (runtime/tools) without duplicating the schema table
 
 #### Primary Output Path
@@ -85,9 +94,11 @@ Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
 
 #### Acceptance Criteria
 
-- Phases 0–8 per workflows README; mode conditional on 4a/4b; shared phases single-run
-- Each phase declares `agents`, `outputs`, `validation:`; gate phases (`verification` pass, `final review`) marked `gate: true` with APPROVED semantics
-- `state_recovery:` reads `artefacts/build/spec-scan.md` and `repo-index.json`; critical files listed
+- Phases 0–8 per workflows README (diagram + Commands, phase-aligned): intake (0) · discovery + repo profile (1) · baseline + drift (2) · evidence (3) · derivation 4a/4b (mode conditional) · draft (5) · verification (6) · confirmation (7) · finalise + gate (8); shared phases single-run
+- Intake inputs: `mode`, `target` (service root passed to the indexer via `--repo <service-root>`), limits, output location
+- Each phase declares `agents`, `outputs`, `validation:`; gate phases (Phase 6 verification pass, Phase 8 final review) marked `gate: true` with APPROVED semantics
+- `state_recovery:` reads `artefacts/build/spec-scan.md`, `repo-profile.md` and `repo-index.json`; critical files listed
+- Promotion path wired: drafts in `artefacts/build/spec-drafts/`; APPROVED copies to `artefacts/{category}/derived/`
 - Phase 6 invokes `spec_indexer.py verify --index`; Phase 8 invokes `verify --doc` on drafts
 
 #### Primary Output Path
@@ -99,6 +110,7 @@ Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
 #### Acceptance Criteria
 
 - New Mode (derive) declared alongside existing modes: loads `derive-spec.md`, runs product derivation, writes drafts, bats MC questions (Q2 format), updates per answers
+- Product derivation includes actor/role discovery from auth/permission evidence (`reverse-spec.md` §1.1); each UX flow names its actor, cited to the auth evidence
 - Intake, escalation, reporting, state-recovery protocols unchanged; derives never promote
 
 #### Primary Output Path
@@ -121,7 +133,7 @@ Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
 #### Acceptance Criteria
 
 - Confirmation mode documented distinctly from problem-discovery: batched MC + Other, evidence-cited, one/two questions at a time, stop-and-wait
-- Exit criteria: every Assumed claim has a question; confirmed answers update drafts
+- Exit criteria: every Assumed / Needs-Confirmation claim has a question; confirmed answers update drafts **and** the banded confidence (Assumed → Needs Confirmation → Verified); questions the human cannot answer stay Assumed and remain in the open-questions appendix as still-open
 
 #### Primary Output Path
 
@@ -131,12 +143,30 @@ Q0 recorded on 2026-10-30 during planning; chosen options bind T-001 and T-002.
 
 #### Acceptance Criteria
 
-- Subsection skeletons for product-spec / architecture / data model / api catalogue with confidence fields (tier + % + evidence `path:line`)
+- Subsection skeletons for product-spec / architecture / data model / api catalogue with confidence fields (tier + banded % + evidence `path:line`)
 - Open-question appendix format (per subsection, priority, MC options), drift section header
+- Confidence band rubric + promotion DoD drafted here, hardened with T-018
 
 #### Primary Output Path
 
 `context/templates/derived-spec-template.md`
+
+---
+
+### T-018: Confidence bands + promotion DoD in `context/templates/derived-spec-template.md`
+
+#### Acceptance Criteria
+
+- Band table with fixed ranges (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50) stating what evidence each band requires (citations + usage counts, call chains, human-confirmed)
+- Per-doc promotion definition of done (e.g. no subsection below Needs Confirmation and no blocking still-open questions, or recorded human override)
+- Update rule baked into the subsection template: confirmed answer → raise band/%; unanswered question → stays Assumed and remains in the open-questions appendix as still-open
+- Consumed by T-005 exit criteria and the Phase 8 promotion decision
+
+#### Primary Output Path
+
+`context/templates/derived-spec-template.md` (amended with T-006)
+
+---
 
 ### T-007: Regenerate adapters and validators
 
@@ -167,12 +197,29 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 `context/scripts/tests/test_spec_indexer.py`
 
-### T-008: Pilot run (mode=both, this repo)
+---
+
+### T-020: Optional: `verify --require-coverage` — deterministic Phase 6 gate
 
 #### Acceptance Criteria
 
-- `scan` + draft + confirmation + review run end-to-end on start-here
-- Every generated subsection carries tier + % + citation; `verify --doc` on all drafts passes
+- `spec_indexer.py verify --doc --require-coverage` exits non-zero listing subsections missing tier / banded % / `file:line` in a derived-spec doc
+- Coverage check parses the template's confidence fields (T-006/T-018 schema) so the Phase 6 "question coverage" check is deterministic, not agent-discretion
+- Documented in the analyse-repo skill (T-014) and README Commands; run against pilot A/B drafts (T-008/T-019)
+
+#### Primary Output Path
+
+`context/scripts/code-specs/spec_indexer.py` (extend `verify`) + `context/scripts/tests/test_spec_indexer.py`
+
+---
+
+### T-008: Pilot A — run on this repo (mode=both)
+
+#### Acceptance Criteria
+
+- `scan` + draft + confirmation + review run end-to-end on start-here (Pilot A)
+- Every generated subsection carries tier + banded % + citation; `verify --doc` on all drafts passes
+- Final docs land in `artefacts/{product,architecture}/derived/`; canonical `requirements.md` / `architecture.md` untouched (`git diff --stat` shows zero changes to canonical)
 - Drift section present where derived behaviour differs from `requirements.md` / `architecture.md`
 - Token ledger filled with measured before/after
 
@@ -194,6 +241,24 @@ before/after comparison is the acceptance metric):
 
 `artefacts/build/spec-pilot-report.md`
 
+---
+
+### T-019: Pilot B — foreign/unorganised repo (human-chosen)
+
+#### Acceptance Criteria
+
+- Run derive-spec end-to-end (`mode=both`) on the human-chosen foreign repo (repo + URL recorded in HANDOFF.md at pilot start; not organised like start-here — no harness artefacts layout)
+- Phases 1–2 validated: repo profile correctly characterises app type / entry points / module boundaries; doc discovery finds candidates via basename/glob patterns; drift section populated where README/spec docs disagree with code
+- Outputs land in `<foreign-repo>/artefacts/{product,architecture}/derived/` (repo-local), canonical docs untouched
+- `verify --doc` passes; `--require-coverage` (T-020) passes if implemented; token ledger extended with pilot B measurements
+- Unstructured-repo gaps feed back into the T-016/T-017 backlog (config/history evidence)
+
+#### Primary Output Path
+
+`artefacts/build/spec-pilot-report.md` (extended — records pilots A and B)
+
+---
+
 ### T-009: Optional build.yaml precursor integration
 
 #### Acceptance Criteria
@@ -209,6 +274,8 @@ before/after comparison is the acceptance metric):
 #### Acceptance Criteria
 
 - Phases 1/3 consume `repo-index.json` + `spec-scan.md`; agent `tool_scope` restricted to index + cited line ranges
+- Phase 1 wires `repo-profile.md` (agent synthesis from the index: app type, entry points, module boundaries) as an input to Phases 2–5
+- Promotion path wired: `artefacts/build/spec-drafts/` → `artefacts/{category}/derived/` on APPROVED (per T-018 DoD)
 - Re-scan rule documented (index refresh before `verify`)
 
 #### Primary Output Path
@@ -289,14 +356,45 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 ---
 
+### T-016: Indexer `config` extraction (env / config / feature flags)
+
+#### Acceptance Criteria
+
+- `scan` collects env-style keys and defaults from `.env.example`, `settings.py` / `config.*` modules, and YAML/JSON config files into a new `config` key: `[ {key, source(file:line), value-hint} ]`
+- Feature flags / environment toggles (e.g. `ENABLE_*`, boolean config entries) are flagged as such
+- Zero-LLM and deterministic; `verify --index` covers the new citations; `--extractors` backends contribute where they add value (e.g. ctags for `config.*`)
+- Documented in the analyse-repo skill (T-014) and README `## Repository Index` table
+- Feeds phases 4a/4b: user-facing constraints → product spec + TSD constraints subsections (reverse-spec/arch "user-facing technical constraints")
+
+#### Primary Output Path
+
+`context/scripts/code-specs/spec_indexer.py` (+ `context/workflows/README.md` index table, `context/skills/analyse-repo.md`)
+
+---
+
+### T-017: Indexer `meta.history` (capped git-history evidence)
+
+#### Acceptance Criteria
+
+- `scan` records `meta.history`: last N (default 200) commit subjects + rename/refactor clues (`git log --name-status`, capped), zero-LLM
+- Optional flag `--history N` bounds the pull; key absent when the repo has no git metadata
+- Used by the agent as cheap feature descriptions, esp. for unorganised repos — commit subjects may cite feature intent
+- Documented in the analyse-repo skill (T-014) and README `## Repository Index` table
+
+#### Primary Output Path
+
+`context/scripts/code-specs/spec_indexer.py` (+ `context/workflows/README.md` index table, `context/skills/analyse-repo.md`)
+
+---
+
 #### Orchestrator Notes
 
 **Parallelism Strategy**
 
-- T-015 (extraction backends) runs critical path after Q0
-- T-014 (analyse-repo skill) depends on T-015 backends being implemented
+- T-015 → T-016 (config) + T-017 (history) run critical path after Q0
+- T-014 (analyse-repo skill) depends on T-015/T-016/T-017 being implemented
 - T-001 → T-002 → T-003 + T-004 + T-005 run in parallel (file-scope disjoint)
-- T-006 → T-007 → T-010 → T-008 → T-009, T-013
+- T-006 + T-018 → T-007 → T-010 (+ T-020) → T-008 (Pilot A) → T-019 (Pilot B) → T-009, T-013
 
 **Commit Strategy**
 
@@ -314,12 +412,13 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 
 #### Acceptance Criteria
 
-- Frontmatter matches the skill schema: `name: analyse-repo`, `description` (procedural guidance for analysing a repository with the deterministic spec-indexer tools before agent synthesis), `globs` covering `**/repo-index.json`, `**/spec-scan.md`, `**/*.py`, `**/*.ts`
+- Frontmatter matches the skill schema: `name: analyse-repo`, `description` (procedural guidance for analysing a repository with the deterministic spec-indexer tools before agent synthesis), `globs` covering `**/repo-index.json`, `**/spec-scan.md`, `**/repo-profile.md`, `**/*.py`, `**/*.ts`
 - Documents, with exact commands and flags:
   - `scan` invocation per derive-spec phases 1/3 (`--repo`, `--mode`, `--max-files`, `--out`, `--extractors`), and `verify --index` / `verify --doc` per phases 6/8
-  - consuming `repo-index.json` (schema summary incl. `meta.extractors` provenance and per-file `extractor` field) and `spec-scan.md`
+  - consuming `repo-index.json` (schema summary incl. `meta.extractors` provenance and per-file `extractor` field), `spec-scan.md`, and `repo-profile.md`; documents the planned `config` (T-016) and `meta.history` (T-017) keys once implemented
+  - documents how the agent writes `repo-profile.md` (app type, entry points, module boundaries) as the Phase 1 deliverable
   - documents the actual T-015 backends (tree-sitter / ast-grep / ctags / ts-morph / stdlib fallback) and their `--extractors` choices, with degradation semantics
-  - evidence citation discipline (`file:line` per claim) and confidence tiers
+  - evidence citation discipline (`file:line` per claim) and confidence bands (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50)
   - re-scan rule: refresh the index before `verify` after any edit
   - token rationale: extraction is zero-LLM; the agent reads the index and cited line ranges only
 - States that agents must invoke the tools rather than reading the repository directly (README derive-spec note: "invoke tools analyse the repo using the analyse-repo skill")
@@ -335,8 +434,8 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 
 ### Parallelism Strategy
 
-**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-015 (extraction backends) → T-014 (analyse-repo skill, documents the backends) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 → T-007 → T-010 → T-008 → T-009, T-013.
-file_scope: `context/skills/` (T-001, T-005), `context/agents/` (T-003, T-004), `context/templates/` (T-006), `context/scripts/code-specs/` (T-015)
+**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-015 (extraction backends) → T-016 (config extraction) → T-017 (git-history evidence) → T-014 (analyse-repo skill, documents the backends) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 + T-018 (template + confidence bands) → T-007 → T-010 (+ T-020) → T-008 (Pilot A) → T-019 (Pilot B) → T-009, T-013.
+file_scope: `context/skills/` (T-001, T-005, T-014), `context/agents/` (T-003, T-004), `context/templates/` (T-006, T-018), `context/scripts/code-specs/` (T-015, T-016, T-017, T-020), `artefacts/build/` (T-019 reports)
 
 ### Commit Strategy
 
