@@ -75,7 +75,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ## Task
 
-### T-001: Create skill `context/skills/derive-spec.md`
+### T-001: Create skill `context/skills/derive-spec.md` (modes: product, technical, both)
 
 #### Acceptance Criteria
 
@@ -90,7 +90,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 `context/skills/derive-spec.md`
 
-### T-002: Create workflow `context/workflows/derive-spec.yaml`
+### T-002: Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery)
 
 #### Acceptance Criteria
 
@@ -105,7 +105,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 `context/workflows/derive-spec.yaml`
 
-### T-003: Extend `context/agents/product-owner.md` with derive mode
+### T-003: Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill)
 
 #### Acceptance Criteria
 
@@ -117,7 +117,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 `context/agents/product-owner.md`
 
-### T-004: Extend `context/agents/solution-architect.md` with derive mode
+### T-004: Extend `context/agents/solution-architect.md` — derive mode (drafts only)
 
 #### Acceptance Criteria
 
@@ -139,7 +139,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 `context/skills/requirements-elicitation.md`
 
-### T-006: Add `context/templates/derived-spec-template.md`
+### T-006: Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix)
 
 #### Acceptance Criteria
 
@@ -153,7 +153,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ---
 
-### T-018: Confidence bands + promotion DoD in `context/templates/derived-spec-template.md`
+### T-018: Confidence bands + promotion DoD in `derived-spec-template.md` (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50; unanswered stays Assumed)
 
 #### Acceptance Criteria
 
@@ -168,7 +168,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ---
 
-### T-007: Regenerate adapters and validators
+### T-007: Regenerate adapters; run validators green
 
 #### Acceptance Criteria
 
@@ -179,7 +179,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
-### T-010: Unit tests
+### T-010: Unit tests: skill/workflow schema, indexer extraction + verify
 
 #### Acceptance Criteria
 
@@ -199,7 +199,7 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ---
 
-### T-020: Optional: `verify --require-coverage` — deterministic Phase 6 gate
+### T-020: Extend `verify` with `--require-coverage` (deterministic Phase 6 gate: tier + % + citation per subsection)
 
 #### Acceptance Criteria
 
@@ -213,7 +213,7 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ---
 
-### T-008: Pilot A — run on this repo (mode=both)
+### T-008: Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/`
 
 #### Acceptance Criteria
 
@@ -243,7 +243,7 @@ before/after comparison is the acceptance metric):
 
 ---
 
-### T-019: Pilot B — foreign/unorganised repo (human-chosen)
+### T-019: Pilot B: derive-spec on the human-chosen foreign/unorganised repo; validate Phases 1–2 + `derived/` landing
 
 #### Acceptance Criteria
 
@@ -259,7 +259,7 @@ before/after comparison is the acceptance metric):
 
 ---
 
-### T-009: Optional build.yaml precursor integration
+### T-009: Optional: register derive-spec as a `build.yaml` precursor phase
 
 #### Acceptance Criteria
 
@@ -269,7 +269,7 @@ before/after comparison is the acceptance metric):
 
 `context/workflows/build.yaml`
 
-### T-013: Wire indexer into derive-spec workflow
+### T-013: Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges)
 
 #### Acceptance Criteria
 
@@ -282,7 +282,7 @@ before/after comparison is the acceptance metric):
 
 `context/workflows/derive-spec.yaml` (with T-002)
 
-### T-015: Tool-backed extraction backends with graceful fallback
+### T-015: Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph)
 
 #### Acceptance Criteria
 
@@ -310,7 +310,7 @@ before/after comparison is the acceptance metric):
 
 `context/scripts/code-specs/spec_indexer.py` + `context/scripts/code-specs/ts_extract.mjs` (+ docs: `context/workflows/README.md` § derive-spec Commands, `artefacts/build/tasks-spec-agent.md`)
 
-### T-SETUP: Install and verify toolchain dependencies (human-run)
+### T-SETUP: Install / verify toolchain dependencies (human-run) before implementation starts
 
 #### Acceptance Criteria
 
@@ -332,27 +332,6 @@ before/after comparison is the acceptance metric):
 #### Primary Output Path
 
 Environment only — verify via the acceptance criteria; record completion in HANDOFF.md (`Workflow: derive-spec`, note "deps installed").
-
----
-
-### T-015: Tool-backed extraction backends with graceful fallback
-
-#### Acceptance Criteria
-
-- Add `--extractors` CLI flag: `auto|stdlib|ctags|tree-sitter|ast-grep|ts-morph` (default `auto`)
-- Implement universal-ctags JSON extraction (parse JSON) for foreign langs (Go, Rust, Java, etc.) via `--output-format=json --fields=+n`
-- Implement tree-sitter backend for Python/TS/JS/TSX using `tree-sitter-language-pack` (auto-probe, fallback to stdlib)
-- Implement ast-grep backend (`sg`) for TS/JS/JSX quick extractions (patterns via `sg run -p <pat> --json`)
-- Provide optional `ts_extract.mjs` helper for ts-morph (Node.js) — invoked on demand, skip gracefully if unavailable
-- Record provenance in `meta.extractors` and per-file `extractor` field in `FileRecord`
-- Degraded-mode (missing tool) warnings when needed tool is unavailable for target language
-- Parities validation against existing `repo-index.json` (stdlib) to ensure backward compatibility
-
-#### Primary Output Path
-
-`context/scripts/code-specs/spec_indexer.py` (modified with `--extractors` flag and backends)
-`context/scripts/code-specs/ts_extract.mjs` (optional ts-morph Node helper, T-015)
-`artefacts/build/tasks-spec-agent.md` (index entry updated)
 
 ---
 
@@ -408,7 +387,7 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 
 ---
 
-### T-014: Wrap indexer tool usage in skill `context/skills/analyse-repo.md`
+### T-014: Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (documents the actual backends)
 
 #### Acceptance Criteria
 
