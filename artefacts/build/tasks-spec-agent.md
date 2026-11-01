@@ -6,7 +6,7 @@
 **Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/code-specs/spec_indexer.py` (schema documented in README Commands / Repository Index)
 **Created**: 2026-10-29
 **Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
-**Amended**: 2026-01-11 — Decisions A1–A4 recorded (outputs land in `derived/`; fixed confidence bands; monorepo handled per-repo via `--repo <service-root>`; pilot B repo per human choice); tasks T-016…T-020 added; T-001/T-002/T-003/T-005/T-006/T-008/T-013/T-014 acceptance criteria amended; workflows README derive-spec diagrams phase-aligned (0–8)
+**Amended**: 2026-01-11 (follow-up) — detail headings aligned to the task index; duplicate short T-015 section removed; T-021 (comment/docstring extraction) added after the AST-discard gap was identified
 
 ## Task Index
 
@@ -34,6 +34,7 @@
 | T-018 | high | pending | T-006 | Confidence bands + promotion DoD in `derived-spec-template.md` (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50; unanswered stays Assumed) |
 | T-019 | critical | pending | T-008 | Pilot B: derive-spec on the human-chosen foreign/unorganised repo; validate Phases 1–2 + `derived/` landing |
 | T-020 | low | pending | T-010 | Extend `verify` with `--require-coverage` (deterministic Phase 6 gate: tier + % + citation per subsection) |
+| T-021 | high | pending | T-015 | Indexer: comment/docstring extraction into `comments` key (stdlib `tokenize`, docstrings, TS JSDoc, SQL `--`); intent evidence attached to symbols; consumed via analyse-repo skill |
 
 ## File Scope
 
@@ -213,6 +214,24 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ---
 
+### T-021: Indexer comment & docstring extraction (`comments` key)
+
+#### Acceptance Criteria
+
+- Python: collect `#` comments via stdlib `tokenize` (AST drops comments by design) and docstrings via `ast.get_docstring()` on module/class/function nodes — zero-LLM, per-file, exact `file:line`
+- TS/JS: JSDoc `/** */` + `//` capture on raw source lines (regex v1; tree-sitter backend from T-015 when present); SQL `--` / `/* */` comments attached to the nearest table/column from the CREATE TABLE parser
+- Schema (additive): per-symbol `docstring` and `comments` entries (`{text, line, kind: leading|inline|block, attached: {kind, name, line}}`) plus a top-level `comments` stream for orphan comments (magic-number explanations, TODOs, licence headers)
+- Comments attach to symbols by line-range overlap (inline) and contiguous leading blocks immediately above a definition (doc-comment style); orphan comments stay in the top-level stream
+- Deterministic + idempotent; `verify --index` covers the new comment citations; `spec-scan.md` shows a compact per-file comment map
+- analyse-repo skill (T-014) documents consumption: read `symbols[].docstring` / `comments` from the index before any source read; only read the exact cited range when the index text is insufficient (agent-sandbox tool policy)
+- Feeds: business intent + domain rules → product spec; magic numbers / limits → TSD constraints; JSDoc semantics → api-catalogue draft; deprecation/TODO comments → drift + open questions; comment-backed claims may reach Needs Confirmation band without a human answer
+
+#### Primary Output Path
+
+`context/scripts/code-specs/spec_indexer.py` (+ `context/workflows/README.md` index table, `context/skills/analyse-repo.md`)
+
+---
+
 ### T-008: Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/`
 
 #### Acceptance Criteria
@@ -370,8 +389,8 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 **Parallelism Strategy**
 
-- T-015 → T-016 (config) + T-017 (history) run critical path after Q0
-- T-014 (analyse-repo skill) depends on T-015/T-016/T-017 being implemented
+- T-015 → T-016 (config) + T-017 (history) + T-021 (comments) run critical path after Q0
+- T-014 (analyse-repo skill) depends on T-015/T-016/T-017/T-021 being implemented
 - T-001 → T-002 → T-003 + T-004 + T-005 run in parallel (file-scope disjoint)
 - T-006 + T-018 → T-007 → T-010 (+ T-020) → T-008 (Pilot A) → T-019 (Pilot B) → T-009, T-013
 
@@ -413,8 +432,8 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 
 ### Parallelism Strategy
 
-**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-015 (extraction backends) → T-016 (config extraction) → T-017 (git-history evidence) → T-014 (analyse-repo skill, documents the backends) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 + T-018 (template + confidence bands) → T-007 → T-010 (+ T-020) → T-008 (Pilot A) → T-019 (Pilot B) → T-009, T-013.
-file_scope: `context/skills/` (T-001, T-005, T-014), `context/agents/` (T-003, T-004), `context/templates/` (T-006, T-018), `context/scripts/code-specs/` (T-015, T-016, T-017, T-020), `artefacts/build/` (T-019 reports)
+**Sprint 1** (critical path after Q0): **T-SETUP (human installs deps, blocks all implementation)** → T-015 (extraction backends) → T-016 (config extraction) → T-017 (git-history evidence) → T-021 (comment/docstring extraction) → T-014 (analyse-repo skill, documents the backends) → T-001 → T-002 → T-003 + T-004 + T-005 (parallel, file-scope disjoint) → T-006 + T-018 (template + confidence bands) → T-007 → T-010 (+ T-020) → T-008 (Pilot A) → T-019 (Pilot B) → T-009, T-013.
+file_scope: `context/skills/` (T-001, T-005, T-014), `context/agents/` (T-003, T-004), `context/templates/` (T-006, T-018), `context/scripts/code-specs/` (T-015, T-016, T-017, T-020, T-021), `artefacts/build/` (T-019 reports)
 
 ### Commit Strategy
 

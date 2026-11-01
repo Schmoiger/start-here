@@ -357,6 +357,7 @@ Produced by `scan`; consumed by every derive-spec agent.
 | `tests` | `[ {node_id, file} ]` from pytest collection / jest listTests — each test name is a candidate feature |
 | `config` | *(planned · T-016)* `[ {key, source(file:line), value-hint} ]` env/config/feature-flag keys and defaults — user-facing constraints for product spec + TSD constraints |
 | `meta.history` | *(planned · T-017)* capped git history: recent commit subjects + renames — zero-LLM feature descriptions, esp. for unorganised repos |
+| `comments` | *(planned · T-021)* per-symbol `docstring` + `comments` (leading │ inline │ block) plus a top-level comment stream — business intent, magic-number explanations, JSDoc semantics |
 
 The index is deterministic: re-running the scan on the same tree is idempotent,
 and `verify` will fail any citation that no longer resolves after edits.
