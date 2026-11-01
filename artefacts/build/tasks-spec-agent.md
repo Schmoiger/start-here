@@ -7,13 +7,14 @@
 **Created**: 2026-10-29
 **Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
 **Amended**: 2026-01-11 (follow-up) — detail headings aligned to the task index; duplicate short T-015 section removed; T-021 (comment/docstring extraction) added after the AST-discard gap was identified
+**Amended**: 2026-01-11 (T-SETUP done) — T-SETUP marked completed (ctags 6.2.1, ast-grep 0.51.0, tree-sitter via uv, ts-morph skipped); T-015 ast-grep backend reworded to the `ast-grep` binary (`sg` deprecated as of 0.51)
 
 ## Task Index
 
 | ID | Priority | Status | Blocked By | Task |
 |----|----------|--------|------------|------|
 | Q0 | critical | completed | - | Answer clarifying questions (recommended decisions below) |
-| T-SETUP | critical | pending | - | Install / verify toolchain dependencies (human-run) before implementation starts |
+| T-SETUP | critical | completed | - | Install / verify toolchain dependencies (human-run) before implementation starts — verified 2026-01-11: ctags 6.2.1, ast-grep 0.51.0, tree-sitter OK via `uv run --with`, ts-morph skipped (absent) |
 | T-012 | high | completed | - | Write `context/scripts/code-specs/spec_indexer.py` (`scan` / `verify` subcommands) |
 | T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
 | T-015 | high | pending | T-SETUP | Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph) |
@@ -311,7 +312,7 @@ before/after comparison is the acceptance metric):
 - Backends implemented, each wrapped so an absent/broken tool never aborts the scan:
   - **universal-ctags**: `--output-format=json --fields=+n`; primary symbol source for languages without a dedicated parser and cross-check for Python/TS; `path`/`kind`/`line`/`language` mapped to the spec symbol model (`function`/`class`/`module`/`variable`/etc.)
   - **tree-sitter**: via `uv run --with tree-sitter --with tree-sitter-language-pack`; real AST pass for TS/TSX delivering named imports, multiline destructured props, JSX usage counts, and decorator annotations (replaces regex heuristics for those fields)
-  - **ast-grep** (`sg run -p PATTERN --json`): rule-driven TS/JS pass used when tree-sitter is absent but `sg` is on PATH
+  - **ast-grep** (`ast-grep run -p PATTERN --json`; legacy `sg` alias deprecated as of 0.51): rule-driven TS/JS pass used when tree-sitter is absent but `ast-grep` is on PATH
   - **ts-morph**: optional Node helper `context/scripts/code-specs/ts_extract.mjs` (guarded by `node` + resolvable `ts-morph`); skipped quietly when absent
   - **Python stdlib `ast`** + regex + PyYAML + SQL heuristics retained as the permanent fallback tier for all languages
 - **Provenance & confidence** (additive schema, no consumer changes):
@@ -330,6 +331,8 @@ before/after comparison is the acceptance metric):
 `context/scripts/code-specs/spec_indexer.py` + `context/scripts/code-specs/ts_extract.mjs` (+ docs: `context/workflows/README.md` § derive-spec Commands, `artefacts/build/tasks-spec-agent.md`)
 
 ### T-SETUP: Install / verify toolchain dependencies (human-run) before implementation starts
+
+**Status**: completed 2026-01-11 — ctags 6.2.1 ✓, ast-grep 0.51.0 ✓ (use `ast-grep`; `sg` deprecated), tree-sitter loads via `uv run --with tree-sitter --with tree-sitter-language-pack` (typescript + python parsers) ✓, ts-morph absent → skipped quietly.
 
 #### Acceptance Criteria
 
