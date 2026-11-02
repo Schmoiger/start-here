@@ -12,6 +12,7 @@
 **Amended**: 2026-02-11 (T-014 done) — `context/skills/analyse-repo.md` added: scan/verify invocations per phase, `repo-index.json` schema (meta.extractors provenance + per-file extractor), spec-scan.md map, repo-profile.md deliverable, T-015 backends with degradation, evidence citation + confidence bands, re-scan rule, token rationale; workflows README `## Commands` / `## Repository Index` reduced to a pointer; indexer docstring schema reference updated
 **Amended**: 2026-02-11 (T-001 done) — `context/skills/derive-spec.md` added: modes (product/technical/both), Phases 0–8 procedural steps (discovery + human confirmation, evidence consumption from repo-index.json + repo-profile.md, 4a product / 4b technical derivation, draft with confidence, verification, batched confirmation with drift-first ordering, finalise + review gate), confidence model (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50) with promotion DoD, output lifecycle (spec-drafts → derived/, canonical untouched), references to workflows README (no schema duplication)
 **Amended**: 2026-02-11 (T-002 done) — `context/workflows/derive-spec.yaml` added: Phases 0–8 (intake · discovery + repo profile · baseline + drift · evidence · 4a/4b mode-conditional derivation · draft · verification · confirmation · finalise), each with agents/outputs/validation; intake inputs (mode, target/`--repo <service-root>`, limits, output location); gates on Phase 6 (verify --index) and Phase 8 (verify --doc + human APPROVED promotion); state_recovery reads HANDOFF/spec-scan/repo-index/repo-profile + critical_files; promotion path spec-drafts → artefacts/{category}/derived/; README workflow table row de-planned
+**Amended**: 2026-02-11 (T-013 done) — derive-spec.yaml indexer wiring: Phases 1/3 validation + notes pin tool_scope to repo-index.json + spec-scan.md + cited line ranges; repo-profile.md (Phase 1 deliverable) declared as an input to Phases 2–5 (baseline-drift, evidence, 4a/4b, draft); Phase 2/3/4a/4b/5 notes list their index/profile inputs; Phase 8 promotion gate annotated per T-018 DoD; re-scan rule covered by Phase 6 validation + workflow_rules
 
 ## Task Index
 
@@ -33,7 +34,7 @@
 | T-010 | high | pending | T-007 | Unit tests: skill/workflow schema, indexer extraction + verify |
 | T-008 | critical | pending | T-010 | Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/` |
 | T-009 | low | won't do | T-008 | Optional: register derive-spec as a `build.yaml` precursor phase |
-| T-013 | high | pending | T-002,T-012 | Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges) |
+| T-013 | high | completed | T-002,T-012 | Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges) |
 | T-016 | high | pending | T-015 | Indexer: env/config/feature-flag extraction into `config` key — user-facing constraints for product spec + TSD constraints |
 | T-017 | medium | pending | T-015 | Indexer: capped git-history evidence into `meta.history` (commit subjects + renames; zero LLM) |
 | T-018 | high | pending | T-006 | Confidence bands + promotion DoD in `derived-spec-template.md` (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50; unanswered stays Assumed) |

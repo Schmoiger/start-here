@@ -35,9 +35,11 @@ phases:
       - "scan --repo --mode (via analyse-repo skill) wrote repo-index.json + spec-scan.md; meta.mode recorded"
       - "spec-doc candidates discovered by glob (artefacts/product/**, artefacts/architecture/**, docs/**, **/README.md, PRD*, *spec*.md, openapi*.yaml) and confirmed by the human — never silent"
       - "repo-profile.md written: app type, entry points, module boundaries, every claim file:line"
+      - "agent tool_scope restricted to repo-index.json + spec-scan.md + cited line ranges — no unfettered repo reads"
     notes:
       - "Mode dispatch: product|both → @product-owner; technical → @solution-architect; both → shared phases run once under one HANDOFF"
       - "Invoke tools via the analyse-repo skill; tool_scope = repo-index.json + cited line ranges"
+      - "repo-profile.md is the Phase 1 deliverable, wired as an input to Phases 2-5 (app type, entry points, module boundaries)"
 
   - id: baseline-drift
     name: Phase 2 · Baseline & Drift
@@ -51,6 +53,9 @@ phases:
       - "drift candidates listed (existing-doc vs code deltas) as the Phase 7 question queue, ordered first"
       - "no existing docs → annotated empty-extraction (code-derived only)"
       - "canonical docs read but never modified"
+      - "consumes repo-index.json + spec-scan.md + repo-profile.md; tool_scope = index + cited line ranges"
+    notes:
+      - "Inputs: artefacts/build/repo-index.json (schema/symbols), artefacts/build/spec-scan.md, artefacts/build/repo-profile.md (app type, entry points, module boundaries)"
 
   - id: evidence
     name: Phase 3 · Evidence Gathering
@@ -65,6 +70,7 @@ phases:
       - "cross-index reasoning over repo-index.json; no bulk source reads"
     notes:
       - "tool_scope restricted to the index + cited line ranges (T-013)"
+      - "Consumes repo-profile.md for orientation (app type, entry points, module boundaries) alongside the index"
 
   - id: derivation-product
     name: Phase 4a · Product Derivation
@@ -77,6 +83,8 @@ phases:
       - "UI inventory → candidate features → roles/actors → UX flows"
       - "actor/role named per UX flow; roles derived from auth/permission evidence"
       - "unsupported by the index → open question, not assertion"
+    notes:
+      - "Inputs: repo-index.json + repo-profile.md — features/roles/UX flows grounded in the profile"
 
   - id: derivation-technical
     name: Phase 4b · Technical Derivation
@@ -88,6 +96,8 @@ phases:
     validation:
       - "architecture + api-catalogue draft + data-model draft staged"
       - "drafts only — canonical architecture docs never rewritten"
+    notes:
+      - "Inputs: repo-index.json + repo-profile.md — module boundaries from the profile seed the architecture draft"
 
   - id: draft
     name: Phase 5 · Draft with Confidence
@@ -107,6 +117,7 @@ phases:
     notes:
       - "Mode-conditional: depends_on resolves to the derivation phase(s) active for the recorded mode — inactive branches are skipped at intake"
       - "staged in artefacts/build/spec-drafts/ — one file per artefacts category; never touch canonical docs"
+      - "Inputs: repo-index.json + repo-profile.md + drift-candidates.md — draft subsections cite from the index, never from memory"
 
   - id: verification
     name: Phase 6 · Verification Pass
@@ -151,7 +162,7 @@ phases:
     validation:
       - "drafts updated: questions resolved, confirmed bands raised, drift reported"
       - "spec_indexer.py verify --doc on final drafts → all citations resolve"
-      - "human review gate: APPROVED → promote drafts to artefacts/{category}/derived/ and commit; CHANGES REQUIRED → return to the specified phase"
+      - "human review gate: APPROVED → promote drafts to artefacts/{category}/derived/ and commit (per T-018 DoD); CHANGES REQUIRED → return to the specified phase"
       - "canonical docs never rewritten"
 
 quality_gates:
