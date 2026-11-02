@@ -107,6 +107,9 @@ Record at intake:
 - **UX flows**: via call chains across backend symbols, named per actor.
 - **Name the actor/role per UX flow** — never leave anonymous flows; each flow
   belongs to at least one named actor.
+- **User-facing constraints**: from `config` (T-016) — env toggles, rate/limit
+  hints, feature availability per config key → product-spec constraints +
+  TSD constraints subsections.
 
 ### 4b · Technical (modes `technical` | `both`) — @solution-architect (drafts only)
 
@@ -116,6 +119,8 @@ Record at intake:
   routes.
 - **Data-model draft**: from `schema` (tables, columns) plus constraint hints in
   code; note every constraint's origin as a citation.
+- **TSD constraints**: from `config` (T-016) — deployment/runtime toggles,
+  timeouts, bounded resources, feature flags → TSD constraints subsections.
 
 ---
 

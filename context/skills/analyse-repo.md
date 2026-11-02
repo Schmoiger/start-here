@@ -119,6 +119,7 @@ skipped, not failed.
 | `schema` | `[ {table, columns, file, line} ]` from SQL migrations plus OpenAPI schema names |
 | `ui` | `[ {component, file, line, props, usages, kind} ]` from TS/JSX component definitions, aggregated with JSX-tag usage counts |
 | `tests` | `[ {node_id, file} ]` from pytest collection / jest listTests — each test name is a candidate feature name |
+| `config` | user-facing constraints (T-016): `[ {key, source, line, value_hint, feature} ]` from `.env.example`/`.env.template` env files, `settings.py`/`config.*` modules, and config YAML/JSON — secret-looking keys redacted to `<redacted>`; `feature` marks flags/toggles (ENABLE_*/FEATURE_* or boolean); test/fixture paths excluded; feeds product-spec + TSD constraints |
 
 ### 3.2 `meta.extractors` provenance
 
@@ -140,9 +141,9 @@ indicate a degraded backend rather than absence of the construct.
 
 ### 3.4 Planned keys
 
-`config` (T-016), `meta.history` (T-017), and `comments` (T-021) are designed
-into the schema but not yet emitted by the indexer; treat them as absent, never
-as empty evidence.
+`meta.history` (T-017) and `comments` (T-021) are designed into the schema but
+not yet emitted by the indexer; treat them as absent, never as empty evidence.
+(`config` is implemented — see §3.1.)
 
 ---
 

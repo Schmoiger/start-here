@@ -29,6 +29,10 @@ Extraction backends (all deterministic, ~0 LLM tokens) selected via ``--extracto
   * OpenAPI - PyYAML parse of openapi*.yaml/json.
   * Tests   - pytest --collect-only / yarn test --listTests when available:
               test node-ids are candidate feature names.
+  * Config  - env template files (.env.example / .env.template / .env.sample /
+              .env.dist), settings/config Python modules (stdlib ast) and config
+              YAML/JSON files: keys + defaults + feature-flag markers (T-016),
+              value-hints redacted for secret-looking keys.
 
 The index schema is documented in context/skills/analyse-repo.md (§ Consuming repo-index.json).
 """
@@ -282,6 +286,26 @@ class DocRecord:
 
     def to_jsonb(self) -> dict[str, Any]:
         return {"path": self.path, "kind": self.kind}
+
+
+@dataclass
+class ConfigEntry:
+    """One env/config/feature-flag key (T-016): ``{key, source, line, value_hint, feature}``."""
+
+    key: str
+    source: str = ""
+    line: int = 0
+    value_hint: str = ""  # <redacted> for secret-looking keys; '' when only the key matters
+    feature: bool = False  # ENABLE_*/FEATURE_* naming or boolean-like value
+
+    def to_jsonb(self) -> dict[str, Any]:
+        return {
+            "key": self.key,
+            "source": self.source,
+            "line": self.line,
+            "value_hint": self.value_hint,
+            "feature": self.feature,
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -1346,6 +1370,301 @@ MAX_API_ROWS = 200
 MAX_UI_ROWS = 200
 MAX_TEST_ROWS = 200
 MAX_SCHEMA_ROWS = 200
+MAX_CONFIG_ROWS = 120
+
+
+# ---------------------------------------------------------------------------
+# Config extraction (T-016): env templates, settings/config modules, config data files
+# ---------------------------------------------------------------------------
+
+_CONFIG_ENV_NAMES: re.Pattern[str] = re.compile(
+    r"(?i)^(\.env|.*\.env)(\.example|\.sample|\.dist|\.template)(\.local)?$"
+)
+_CONFIG_PY_STEM_RE: re.Pattern[str] = re.compile(
+    r"^(settings|config|conf|configuration|appsettings|application)(_\w*)?$"
+    r"|^[\w]+[-_](settings|config|conf)$",
+    re.IGNORECASE,
+)
+_CONFIG_DATA_STEM_RE: re.Pattern[str] = re.compile(
+    r"^(settings|config|conf|configuration|appsettings|application)([-._][\w]+)?$"
+    r"|^[\w]+[-_.](settings|config|conf)$",
+    re.IGNORECASE,
+)
+_CONFIG_DATA_EXCLUDE_RE: re.Pattern[str] = re.compile(
+    r"(?i)(^|[-_.])(openapi|package|lock|yarn|pnpm|npm|eslint|prettier|tsconfig|"
+    r"tslint|jest|vitest|babel|webpack|vite|rollup)([-_.]|$)"
+)
+_CONFIG_SECRET_RE: re.Pattern[str] = re.compile(
+    r"(?i)(^|[_-])(secret|token|password|passwd|pass|key|api[_-]?key|"
+    r"private[_-]?key|credential|access[_-]?key|client[_-]?secret|auth|url|uri|dsn)([_-]|$)"
+)
+_CONFIG_FEATURE_RE: re.Pattern[str] = re.compile(
+    r"(?i)(^|[_-])(enable|disable|feature|feat|flag|ff|preview|beta|experiment)([_-]|$)"
+)
+_CONFIG_BOOL_VALUES: frozenset[str] = frozenset(
+    {"true", "false", "yes", "no", "on", "off", "1", "0", "enabled", "disabled"}
+)
+_CONFIG_TEST_PARTS: frozenset[str] = frozenset(
+    {"tests", "test", "testing", "fixtures", "fixture"}
+)
+_MAX_VALUE_HINT = 120
+
+
+def _skip_config_path(rel_path: str, name: str) -> bool:
+    """Exclude test/fixture material: test modules and anything under tests/ dirs."""
+    if name.startswith("test_") or name.endswith("_test.py"):
+        return True
+    parent_parts = Path(rel_path).parts[:-1]
+    return any(p.lower() in _CONFIG_TEST_PARTS for p in parent_parts)
+
+
+def _config_value_hint(key: str, value: str) -> str:
+    """Truncated, quote-stripped value hint; secret-looking keys become ``<redacted>``."""
+    if _CONFIG_SECRET_RE.search(key):
+        return "<redacted>"
+    if not value:
+        return ""
+    value = value.strip().strip("'\"")
+    if len(value) > _MAX_VALUE_HINT:
+        return value[:_MAX_VALUE_HINT - 3] + "..."
+    return value
+
+
+def _config_is_feature(key: str, value: str) -> bool:
+    return bool(_CONFIG_FEATURE_RE.search(key)) or value.strip().strip("'\" ").lower() in _CONFIG_BOOL_VALUES
+
+
+def _config_env_call(node: ast.Call) -> tuple[str, str]:
+    """Return (ENV_KEY, default) for ``os.getenv('K', d)`` / ``os.environ.get('K', d)``."""
+    func = node.func
+    if not isinstance(func, ast.Attribute):
+        return "", ""
+    attr, base = func.attr, func.value
+    if attr == "getenv":
+        if not (isinstance(base, ast.Name) and base.id == "os"):
+            return "", ""
+    elif attr == "get":
+        if not (
+            isinstance(base, ast.Attribute)
+            and base.attr == "environ"
+            and isinstance(base.value, ast.Name)
+            and base.value.id == "os"
+        ):
+            return "", ""
+    else:
+        return "", ""
+    if not node.args or not isinstance(node.args[0], ast.Constant):
+        return "", ""
+    key = node.args[0].value
+    if not isinstance(key, str) or not key:
+        return "", ""
+    default = _unparse(node.args[1]) if len(node.args) > 1 else ""
+    if not default and node.keywords:
+        for kw in node.keywords:
+            if kw.arg == "default":
+                default = _unparse(kw.value)
+    return key, default.strip().strip("'\"")
+
+
+def _collect_config_env(abs_path: Path, rel_path: str, add: Any) -> None:
+    """Parse ``KEY=value`` lines from env template files (never the live ``.env``)."""
+    try:
+        text = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:  # pragma: no cover - filesystem race
+        return
+    for lineno, raw in enumerate(text.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        eq = line.find("=")
+        if eq <= 0:
+            continue
+        key = line[:eq].strip()
+        value = line[eq + 1:].strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
+            value = value[1:-1]
+        add(key, rel_path, lineno, _config_value_hint(key, value), _config_is_feature(key, value))
+
+
+def _collect_config_py_module(abs_path: Path, rel_path: str, add: Any) -> None:
+    """Extract UPPER_CASE module constants + os.getenv/os.environ.get reads from stdlib ast."""
+    try:
+        tree = ast.parse(abs_path.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, SyntaxError):
+        return
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target] if node.target else []
+        else:
+            targets = []
+        for target in targets:
+            if isinstance(target, ast.Name) and target.id.isupper():
+                raw = _unparse(node.value)
+                env_key, env_default = ("", "")
+                if isinstance(node.value, ast.Call):
+                    env_key, env_default = _config_env_call(node.value)
+                if env_key:
+                    # RHS is an env read: the config key IS the env var, default is the hint
+                    add(
+                        env_key,
+                        rel_path,
+                        node.lineno,
+                        _config_value_hint(env_key, env_default),
+                        _config_is_feature(env_key, env_default),
+                    )
+                else:
+                    add(
+                        target.id,
+                        rel_path,
+                        node.lineno,
+                        _config_value_hint(target.id, raw),
+                        _config_is_feature(target.id, raw),
+                    )
+        if isinstance(node, ast.Call):
+            key, default = _config_env_call(node)
+            if key:
+                add(key, rel_path, node.lineno, _config_value_hint(key, default), _config_is_feature(key, default))
+
+
+def _config_key_line(lines: list[str], key: str) -> int:
+    """First 1-based line declaring the key — ``key:`` at line start (YAML) or
+    ``"key":`` anywhere (JSON dicts are usually single-line)."""
+    needle_yaml = f"{key}:"
+    for i, raw in enumerate(lines, 1):
+        line = raw.strip()
+        if line.startswith(needle_yaml):
+            return i
+        if f'"{key}":' in line:
+            return i
+    return 0
+
+
+def _collect_config_data_file(abs_path: Path, rel_path: str, add: Any) -> None:
+    """Top-level scalar keys from config YAML/JSON files (nested structures skipped)."""
+    try:
+        text = abs_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:  # pragma: no cover - filesystem race
+        return
+    data: Any = None
+    try:
+        if abs_path.suffix.lower() == ".json":
+            data = json.loads(text)
+        elif yaml is not None:
+            data = yaml.safe_load(text)
+        else:
+            return
+    except Exception:  # noqa: BLE001 - best-effort parse of arbitrary config data
+        return
+    if not isinstance(data, dict):
+        return
+    lines = text.splitlines()
+    for raw_key, value in data.items():
+        if not isinstance(raw_key, str) or not isinstance(value, (str, int, float, bool)):
+            continue  # nested structures are not config value-hints
+        raw_value = str(value)
+        add(
+            raw_key,
+            rel_path,
+            _config_key_line(lines, raw_key),
+            _config_value_hint(raw_key, raw_value),
+            _config_is_feature(raw_key, raw_value),
+        )
+
+
+def collect_config(repo: Path) -> list[ConfigEntry]:
+    """Deterministic, zero-LLM extraction of env/config/feature-flag keys.
+
+    Sources, highest precedence first (key collisions: first source wins):
+      1. ``settings.py`` / ``config.*`` Python modules — UPPER_CASE module
+         constants and ``os.getenv`` / ``os.environ.get`` reads (stdlib ast).
+      2. Config YAML/JSON data files (top-level scalar keys; OpenAPI /
+         package/lock/tooling files excluded).
+      3. Env template files (``.env.example`` / ``.env.template`` /
+         ``.env.sample`` / ``.env.dist``) — the live ``.env`` is never read.
+
+    Git-tracked files only when the repo is a git worktree (respects
+    .gitignore); a bounded os.walk fallback covers non-git trees.
+    """
+    py_candidates: list[tuple[str, Path]] = []
+    data_candidates: list[tuple[str, Path]] = []
+    env_candidates: list[tuple[str, Path]] = []
+
+    try:
+        proc = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "ls-files",
+                "-z",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        raw_paths = proc.stdout.replace("\x00", "\n").split("\n") if proc.returncode == 0 else None
+    except (OSError, subprocess.TimeoutExpired):
+        raw_paths = None
+
+    if raw_paths is not None:
+        paths = [p for p in raw_paths if p]
+    else:  # non-git fallback: bounded walk
+        paths = []
+        for root, dirs, files in os.walk(repo):
+            dirs[:] = [d for d in dirs if d not in EXCLUDED_DIRS]
+            for fname in files:
+                rp = rel(repo, Path(root) / fname)
+                if any(part in EXCLUDED_DIRS for part in Path(rp).parts):
+                    continue
+                paths.append(rp)
+
+    for rel_path in sorted(set(paths)):
+        abs_path = repo / rel_path
+        if not abs_path.is_file():
+            continue
+        name = Path(rel_path).name
+        suffix = Path(name).suffix.lower()
+        stem = Path(name).stem
+        if _CONFIG_ENV_NAMES.match(name):
+            env_candidates.append((rel_path, abs_path))
+        elif (
+            not name.startswith(".")
+            and not _skip_config_path(rel_path, name)
+            and suffix == ".py"
+            and _CONFIG_PY_STEM_RE.match(stem)
+        ):
+            py_candidates.append((rel_path, abs_path))
+        elif (
+            not name.startswith(".")
+            and not _skip_config_path(rel_path, name)
+            and suffix in (".yaml", ".yml", ".json")
+            and _CONFIG_DATA_STEM_RE.match(stem)
+            and not _CONFIG_DATA_EXCLUDE_RE.search(name)
+        ):
+            data_candidates.append((rel_path, abs_path))
+
+    entries: list[ConfigEntry] = []
+    seen: set[str] = set()
+
+    def add(key: str, source: str, line: int, value_hint: str, feature: bool) -> None:
+        if not key or key in seen:
+            return
+        seen.add(key)
+        entries.append(ConfigEntry(key, source, line, value_hint, feature))
+
+    for rel_path, abs_path in py_candidates:
+        _collect_config_py_module(abs_path, rel_path, add)
+    for rel_path, abs_path in data_candidates:
+        _collect_config_data_file(abs_path, rel_path, add)
+    for rel_path, abs_path in env_candidates:
+        _collect_config_env(abs_path, rel_path, add)
+
+    return sorted(entries, key=lambda e: (e.key.lower(), e.key))
 
 
 def _default_out_dir(repo: Path) -> Path:
@@ -1439,6 +1758,24 @@ def render_spec_scan(index: dict[str, Any]) -> str:
     else:
         out.append("None collected (no pytest/jest marker detected).")
 
+    out.append("\n## Config Settings & Feature Flags")
+    if index["config"]:
+        for entry in index["config"][:MAX_CONFIG_ROWS]:
+            loc = (
+                f" @{entry['source']}:{entry['line']}"
+                if entry.get("line")
+                else f" ({entry['source']})"
+            )
+            flag = " [feature]" if entry.get("feature") else ""
+            hint = f" = {entry['value_hint']}" if entry.get("value_hint") else ""
+            out.append(f"- `{entry['key']}`{flag}{hint}{loc}")
+        if len(index["config"]) > MAX_CONFIG_ROWS:
+            out.append(f"… {len(index['config']) - MAX_CONFIG_ROWS} more keys")
+    else:
+        out.append(
+            "None detected (no .env*.example/template · settings/config module · config data file)."
+        )
+
     out.append(
         "\n---\nGenerated deterministically by `context/scripts/code-specs/spec_indexer.py scan` "
         "(zero LLM tokens). Consume via `repo-index.json`."
@@ -1528,6 +1865,8 @@ def run_scan(
     test_nodes, test_warnings = collect_tests(repo)
     warnings.extend(test_warnings)
 
+    config_entries = collect_config(repo)
+
     for schema_name in openapi_schemas:
         tables.append(TableDef(table=schema_name, columns=[], file="", line=0))
 
@@ -1559,6 +1898,7 @@ def run_scan(
         "schema": [t.to_jsonb() for t in tables],
         "ui": [u.to_jsonb() for u in ui],
         "tests": [TestNode(node_id=n, file=n.split("::")[0]).to_jsonb() for n in test_nodes],
+        "config": [e.to_jsonb() for e in config_entries],
     }
 
     out_json.parent.mkdir(parents=True, exist_ok=True)
@@ -1570,7 +1910,8 @@ def run_scan(
     print(f"spec-scan.md     -> {out_md}")
     print(
         f"files={len(records)} symbols={sum(len(r.symbols) for r in records)} "
-        f"api={len(api)} tables={len(tables)} ui={len(ui)} tests={len(test_nodes)}"
+        f"api={len(api)} tables={len(tables)} ui={len(ui)} tests={len(test_nodes)} "
+        f"config={len(config_entries)}"
     )
     if verbose:  # pragma: no cover - informational
         for w in warnings:
@@ -1648,6 +1989,8 @@ def run_verify(
             check(table.get("file", ""), table.get("line", 0))
         for comp in index.get("ui", []):
             check(comp.get("file", ""), comp.get("line", 0))
+        for entry in index.get("config", []):
+            check(entry.get("source", ""), entry.get("line", 0))
 
     print(
         f"checked {checked} citations "

@@ -2,14 +2,14 @@
   "meta": {
     "repo": "start-here",
     "repo_abs": "/Users/avi/Repos/start-here",
-    "generated_at": "2026-11-01T19:57:13Z",
+    "generated_at": "2026-11-02T10:39:07Z",
     "mode": "both",
-    "scanned_files": 59,
+    "scanned_files": 60,
     "languages": {
-      "python": 58,
+      "python": 59,
       "javascript": 1
     },
-    "loc": 11821,
+    "loc": 12346,
     "scan_too_large": false,
     "extractors": {
       "ctags": {
@@ -41,7 +41,7 @@
     "confidence": "full"
   },
   "warnings": [
-    "pytest: 213 collected (py3)"
+    "pytest: 222 collected (uv)"
   ],
   "docs": [
     {
@@ -121,6 +121,10 @@
       "kind": "readme"
     },
     {
+      "path": "context/skills/derive-spec.md",
+      "kind": "spec"
+    },
+    {
       "path": "context/skills/requirements-elicitation.md",
       "kind": "requirements"
     },
@@ -157,13 +161,13 @@
     {
       "path": "context/scripts/code-specs/spec_indexer.py",
       "language": "python",
-      "line_count": 1754,
+      "line_count": 2097,
       "symbols": [
         {
           "kind": "const",
           "name": "LANG_BY_SUFFIX",
           "signature": "",
-          "line": 58,
+          "line": 62,
           "decorators": [],
           "props": []
         },
@@ -171,7 +175,7 @@
           "kind": "const",
           "name": "FOREIGN_LANG_SUFFIXES",
           "signature": "",
-          "line": 69,
+          "line": 73,
           "decorators": [],
           "props": []
         },
@@ -179,7 +183,7 @@
           "kind": "const",
           "name": "FOREIGN_LANGS",
           "signature": "",
-          "line": 84,
+          "line": 88,
           "decorators": [],
           "props": []
         },
@@ -187,7 +191,7 @@
           "kind": "const",
           "name": "TS_LANGS",
           "signature": "",
-          "line": 85,
+          "line": 89,
           "decorators": [],
           "props": []
         },
@@ -195,7 +199,7 @@
           "kind": "const",
           "name": "DOC_GLOBS",
           "signature": "",
-          "line": 88,
+          "line": 92,
           "decorators": [],
           "props": []
         },
@@ -203,7 +207,7 @@
           "kind": "const",
           "name": "DOC_BASENAME_PATTERNS",
           "signature": "",
-          "line": 100,
+          "line": 104,
           "decorators": [],
           "props": []
         },
@@ -211,7 +215,7 @@
           "kind": "const",
           "name": "EXCLUDED_DIRS",
           "signature": "",
-          "line": 111,
+          "line": 115,
           "decorators": [],
           "props": []
         },
@@ -219,7 +223,7 @@
           "kind": "const",
           "name": "ROUTE_METHOD_ATTRS",
           "signature": "",
-          "line": 134,
+          "line": 138,
           "decorators": [],
           "props": []
         },
@@ -227,7 +231,7 @@
           "kind": "const",
           "name": "_JSX_TAG_RE",
           "signature": "",
-          "line": 138,
+          "line": 142,
           "decorators": [],
           "props": []
         },
@@ -235,7 +239,7 @@
           "kind": "const",
           "name": "_TS_IMPORT_NAMED",
           "signature": "",
-          "line": 141,
+          "line": 145,
           "decorators": [],
           "props": []
         },
@@ -243,7 +247,7 @@
           "kind": "const",
           "name": "_TS_IMPORT_DEFAULT",
           "signature": "",
-          "line": 144,
+          "line": 148,
           "decorators": [],
           "props": []
         },
@@ -251,7 +255,7 @@
           "kind": "const",
           "name": "_TS_FUNC",
           "signature": "",
-          "line": 147,
+          "line": 151,
           "decorators": [],
           "props": []
         },
@@ -259,7 +263,7 @@
           "kind": "const",
           "name": "_TS_ARROW",
           "signature": "",
-          "line": 150,
+          "line": 154,
           "decorators": [],
           "props": []
         },
@@ -267,7 +271,7 @@
           "kind": "const",
           "name": "_TS_CLASS",
           "signature": "",
-          "line": 154,
+          "line": 158,
           "decorators": [],
           "props": []
         },
@@ -275,7 +279,7 @@
           "kind": "const",
           "name": "_TS_IFACE",
           "signature": "",
-          "line": 155,
+          "line": 159,
           "decorators": [],
           "props": []
         },
@@ -283,7 +287,7 @@
           "kind": "const",
           "name": "_TS_TYPE",
           "signature": "",
-          "line": 156,
+          "line": 160,
           "decorators": [],
           "props": []
         },
@@ -291,7 +295,7 @@
           "kind": "const",
           "name": "_TS_REQUIRE",
           "signature": "",
-          "line": 157,
+          "line": 161,
           "decorators": [],
           "props": []
         },
@@ -299,7 +303,7 @@
           "kind": "class",
           "name": "Symbol",
           "signature": "",
-          "line": 167,
+          "line": 171,
           "decorators": [],
           "props": []
         },
@@ -307,7 +311,7 @@
           "kind": "method",
           "name": "Symbol.to_jsonb",
           "signature": "(self)",
-          "line": 175,
+          "line": 179,
           "decorators": [],
           "props": []
         },
@@ -315,7 +319,7 @@
           "kind": "class",
           "name": "FileRecord",
           "signature": "",
-          "line": 187,
+          "line": 191,
           "decorators": [],
           "props": []
         },
@@ -323,7 +327,7 @@
           "kind": "method",
           "name": "FileRecord.to_jsonb",
           "signature": "(self)",
-          "line": 195,
+          "line": 199,
           "decorators": [],
           "props": []
         },
@@ -331,7 +335,7 @@
           "kind": "class",
           "name": "ApiEntry",
           "signature": "",
-          "line": 207,
+          "line": 211,
           "decorators": [],
           "props": []
         },
@@ -339,7 +343,7 @@
           "kind": "method",
           "name": "ApiEntry.to_jsonb",
           "signature": "(self)",
-          "line": 214,
+          "line": 218,
           "decorators": [],
           "props": []
         },
@@ -347,7 +351,7 @@
           "kind": "class",
           "name": "ColumnDef",
           "signature": "",
-          "line": 225,
+          "line": 229,
           "decorators": [],
           "props": []
         },
@@ -355,7 +359,7 @@
           "kind": "method",
           "name": "ColumnDef.to_jsonb",
           "signature": "(self)",
-          "line": 229,
+          "line": 233,
           "decorators": [],
           "props": []
         },
@@ -363,7 +367,7 @@
           "kind": "class",
           "name": "TableDef",
           "signature": "",
-          "line": 234,
+          "line": 238,
           "decorators": [],
           "props": []
         },
@@ -371,7 +375,7 @@
           "kind": "method",
           "name": "TableDef.to_jsonb",
           "signature": "(self)",
-          "line": 240,
+          "line": 244,
           "decorators": [],
           "props": []
         },
@@ -379,7 +383,7 @@
           "kind": "class",
           "name": "UiComponent",
           "signature": "",
-          "line": 250,
+          "line": 254,
           "decorators": [],
           "props": []
         },
@@ -387,7 +391,7 @@
           "kind": "method",
           "name": "UiComponent.to_jsonb",
           "signature": "(self)",
-          "line": 258,
+          "line": 262,
           "decorators": [],
           "props": []
         },
@@ -395,7 +399,7 @@
           "kind": "class",
           "name": "TestNode",
           "signature": "",
-          "line": 270,
+          "line": 274,
           "decorators": [],
           "props": []
         },
@@ -403,7 +407,7 @@
           "kind": "method",
           "name": "TestNode.to_jsonb",
           "signature": "(self)",
-          "line": 274,
+          "line": 278,
           "decorators": [],
           "props": []
         },
@@ -411,7 +415,7 @@
           "kind": "class",
           "name": "DocRecord",
           "signature": "",
-          "line": 279,
+          "line": 283,
           "decorators": [],
           "props": []
         },
@@ -419,7 +423,23 @@
           "kind": "method",
           "name": "DocRecord.to_jsonb",
           "signature": "(self)",
-          "line": 283,
+          "line": 287,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "ConfigEntry",
+          "signature": "",
+          "line": 292,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "ConfigEntry.to_jsonb",
+          "signature": "(self)",
+          "line": 301,
           "decorators": [],
           "props": []
         },
@@ -427,7 +447,7 @@
           "kind": "function",
           "name": "rel",
           "signature": "(repo: Path, path: Path)",
-          "line": 292,
+          "line": 316,
           "decorators": [],
           "props": []
         },
@@ -435,7 +455,7 @@
           "kind": "function",
           "name": "language_of",
           "signature": "(name: str)",
-          "line": 297,
+          "line": 321,
           "decorators": [],
           "props": []
         },
@@ -443,7 +463,7 @@
           "kind": "function",
           "name": "find_target_files",
           "signature": "(repo: Path, max_files: int)",
-          "line": 304,
+          "line": 328,
           "decorators": [],
           "props": []
         },
@@ -451,7 +471,7 @@
           "kind": "function",
           "name": "_unparse",
           "signature": "(node: ast.AST | None)",
-          "line": 362,
+          "line": 386,
           "decorators": [],
           "props": []
         },
@@ -459,7 +479,7 @@
           "kind": "function",
           "name": "_decorator_names",
           "signature": "(decorators: list[ast.expr])",
-          "line": 369,
+          "line": 393,
           "decorators": [],
           "props": []
         },
@@ -467,7 +487,7 @@
           "kind": "function",
           "name": "_route_from_decorator",
           "signature": "(dec: ast.expr)",
-          "line": 377,
+          "line": 401,
           "decorators": [],
           "props": []
         },
@@ -475,7 +495,7 @@
           "kind": "function",
           "name": "_method_body",
           "signature": "(owner: str, node: ast.FunctionDef | ast.AsyncFunctionDef)",
-          "line": 402,
+          "line": 426,
           "decorators": [],
           "props": []
         },
@@ -483,7 +503,7 @@
           "kind": "function",
           "name": "analyze_python",
           "signature": "(abs_path: Path, rel_path: str)",
-          "line": 413,
+          "line": 437,
           "decorators": [],
           "props": []
         },
@@ -491,7 +511,7 @@
           "kind": "function",
           "name": "_destructured_props",
           "signature": "(signature: str)",
-          "line": 485,
+          "line": 509,
           "decorators": [],
           "props": []
         },
@@ -499,7 +519,7 @@
           "kind": "function",
           "name": "_is_component",
           "signature": "(name: str, kind: str)",
-          "line": 498,
+          "line": 522,
           "decorators": [],
           "props": []
         },
@@ -507,7 +527,7 @@
           "kind": "function",
           "name": "analyze_tsjs",
           "signature": "(abs_path: Path, rel_path: str, language: str)",
-          "line": 502,
+          "line": 526,
           "decorators": [],
           "props": []
         },
@@ -515,7 +535,7 @@
           "kind": "const",
           "name": "EXTRACTOR_CHOICES",
           "signature": "",
-          "line": 590,
+          "line": 614,
           "decorators": [],
           "props": []
         },
@@ -523,7 +543,7 @@
           "kind": "const",
           "name": "BACKEND_LANG_COVERAGE",
           "signature": "",
-          "line": 600,
+          "line": 624,
           "decorators": [],
           "props": []
         },
@@ -531,7 +551,7 @@
           "kind": "const",
           "name": "_EXTRACTOR_LABEL",
           "signature": "",
-          "line": 608,
+          "line": 632,
           "decorators": [],
           "props": []
         },
@@ -539,7 +559,7 @@
           "kind": "function",
           "name": "_cmd_ok",
           "signature": "(cmd: list[str], cwd: Path, timeout: int=20)",
-          "line": 620,
+          "line": 644,
           "decorators": [],
           "props": []
         },
@@ -547,7 +567,7 @@
           "kind": "function",
           "name": "probe_backends",
           "signature": "(repo: Path)",
-          "line": 628,
+          "line": 652,
           "decorators": [],
           "props": []
         },
@@ -555,7 +575,7 @@
           "kind": "function",
           "name": "_likely_backend",
           "signature": "(lang: str, avail: dict[str, bool])",
-          "line": 649,
+          "line": 673,
           "decorators": [],
           "props": []
         },
@@ -563,7 +583,7 @@
           "kind": "function",
           "name": "_stdlib_for",
           "signature": "(lang: str, reason_note: str)",
-          "line": 670,
+          "line": 694,
           "decorators": [],
           "props": []
         },
@@ -571,7 +591,7 @@
           "kind": "function",
           "name": "resolve_plan",
           "signature": "(choice: str, avail: dict[str, bool], languages: set[str])",
-          "line": 680,
+          "line": 704,
           "decorators": [],
           "props": []
         },
@@ -579,7 +599,7 @@
           "kind": "function",
           "name": "_extractor_meta",
           "signature": "(avail: dict[str, bool], plan: dict[str, str], reasons: dict[str, str])",
-          "line": 729,
+          "line": 753,
           "decorators": [],
           "props": []
         },
@@ -587,7 +607,7 @@
           "kind": "function",
           "name": "_ctags_kind",
           "signature": "(kind: str)",
-          "line": 751,
+          "line": 775,
           "decorators": [],
           "props": []
         },
@@ -595,7 +615,7 @@
           "kind": "function",
           "name": "analyze_ctags",
           "signature": "(abs_path: Path, rel_path: str, language: str)",
-          "line": 770,
+          "line": 794,
           "decorators": [],
           "props": []
         },
@@ -603,7 +623,7 @@
           "kind": "const",
           "name": "_TS_PACK_LANG",
           "signature": "",
-          "line": 821,
+          "line": 845,
           "decorators": [],
           "props": []
         },
@@ -611,7 +631,7 @@
           "kind": "function",
           "name": "analyze_tsjs_treesitter",
           "signature": "(abs_path: Path, rel_path: str, language: str)",
-          "line": 830,
+          "line": 854,
           "decorators": [],
           "props": []
         },
@@ -619,7 +639,7 @@
           "kind": "const",
           "name": "_ASTGREP_PATTERNS",
           "signature": "",
-          "line": 1020,
+          "line": 1044,
           "decorators": [],
           "props": []
         },
@@ -627,7 +647,7 @@
           "kind": "const",
           "name": "_ASTGREP_KIND_RE",
           "signature": "",
-          "line": 1028,
+          "line": 1052,
           "decorators": [],
           "props": []
         },
@@ -635,7 +655,7 @@
           "kind": "const",
           "name": "_ASTGREP_LANG_FLAG",
           "signature": "",
-          "line": 1037,
+          "line": 1061,
           "decorators": [],
           "props": []
         },
@@ -643,7 +663,7 @@
           "kind": "function",
           "name": "analyze_tsjs_astgrep",
           "signature": "(abs_path: Path, rel_path: str, language: str)",
-          "line": 1046,
+          "line": 1070,
           "decorators": [],
           "props": []
         },
@@ -651,7 +671,7 @@
           "kind": "function",
           "name": "analyze_tsjs_tsmorph",
           "signature": "(abs_path: Path, rel_path: str, language: str, helper: Path)",
-          "line": 1114,
+          "line": 1138,
           "decorators": [],
           "props": []
         },
@@ -659,7 +679,7 @@
           "kind": "const",
           "name": "_SQL_CREATE",
           "signature": "",
-          "line": 1159,
+          "line": 1183,
           "decorators": [],
           "props": []
         },
@@ -667,7 +687,7 @@
           "kind": "const",
           "name": "_SQL_SKIP_COLUMN",
           "signature": "",
-          "line": 1163,
+          "line": 1187,
           "decorators": [],
           "props": []
         },
@@ -675,7 +695,7 @@
           "kind": "function",
           "name": "analyze_sql",
           "signature": "(abs_path: Path, rel_path: str)",
-          "line": 1170,
+          "line": 1194,
           "decorators": [],
           "props": []
         },
@@ -683,7 +703,7 @@
           "kind": "function",
           "name": "_run",
           "signature": "(cmd: list[str], cwd: Path, timeout: int=60)",
-          "line": 1208,
+          "line": 1232,
           "decorators": [],
           "props": []
         },
@@ -691,7 +711,7 @@
           "kind": "function",
           "name": "collect_tests",
           "signature": "(repo: Path)",
-          "line": 1216,
+          "line": 1240,
           "decorators": [],
           "props": []
         },
@@ -699,7 +719,7 @@
           "kind": "function",
           "name": "discover_docs",
           "signature": "(repo: Path)",
-          "line": 1274,
+          "line": 1298,
           "decorators": [],
           "props": []
         },
@@ -707,7 +727,7 @@
           "kind": "function",
           "name": "analyze_openapi",
           "signature": "(docs: list[DocRecord], repo: Path)",
-          "line": 1306,
+          "line": 1330,
           "decorators": [],
           "props": []
         },
@@ -715,7 +735,7 @@
           "kind": "const",
           "name": "MAX_MAP_ROWS",
           "signature": "",
-          "line": 1344,
+          "line": 1368,
           "decorators": [],
           "props": []
         },
@@ -723,7 +743,7 @@
           "kind": "const",
           "name": "MAX_API_ROWS",
           "signature": "",
-          "line": 1345,
+          "line": 1369,
           "decorators": [],
           "props": []
         },
@@ -731,7 +751,7 @@
           "kind": "const",
           "name": "MAX_UI_ROWS",
           "signature": "",
-          "line": 1346,
+          "line": 1370,
           "decorators": [],
           "props": []
         },
@@ -739,7 +759,7 @@
           "kind": "const",
           "name": "MAX_TEST_ROWS",
           "signature": "",
-          "line": 1347,
+          "line": 1371,
           "decorators": [],
           "props": []
         },
@@ -747,7 +767,159 @@
           "kind": "const",
           "name": "MAX_SCHEMA_ROWS",
           "signature": "",
-          "line": 1348,
+          "line": 1372,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "MAX_CONFIG_ROWS",
+          "signature": "",
+          "line": 1373,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_ENV_NAMES",
+          "signature": "",
+          "line": 1380,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_PY_STEM_RE",
+          "signature": "",
+          "line": 1383,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_DATA_STEM_RE",
+          "signature": "",
+          "line": 1388,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_DATA_EXCLUDE_RE",
+          "signature": "",
+          "line": 1393,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_SECRET_RE",
+          "signature": "",
+          "line": 1397,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_FEATURE_RE",
+          "signature": "",
+          "line": 1401,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_BOOL_VALUES",
+          "signature": "",
+          "line": 1404,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_CONFIG_TEST_PARTS",
+          "signature": "",
+          "line": 1407,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "_MAX_VALUE_HINT",
+          "signature": "",
+          "line": 1410,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_skip_config_path",
+          "signature": "(rel_path: str, name: str)",
+          "line": 1413,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_config_value_hint",
+          "signature": "(key: str, value: str)",
+          "line": 1421,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_config_is_feature",
+          "signature": "(key: str, value: str)",
+          "line": 1433,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_config_env_call",
+          "signature": "(node: ast.Call)",
+          "line": 1437,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_collect_config_env",
+          "signature": "(abs_path: Path, rel_path: str, add: Any)",
+          "line": 1469,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_collect_config_py_module",
+          "signature": "(abs_path: Path, rel_path: str, add: Any)",
+          "line": 1489,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_config_key_line",
+          "signature": "(lines: list[str], key: str)",
+          "line": 1531,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_collect_config_data_file",
+          "signature": "(abs_path: Path, rel_path: str, add: Any)",
+          "line": 1544,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "collect_config",
+          "signature": "(repo: Path)",
+          "line": 1576,
           "decorators": [],
           "props": []
         },
@@ -755,7 +927,7 @@
           "kind": "function",
           "name": "_default_out_dir",
           "signature": "(repo: Path)",
-          "line": 1351,
+          "line": 1670,
           "decorators": [],
           "props": []
         },
@@ -763,7 +935,7 @@
           "kind": "function",
           "name": "render_spec_scan",
           "signature": "(index: dict[str, Any])",
-          "line": 1356,
+          "line": 1675,
           "decorators": [],
           "props": []
         },
@@ -771,7 +943,7 @@
           "kind": "function",
           "name": "run_scan",
           "signature": "(repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool, extractors: str='auto')",
-          "line": 1449,
+          "line": 1786,
           "decorators": [],
           "props": []
         },
@@ -779,7 +951,7 @@
           "kind": "const",
           "name": "_CITATION_RE",
           "signature": "",
-          "line": 1585,
+          "line": 1926,
           "decorators": [],
           "props": []
         },
@@ -787,7 +959,7 @@
           "kind": "function",
           "name": "_line_text",
           "signature": "(abs_file: Path, line: int)",
-          "line": 1590,
+          "line": 1931,
           "decorators": [],
           "props": []
         },
@@ -795,7 +967,7 @@
           "kind": "function",
           "name": "run_verify",
           "signature": "(index_path: Path | None, repo_path: Path, doc_path: Path | None, verbose: bool)",
-          "line": 1604,
+          "line": 1945,
           "decorators": [],
           "props": []
         },
@@ -803,7 +975,7 @@
           "kind": "function",
           "name": "main",
           "signature": "(argv: list[str] | None=None)",
-          "line": 1672,
+          "line": 2015,
           "decorators": [],
           "props": []
         }
@@ -3134,6 +3306,172 @@
         "pathlib",
         "importlib.util",
         "sys"
+      ],
+      "extractor": "stdlib.ast"
+    },
+    {
+      "path": "context/scripts/tests/test_spec_indexer_config.py",
+      "language": "python",
+      "line_count": 182,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "INDEXER_PATH",
+          "signature": "",
+          "line": 12,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 13,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "ENV_TEMPLATE",
+          "signature": "",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "SETTINGS_PY",
+          "signature": "",
+          "line": 29,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_write_tree",
+          "signature": "(repo: Path, files: dict[str, str])",
+          "line": 40,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_scan",
+          "signature": "(repo: Path, out_dir: Path)",
+          "line": 48,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_config_map",
+          "signature": "(index: dict)",
+          "line": 56,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestConfigSources",
+          "signature": "",
+          "line": 60,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_env_template_extraction",
+          "signature": "(self, tmp_path)",
+          "line": 61,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_python_settings_module",
+          "signature": "(self, tmp_path)",
+          "line": 76,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_yaml_config_file",
+          "signature": "(self, tmp_path)",
+          "line": 91,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_json_config_file",
+          "signature": "(self, tmp_path)",
+          "line": 112,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_non_config_files_ignored",
+          "signature": "(self, tmp_path)",
+          "line": 124,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_precedence_first_source_wins",
+          "signature": "(self, tmp_path)",
+          "line": 139,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigSources.test_determinism",
+          "signature": "(self, tmp_path)",
+          "line": 151,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestConfigVerify",
+          "signature": "",
+          "line": 165,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestConfigVerify.test_verify_index_covers_config_citations",
+          "signature": "(self, tmp_path)",
+          "line": 166,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestRealRepo",
+          "signature": "",
+          "line": 176,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestRealRepo.test_start_here_env_template_keys_redacted",
+          "signature": "(self)",
+          "line": 177,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "importlib.util",
+        "json",
+        "sys",
+        "pathlib"
       ],
       "extractor": "stdlib.ast"
     },
@@ -6529,6 +6867,42 @@
       "file": "context/scripts/tests/test_runtime_telemetry.py"
     },
     {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_env_template_extraction",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_python_settings_module",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_yaml_config_file",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_json_config_file",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_non_config_files_ignored",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_precedence_first_source_wins",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_determinism",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigVerify::test_verify_index_covers_config_citations",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestRealRepo::test_start_here_env_template_keys_redacted",
+      "file": "context/scripts/tests/test_spec_indexer_config.py"
+    },
+    {
       "node_id": "context/scripts/tests/test_spec_indexer_extractors.py::TestProbeAndPlan::test_probe_backends_never_raises",
       "file": "context/scripts/tests/test_spec_indexer_extractors.py"
     },
@@ -7007,6 +7381,64 @@
     {
       "node_id": "context/scripts/tests/test_validators.py::TestLoggingTemplateDocs::test_agent_template_references_logging_template",
       "file": "context/scripts/tests/test_validators.py"
+    }
+  ],
+  "config": [
+    {
+      "key": "ANTHROPIC_API_KEY",
+      "source": ".env.template",
+      "line": 18,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "GEMINI_API_KEY",
+      "source": ".env.template",
+      "line": 20,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "OPENAI_API_KEY",
+      "source": ".env.template",
+      "line": 19,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "SUPABASE_ANON_KEY",
+      "source": ".env.template",
+      "line": 13,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "SUPABASE_DB_PASSWORD",
+      "source": ".env.template",
+      "line": 15,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "SUPABASE_SERVICE_ROLE_KEY",
+      "source": ".env.template",
+      "line": 14,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "SUPABASE_URL",
+      "source": ".env.template",
+      "line": 12,
+      "value_hint": "<redacted>",
+      "feature": false
+    },
+    {
+      "key": "UPSTREAM_PUSH_TOKEN",
+      "source": ".env.template",
+      "line": 9,
+      "value_hint": "<redacted>",
+      "feature": false
     }
   ]
 }
