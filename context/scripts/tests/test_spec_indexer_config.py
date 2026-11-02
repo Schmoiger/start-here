@@ -58,7 +58,7 @@ def _config_map(index: dict) -> dict[str, dict]:
 
 
 class TestConfigSources:
-    def test_env_template_extraction(self, tmp_path):
+    def test_config_should_extract_env_template_keys_when_env_file_present(self, tmp_path):
         repo = _write_tree(tmp_path, {".env.example": ENV_TEMPLATE})
         index = _scan(repo, tmp_path / "out")
         cfg = _config_map(index)
@@ -73,7 +73,7 @@ class TestConfigSources:
         # empty values still produce a key, with an empty hint
         assert cfg["EMPTY_VALUE"]["value_hint"] == ""
 
-    def test_python_settings_module(self, tmp_path):
+    def test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present(self, tmp_path):
         repo = _write_tree(tmp_path, {"settings.py": SETTINGS_PY})
         index = _scan(repo, tmp_path / "out")
         cfg = _config_map(index)
@@ -88,7 +88,7 @@ class TestConfigSources:
         # env read without a default still records the key (redacted hint for TOKEN)
         assert cfg["TOKEN"]["value_hint"] == "<redacted>"
 
-    def test_yaml_config_file(self, tmp_path):
+    def test_config_should_extract_scalar_keys_when_yaml_config_present(self, tmp_path):
         repo = _write_tree(
             tmp_path,
             {
@@ -109,7 +109,7 @@ class TestConfigSources:
         assert cfg["max_connections"]["value_hint"] == "10"
         assert "ignored" not in cfg  # nested structures are not value-hints
 
-    def test_json_config_file(self, tmp_path):
+    def test_config_should_extract_scalar_keys_when_json_config_present(self, tmp_path):
         repo = _write_tree(
             tmp_path,
             {"appsettings.json": '{"Name": "demo", "FeatureB": true, "Nested": {"x": 1}}'},
@@ -121,7 +121,7 @@ class TestConfigSources:
         assert cfg["FeatureB"]["feature"] is True  # boolean value
         assert "Nested" not in cfg
 
-    def test_non_config_files_ignored(self, tmp_path):
+    def test_config_should_ignore_non_config_files_when_names_do_not_match(self, tmp_path):
         repo = _write_tree(
             tmp_path,
             {
@@ -136,7 +136,7 @@ class TestConfigSources:
         for key in ("X", "IGNORED_KEY", "name", "openapi", "user"):
             assert key not in _config_map(index)
 
-    def test_precedence_first_source_wins(self, tmp_path):
+    def test_config_should_keep_first_source_value_when_key_defined_in_multiple_sources(self, tmp_path):
         # same key in settings.py (highest precedence) and .env.example
         repo = _write_tree(
             tmp_path,
@@ -148,7 +148,7 @@ class TestConfigSources:
         assert entry["value_hint"] == "5"
         assert entry["source"] == "settings.py"
 
-    def test_determinism(self, tmp_path):
+    def test_config_should_be_deterministic_when_scan_repeated(self, tmp_path):
         repo = _write_tree(
             tmp_path,
             {
@@ -163,7 +163,7 @@ class TestConfigSources:
 
 
 class TestConfigVerify:
-    def test_verify_index_covers_config_citations(self, tmp_path):
+    def test_verify_should_fail_when_config_source_removed_after_indexing(self, tmp_path):
         repo = _write_tree(tmp_path, {".env.example": ENV_TEMPLATE, "settings.py": SETTINGS_PY})
         index_path = tmp_path / "out" / "repo-index.json"
         _scan(repo, tmp_path / "out")
@@ -174,7 +174,7 @@ class TestConfigVerify:
 
 
 class TestRealRepo:
-    def test_start_here_env_template_keys_redacted(self):
+    def test_config_should_redact_secrets_when_scanning_real_repo_env_template(self):
         cfg = {e.key: e for e in si.collect_config(REPO_ROOT)}
         assert "UPSTREAM_PUSH_TOKEN" in cfg
         assert cfg["SUPABASE_URL"].value_hint == "<redacted>"
