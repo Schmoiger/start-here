@@ -20,7 +20,7 @@ three things: **when to pick a workflow** (§2), **what each workflow contains**
 | `continuous-improvement` | `continuous-improvement.yaml` | Framework improvement — reactive (incident) or proactive (retrospective) | Retrospective discuss gate |
 | `deploy` | `deploy.yaml` | GCP cloud deployment and deployment review, after build local-deployment | deployment-review gate |
 | `design` | `design.yaml` | Discovery through design review — run before build | design-review gate |
-| `derive-spec` | `derive-spec.yaml` *(planned)* | Derive product and technical specifications from a codebase (organised or not) via deterministic indexing + agent synthesis | final review before promotion to `derived/` |
+| `derive-spec` | `derive-spec.yaml` | Derive product and technical specifications from a codebase (organised or not) via deterministic indexing + agent synthesis | final review before promotion to `derived/` |
 | `full-test` | `full-test.yaml` | Full-suite testing across all modules — run before merge to main or on demand | quality-check gate |
 | `prototype` | `prototype.yaml` | Fast iteration workflow for prototyping and experimentation | None (skip on promotion) |
 | `small-task` | `small-task.yaml` | Small, single-change, human-approved tasks done directly by the default agent | The approval is the gate (always) |
