@@ -30,7 +30,7 @@ Extraction backends (all deterministic, ~0 LLM tokens) selected via ``--extracto
   * Tests   - pytest --collect-only / yarn test --listTests when available:
               test node-ids are candidate feature names.
 
-The index schema is documented in context/workflows/README.md § Repository Index.
+The index schema is documented in context/skills/analyse-repo.md (§ Consuming repo-index.json).
 """
 
 from __future__ import annotations

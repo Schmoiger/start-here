@@ -325,47 +325,16 @@ sequenceDiagram
 - Outputs land in `derived/`: drafts are staged in `artefacts/build/spec-drafts/`, approval promotes to `artefacts/{category}/derived/`; canonical docs are never rewritten
 - Respect scope limits to bound token burn; `max-files` flag surfaces large repos; read the index to target file reads
 
-### Commands
+### Commands & Repository Index
 
-```bash
-# Phases 1 & 3 — build the index and the compact evidence map (zero LLM tokens); the agent writes repo-profile.md from it
-uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both
-# → artefacts/build/repo-index.json   (structured index)
-# → artefacts/build/spec-scan.md      (human/agent-readable evidence map)
-# → artefacts/build/repo-profile.md   (agent synthesis: app type, entry points, module boundaries)
-#
-# Extraction backends (T-015, --extractors):
-#   auto (default) — probe and prefer the richest backend per language:
-#     python → stdlib ast; TS/JS → tree-sitter (when available) → ast-grep → ts-morph → regex
-#   stdlib       — zero-dependency fallback tier (deterministic, reproduces the baseline exactly)
-#   ctags        — universal-ctags JSON (foreign langs: Go, Rust, Java, C, C++, Ruby, …)
-#   tree-sitter  — requires: uv run --with tree-sitter --with tree-sitter-language-pack python context/scripts/code-specs/spec_indexer.py scan …
-#   ast-grep | ts-morph — forced backends; an absent forced backend exits non-zero (ts-morph degrades quietly)
-
-# Phase 6 — every citation in the index resolves
-uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json
-
-# Phase 8 — every file:line cited by a final draft resolves
-uv run context/scripts/code-specs/spec_indexer.py verify --doc artefacts/product/derived/product-spec.md
-```
-
-### Repository Index (`repo-index.json`)
-
-Produced by `scan`; consumed by every derive-spec agent.
-
-| Key | Contents |
-|-----|----------|
-| `meta` | repo, absolute root (`repo_abs`), UTC `generated_at`, mode, file/language counts, LOC, `scan_too_large` flag, `confidence` tier, `extractors` provenance; `history` (T-017) when present |
-| `warnings` | scan-level warnings (e.g. size threshold, collection method) |
-| `docs` | existing spec documents: `[ {path, kind} ]` — `requirements │ architecture │ api │ design │ docs │ discovery │ prd │ tsd │ spec │ readme │ openapi` |
-| `files` | per file: path, language, line count, `symbols` (kind, name, signature, line, decorators, props), imports |
-| `api` | `[ {method, path, handler(=function or operationId), file, line} ]` from route decorators (FastAPI/Flask) and OpenAPI documents |
-| `schema` | `[ {table, columns:[{name,type}], file, line} ]` from SQL migrations plus OpenAPI schema names |
-| `ui` | `[ {component, file, line, props, usages, kind} ]` from TS/JSX component definitions, aggregated with JSX-tag usage counts |
-| `tests` | `[ {node_id, file} ]` from pytest collection / jest listTests — each test name is a candidate feature |
-| `config` | *(planned · T-016)* `[ {key, source(file:line), value-hint} ]` env/config/feature-flag keys and defaults — user-facing constraints for product spec + TSD constraints |
-| `meta.history` | *(planned · T-017)* capped git history: recent commit subjects + renames — zero-LLM feature descriptions, esp. for unorganised repos |
-| `comments` | *(planned · T-021)* per-symbol `docstring` + `comments` (leading │ inline │ block) plus a top-level comment stream — business intent, magic-number explanations, JSDoc semantics |
+The `scan` / `verify` invocations per phase (`--repo`, `--mode`, `--max-files`,
+`--out`, `--extractors`, `verify --index` / `verify --doc`), the `repo-index.json`
+schema (including `meta.extractors` provenance and the per-file `extractor`
+field), the `spec-scan.md` evidence map, the `repo-profile.md` Phase-1
+deliverable, backend degradation semantics, and the evidence-citation /
+confidence-band discipline are documented in the **`analyse-repo`** skill —
+`context/skills/analyse-repo.md`. Invoke the indexer through that skill; do not
+duplicate its procedure here.
 
 The index is deterministic: re-running the scan on the same tree is idempotent,
 and `verify` will fail any citation that no longer resolves after edits.
