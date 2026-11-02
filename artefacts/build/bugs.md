@@ -2,7 +2,7 @@
 
 **Branch**: feat/spec-agent
 **Status**: In Progress
-**Scope**: Process and compliance defects found by auditing the shipped spec-agent work (T-014 → T-016) against the harness's own rules/standards/skills — tdd-workflow.md, testing.md, python-environment.md, python-scripting.md, secrets.md, tech-writing.md, doc-standards.md, workspace-conventions.md.
+**Scope**: Process and compliance defects found by auditing the shipped spec-agent work (T-014 → T-016) against the harness's own rules/standards/skills — tdd-workflow.md, testing.md, python-environment.md, python-scripting.md, secrets.md, tech-writing.md, doc-standards.md, workspace-conventions.md. Also records Cline tool-hygiene defects observed during the same work (editor chunk limit, terminal heredocs).
 **Audited**: 2026-02-11 — post-hoc context-acquisition sweep (triggered by the failure chain recorded in B-001)
 **Related**: `artefacts/build/tasks-spec-agent.md` (feature tasks). Bugs here are process defects; feature backlog lives there.
 
@@ -17,6 +17,8 @@
 | B-003 | medium | open | Context acquisition | Matching skill/rule not loaded before code tasks — root cause of B-001 |
 | B-004 | low | partial | Code hygiene | ruff not run/enforced on `context/scripts/` — 228 findings in indexer code/tests |
 | B-005 | low | open | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
+| B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
+| B-007 | medium | open | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
 
 ---
 
@@ -117,6 +119,70 @@ Add `pytest-cov` to `[dependency-groups] dev` (root `pyproject.toml`) at T-010 t
 
 - [ ] dev deps include `pytest-cov`
 - [ ] A task report (T-017 or later) includes a real Coverage % per tested module
+
+---
+
+## B-006: Cline forgets to chunk edits — repeated "Editor input too large" retries waste tokens
+
+#### Symptom
+
+The editor tool rejects `new_text` above ~6000 characters. This session repeatedly wrote whole-file drafts into a single editor call, got rejected, and re-sent as splits — retrying the same content wastes tokens and round-trips:
+
+- derive-spec.yaml draft: 9515 chars → rejected → split into 3 calls
+- spec_indexer.py config helpers: 8296 chars → rejected → split into 2
+- test_spec_indexer_config.py: 6971 chars → rejected → split into 2
+- bugs.md: 6137 chars → rejected → split into 3
+- T-001 derive-spec skill: 6764 chars → rejected → split
+
+Related: one `insert_line`-based append (derive-spec.md §3.4, §7-§9) landed in the wrong position and duplicated a bullet, costing extra repair edits. Anchor-based `old_text` appends proved reliable; `insert_line` semantics were misjudged.
+
+#### Failure Chain (root cause)
+
+1. Size estimation happens after the draft is written, not before — each large content block is attempted whole, relying on the tool to reject rather than chunking by design.
+2. No habitual rule "plan every file write/append as ≤6000-char chunks, appended via unique `old_text` anchors" — so the failure pattern recurs whenever a new multi-section file is created.
+3. `insert_line` was used as "append at EOF" without confirming the current line count first — producing content splits that then needed manual repair.
+
+#### Fix
+
+- Always chunk file creation/append into ≤6000-char edits planned in advance (frontmatter+overview → sections → tail), using unique `old_text` anchors for sequential appends.
+- Never use `insert_line` for appends without first reading the file's exact end; verify structure (grep section headers / `wc -l`) after any multi-edit sequence.
+- Adopt the chunking habit for every new file, including future T-017/T-021 and docs work.
+
+#### Acceptance Criteria
+
+- [x] Recorded with evidence (this section)
+- [ ] No "Editor input too large" rejection occurs in T-017/T-021 implementation
+- [ ] No `insert_line`-induced duplicate/misplaced content in future multi-edit sequences
+
+---
+
+## B-007: Cline hangs on some terminal commands — heredocs leave the shell in prompt state
+
+#### Symptom
+
+Long heredoc bodies passed to `run_command` do not complete reliably through shell integration: the terminal is left open at the `heredoc>` prompt, output is mangled or lost, and the wrapped command aborts (exit 1) or silently no-ops. Observed this session:
+
+- `cat > /tmp/t14-msg.txt <<'EOF' …` — command "completed" with empty output; the intended `git commit` afterwards did NOT run (verified via `git log` — no commit). Recovered by writing the message file with the editor tool instead.
+- `python3 - <<'PYEOF' …` (rewrite of the corrupted derive-spec.md) — the shell entered heredoc prompt state, echoed fragments (`heredoc> ##uvit-in` …), and exited 1 without writing the file.
+- Subsequent grep/pytest commands occasionally printed stale `direnv`/`source` shell noise into captured output.
+
+#### Failure Chain (root cause)
+
+1. Long stdin-fed scripts (heredocs) rely on interactive prompt handling that the non-interactive command runner does not support reliably.
+2. The runner reports "no result signal" instead of a clean success/failure, and per the core rules a no-signal result must be treated as unknown — the failure continued to a second attempt instead of switching tools.
+3. The workaround (editor-created files, one-line commands) is known but was not applied on first attempt.
+
+#### Fix
+
+- Never pipe multi-line content through `run_command` heredocs: write message files and content via the `editor` tool, keep shell commands single-line (`git add && git commit -F <file>`, `git log --oneline -3`).
+- After any "no result signal" from a command, verify true state with git (`git log`/`git status`) before retrying or proceeding (per core rules "treat no result signal as unknown, not failed").
+- Use `git commit -F /tmp/<file>` with an editor-written message file for every commit.
+
+#### Acceptance Criteria
+
+- [x] Recorded with evidence (this section)
+- [ ] No heredoc bodies sent through `run_command` in future sessions; message files created via the editor
+- [ ] After a no-signal command, state verified via `git log`/`git status` before proceeding
 
 ---
 
