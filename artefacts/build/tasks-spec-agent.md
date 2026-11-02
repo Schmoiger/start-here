@@ -10,6 +10,7 @@
 **Amended**: 2026-01-11 (T-SETUP done) — T-SETUP marked completed (ctags 6.2.1, ast-grep 0.51.0, tree-sitter via uv, ts-morph skipped); T-015 ast-grep backend reworded to the `ast-grep` binary (`sg` deprecated as of 0.51)
 **Amended**: 2026-01-11 (T-015 done) — T-015 completed: `--extractors` backends (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph), `meta.extractors` + `meta.confidence` + per-file `extractor`, `ts_extract.mjs` helper, parity + fixture tests (15/15 with tree-sitter); README Commands notes the flag
 **Amended**: 2026-02-11 (T-014 done) — `context/skills/analyse-repo.md` added: scan/verify invocations per phase, `repo-index.json` schema (meta.extractors provenance + per-file extractor), spec-scan.md map, repo-profile.md deliverable, T-015 backends with degradation, evidence citation + confidence bands, re-scan rule, token rationale; workflows README `## Commands` / `## Repository Index` reduced to a pointer; indexer docstring schema reference updated
+**Amended**: 2026-02-11 (T-001 done) — `context/skills/derive-spec.md` added: modes (product/technical/both), Phases 0–8 procedural steps (discovery + human confirmation, evidence consumption from repo-index.json + repo-profile.md, 4a product / 4b technical derivation, draft with confidence, verification, batched confirmation with drift-first ordering, finalise + review gate), confidence model (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50) with promotion DoD, output lifecycle (spec-drafts → derived/, canonical untouched), references to workflows README (no schema duplication)
 
 ## Task Index
 
@@ -21,7 +22,7 @@
 | T-011 | high | completed | - | Author `context/workflows/README.md` (diagrams + runtime narrative + token ledger); note in `context/README.md` |
 | T-015 | high | completed | T-SETUP | Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph) |
 | T-014 | high | completed | T-SETUP,T-015 | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (documents the actual backends) |
-| T-001 | critical | pending | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
+| T-001 | critical | completed | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
 | T-002 | high | pending | Q0 | Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery) |
 | T-003 | high | pending | T-001 | Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill) |
 | T-004 | high | pending | T-001 | Extend `context/agents/solution-architect.md` — derive mode (drafts only) |
@@ -30,7 +31,7 @@
 | T-007 | high | pending | T-001,T-002,T-006 | Regenerate adapters; run validators green |
 | T-010 | high | pending | T-007 | Unit tests: skill/workflow schema, indexer extraction + verify |
 | T-008 | critical | pending | T-010 | Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/` |
-| T-009 | low | pending | T-008 | Optional: register derive-spec as a `build.yaml` precursor phase |
+| T-009 | low | won't do | T-008 | Optional: register derive-spec as a `build.yaml` precursor phase |
 | T-013 | high | pending | T-002,T-012 | Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges) |
 | T-016 | high | pending | T-015 | Indexer: env/config/feature-flag extraction into `config` key — user-facing constraints for product spec + TSD constraints |
 | T-017 | medium | pending | T-015 | Indexer: capped git-history evidence into `meta.history` (commit subjects + renames; zero LLM) |
