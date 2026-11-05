@@ -19,6 +19,9 @@
 | B-005 | low | open | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
 | B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
 | B-007 | medium | open | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
+| B-008 | high | open | Output | Content at front of derived docs should be in the appendix |
+| B-009 | high | open | Output | Architecture process model is currently text instead should be Mermaid |
+| B-010 | high | open | Workflow | After open questions have been answered, docs should be updated with answers and confidence band improved |
 
 ---
 

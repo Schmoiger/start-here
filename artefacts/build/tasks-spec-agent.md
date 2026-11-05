@@ -18,7 +18,7 @@
 | T-006 | medium | completed | T-001 | Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix) |
 | T-007 | high | won't do | T-001,T-002,T-006 | Regenerate adapters; run validators green |
 | T-010 | high | completed | - | Unit tests: skill/workflow schema, indexer extraction + verify |
-| T-008 | critical | pending | T-010 | Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/` |
+| T-008 | critical | completed | T-010 | Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/` |
 | T-009 | low | won't do | T-008 | Optional: register derive-spec as a `build.yaml` precursor phase |
 | T-013 | high | completed | T-002,T-012 | Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges) |
 | T-016 | high | completed | T-015 | Indexer: env/config/feature-flag extraction into `config` key — user-facing constraints for product spec + TSD constraints |
