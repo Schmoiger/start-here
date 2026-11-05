@@ -14,6 +14,8 @@
 [ ] Add projection to OpenRouter runtime e.g. new telemetry location
 [ ] Model selection should be per-task, not per-agent. Model should persist for task to make use of cached context economies.
 [ ] Update harness to work with Intent Driven Design
+[ ] Add telemetry source to projection script
+[ ] Simplify AGENTS.md as it currently isn't DRY
 
 ## Done
 
