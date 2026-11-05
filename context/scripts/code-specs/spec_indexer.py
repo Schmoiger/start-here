@@ -12,7 +12,7 @@ instead of file reads.
 
 Subcommands
 -----------
-scan   Build <repo>/artefacts/build/repo-index.json and spec-scan.md.
+scan   Build <repo>/artefacts/build/derived-spec-working/repo-index.json and spec-scan.md.
 verify Validate that every cited file:line in an index (or in a markdown spec
        document) resolves to an existing line in the repository.
 
@@ -1668,7 +1668,7 @@ def collect_config(repo: Path) -> list[ConfigEntry]:
 
 
 def _default_out_dir(repo: Path) -> Path:
-    build_dir = repo / "artefacts" / "build"
+    build_dir = repo / "artefacts" / "build" / "derived-spec-working"
     return build_dir if build_dir.is_dir() else repo
 
 
@@ -2030,7 +2030,7 @@ def main(argv: list[str] | None = None) -> int:
     p_scan.add_argument(
         "--out",
         default=None,
-        help="output path for repo-index.json (default: <repo>/artefacts/build/repo-index.json "
+        help="output path for repo-index.json (default: <repo>/artefacts/build/derived-spec-working/repo-index.json "
         "when artefacts/build exists, else repo root)",
     )
     p_scan.add_argument(

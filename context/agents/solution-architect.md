@@ -113,7 +113,7 @@ Load `derive-spec.md` — and its driver, the `analyse-repo` skill — before th
 Workflow:
 1. Record derive intake: mode (`technical` | `both`), target repo (`--repo <service-root>` in a monorepo), limits, and output location
 2. Run the deterministic indexer via the `analyse-repo` skill (`scan --repo <target> --mode <mode>`); tool scope is `repo-index.json` + cited line ranges — never unfettered repo reads
-3. Write `artefacts/build/repo-profile.md` (app type, entry points, module boundaries; every claim `file:line`)
+3. Write `artefacts/build/derived-spec-working/repo-profile.md` (app type, entry points, module boundaries; every claim `file:line`)
 4. Build the drift candidate list (doc-vs-code deltas) into the Phase 7 question queue, then gather further evidence and derive the technical specs (Phase 4b — architecture, api-catalogue, data-model) with per-subsection confidence (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50)
 5. Stage drafts at `artefacts/build/spec-drafts/` (`architecture.md`, `api-catalogue.md`, `data-model.md`); run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
 6. Run one batched human confirmation round, drift candidates first — use the `requirements-elicitation` skill's confirmation discipline
@@ -165,7 +165,7 @@ You create the **conceptual** `data-model.md`: entities, relationships, and busi
 
 If context window compaction occurs during task execution, execute this sequence to resume state:
 
-1. Read current state from the primary output file: `{project-root}/artefacts/architecture/architecture.md` (or `openapi.yaml` when the task is contract-only); in derive mode — `artefacts/build/HANDOFF.md` (workflow/phase) plus `artefacts/build/repo-index.json`, `spec-scan.md`, `repo-profile.md`, and `spec-drafts/` (see `derive-spec.yaml` state_recovery).
+1. Read current state from the primary output file: `{project-root}/artefacts/architecture/architecture.md` (or `openapi.yaml` when the task is contract-only); in derive mode — `artefacts/build/HANDOFF.md` (workflow/phase) plus `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md`, `repo-profile.md`, and `spec-drafts/` (see `derive-spec.yaml` state_recovery).
 2. Inspect local workspace state via `git status --short`.
 3. Re-read the initial prompt intake.
 4. Resume execution from the last uncompleted step identified in disk state.

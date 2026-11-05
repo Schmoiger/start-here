@@ -28,9 +28,9 @@ phases:
       - product-owner      # modes product | both
       - solution-architect # mode technical
     outputs:
-      - artefacts/build/repo-index.json
-      - artefacts/build/spec-scan.md
-      - artefacts/build/repo-profile.md
+      - artefacts/build/derived-spec-working/repo-index.json
+      - artefacts/build/derived-spec-working/spec-scan.md
+      - artefacts/build/derived-spec-working/repo-profile.md
     validation:
       - "scan --repo --mode (via analyse-repo skill) wrote repo-index.json + spec-scan.md; meta.mode recorded"
       - "spec-doc candidates discovered by glob (artefacts/product/**, artefacts/architecture/**, docs/**, **/README.md, PRD*, *spec*.md, openapi*.yaml) and confirmed by the human — never silent"
@@ -55,7 +55,7 @@ phases:
       - "canonical docs read but never modified"
       - "consumes repo-index.json + spec-scan.md + repo-profile.md; tool_scope = index + cited line ranges"
     notes:
-      - "Inputs: artefacts/build/repo-index.json (schema/symbols), artefacts/build/spec-scan.md, artefacts/build/repo-profile.md (app type, entry points, module boundaries)"
+      - "Inputs: artefacts/build/derived-spec-working/repo-index.json (schema/symbols), artefacts/build/derived-spec-working/spec-scan.md, artefacts/build/derived-spec-working/repo-profile.md (app type, entry points, module boundaries)"
 
   - id: evidence
     name: Phase 3 · Evidence Gathering
@@ -64,7 +64,7 @@ phases:
       - product-owner
       - solution-architect
     outputs:
-      - artefacts/build/repo-index.json   # refreshed by the evidence-pass scan
+      - artefacts/build/derived-spec-working/repo-index.json   # refreshed by the evidence-pass scan
     validation:
       - "evidence-pass scan rerun (symbols · routes · UI · schema · tests) per analyse-repo §1.3"
       - "cross-index reasoning over repo-index.json; no bulk source reads"
@@ -187,12 +187,12 @@ workflow_rules:
 state_recovery:
   after_compaction:
     - "Read artefacts/build/HANDOFF.md — the Workflow: derive-spec and Phase: fields identify the active phase"
-    - "Read artefacts/build/repo-index.json + artefacts/build/spec-scan.md for the indexed evidence (Phase ≥ 1)"
-    - "Read artefacts/build/repo-profile.md for the Phase 1 deliverable (app type, entry points, module boundaries)"
+    - "Read artefacts/build/derived-spec-working/repo-index.json + artefacts/build/derived-spec-working/spec-scan.md for the indexed evidence (Phase ≥ 1)"
+    - "Read artefacts/build/derived-spec-working/repo-profile.md for the Phase 1 deliverable (app type, entry points, module boundaries)"
     - "Read artefacts/build/drift-candidates.md for the Phase 2/7 question queue; read artefacts/build/spec-drafts/ for staged drafts (Phase ≥ 5)"
   critical_files:
     - artefacts/build/HANDOFF.md
-    - artefacts/build/repo-index.json
-    - artefacts/build/spec-scan.md
-    - artefacts/build/repo-profile.md
+    - artefacts/build/derived-spec-working/repo-index.json
+    - artefacts/build/derived-spec-working/spec-scan.md
+    - artefacts/build/derived-spec-working/repo-profile.md
     - artefacts/build/spec-drafts/

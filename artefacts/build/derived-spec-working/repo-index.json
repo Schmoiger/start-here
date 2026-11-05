@@ -2,14 +2,14 @@
   "meta": {
     "repo": "start-here",
     "repo_abs": "/Users/avi/Repos/start-here",
-    "generated_at": "2026-11-05T13:24:38Z",
+    "generated_at": "2026-11-05T15:02:19Z",
     "mode": "both",
-    "scanned_files": 61,
+    "scanned_files": 62,
     "languages": {
-      "python": 60,
+      "python": 61,
       "javascript": 1
     },
-    "loc": 12832,
+    "loc": 12880,
     "scan_too_large": false,
     "extractors": {
       "ctags": {
@@ -146,6 +146,28 @@
     }
   ],
   "files": [
+    {
+      "path": ".openai/runner.py",
+      "language": "python",
+      "line_count": 48,
+      "symbols": [
+        {
+          "kind": "function",
+          "name": "run_agent",
+          "signature": "(agent_name: str, user_prompt: str)",
+          "line": 6,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "os",
+        "json",
+        "httpx",
+        "pathlib"
+      ],
+      "extractor": "stdlib.ast"
+    },
     {
       "path": "context/__init__.py",
       "language": "python",

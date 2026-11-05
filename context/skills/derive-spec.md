@@ -51,7 +51,7 @@ Record at intake:
 - **Limits** — `--max-files` bound; large repos flagged by
   `meta.scan_too_large` → consult the human on scoping before spending tokens.
 - **Output location** — per-run choice; drafts stage in
-  `artefacts/build/spec-drafts/`, approval promotes to `artefacts/{category}/derived/`.
+  `artefacts/build/derived-spec-drafts/`, approval promotes to `artefacts/derived/{category}/`.
 
 ---
 
@@ -64,7 +64,7 @@ Record at intake:
    `artefacts/product/**` · `artefacts/architecture/**` · `docs/**` ·
    `**/README.md` · `PRD*` · `*spec*.md` · `openapi*.yaml`
 3. **Write `repo-profile.md`** (Phase 1 deliverable; analyse-repo §5) at
-   `artefacts/build/repo-profile.md`: app type, entry points, and module
+   `artefacts/build/derived-spec-working/repo-profile.md`: app type, entry points, and module
    boundaries ground-truth from the index. This is the orientation for
    **unorganised repositories** — when the repo has no docs or an unfamiliar
    layout, the profile replaces guesswork; every claim carries `file:line`.
@@ -102,8 +102,7 @@ Record at intake:
   candidate feature names).
 - **Roles/actors**: from auth/permission evidence (route guards, decorators,
   RBAC, role-scoped API paths), UI inventory (who interacts with what), and doc
-  classification — see `artefacts/build/reverse-spec.md` §1.1 Features &
-  Capabilities.
+  classification.
 - **UX flows**: via call chains across backend symbols, named per actor.
 - **Name the actor/role per UX flow** — never leave anonymous flows; each flow
   belongs to at least one named actor.
@@ -130,13 +129,11 @@ Record at intake:
   (confidence model below).
 - Append the **open-questions appendix** (per subsection, priority, MC options)
   and the **drift section** (canonical docs vs derived behaviour).
-- Stage drafts in `artefacts/build/spec-drafts/` — one file per artefacts
+- Stage drafts in `artefacts/build/derived-spec-drafts/` — one file per artefacts
   category (`product-spec.md` · `architecture.md` · `api-catalogue.md` ·
   `data-model.md`).
 
----
-
-## Confidence Model (Q4 · A2 · T-018)
+### Confidence Model
 
 | Band | % | Evidence required to claim it |
 |------|---|-------------------------------|
@@ -183,30 +180,17 @@ Record at intake:
 2. Run `verify --doc` on the final drafts (analyse-repo §2) — all citations
    resolve.
 3. Human review gate: **APPROVED** → promote drafts from
-   `artefacts/build/spec-drafts/` to `artefacts/{category}/derived/` and commit.
+   `artefacts/build/derived-spec-drafts/` to `artefacts/derived/{category}/` and commit.
    **CHANGES REQUIRED** → return to the specified phase; canonical docs are
    never rewritten.
 
 ---
 
-## Output Lifecycle (Q1 · A1)
+## Output Lifecycle
 
-- Drafts: `artefacts/build/spec-drafts/` (one file per category).
-- Promotion: `artefacts/{category}/derived/` behind human APPROVED (T-018 DoD)
+- Drafts: `artefacts/build/derived-spec-drafts/` (one file per category).
+- Promotion: `artefacts/derived/{category}/` behind human APPROVED (T-018 DoD)
   — e.g. `artefacts/product/derived/product-spec.md`.
 - Canonical docs (`requirements.md`, `architecture.md`, …) are **never
   rewritten** by derive-spec; the drift section records deltas vs canonical
   instead.
-
----
-
-## References (no duplication)
-
-- `context/workflows/README.md` § derive-spec.yaml — phase diagrams, runtime
-  sequence, action/tool table, notes for agents (the authoritative phase map).
-- `context/skills/analyse-repo.md` — `scan` / `verify` commands, index schema,
-  backends, evidence-citation and confidence-band discipline.
-- `artefacts/build/reverse-spec.md` — reverse-PRD process: §1.1 features/roles,
-  Step 3 MC question format.
-- `context/skills/requirements-elicitation.md` — confirmation interviewing
-  discipline (Mode: confirmation, T-005).

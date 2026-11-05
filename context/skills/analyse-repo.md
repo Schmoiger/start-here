@@ -42,7 +42,7 @@ uv run context/scripts/code-specs/spec_indexer.py scan \
 |------|---------|
 | `--repo` | Repo root to index (default: cwd). Scope a monorepo/service by passing `<service-root>` — one scan per repo. |
 | `--mode` | derive-spec mode hint recorded in the index: `product`, `technical`, or `both` (default). Shared phases read it from `meta.mode`. |
-| `--out` | Output path for `repo-index.json` (default `<repo>/artefacts/build/repo-index.json` when `artefacts/build` exists, else repo root). `spec-scan.md` is written beside it. |
+| `--out` | Output path for `repo-index.json` (default `<repo>/artefacts/build/derived-spec-working/repo-index.json` when `artefacts/build/derived-spec-working` exists, else repo root). `spec-scan.md` is written beside it. |
 | `--max-files` | Scan-size bound (default 2000); `meta.scan_too_large` is set when the bound is hit. |
 | `--extractors` | Extraction backend (§6). Default `auto` probes the toolchain and prefers the richest backend per language; `stdlib` is the zero-dependency fallback tier. |
 
@@ -50,9 +50,9 @@ uv run context/scripts/code-specs/spec_indexer.py scan \
 
 ```bash
 uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both
-# → artefacts/build/repo-index.json   (structured index)
-# → artefacts/build/spec-scan.md      (human/agent-readable evidence map)
-# → artefacts/build/repo-profile.md   (agent synthesis: app type, entry points, module boundaries)
+# → artefacts/build/derived-spec-working/repo-index.json   (structured index)
+# → artefacts/build/derived-spec-working/spec-scan.md      (human/agent-readable evidence map)
+# → artefacts/build/derived-spec-working/repo-profile.md   (agent synthesis: app type, entry points, module boundaries)
 ```
 
 Phase 1 also discovers existing spec documents (`docs` key) via the document
@@ -91,7 +91,7 @@ first, and plan only the few targeted line-range reads Phase 3 needs.
 
 ```bash
 # Phase 6 — every citation in the index resolves
-uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build/repo-index.json
+uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build/derived-spec-working/repo-index.json
 
 # Phase 8 — every file:line cited by a final draft resolves
 uv run context/scripts/code-specs/spec_indexer.py verify --doc artefacts/product/derived/product-spec.md
