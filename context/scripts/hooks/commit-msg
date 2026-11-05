@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Commit-msg hook: validate the commit message (conventional header, explanatory
+# body, agent trailers) via the workspace-conventions validator.
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0" 2>/dev/null || realpath "$0" 2>/dev/null || echo "$0")")" && pwd)"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SCRIPT="$SCRIPT_DIR/../validators/workspace_conventions.py"
+
+if [ ! -f "$SCRIPT" ]; then
+    exit 0
+fi
+
+MSG_FILE="${1:-$REPO_ROOT/.git/COMMIT_EDITMSG}"
+if [ ! -f "$MSG_FILE" ]; then
+    exit 0
+fi
+
+if [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
+    "$VIRTUAL_ENV/bin/python" "$SCRIPT" commit-msg "$MSG_FILE"
+elif command -v uv >/dev/null 2>&1 && uv run python --version >/dev/null 2>&1; then
+    uv run python "$SCRIPT" commit-msg "$MSG_FILE"
+else
+    python3 "$SCRIPT" commit-msg "$MSG_FILE"
+fi

@@ -86,6 +86,13 @@ class TestConventionalCommits:
         assert not is_valid
         assert "too long" in error
 
+    def test_invalid_no_body(self, invalid_commit_no_body):
+        """Test that a commit without an explanatory body fails validation."""
+        msg = invalid_commit_no_body.read_text()
+        is_valid, error = validate_commit_message(msg)
+        assert not is_valid
+        assert "body" in error.lower()
+
     def test_invalid_past_tense(self, invalid_commit_past_tense):
         """Test that past tense description fails validation."""
         msg = invalid_commit_past_tense.read_text()
@@ -148,6 +155,8 @@ Agent-Session: tool=cursor model=sonnet agents=python-coder duration=5m tokens=1
         """prepare-commit-msg formats >=1M token counts with an M suffix."""
         msg = """feat(test): valid subject
 
+Implements the endpoint under test.
+
 Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=3.59M/7.4K
 Co-Authored-By: Agent <a@b.c>"""
         is_valid, error = validate_commit_message(msg)
@@ -157,6 +166,8 @@ Co-Authored-By: Agent <a@b.c>"""
         """Lowercase k/m token suffixes are accepted."""
         msg = """feat(test): valid subject
 
+Implements the endpoint under test.
+
 Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=1m/2k
 Co-Authored-By: Agent <a@b.c>"""
         is_valid, error = validate_commit_message(msg)
@@ -165,6 +176,8 @@ Co-Authored-By: Agent <a@b.c>"""
     def test_agent_session_hook_appended_form(self):
         """prepare-commit-msg appends tool=/model=/tokens= when the author omits them."""
         msg = """feat(test): valid subject
+
+Implements the endpoint under test.
 
 Agent-Session: agents=python-coder dispatch=human interactions=2 approvals=0 tool=cursor model=sonnet tokens=35.01M/47.2K
 Co-Authored-By: Agent <a@b.c>"""
@@ -212,6 +225,7 @@ class TestAgentSessionCorroboration:
     def _agent_commit(tool: str, model: str) -> str:
         return (
             f"feat(test): subject\n\n"
+            f"Implements the feature under test.\n\n"
             f"Agent-Session: tool={tool} model={model} agents=python-coder\n\n"
             f"Co-Authored-By: Agent <a@b.c>"
         )

@@ -126,7 +126,7 @@ uv run pre-commit run --all-files
 
 Validates invariants from `context/rules/workspace-conventions.md`.
 
-- **Commit Messages**: `{type}({scope}): {description}` subject, max 72 chars, imperative mood, lowercase alphanumeric scope.
+- **Commit Messages**: `{type}({scope}): {description}` subject, max 72 chars, imperative mood, lowercase alphanumeric scope; explanatory body required (trailers only are rejected).
 - **Agent Trailers**: Validates `Agent-Session: tool=... model=... agents=...` and ensures `Co-Authored-By:` is present.
 - **Metrics Logging**: Ensures JSONL entries in `artefacts/build/metrics/` match schema (`ts`, `task`, `agent`, `event`, `tokens`), valid events (`start`, `handoff`, `escalate`, `complete`, `blocked`), and `to` field for handoffs. Metrics logs are build records, so a repository-root `metrics/` path is rejected.
 - **Interruption Logging**: Ensures logs in `artefacts/build/interruptions/` follow the schema in `context/templates/logging-template.md` § Interruption Log: `id`, `ts` (ISO 8601 UTC), `agent` (no `@`), `task_id`, and `type` (`question`, `tool_approval`, `escalation`, `resolution`), plus the per-type fields. Outcome fields may be `null` when a record is written at the moment of blocking, provided a `resolution` record later references it via `ref`. Record ids must be unique, `ref` must resolve within the same log, and the filename stem must equal the `task_id` — one rolling log per task, so legacy `{agent-name}-{task-id}-{timestamp}.jsonl` names fail.

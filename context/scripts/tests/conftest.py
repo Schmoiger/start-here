@@ -47,6 +47,12 @@ def merge_commit(fixtures_dir):
 
 
 @pytest.fixture
+def invalid_commit_no_body(fixtures_dir):
+    """Return path to invalid commit (trailers only, no explanatory body) fixture."""
+    return fixtures_dir / 'invalid_commit_no_body.txt'
+
+
+@pytest.fixture
 def valid_requirements(fixtures_dir):
     """Return path to valid requirements fixture."""
     return fixtures_dir / 'valid_requirements.md'

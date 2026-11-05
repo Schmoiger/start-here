@@ -193,6 +193,29 @@ def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root
     return True, ""
 
 
+# Trailer/footer prefixes that are metadata, not an explanatory body.
+BODY_EXCLUDED_PREFIXES = (
+    "Tasks:",
+    "Agent-Session:",
+    "Co-Authored-By:",
+    "Blocker-Resolved:",
+    "Reviewed-By:",
+    "Signed-off-by:",
+)
+
+
+def _has_explanatory_body(lines: list[str]) -> bool:
+    """A body exists when at least one non-empty, non-trailer line follows the subject."""
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith(BODY_EXCLUDED_PREFIXES):
+            continue
+        return True
+    return False
+
+
 def validate_commit_message(msg: str, repo_root: str | None = None) -> tuple[bool, str]:
     """Validate commit message against conventional commits and agent trailers."""
     lines = msg.strip().split("\n")
@@ -262,6 +285,12 @@ def validate_commit_message(msg: str, repo_root: str | None = None) -> tuple[boo
         )
         if not ok:
             return False, reason
+
+    if not _has_explanatory_body(lines[1:]):
+        return False, (
+            "Missing explanatory body: add at least one line describing what changed and why. "
+            "Trailers only (Tasks / Agent-Session / Co-Authored-By) are not a body."
+        )
 
     return True, ""
 
