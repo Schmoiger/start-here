@@ -1,20 +1,5 @@
 # Tasks: Derive Product and Technical Specifications from Repo
 
-**Branch**: feat/spec-agent
-**Status**: In Progress
-**Scope**: New harness capability: derive product and/or technical specifications from an existing codebase (organised or not) via a single mode-switched workflow, backed by a deterministic zero-LLM indexer (`spec_indexer.py`) and agent synthesis with confidence tiers.
-**Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/code-specs/spec_indexer.py` (schema documented in README Commands / Repository Index)
-**Created**: 2026-10-29
-**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
-**Amended**: 2026-01-11 (follow-up) — detail headings aligned to the task index; duplicate short T-015 section removed; T-021 (comment/docstring extraction) added after the AST-discard gap was identified
-**Amended**: 2026-01-11 (T-SETUP done) — T-SETUP marked completed (ctags 6.2.1, ast-grep 0.51.0, tree-sitter via uv, ts-morph skipped); T-015 ast-grep backend reworded to the `ast-grep` binary (`sg` deprecated as of 0.51)
-**Amended**: 2026-01-11 (T-015 done) — T-015 completed: `--extractors` backends (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph), `meta.extractors` + `meta.confidence` + per-file `extractor`, `ts_extract.mjs` helper, parity + fixture tests (15/15 with tree-sitter); README Commands notes the flag
-**Amended**: 2026-02-11 (T-014 done) — `context/skills/analyse-repo.md` added: scan/verify invocations per phase, `repo-index.json` schema (meta.extractors provenance + per-file extractor), spec-scan.md map, repo-profile.md deliverable, T-015 backends with degradation, evidence citation + confidence bands, re-scan rule, token rationale; workflows README `## Commands` / `## Repository Index` reduced to a pointer; indexer docstring schema reference updated
-**Amended**: 2026-02-11 (T-001 done) — `context/skills/derive-spec.md` added: modes (product/technical/both), Phases 0–8 procedural steps (discovery + human confirmation, evidence consumption from repo-index.json + repo-profile.md, 4a product / 4b technical derivation, draft with confidence, verification, batched confirmation with drift-first ordering, finalise + review gate), confidence model (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50) with promotion DoD, output lifecycle (spec-drafts → derived/, canonical untouched), references to workflows README (no schema duplication)
-**Amended**: 2026-02-11 (T-002 done) — `context/workflows/derive-spec.yaml` added: Phases 0–8 (intake · discovery + repo profile · baseline + drift · evidence · 4a/4b mode-conditional derivation · draft · verification · confirmation · finalise), each with agents/outputs/validation; intake inputs (mode, target/`--repo <service-root>`, limits, output location); gates on Phase 6 (verify --index) and Phase 8 (verify --doc + human APPROVED promotion); state_recovery reads HANDOFF/spec-scan/repo-index/repo-profile + critical_files; promotion path spec-drafts → artefacts/{category}/derived/; README workflow table row de-planned
-**Amended**: 2026-02-11 (T-013 done) — derive-spec.yaml indexer wiring: Phases 1/3 validation + notes pin tool_scope to repo-index.json + spec-scan.md + cited line ranges; repo-profile.md (Phase 1 deliverable) declared as an input to Phases 2–5 (baseline-drift, evidence, 4a/4b, draft); Phase 2/3/4a/4b/5 notes list their index/profile inputs; Phase 8 promotion gate annotated per T-018 DoD; re-scan rule covered by Phase 6 validation + workflow_rules
-**Amended**: 2026-02-11 (T-016 done) — indexer `config` extraction: env templates (.env.example/.env.template/.env.sample/.env.dist, never the live .env), settings/config Python modules (UPPER_CASE constants + os.getenv/os.environ.get with defaults), config YAML/JSON top-level scalars (nested + openapi/package/lock/tooling excluded); precedence py→data→env, sorted deterministic; `feature` flag (ENABLE_*/FEATURE_* or boolean); secret-looking keys redacted; test/fixture paths excluded; `verify --index` covers config citations; spec-scan Config section; 9 new tests; analyse-repo §3.1/§3.4 + derive-spec 4a/4b docs; example outputs regenerated (config=8 from .env.template, all redacted)
-
 ## Task Index
 
 | ID | Priority | Status | Blocked By | Task |
@@ -43,7 +28,10 @@
 | T-020 | low | pending | T-010 | Extend `verify` with `--require-coverage` (deterministic Phase 6 gate: tier + % + citation per subsection) |
 | T-021 | high | pending | T-015 | Indexer: comment/docstring extraction into `comments` key (stdlib `tokenize`, docstrings, TS JSDoc, SQL `--`); intent evidence attached to symbols; consumed via analyse-repo skill |
 
-## File Scope
+
+---
+
+## Project Context
 
 - `artefacts/build/tasks-spec-agent.md` — task definition and workflow specification
 - `context/skills/analyse-repo.md` — analysis-tool skill wrapping `spec_indexer.py` usage (T-014)
@@ -61,7 +49,10 @@
 - `context/workflows/build.yaml` — optional precursor-phase dependency
 - Derived outputs (staged drafts, then promoted on approval): `artefacts/build/spec-drafts/` → `artefacts/{product,architecture}/derived/`; plus `artefacts/build/repo-profile.md`
 
-## Recommended Decisions (Q0)
+
+---
+
+## Decisions (Q0)
 
 Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-11 — Q1 (A1: land in `derived/`), Q4 (A2: fixed confidence bands), Q11 (A3: monorepo per-repo), and T-019 (A4: pilot B repo, human-chosen). Chosen options bind T-001 and T-002.
 
@@ -79,9 +70,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 | Q10 | Combined output format | **B** — separate docs per artefacts category (product-spec, architecture, data model, api catalogue) | Matches the canonical artefacts layout 1:1 |
 | Q11 | Monorepo / multi-repo handling | **A** — run once per repo or service; `--repo <service-root>` scopes the scan; one HANDOFF per run | Decision **A3**: products spanning multiple repos get one derived spec set per repo; cross-repo questions go to the elicitation round |
 
+
 ---
 
-## Task
+## Task Detail
 
 ### T-001: Create skill `context/skills/derive-spec.md` (modes: product, technical, both)
 
@@ -98,6 +90,8 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 `context/skills/derive-spec.md`
 
+---
+
 ### T-002: Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery)
 
 #### Acceptance Criteria
@@ -113,6 +107,8 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 `context/workflows/derive-spec.yaml`
 
+---
+
 ### T-003: Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill)
 
 #### Acceptance Criteria
@@ -124,6 +120,8 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 #### Primary Output Path
 
 `context/agents/product-owner.md`
+
+---
 
 ### T-004: Extend `context/agents/solution-architect.md` — derive mode (drafts only)
 
@@ -146,6 +144,8 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 #### Primary Output Path
 
 `context/skills/requirements-elicitation.md`
+
+---
 
 ### T-006: Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix)
 
@@ -186,6 +186,8 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 #### Primary Output Path
 
 Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
+
+---
 
 ### T-010: Unit tests: skill/workflow schema, indexer extraction + verify
 
@@ -295,6 +297,8 @@ before/after comparison is the acceptance metric):
 
 `context/workflows/build.yaml`
 
+---
+
 ### T-013: Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges)
 
 #### Acceptance Criteria
@@ -307,6 +311,8 @@ before/after comparison is the acceptance metric):
 #### Primary Output Path
 
 `context/workflows/derive-spec.yaml` (with T-002)
+
+---
 
 ### T-015: Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph)
 
@@ -337,6 +343,8 @@ before/after comparison is the acceptance metric):
 #### Primary Output Path
 
 `context/scripts/code-specs/spec_indexer.py` + `context/scripts/code-specs/ts_extract.mjs` (+ docs: `context/workflows/README.md` § derive-spec Commands, `artefacts/build/tasks-spec-agent.md`)
+
+---
 
 ### T-SETUP: Install / verify toolchain dependencies (human-run) before implementation starts
 
@@ -454,5 +462,21 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 
 - `todo.md`: no overlapping items identified; the workflows README (T-011) reduces the “AGENTS.md distribution” backlog item tension by centralising workflow documentation.
 
+---
 
+## Change Log
 
+**Branch**: feat/spec-agent
+**Status**: In Progress
+**Scope**: New harness capability: derive product and/or technical specifications from an existing codebase (organised or not) via a single mode-switched workflow, backed by a deterministic zero-LLM indexer (`spec_indexer.py`) and agent synthesis with confidence tiers.
+**Design**: `context/workflows/README.md` § derive-spec (overview, mode branch, runtime/tool wiring, token ledger); `context/scripts/code-specs/spec_indexer.py` (schema documented in README Commands / Repository Index)
+**Created**: 2026-10-29
+**Amended**: 2026-10-30 — Q0 answered (Q1–Q10 recommended decisions below); task index expanded T-003…T-015; T-011 (workflows README) and T-012 (indexer) completed; T-SETUP (dependencies) and T-014 (analyse-repo skill) added; T-015 (tool-backed extraction backends) added
+**Amended**: 2026-01-11 (follow-up) — detail headings aligned to the task index; duplicate short T-015 section removed; T-021 (comment/docstring extraction) added after the AST-discard gap was identified
+**Amended**: 2026-01-11 (T-SETUP done) — T-SETUP marked completed (ctags 6.2.1, ast-grep 0.51.0, tree-sitter via uv, ts-morph skipped); T-015 ast-grep backend reworded to the `ast-grep` binary (`sg` deprecated as of 0.51)
+**Amended**: 2026-01-11 (T-015 done) — T-015 completed: `--extractors` backends (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph), `meta.extractors` + `meta.confidence` + per-file `extractor`, `ts_extract.mjs` helper, parity + fixture tests (15/15 with tree-sitter); README Commands notes the flag
+**Amended**: 2026-02-11 (T-014 done) — `context/skills/analyse-repo.md` added: scan/verify invocations per phase, `repo-index.json` schema (meta.extractors provenance + per-file extractor), spec-scan.md map, repo-profile.md deliverable, T-015 backends with degradation, evidence citation + confidence bands, re-scan rule, token rationale; workflows README `## Commands` / `## Repository Index` reduced to a pointer; indexer docstring schema reference updated
+**Amended**: 2026-02-11 (T-001 done) — `context/skills/derive-spec.md` added: modes (product/technical/both), Phases 0–8 procedural steps (discovery + human confirmation, evidence consumption from repo-index.json + repo-profile.md, 4a product / 4b technical derivation, draft with confidence, verification, batched confirmation with drift-first ordering, finalise + review gate), confidence model (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50) with promotion DoD, output lifecycle (spec-drafts → derived/, canonical untouched), references to workflows README (no schema duplication)
+**Amended**: 2026-02-11 (T-002 done) — `context/workflows/derive-spec.yaml` added: Phases 0–8 (intake · discovery + repo profile · baseline + drift · evidence · 4a/4b mode-conditional derivation · draft · verification · confirmation · finalise), each with agents/outputs/validation; intake inputs (mode, target/`--repo <service-root>`, limits, output location); gates on Phase 6 (verify --index) and Phase 8 (verify --doc + human APPROVED promotion); state_recovery reads HANDOFF/spec-scan/repo-index/repo-profile + critical_files; promotion path spec-drafts → artefacts/{category}/derived/; README workflow table row de-planned
+**Amended**: 2026-02-11 (T-013 done) — derive-spec.yaml indexer wiring: Phases 1/3 validation + notes pin tool_scope to repo-index.json + spec-scan.md + cited line ranges; repo-profile.md (Phase 1 deliverable) declared as an input to Phases 2–5 (baseline-drift, evidence, 4a/4b, draft); Phase 2/3/4a/4b/5 notes list their index/profile inputs; Phase 8 promotion gate annotated per T-018 DoD; re-scan rule covered by Phase 6 validation + workflow_rules
+**Amended**: 2026-02-11 (T-016 done) — indexer `config` extraction: env templates (.env.example/.env.template/.env.sample/.env.dist, never the live .env), settings/config Python modules (UPPER_CASE constants + os.getenv/os.environ.get with defaults), config YAML/JSON top-level scalars (nested + openapi/package/lock/tooling excluded); precedence py→data→env, sorted deterministic; `feature` flag (ENABLE_*/FEATURE_* or boolean); secret-looking keys redacted; test/fixture paths excluded; `verify --index` covers config citations; spec-scan Config section; 9 new tests; analyse-repo §3.1/§3.4 + derive-spec 4a/4b docs; example outputs regenerated (config=8 from .env.template, all redacted)
