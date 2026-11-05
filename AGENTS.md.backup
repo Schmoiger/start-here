@@ -23,3 +23,4 @@
 ## Project Context
 
 - Read `@artefacts/build/tasks-{branch}.md` if it exists for the task list
+- Read `@context/skills/agent-sandbox.md` for how to interact with the runtime
