@@ -1,0 +1,25 @@
+# AGENTS.md
+
+---
+
+## Runtime Context
+
+- Read `@CLINE.md` for Cline-specific tool mappings, rules, and model guidance.
+
+
+---
+
+## On Start
+
+- Glob `**/artefacts/README.md` and read all matches. 
+- Run `git log --oneline -5`.
+- Read `@context/agents/orchestrator.md`.
+- Determine workflow: 1) from the prompt; 2) if not in prompt, read the `Workflow:` field in `artefacts/build/HANDOFF.md` if it exists; 3) if no HANDOFF.md exists, ask the user which workflow to start.
+- Load `@context/workflows/<workflow>.yaml`. 
+
+
+---
+
+## Project Context
+
+- Read `@artefacts/build/tasks-{branch}.md` if it exists for the task list
