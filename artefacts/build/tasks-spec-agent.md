@@ -12,7 +12,7 @@
 | T-014 | high | completed | T-SETUP,T-015 | Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (documents the actual backends) |
 | T-001 | critical | completed | Q0,T-014 | Create skill `context/skills/derive-spec.md` (modes: product, technical, both) |
 | T-002 | high | completed | Q0 | Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery) |
-| T-003 | high | pending | T-001 | Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill) |
+| T-003 | high | completed | T-001 | Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill) |
 | T-004 | high | pending | T-001 | Extend `context/agents/solution-architect.md` — derive mode (drafts only) |
 | T-005 | high | pending | T-001 | Add confirmation mode to `context/skills/requirements-elicitation.md` |
 | T-006 | medium | completed | T-001 | Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix) |
@@ -32,22 +32,6 @@
 ---
 
 ## Project Context
-
-- `artefacts/build/tasks-spec-agent.md` — task definition and workflow specification
-- `context/skills/analyse-repo.md` — analysis-tool skill wrapping `spec_indexer.py` usage (T-014)
-- `context/scripts/code-specs/spec_indexer.py` — indexer with multi-backend extraction (T-015)
-- `context/scripts/code-specs/ts_extract.mjs` — optional ts-morph Node helper (T-015)
-- `context/skills/derive-spec.md` — new skill with mode switches: product, technical, both
-- `context/workflows/derive-spec.yaml` — new workflow YAML supporting all three modes
-- `context/workflows/README.md` — workflow index, derive-spec diagrams, runtime/tool wiring, token ledger *(completed)*
-- `context/README.md` — brief pointer to the workflows index *(completed)*
-- `context/scripts/code-specs/spec_indexer.py` — deterministic indexer (`scan` / `verify`) *(completed)*
-- `context/agents/product-owner.md` — adds derive mode for product-spec synthesis
-- `context/agents/solution-architect.md` — adds derive mode for technical-spec synthesis
-- `context/skills/requirements-elicitation.md` — adds confirmation mode
-- `context/templates/derived-spec-template.md` — derived spec output format
-- `context/workflows/build.yaml` — optional precursor-phase dependency
-- Derived outputs (staged drafts, then promoted on approval): `artefacts/build/spec-drafts/` → `artefacts/{product,architecture}/derived/`; plus `artefacts/build/repo-profile.md`
 
 
 ---
