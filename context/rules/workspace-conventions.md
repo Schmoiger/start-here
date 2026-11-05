@@ -40,7 +40,7 @@ alwaysApply: true
 1. **Who Commits**: If invoked directly by a human, **commit directly**. If spawned as a subagent by an Orchestrator, **DO NOT commit** — write your message to `/tmp/{task-id}_commit_msg.txt` and return the file paths.
 2. **Pre-Commit**: Always format before staging (e.g. `uv run ruff format {files}` or `yarn biome check --write {files}`). If a hook reverts your changes, read the formatted file and commit it.
 3. **Message Format**: Commit header MUST follow `{type}({scope}): {description}`. Commit body MUST follow `context/templates/commit-message-template.md`.
-4. **Agent Trailers**: Do not guess the data for the agent trailer (`Agent-Session` and `Co-Authored-By`); use the protocol referred to in AGENTS.md
+4. **Agent Trailers**: Do not guess the data for the agent trailer (`Agent-Session` and `Co-Authored-By`); use `context/scripts/prepare-commit-msg.sh`
 5. **Hook-Owned Trailer Fields**: `tool=`, `model=`, and `tokens=` in the `Agent-Session` trailer are populated by the `prepare-commit-msg` hook from runtime session telemetry (Claude Code, Antigravity, Copilot, Codex, Cline). Do not hand-write them: the `commit-msg` validator rejects values that runtime telemetry contradicts or cannot corroborate.
 
 ---
