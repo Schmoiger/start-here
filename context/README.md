@@ -146,13 +146,14 @@ The orchestrator consults this index when constructing a task prompt, references
 | `pr-description-template.md` | Pull request description | GitHub PR body |
 | `domain-rules-template.yaml` | Domain-specific rules and blockers | `services/{domain}/context/domain-rules.yaml` |
 | `architecture-template.md` | System architecture reference | `artefacts/architecture/architecture.md` |
+| `derived-spec-template.md` | Derive-spec draft (confidence schema, open-question appendix, drift section) | `artefacts/build/spec-drafts/{product-spec,architecture,api-catalogue,data-model}.md` |
 | `design-template.md` | Feature design document | `artefacts/design/design-{feature}.md` |
 | `agent-template.md` | New agent definition | `context/agents/{name}.md` |
 | `logging-template.md` | Session metrics and interruption log schemas (JSONL) | `artefacts/build/metrics/session-log.jsonl` · `artefacts/build/interruptions/{task-id}.jsonl` |
 | `task-prompt-template.md` | Agent task prompt (orchestrator use only) | — |
 | `settings-local-template.json` | Claude Code / local runtime permissions | `.claude/settings.local.json` |
 
-**Format notes** — Local Settings: copy to `.claude/settings.local.json` to configure autonomous command permissions (Git, `uv`, `yarn`, test runners) conforming to `bash-environment.md` without triggering manual prompt friction. Handoffs: keep summary under 500 characters; reference shared artefacts rather than duplicating content. Reviews: issue format `**ID** \`file:line\` Problem. → Fix.`; severity critical / high / medium / low. Architecture: system-level reference, one per project, present tense ("what IS built") — inline HTML comments mark monolith vs microservice sections. Design: one per feature; update to "Current (as-built)" after implementation.
+**Format notes** — Local Settings: copy to `.claude/settings.local.json` to configure autonomous command permissions (Git, `uv`, `yarn`, test runners) conforming to `bash-environment.md` without triggering manual prompt friction. Handoffs: keep summary under 500 characters; reference shared artefacts rather than duplicating content. Reviews: issue format `**ID** \`file:line\` Problem. → Fix.`; severity critical / high / medium / low. Architecture: system-level reference, one per project, present tense ("what IS built") — inline HTML comments mark monolith vs microservice sections. Design: one per feature; update to "Current (as-built)" after implementation. Derived specs: one per artefacts category per derive-spec run; every subsection carries tier + banded % + `path:line` evidence, and the open-question appendix and drift section are mandatory (see `context/skills/derive-spec.md` Phase 5); promotion to `artefacts/{category}/derived/` behind human APPROVED.
 
 **Naming**: templates use a `-template.{ext}` suffix. Generated files drop the `-template` suffix (e.g. `review-template.md` → `tech-review.md`).
 
