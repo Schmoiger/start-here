@@ -19,7 +19,7 @@ phases:
       - "mode recorded: product | technical | both"
       - "target recorded: repo root, or --repo <service-root> for monorepos (one run per repo/service)"
       - "limits recorded: --max-files bound; scan_too_large flag surfaces large repos for human scoping"
-      - "output location recorded: drafts → artefacts/build/spec-drafts/, promotion → artefacts/{category}/derived/"
+      - "output location recorded: drafts → artefacts/build/derived-spec-working/, promotion → artefacts/{category}/derived/"
 
   - id: discovery
     name: Phase 1 · Repo & Doc Discovery
@@ -106,10 +106,10 @@ phases:
       - product-owner
       - solution-architect
     outputs:
-      - artefacts/build/spec-drafts/product-spec.md  # modes product | both
-      - artefacts/build/spec-drafts/architecture.md  # modes technical | both
-      - artefacts/build/spec-drafts/api-catalogue.md # modes technical | both
-      - artefacts/build/spec-drafts/data-model.md    # modes technical | both
+      - artefacts/build/derived-spec-working/product-spec-draft.md  # modes product | both
+      - artefacts/build/derived-spec-working/architecture-draft.md  # modes technical | both
+      - artefacts/build/derived-spec-working/api-catalogue-draft.md # modes technical | both
+      - artefacts/build/derived-spec-working/data-model-draft.md    # modes technical | both
     validation:
       - "every subsection carries tier + banded % + file:line evidence (Verified 85-100 · Needs Confirmation 50-85 · Assumed <50)"
       - "open-questions appendix present (per subsection, priority, MC options)"
@@ -142,7 +142,7 @@ phases:
     agents:
       - product-owner  # one batched MC round (reverse-spec Step 3 format)
     outputs:
-      - artefacts/build/spec-drafts/confirmation-answers.md
+      - artefacts/build/derived-spec-working/confirmation-answers-draft.md
     validation:
       - "one batched round; drift candidates asked first, then pure code facts"
       - "numbered MC with 'Other', each option citing files"
@@ -180,7 +180,7 @@ workflow_rules:
   - "Invoke the indexer through the analyse-repo skill (scan → out; verify --index / --doc); agent tool_scope = repo-index.json + cited line ranges only"
   - "Existing-spec discovery is human-confirmed, never silent; drift candidates (doc vs code deltas) are asked before pure code facts"
   - "Every subsection carries tier + banded % + file:line; confirmed answers raise the band/%, unanswered questions stay Assumed in the still-open appendix"
-  - "Drafts stage in artefacts/build/spec-drafts/; APPROVED copies to artefacts/{category}/derived/; canonical docs are never rewritten"
+  - "Drafts stage in artefacts/build/derived-spec-working/; APPROVED copies to artefacts/{category}/derived/; canonical docs are never rewritten"
   - "Re-scan before verify after any edit — the index is a snapshot and verify fails stale citations"
   - "Phase 6 (verification) and Phase 8 (final review) are gates: an explicit APPROVED verdict is required to proceed"
 
@@ -189,10 +189,9 @@ state_recovery:
     - "Read artefacts/build/HANDOFF.md — the Workflow: derive-spec and Phase: fields identify the active phase"
     - "Read artefacts/build/derived-spec-working/repo-index.json + artefacts/build/derived-spec-working/spec-scan.md for the indexed evidence (Phase ≥ 1)"
     - "Read artefacts/build/derived-spec-working/repo-profile.md for the Phase 1 deliverable (app type, entry points, module boundaries)"
-    - "Read artefacts/build/drift-candidates.md for the Phase 2/7 question queue; read artefacts/build/spec-drafts/ for staged drafts (Phase ≥ 5)"
+    - "Read artefacts/build/drift-candidates.md for the Phase 2/7 question queue; read artefacts/build/derived-spec-working/ for staged drafts (Phase ≥ 5)"
   critical_files:
     - artefacts/build/HANDOFF.md
     - artefacts/build/derived-spec-working/repo-index.json
     - artefacts/build/derived-spec-working/spec-scan.md
     - artefacts/build/derived-spec-working/repo-profile.md
-    - artefacts/build/spec-drafts/

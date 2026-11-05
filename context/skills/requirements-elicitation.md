@@ -112,8 +112,8 @@ discovery.
 
 ### 3.1 Applicability
 
-- Derived spec drafts staged in `artefacts/build/spec-drafts/` ahead of promotion:
-  `product-spec.md` · `architecture.md` · `api-catalogue.md` · `data-model.md`.
+- Derived spec drafts staged in `artefacts/build/derived-spec-working/` ahead of promotion:
+  `product-spec-draft.md` · `architecture-draft.md` · `api-catalogue-draft.md` · `data-model-draft.md`.
 
 ### 3.2 Questioning Discipline
 

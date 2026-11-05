@@ -279,7 +279,7 @@ sequenceDiagram
     A->>A: 4b technical: architecture · api-catalogue draft · data-model draft
     end
     loop Phase 5 — Draft with Confidence
-    A->>D: draft specs staged in artefacts/build/spec-drafts/ (tier + banded % + file:line, open questions, drift section)
+    A->>D: draft specs staged in artefacts/build/derived-spec-working/ (tier + banded % + file:line, open questions, drift section)
     end
     loop Phase 6 — Verification Pass
     A->>T: verify --index (citation resolution re-check)
@@ -322,7 +322,7 @@ sequenceDiagram
 - Batch the human interactions. Use requirements-elicitation skill to question the human; ask drift items (existing-doc vs code deltas) before pure code facts. If the answers are not known, the confidence does not improve.
 - Confidence bands: Verified 85–100 · Needs Confirmation 50–85 · Assumed <50. Confirmed answers raise the band/%; unanswered questions stay Assumed and remain in the open-questions appendix
 - Product derivation includes actor/role discovery from auth/permission evidence
-- Outputs land in `derived/`: drafts are staged in `artefacts/build/spec-drafts/`, approval promotes to `artefacts/{category}/derived/`; canonical docs are never rewritten
+- Outputs land in `derived/`: drafts are staged in `artefacts/build/derived-spec-working/`, approval promotes to `artefacts/{category}/derived/`; canonical docs are never rewritten
 - Respect scope limits to bound token burn; `max-files` flag surfaces large repos; read the index to target file reads
 
 ### Commands & Repository Index

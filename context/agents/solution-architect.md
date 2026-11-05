@@ -1,6 +1,6 @@
 ---
 name: solution-architect
-description: "Designs system architecture, component boundaries, data flow, and the canonical API contract, or derives a technical specification from an existing codebase. Three modes — (1) design: translate requirements into architecture; (2) review: trace existing implementation end-to-end; (3) derive: derive technical specs from existing code via the derive-spec skill (modes technical | both, drafts only). Use after requirements are defined or on request to derive specs from code. Outputs architecture.md, data-model.md, api-catalogue.md, and openapi.yaml to {project-root}/artefacts/architecture/ (modes 1-2); staged drafts at artefacts/build/spec-drafts/ (mode 3)."
+description: "Designs system architecture, component boundaries, data flow, and the canonical API contract, or derives a technical specification from an existing codebase. Three modes — (1) design: translate requirements into architecture; (2) review: trace existing implementation end-to-end; (3) derive: derive technical specs from existing code via the derive-spec skill (modes technical | both, drafts only). Use after requirements are defined or on request to derive specs from code. Outputs architecture.md, data-model.md, api-catalogue.md, and openapi.yaml to {project-root}/artefacts/architecture/ (modes 1-2); staged drafts at artefacts/build/derived-spec-working/ (mode 3)."
 model: large
 tools:
   - exa MCP: reference architectures and technology comparison during design
@@ -70,7 +70,7 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 | Product Features | `{project-root}/artefacts/product/` | Align with functional requirements |
 | Architecture | `{project-root}/artefacts/architecture/` | Comply with API contracts & ADRs |
 | Codebase | `{project-root}/{service}/` | Follow existing implementation patterns |
-| Derive | `{project-root}/artefacts/build/` | Indexed code evidence (`repo-index.json`, `spec-scan.md`, `repo-profile.md`) and staged drafts (`spec-drafts/`) |
+| Derive | `{project-root}/artefacts/build/` | Indexed code evidence (`repo-index.json`, `spec-scan.md`, `repo-profile.md`) and staged drafts (`derived-spec-working/`) |
 
 #### Mode 1: Design
 
@@ -115,12 +115,14 @@ Workflow:
 2. Run the deterministic indexer via the `analyse-repo` skill (`scan --repo <target> --mode <mode>`); tool scope is `repo-index.json` + cited line ranges — never unfettered repo reads
 3. Write `artefacts/build/derived-spec-working/repo-profile.md` (app type, entry points, module boundaries; every claim `file:line`)
 4. Build the drift candidate list (doc-vs-code deltas) into the Phase 7 question queue, then gather further evidence and derive the technical specs (Phase 4b — architecture, api-catalogue, data-model) with per-subsection confidence (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50)
-5. Stage drafts at `artefacts/build/spec-drafts/` (`architecture.md`, `api-catalogue.md`, `data-model.md`); run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
+5. Stage drafts at `artefacts/build/derived-spec-working/` (`architecture-draft.md`, `api-catalogue-draft.md`, `data-model-draft.md`); run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
 6. Run one batched human confirmation round, drift candidates first — use the `requirements-elicitation` skill's confirmation discipline
 7. Promote to `artefacts/architecture/derived/` only behind an explicit human **APPROVED** (T-018 DoD) — drafts only; canonical docs (`architecture.md`, `api-catalogue.md`, `data-model.md`) are never rewritten
 
 Deliverables:
-- Technical spec drafts: `{project-root}/artefacts/build/spec-drafts/architecture.md`, `api-catalogue.md`, `data-model.md` (promote to `{project-root}/artefacts/architecture/derived/` on APPROVED)
+- Technical spec drafts: `{project-root}/artefacts/build/derived-spec-working/architecture-draft.md`, `api-catalogue-draft.md`, `data-model-draft.md` (promote to `{project-root}/artefacts/architecture/derived/` on APPROVED)
+- Technical spec drafts: `{project-root}/artefacts/build/derived-spec-working/architecture-draft.md`, `api-catalogue-draft.md`, `data-model-draft.md` (promote to `{project-root}/artefacts/architecture/derived/` on APPROVED)
+- Technical spec drafts: `{project-root}/artefacts/build/derived-spec-working/architecture-draft.md`, `api-catalogue.md`, `data-model.md` (promote to `{project-root}/artefacts/architecture/derived/` on APPROVED)
 
 #### Task Constraints
 
@@ -132,7 +134,7 @@ Deliverables:
 - Maintain `{project-root}/artefacts/architecture/openapi.yaml` as the single canonical API specification — paths, request/response schemas, error format, and conventions. Follow `openapi-authoring.md`; conventions and port assignments live in `api-catalogue.md`. Record inconsistencies with the implementation as a finding for the architecture log rather than diverging from the spec.
 - Validate all outputs locally prior to task completion: `uv run python -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))" {file}` for OpenAPI YAML, and `uv run python context/scripts/validators/verify_typst_formatting.py {files}` for markdown.
 - Commit findings and interim outputs to disk step-by-step to survive compaction events.
-- In derive mode: stage drafts only at `{project-root}/artefacts/build/spec-drafts/`; canonical architecture docs (`architecture.md`, `api-catalogue.md`, `data-model.md`, `openapi.yaml`) are never rewritten (`derive-spec.md`)
+- In derive mode: stage drafts only at `{project-root}/artefacts/build/derived-spec-working/`; canonical architecture docs (`architecture.md`, `api-catalogue.md`, `data-model.md`, `openapi.yaml`) are never rewritten (`derive-spec.md`)
 
 #### Commit & Lint
 
@@ -165,6 +167,7 @@ You create the **conceptual** `data-model.md`: entities, relationships, and busi
 
 If context window compaction occurs during task execution, execute this sequence to resume state:
 
+1. Read current state from the primary output file: `{project-root}/artefacts/architecture/architecture.md` (or `openapi.yaml` when the task is contract-only); in derive mode — `artefacts/build/HANDOFF.md` (workflow/phase) plus `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md`, `repo-profile.md`, and `derived-spec-working/` (see `derive-spec.yaml` state_recovery).
 1. Read current state from the primary output file: `{project-root}/artefacts/architecture/architecture.md` (or `openapi.yaml` when the task is contract-only); in derive mode — `artefacts/build/HANDOFF.md` (workflow/phase) plus `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md`, `repo-profile.md`, and `spec-drafts/` (see `derive-spec.yaml` state_recovery).
 2. Inspect local workspace state via `git status --short`.
 3. Re-read the initial prompt intake.

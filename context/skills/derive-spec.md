@@ -51,7 +51,7 @@ Record at intake:
 - **Limits** — `--max-files` bound; large repos flagged by
   `meta.scan_too_large` → consult the human on scoping before spending tokens.
 - **Output location** — per-run choice; drafts stage in
-  `artefacts/build/derived-spec-drafts/`, approval promotes to `artefacts/derived/{category}/`.
+  `artefacts/build/derived-spec-working/`, approval promotes to `artefacts/derived/{category}/`.
 
 ---
 
@@ -129,9 +129,9 @@ Record at intake:
   (confidence model below).
 - Append the **open-questions appendix** (per subsection, priority, MC options)
   and the **drift section** (canonical docs vs derived behaviour).
-- Stage drafts in `artefacts/build/derived-spec-drafts/` — one file per artefacts
-  category (`product-spec.md` · `architecture.md` · `api-catalogue.md` ·
-  `data-model.md`).
+- Stage drafts in `artefacts/build/derived-spec-working/` — one file per artefacts
+  category (`product-spec-draft.md` · `architecture-draft.md` · `api-catalogue-draft.md` ·
+  `data-model-draft.md`).
 
 ### Confidence Model
 
@@ -180,7 +180,7 @@ Record at intake:
 2. Run `verify --doc` on the final drafts (analyse-repo §2) — all citations
    resolve.
 3. Human review gate: **APPROVED** → promote drafts from
-   `artefacts/build/derived-spec-drafts/` to `artefacts/derived/{category}/` and commit.
+   `artefacts/build/derived-spec-working/` to `artefacts/derived/{category}/` and commit.
    **CHANGES REQUIRED** → return to the specified phase; canonical docs are
    never rewritten.
 
@@ -188,7 +188,7 @@ Record at intake:
 
 ## Output Lifecycle
 
-- Drafts: `artefacts/build/derived-spec-drafts/` (one file per category).
+- Drafts: `artefacts/build/derived-spec-working/` (one file per category).
 - Promotion: `artefacts/derived/{category}/` behind human APPROVED (T-018 DoD)
   — e.g. `artefacts/product/derived/product-spec.md`.
 - Canonical docs (`requirements.md`, `architecture.md`, …) are **never

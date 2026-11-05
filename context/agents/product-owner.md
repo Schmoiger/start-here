@@ -103,12 +103,12 @@ Workflow:
 2. Run the deterministic indexer via the `analyse-repo` skill (`scan --repo <target> --mode <mode>`); tool scope is `repo-index.json` + cited line ranges — never unfettered repo reads
 3. Write `artefacts/build/derived-spec-working/repo-profile.md` (app type, entry points, module boundaries; every claim `file:line`)
 4. Build the drift candidate list (doc-vs-code deltas) into the Phase 7 question queue, then gather further evidence and derive the product spec (Phase 4a) with per-subsection confidence (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50)
-5. Stage the draft at `artefacts/build/spec-drafts/product-spec.md`; run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
+5. Stage the draft at `artefacts/build/derived-spec-working/product-spec-draft.md`; run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
 6. Run one batched human confirmation round, drift candidates first — use the `requirements-elicitation` skill's confirmation discipline
 7. Promote to `artefacts/product/derived/` only behind an explicit human **APPROVED** (T-018 DoD); canonical docs are never rewritten
 
 Deliverables:
-- Product spec draft: `{project-root}/artefacts/build/spec-drafts/product-spec.md` (promotes to `{project-root}/artefacts/product/derived/` on APPROVED)
+- Product spec draft: `{project-root}/artefacts/build/derived-spec-working/product-spec-draft.md` (promotes to `{project-root}/artefacts/product/derived/` on APPROVED)
 
 #### Task Constraints
 - Be specific and testable; avoid vague language like "fast" or "user-friendly"
@@ -143,7 +143,7 @@ Deliverables:
 
 If context window compaction occurs during task execution, execute this sequence to resume state:
 
-1. Read current state from the primary output file: `{project-root}/artefacts/product/discovery-notes.md` in Mode 1, `{project-root}/artefacts/product/requirements.md` in Mode 2, or — in Mode 3 (derive) — `artefacts/build/HANDOFF.md` (workflow/phase) plus `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md`, `repo-profile.md`, and `spec-drafts/` (see `derive-spec.yaml` state_recovery).
+1. Read current state from the primary output file: `{project-root}/artefacts/product/discovery-notes.md` in Mode 1, `{project-root}/artefacts/product/requirements.md` in Mode 2, or — in Mode 3 (derive) — `artefacts/build/HANDOFF.md` (workflow/phase) plus `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md`, `repo-profile.md`, and `derived-spec-working/` (see `derive-spec.yaml` state_recovery).
 2. Inspect local workspace state via `git status --short`.
 3. Re-read the initial prompt intake.
 4. Resume execution from the last uncompleted step identified in disk state.
