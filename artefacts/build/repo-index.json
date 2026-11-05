@@ -2,14 +2,14 @@
   "meta": {
     "repo": "start-here",
     "repo_abs": "/Users/avi/Repos/start-here",
-    "generated_at": "2026-11-02T10:39:07Z",
+    "generated_at": "2026-11-05T13:24:38Z",
     "mode": "both",
-    "scanned_files": 60,
+    "scanned_files": 61,
     "languages": {
-      "python": 59,
+      "python": 60,
       "javascript": 1
     },
-    "loc": 12346,
+    "loc": 12832,
     "scan_too_large": false,
     "extractors": {
       "ctags": {
@@ -41,7 +41,7 @@
     "confidence": "full"
   },
   "warnings": [
-    "pytest: 222 collected (uv)"
+    "pytest: 245 collected (uv)"
   ],
   "docs": [
     {
@@ -127,6 +127,10 @@
     {
       "path": "context/skills/requirements-elicitation.md",
       "kind": "requirements"
+    },
+    {
+      "path": "context/templates/derived-spec-template.md",
+      "kind": "spec"
     },
     {
       "path": "context/templates/requirements-template.md",
@@ -2015,7 +2019,7 @@
     {
       "path": "context/scripts/tests/conftest.py",
       "language": "python",
-      "line_count": 125,
+      "line_count": 131,
       "symbols": [
         {
           "kind": "function",
@@ -2089,7 +2093,7 @@
         },
         {
           "kind": "function",
-          "name": "valid_requirements",
+          "name": "invalid_commit_no_body",
           "signature": "(fixtures_dir)",
           "line": 50,
           "decorators": [
@@ -2099,7 +2103,7 @@
         },
         {
           "kind": "function",
-          "name": "invalid_requirements",
+          "name": "valid_requirements",
           "signature": "(fixtures_dir)",
           "line": 56,
           "decorators": [
@@ -2109,7 +2113,7 @@
         },
         {
           "kind": "function",
-          "name": "valid_british_english",
+          "name": "invalid_requirements",
           "signature": "(fixtures_dir)",
           "line": 62,
           "decorators": [
@@ -2119,7 +2123,7 @@
         },
         {
           "kind": "function",
-          "name": "invalid_british_english",
+          "name": "valid_british_english",
           "signature": "(fixtures_dir)",
           "line": 68,
           "decorators": [
@@ -2129,7 +2133,7 @@
         },
         {
           "kind": "function",
-          "name": "valid_metrics",
+          "name": "invalid_british_english",
           "signature": "(fixtures_dir)",
           "line": 74,
           "decorators": [
@@ -2139,7 +2143,7 @@
         },
         {
           "kind": "function",
-          "name": "invalid_metrics",
+          "name": "valid_metrics",
           "signature": "(fixtures_dir)",
           "line": 80,
           "decorators": [
@@ -2149,7 +2153,7 @@
         },
         {
           "kind": "function",
-          "name": "valid_interruptions",
+          "name": "invalid_metrics",
           "signature": "(fixtures_dir)",
           "line": 86,
           "decorators": [
@@ -2159,7 +2163,7 @@
         },
         {
           "kind": "function",
-          "name": "invalid_interruptions",
+          "name": "valid_interruptions",
           "signature": "(fixtures_dir)",
           "line": 92,
           "decorators": [
@@ -2169,7 +2173,7 @@
         },
         {
           "kind": "function",
-          "name": "test_workflow",
+          "name": "invalid_interruptions",
           "signature": "(fixtures_dir)",
           "line": 98,
           "decorators": [
@@ -2179,7 +2183,7 @@
         },
         {
           "kind": "function",
-          "name": "valid_agent",
+          "name": "test_workflow",
           "signature": "(fixtures_dir)",
           "line": 104,
           "decorators": [
@@ -2189,7 +2193,7 @@
         },
         {
           "kind": "function",
-          "name": "invalid_agent_no_frontmatter",
+          "name": "valid_agent",
           "signature": "(fixtures_dir)",
           "line": 110,
           "decorators": [
@@ -2199,7 +2203,7 @@
         },
         {
           "kind": "function",
-          "name": "invalid_agent_hardcoded_paths",
+          "name": "invalid_agent_no_frontmatter",
           "signature": "(fixtures_dir)",
           "line": 116,
           "decorators": [
@@ -2209,9 +2213,19 @@
         },
         {
           "kind": "function",
-          "name": "invalid_agent_missing_sections",
+          "name": "invalid_agent_hardcoded_paths",
           "signature": "(fixtures_dir)",
           "line": 122,
+          "decorators": [
+            "pytest.fixture"
+          ],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "invalid_agent_missing_sections",
+          "signature": "(fixtures_dir)",
+          "line": 128,
           "decorators": [
             "pytest.fixture"
           ],
@@ -3310,9 +3324,369 @@
       "extractor": "stdlib.ast"
     },
     {
+      "path": "context/scripts/tests/test_spec_indexer.py",
+      "language": "python",
+      "line_count": 436,
+      "symbols": [
+        {
+          "kind": "const",
+          "name": "INDEXER_PATH",
+          "signature": "",
+          "line": 20,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "REPO_ROOT",
+          "signature": "",
+          "line": 21,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "CONTEXT_DIR",
+          "signature": "",
+          "line": 22,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "SKILLS_DIR",
+          "signature": "",
+          "line": 23,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "AGENTS_DIR",
+          "signature": "",
+          "line": 24,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "WORKFLOWS_DIR",
+          "signature": "",
+          "line": 25,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "KNOWN_AGENTS",
+          "signature": "",
+          "line": 34,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "SKILL_FILES",
+          "signature": "",
+          "line": 37,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "const",
+          "name": "TSX_FIXTURE",
+          "signature": "",
+          "line": 39,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_parse_frontmatter",
+          "signature": "(path: Path)",
+          "line": 60,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_validate_skill",
+          "signature": "(fm: dict)",
+          "line": 73,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_validate_workflow",
+          "signature": "(data: dict, known_agents: set[str])",
+          "line": 87,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_valid_workflow",
+          "signature": "()",
+          "line": 143,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_scan",
+          "signature": "(repo: Path, out_dir: Path, extractors: str='auto')",
+          "line": 160,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestSkillFrontmatterSchema",
+          "signature": "",
+          "line": 173,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSkillFrontmatterSchema.test_derive_skills_have_valid_frontmatter",
+          "signature": "(self)",
+          "line": 174,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSkillFrontmatterSchema.test_skill_name_matches_filename_stem",
+          "signature": "(self)",
+          "line": 179,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSkillFrontmatterSchema.test_skill_globs_is_list_of_glob_strings",
+          "signature": "(self)",
+          "line": 184,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestWorkflowPhaseSchema",
+          "signature": "",
+          "line": 196,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_all_real_workflows_pass_schema",
+          "signature": "(self)",
+          "line": 197,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_rejects_duplicate_phase_ids",
+          "signature": "(self)",
+          "line": 203,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_rejects_unresolvable_depends_on",
+          "signature": "(self)",
+          "line": 209,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_rejects_unknown_agent",
+          "signature": "(self)",
+          "line": 215,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_accepts_at_prefix_and_inline_comment_agents",
+          "signature": "(self)",
+          "line": 221,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_rejects_non_boolean_phase_gate",
+          "signature": "(self)",
+          "line": 226,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_gate_phase_without_quality_gates_entry_is_allowed",
+          "signature": "(self)",
+          "line": 232,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_rejects_quality_gate_unknown_phase",
+          "signature": "(self)",
+          "line": 238,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestWorkflowPhaseSchema.test_accepts_evidence_style_quality_gate_without_gate_key",
+          "signature": "(self)",
+          "line": 244,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestPythonExtraction",
+          "signature": "",
+          "line": 256,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestPythonExtraction.test_symbols_and_constants",
+          "signature": "(self, tmp_path)",
+          "line": 282,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestPythonExtraction.test_imports_recorded",
+          "signature": "(self, tmp_path)",
+          "line": 296,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestPythonExtraction.test_route_decorators_produce_api_entries",
+          "signature": "(self, tmp_path)",
+          "line": 303,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestTsJsExtraction",
+          "signature": "",
+          "line": 320,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTsJsExtraction.test_components_props_and_usage",
+          "signature": "(self, tmp_path)",
+          "line": 321,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestTsJsExtraction.test_scan_aggregates_ui_components",
+          "signature": "(self, tmp_path)",
+          "line": 336,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestSqlParsing",
+          "signature": "",
+          "line": 355,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestSqlParsing.test_create_table_columns",
+          "signature": "(self, tmp_path)",
+          "line": 369,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestVerifyOnSyntheticRepo",
+          "signature": "",
+          "line": 389,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestVerifyOnSyntheticRepo.test_verify_passes_index_then_fails_when_source_removed",
+          "signature": "(self, tmp_path)",
+          "line": 390,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestVerifyOnSyntheticRepo.test_verify_doc_checks_cited_file_lines",
+          "signature": "(self, tmp_path)",
+          "line": 401,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "class",
+          "name": "TestExtractorSmoke",
+          "signature": "",
+          "line": 419,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestExtractorSmoke.test_invalid_extractor_exits_nonzero",
+          "signature": "(self, tmp_path)",
+          "line": 420,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
+          "name": "TestExtractorSmoke.test_meta_extractors_provenance_populated",
+          "signature": "(self, tmp_path)",
+          "line": 425,
+          "decorators": [],
+          "props": []
+        }
+      ],
+      "imports": [
+        "__future__",
+        "importlib.util",
+        "json",
+        "sys",
+        "pathlib",
+        "yaml"
+      ],
+      "extractor": "stdlib.ast"
+    },
+    {
       "path": "context/scripts/tests/test_spec_indexer_config.py",
       "language": "python",
-      "line_count": 182,
+      "line_count": 183,
       "symbols": [
         {
           "kind": "const",
@@ -3380,7 +3754,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_env_template_extraction",
+          "name": "TestConfigSources.test_config_should_extract_env_template_keys_when_env_file_present",
           "signature": "(self, tmp_path)",
           "line": 61,
           "decorators": [],
@@ -3388,7 +3762,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_python_settings_module",
+          "name": "TestConfigSources.test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present",
           "signature": "(self, tmp_path)",
           "line": 76,
           "decorators": [],
@@ -3396,7 +3770,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_yaml_config_file",
+          "name": "TestConfigSources.test_config_should_extract_scalar_keys_when_yaml_config_present",
           "signature": "(self, tmp_path)",
           "line": 91,
           "decorators": [],
@@ -3404,7 +3778,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_json_config_file",
+          "name": "TestConfigSources.test_config_should_extract_scalar_keys_when_json_config_present",
           "signature": "(self, tmp_path)",
           "line": 112,
           "decorators": [],
@@ -3412,7 +3786,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_non_config_files_ignored",
+          "name": "TestConfigSources.test_config_should_ignore_non_config_files_when_names_do_not_match",
           "signature": "(self, tmp_path)",
           "line": 124,
           "decorators": [],
@@ -3420,7 +3794,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_precedence_first_source_wins",
+          "name": "TestConfigSources.test_config_should_keep_first_source_value_when_key_defined_in_multiple_sources",
           "signature": "(self, tmp_path)",
           "line": 139,
           "decorators": [],
@@ -3428,7 +3802,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigSources.test_determinism",
+          "name": "TestConfigSources.test_config_should_be_deterministic_when_scan_repeated",
           "signature": "(self, tmp_path)",
           "line": 151,
           "decorators": [],
@@ -3444,7 +3818,7 @@
         },
         {
           "kind": "method",
-          "name": "TestConfigVerify.test_verify_index_covers_config_citations",
+          "name": "TestConfigVerify.test_verify_should_fail_when_config_source_removed_after_indexing",
           "signature": "(self, tmp_path)",
           "line": 166,
           "decorators": [],
@@ -3460,7 +3834,7 @@
         },
         {
           "kind": "method",
-          "name": "TestRealRepo.test_start_here_env_template_keys_redacted",
+          "name": "TestRealRepo.test_config_should_redact_secrets_when_scanning_real_repo_env_template",
           "signature": "(self)",
           "line": 177,
           "decorators": [],
@@ -3701,7 +4075,7 @@
     {
       "path": "context/scripts/tests/test_validators.py",
       "language": "python",
-      "line_count": 1254,
+      "line_count": 1268,
       "symbols": [
         {
           "kind": "class",
@@ -3737,9 +4111,17 @@
         },
         {
           "kind": "method",
+          "name": "TestConventionalCommits.test_invalid_no_body",
+          "signature": "(self, invalid_commit_no_body)",
+          "line": 89,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "method",
           "name": "TestConventionalCommits.test_invalid_past_tense",
           "signature": "(self, invalid_commit_past_tense)",
-          "line": 89,
+          "line": 96,
           "decorators": [],
           "props": []
         },
@@ -3747,7 +4129,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_valid_with_agent_session",
           "signature": "(self, valid_commit_with_agent_session)",
-          "line": 96,
+          "line": 103,
           "decorators": [],
           "props": []
         },
@@ -3755,7 +4137,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_merge_commit_allowed",
           "signature": "(self, merge_commit)",
-          "line": 102,
+          "line": 109,
           "decorators": [],
           "props": []
         },
@@ -3763,7 +4145,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_empty_commit_fails",
           "signature": "(self)",
-          "line": 108,
+          "line": 115,
           "decorators": [],
           "props": []
         },
@@ -3771,7 +4153,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_invalid_type",
           "signature": "(self)",
-          "line": 115,
+          "line": 122,
           "decorators": [],
           "props": []
         },
@@ -3779,7 +4161,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_invalid_scope_uppercase",
           "signature": "(self)",
-          "line": 122,
+          "line": 129,
           "decorators": [],
           "props": []
         },
@@ -3787,7 +4169,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_coauthor_format",
           "signature": "(self)",
-          "line": 129,
+          "line": 136,
           "decorators": [],
           "props": []
         },
@@ -3795,7 +4177,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_agent_session_requires_coauthor",
           "signature": "(self)",
-          "line": 138,
+          "line": 145,
           "decorators": [],
           "props": []
         },
@@ -3803,7 +4185,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_agent_session_tokens_mega_suffix",
           "signature": "(self)",
-          "line": 147,
+          "line": 154,
           "decorators": [],
           "props": []
         },
@@ -3811,7 +4193,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_agent_session_tokens_lowercase_suffix",
           "signature": "(self)",
-          "line": 156,
+          "line": 165,
           "decorators": [],
           "props": []
         },
@@ -3819,7 +4201,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_agent_session_hook_appended_form",
           "signature": "(self)",
-          "line": 165,
+          "line": 176,
           "decorators": [],
           "props": []
         },
@@ -3827,7 +4209,7 @@
           "kind": "method",
           "name": "TestConventionalCommits.test_agent_session_malformed_tokens_fails",
           "signature": "(self)",
-          "line": 174,
+          "line": 187,
           "decorators": [],
           "props": []
         },
@@ -3835,7 +4217,7 @@
           "kind": "class",
           "name": "TestAgentSessionCorroboration",
           "signature": "",
-          "line": 185,
+          "line": 198,
           "decorators": [],
           "props": []
         },
@@ -3843,7 +4225,7 @@
           "kind": "method",
           "name": "TestAgentSessionCorroboration._cline_session_for_repo",
           "signature": "(self, root: Path, session_id: str, repo: str, model: str)",
-          "line": 193,
+          "line": 206,
           "decorators": [],
           "props": []
         },
@@ -3851,7 +4233,7 @@
           "kind": "method",
           "name": "TestAgentSessionCorroboration._agent_commit",
           "signature": "(tool: str, model: str)",
-          "line": 212,
+          "line": 225,
           "decorators": [
             "staticmethod"
           ],
@@ -3861,7 +4243,7 @@
           "kind": "method",
           "name": "TestAgentSessionCorroboration.test_model_corroborated_for_cline",
           "signature": "(self, tmp_path, monkeypatch)",
-          "line": 219,
+          "line": 233,
           "decorators": [],
           "props": []
         },
@@ -3869,7 +4251,7 @@
           "kind": "method",
           "name": "TestAgentSessionCorroboration.test_model_contradicting_runtime_fails",
           "signature": "(self, tmp_path, monkeypatch)",
-          "line": 228,
+          "line": 242,
           "decorators": [],
           "props": []
         },
@@ -3877,7 +4259,7 @@
           "kind": "method",
           "name": "TestAgentSessionCorroboration.test_unconfirmable_model_fails",
           "signature": "(self, tmp_path, monkeypatch)",
-          "line": 238,
+          "line": 252,
           "decorators": [],
           "props": []
         },
@@ -3885,7 +4267,7 @@
           "kind": "method",
           "name": "TestAgentSessionCorroboration.test_third_party_tool_not_adjudicated",
           "signature": "(self)",
-          "line": 247,
+          "line": 261,
           "decorators": [],
           "props": []
         },
@@ -3893,7 +4275,7 @@
           "kind": "class",
           "name": "TestEARSNotation",
           "signature": "",
-          "line": 253,
+          "line": 267,
           "decorators": [],
           "props": []
         },
@@ -3901,7 +4283,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_valid_requirements",
           "signature": "(self, valid_requirements)",
-          "line": 256,
+          "line": 270,
           "decorators": [],
           "props": []
         },
@@ -3909,7 +4291,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_invalid_requirements",
           "signature": "(self, invalid_requirements)",
-          "line": 261,
+          "line": 275,
           "decorators": [],
           "props": []
         },
@@ -3917,7 +4299,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_ubiquitous_pattern",
           "signature": "(self)",
-          "line": 267,
+          "line": 281,
           "decorators": [],
           "props": []
         },
@@ -3925,7 +4307,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_event_pattern",
           "signature": "(self)",
-          "line": 272,
+          "line": 286,
           "decorators": [],
           "props": []
         },
@@ -3933,7 +4315,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_state_pattern",
           "signature": "(self)",
-          "line": 276,
+          "line": 290,
           "decorators": [],
           "props": []
         },
@@ -3941,7 +4323,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_optional_pattern",
           "signature": "(self)",
-          "line": 280,
+          "line": 294,
           "decorators": [],
           "props": []
         },
@@ -3949,7 +4331,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_forbidden_pattern",
           "signature": "(self)",
-          "line": 284,
+          "line": 298,
           "decorators": [],
           "props": []
         },
@@ -3957,7 +4339,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_complex_pattern",
           "signature": "(self)",
-          "line": 288,
+          "line": 302,
           "decorators": [],
           "props": []
         },
@@ -3965,7 +4347,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_non_ears_requirement",
           "signature": "(self)",
-          "line": 294,
+          "line": 308,
           "decorators": [],
           "props": []
         },
@@ -3973,7 +4355,7 @@
           "kind": "method",
           "name": "TestEARSNotation.test_code_blocks_ignored",
           "signature": "(self, tmp_path)",
-          "line": 299,
+          "line": 313,
           "decorators": [],
           "props": []
         },
@@ -3981,7 +4363,7 @@
           "kind": "class",
           "name": "TestBritishEnglish",
           "signature": "",
-          "line": 315,
+          "line": 329,
           "decorators": [],
           "props": []
         },
@@ -3989,7 +4371,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_valid_british_english",
           "signature": "(self, valid_british_english)",
-          "line": 318,
+          "line": 332,
           "decorators": [],
           "props": []
         },
@@ -3997,7 +4379,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_invalid_american_english",
           "signature": "(self, invalid_british_english)",
-          "line": 323,
+          "line": 337,
           "decorators": [],
           "props": []
         },
@@ -4005,7 +4387,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_color_vs_colour",
           "signature": "(self)",
-          "line": 330,
+          "line": 344,
           "decorators": [],
           "props": []
         },
@@ -4013,7 +4395,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_behavior_vs_behaviour",
           "signature": "(self)",
-          "line": 342,
+          "line": 356,
           "decorators": [],
           "props": []
         },
@@ -4021,7 +4403,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_organize_vs_organise",
           "signature": "(self)",
-          "line": 353,
+          "line": 367,
           "decorators": [],
           "props": []
         },
@@ -4029,7 +4411,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_code_blocks_ignored",
           "signature": "(self, tmp_path)",
-          "line": 364,
+          "line": 378,
           "decorators": [],
           "props": []
         },
@@ -4037,7 +4419,7 @@
           "kind": "method",
           "name": "TestBritishEnglish.test_inline_code_ignored",
           "signature": "(self, tmp_path)",
-          "line": 379,
+          "line": 393,
           "decorators": [],
           "props": []
         },
@@ -4045,7 +4427,7 @@
           "kind": "class",
           "name": "TestMetricsLogging",
           "signature": "",
-          "line": 389,
+          "line": 403,
           "decorators": [],
           "props": []
         },
@@ -4053,7 +4435,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_valid_metrics",
           "signature": "(self, valid_metrics)",
-          "line": 392,
+          "line": 406,
           "decorators": [],
           "props": []
         },
@@ -4061,7 +4443,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_invalid_metrics",
           "signature": "(self, invalid_metrics)",
-          "line": 397,
+          "line": 411,
           "decorators": [],
           "props": []
         },
@@ -4069,7 +4451,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_metrics_log_location_under_build",
           "signature": "(self)",
-          "line": 402,
+          "line": 416,
           "decorators": [],
           "props": []
         },
@@ -4077,7 +4459,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_metrics_log_requires_jsonl_suffix",
           "signature": "(self)",
-          "line": 406,
+          "line": 420,
           "decorators": [],
           "props": []
         },
@@ -4085,7 +4467,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_metrics_log_rejects_repository_root",
           "signature": "(self)",
-          "line": 411,
+          "line": 425,
           "decorators": [],
           "props": []
         },
@@ -4093,7 +4475,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_missing_required_field",
           "signature": "(self)",
-          "line": 416,
+          "line": 430,
           "decorators": [],
           "props": []
         },
@@ -4101,7 +4483,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_invalid_timestamp",
           "signature": "(self)",
-          "line": 429,
+          "line": 443,
           "decorators": [],
           "props": []
         },
@@ -4109,7 +4491,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_invalid_event",
           "signature": "(self)",
-          "line": 442,
+          "line": 456,
           "decorators": [],
           "props": []
         },
@@ -4117,7 +4499,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_invalid_token_source",
           "signature": "(self)",
-          "line": 455,
+          "line": 469,
           "decorators": [],
           "props": []
         },
@@ -4125,7 +4507,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_missing_tokens_fields",
           "signature": "(self)",
-          "line": 468,
+          "line": 482,
           "decorators": [],
           "props": []
         },
@@ -4133,7 +4515,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_handoff_requires_to_field",
           "signature": "(self)",
-          "line": 481,
+          "line": 495,
           "decorators": [],
           "props": []
         },
@@ -4141,7 +4523,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_empty_file_valid",
           "signature": "(self, tmp_path)",
-          "line": 495,
+          "line": 509,
           "decorators": [],
           "props": []
         },
@@ -4149,7 +4531,7 @@
           "kind": "method",
           "name": "TestMetricsLogging.test_invalid_json",
           "signature": "(self, tmp_path)",
-          "line": 503,
+          "line": 517,
           "decorators": [],
           "props": []
         },
@@ -4157,7 +4539,7 @@
           "kind": "class",
           "name": "TestInterruptionsLogging",
           "signature": "",
-          "line": 513,
+          "line": 527,
           "decorators": [],
           "props": []
         },
@@ -4165,7 +4547,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging._question",
           "signature": "(**overrides)",
-          "line": 517,
+          "line": 531,
           "decorators": [
             "staticmethod"
           ],
@@ -4175,7 +4557,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_valid_interruptions",
           "signature": "(self, valid_interruptions)",
-          "line": 532,
+          "line": 546,
           "decorators": [],
           "props": []
         },
@@ -4183,7 +4565,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_invalid_interruptions",
           "signature": "(self, invalid_interruptions)",
-          "line": 537,
+          "line": 551,
           "decorators": [],
           "props": []
         },
@@ -4191,7 +4573,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_missing_required_field",
           "signature": "(self)",
-          "line": 542,
+          "line": 556,
           "decorators": [],
           "props": []
         },
@@ -4199,7 +4581,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_null_outcome_fields_allowed",
           "signature": "(self)",
-          "line": 549,
+          "line": 563,
           "decorators": [],
           "props": []
         },
@@ -4207,7 +4589,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_invalid_type",
           "signature": "(self)",
-          "line": 554,
+          "line": 568,
           "decorators": [],
           "props": []
         },
@@ -4215,7 +4597,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_invalid_timestamp",
           "signature": "(self)",
-          "line": 560,
+          "line": 574,
           "decorators": [],
           "props": []
         },
@@ -4223,7 +4605,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_agent_at_prefix_rejected",
           "signature": "(self)",
-          "line": 566,
+          "line": 580,
           "decorators": [],
           "props": []
         },
@@ -4231,7 +4613,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_invalid_decision",
           "signature": "(self)",
-          "line": 572,
+          "line": 586,
           "decorators": [],
           "props": []
         },
@@ -4239,7 +4621,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_invalid_impact",
           "signature": "(self)",
-          "line": 588,
+          "line": 602,
           "decorators": [],
           "props": []
         },
@@ -4247,7 +4629,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_options_must_be_array",
           "signature": "(self)",
-          "line": 605,
+          "line": 619,
           "decorators": [],
           "props": []
         },
@@ -4255,7 +4637,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_mixed_tasks_rejected",
           "signature": "(self, tmp_path)",
-          "line": 623,
+          "line": 637,
           "decorators": [],
           "props": []
         },
@@ -4263,7 +4645,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_legacy_filename_rejected",
           "signature": "(self, tmp_path)",
-          "line": 633,
+          "line": 647,
           "decorators": [],
           "props": []
         },
@@ -4271,7 +4653,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_duplicate_ids_rejected",
           "signature": "(self, tmp_path)",
-          "line": 640,
+          "line": 654,
           "decorators": [],
           "props": []
         },
@@ -4279,7 +4661,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_resolution_ref_must_resolve",
           "signature": "(self, tmp_path)",
-          "line": 647,
+          "line": 661,
           "decorators": [],
           "props": []
         },
@@ -4287,7 +4669,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_resolution_record_resolves",
           "signature": "(self, tmp_path)",
-          "line": 669,
+          "line": 683,
           "decorators": [],
           "props": []
         },
@@ -4295,7 +4677,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_empty_file_valid",
           "signature": "(self, tmp_path)",
-          "line": 690,
+          "line": 704,
           "decorators": [],
           "props": []
         },
@@ -4303,7 +4685,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_invalid_json",
           "signature": "(self, tmp_path)",
-          "line": 696,
+          "line": 710,
           "decorators": [],
           "props": []
         },
@@ -4311,7 +4693,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_interruptions_path_detection",
           "signature": "(self)",
-          "line": 703,
+          "line": 717,
           "decorators": [],
           "props": []
         },
@@ -4319,7 +4701,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_interruption_log_requires_jsonl_suffix",
           "signature": "(self)",
-          "line": 709,
+          "line": 723,
           "decorators": [],
           "props": []
         },
@@ -4327,7 +4709,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_main_auto_detects_interruptions_log",
           "signature": "(self, tmp_path, monkeypatch, capsys)",
-          "line": 715,
+          "line": 729,
           "decorators": [],
           "props": []
         },
@@ -4335,7 +4717,7 @@
           "kind": "method",
           "name": "TestInterruptionsLogging.test_main_auto_detects_metrics_log",
           "signature": "(self, tmp_path, monkeypatch, capsys)",
-          "line": 728,
+          "line": 742,
           "decorators": [],
           "props": []
         },
@@ -4343,7 +4725,7 @@
           "kind": "class",
           "name": "TestTypstFormatting",
           "signature": "",
-          "line": 753,
+          "line": 767,
           "decorators": [],
           "props": []
         },
@@ -4351,7 +4733,7 @@
           "kind": "method",
           "name": "TestTypstFormatting.test_valid_formatting",
           "signature": "(self, tmp_path)",
-          "line": 756,
+          "line": 770,
           "decorators": [],
           "props": []
         },
@@ -4359,7 +4741,7 @@
           "kind": "method",
           "name": "TestTypstFormatting.test_mermaid_insufficient_blank_lines",
           "signature": "(self, tmp_path)",
-          "line": 772,
+          "line": 786,
           "decorators": [],
           "props": []
         },
@@ -4367,7 +4749,7 @@
           "kind": "method",
           "name": "TestTypstFormatting.test_section_heading_without_separator",
           "signature": "(self, tmp_path)",
-          "line": 793,
+          "line": 807,
           "decorators": [],
           "props": []
         },
@@ -4375,7 +4757,7 @@
           "kind": "method",
           "name": "TestTypstFormatting.test_typst_skip_blocks_ignored",
           "signature": "(self, tmp_path)",
-          "line": 812,
+          "line": 826,
           "decorators": [],
           "props": []
         },
@@ -4383,7 +4765,7 @@
           "kind": "method",
           "name": "TestTypstFormatting.test_headings_in_code_blocks_ignored",
           "signature": "(self, tmp_path)",
-          "line": 824,
+          "line": 838,
           "decorators": [],
           "props": []
         },
@@ -4391,7 +4773,7 @@
           "kind": "class",
           "name": "TestWorkspaceOutputLocations",
           "signature": "",
-          "line": 842,
+          "line": 856,
           "decorators": [],
           "props": []
         },
@@ -4399,7 +4781,7 @@
           "kind": "method",
           "name": "TestWorkspaceOutputLocations.test_valid_output_paths",
           "signature": "(self)",
-          "line": 845,
+          "line": 859,
           "decorators": [],
           "props": []
         },
@@ -4407,7 +4789,7 @@
           "kind": "method",
           "name": "TestWorkspaceOutputLocations.test_invalid_artefact_subdir",
           "signature": "(self)",
-          "line": 856,
+          "line": 870,
           "decorators": [],
           "props": []
         },
@@ -4415,7 +4797,7 @@
           "kind": "method",
           "name": "TestWorkspaceOutputLocations.test_invalid_test_result_name",
           "signature": "(self)",
-          "line": 863,
+          "line": 877,
           "decorators": [],
           "props": []
         },
@@ -4423,7 +4805,7 @@
           "kind": "class",
           "name": "TestUIDev",
           "signature": "",
-          "line": 871,
+          "line": 885,
           "decorators": [],
           "props": []
         },
@@ -4431,7 +4813,7 @@
           "kind": "method",
           "name": "TestUIDev.test_important_forbidden",
           "signature": "(self, tmp_path)",
-          "line": 874,
+          "line": 888,
           "decorators": [],
           "props": []
         },
@@ -4439,7 +4821,7 @@
           "kind": "method",
           "name": "TestUIDev.test_raw_hex_forbidden",
           "signature": "(self, tmp_path)",
-          "line": 882,
+          "line": 896,
           "decorators": [],
           "props": []
         },
@@ -4447,7 +4829,7 @@
           "kind": "method",
           "name": "TestUIDev.test_css_files_restriction",
           "signature": "(self, tmp_path)",
-          "line": 890,
+          "line": 904,
           "decorators": [],
           "props": []
         },
@@ -4455,7 +4837,7 @@
           "kind": "class",
           "name": "TestSupabase",
           "signature": "",
-          "line": 901,
+          "line": 915,
           "decorators": [],
           "props": []
         },
@@ -4463,7 +4845,7 @@
           "kind": "method",
           "name": "TestSupabase.test_supabase_import_outside_database_service",
           "signature": "(self, tmp_path)",
-          "line": 904,
+          "line": 918,
           "decorators": [],
           "props": []
         },
@@ -4471,7 +4853,7 @@
           "kind": "method",
           "name": "TestSupabase.test_supabase_import_inside_database_service_allowed",
           "signature": "(self, tmp_path)",
-          "line": 913,
+          "line": 927,
           "decorators": [],
           "props": []
         },
@@ -4479,7 +4861,7 @@
           "kind": "method",
           "name": "TestSupabase.test_migration_audit_row_required",
           "signature": "(self, tmp_path)",
-          "line": 921,
+          "line": 935,
           "decorators": [],
           "props": []
         },
@@ -4487,7 +4869,7 @@
           "kind": "class",
           "name": "TestTestingInvariants",
           "signature": "",
-          "line": 939,
+          "line": 953,
           "decorators": [],
           "props": []
         },
@@ -4495,7 +4877,7 @@
           "kind": "method",
           "name": "TestTestingInvariants.test_forbidden_interaction_mock",
           "signature": "(self, tmp_path)",
-          "line": 942,
+          "line": 956,
           "decorators": [],
           "props": []
         },
@@ -4503,7 +4885,7 @@
           "kind": "method",
           "name": "TestTestingInvariants.test_exempt_interaction_mock",
           "signature": "(self, tmp_path)",
-          "line": 950,
+          "line": 964,
           "decorators": [],
           "props": []
         },
@@ -4511,7 +4893,7 @@
           "kind": "class",
           "name": "TestTypeScriptEnvironment",
           "signature": "",
-          "line": 958,
+          "line": 972,
           "decorators": [],
           "props": []
         },
@@ -4519,7 +4901,7 @@
           "kind": "method",
           "name": "TestTypeScriptEnvironment.test_package_lock_flagged",
           "signature": "(self, tmp_path)",
-          "line": 961,
+          "line": 975,
           "decorators": [],
           "props": []
         },
@@ -4527,7 +4909,7 @@
           "kind": "method",
           "name": "TestTypeScriptEnvironment.test_tsconfig_strictness",
           "signature": "(self, tmp_path)",
-          "line": 969,
+          "line": 983,
           "decorators": [],
           "props": []
         },
@@ -4535,7 +4917,7 @@
           "kind": "method",
           "name": "TestTypeScriptEnvironment.test_workspaces_validation",
           "signature": "(self, tmp_path)",
-          "line": 982,
+          "line": 996,
           "decorators": [],
           "props": []
         },
@@ -4543,7 +4925,7 @@
           "kind": "class",
           "name": "TestUITesting",
           "signature": "",
-          "line": 996,
+          "line": 1010,
           "decorators": [],
           "props": []
         },
@@ -4551,7 +4933,7 @@
           "kind": "method",
           "name": "TestUITesting.test_banned_dependencies_flagged",
           "signature": "(self, tmp_path)",
-          "line": 999,
+          "line": 1013,
           "decorators": [],
           "props": []
         },
@@ -4559,7 +4941,7 @@
           "kind": "method",
           "name": "TestUITesting.test_puppeteer_core_allowed",
           "signature": "(self, tmp_path)",
-          "line": 1013,
+          "line": 1027,
           "decorators": [],
           "props": []
         },
@@ -4567,7 +4949,7 @@
           "kind": "class",
           "name": "TestSecrets",
           "signature": "",
-          "line": 1025,
+          "line": 1039,
           "decorators": [],
           "props": []
         },
@@ -4575,7 +4957,7 @@
           "kind": "method",
           "name": "TestSecrets.test_private_key_flagged",
           "signature": "(self, tmp_path)",
-          "line": 1028,
+          "line": 1042,
           "decorators": [],
           "props": []
         },
@@ -4583,7 +4965,7 @@
           "kind": "method",
           "name": "TestSecrets.test_env_file_with_secret_flagged",
           "signature": "(self, tmp_path)",
-          "line": 1036,
+          "line": 1050,
           "decorators": [],
           "props": []
         },
@@ -4591,7 +4973,7 @@
           "kind": "class",
           "name": "TestSubrepoFreshness",
           "signature": "",
-          "line": 1045,
+          "line": 1059,
           "decorators": [],
           "props": []
         },
@@ -4599,7 +4981,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_find_subrepos",
           "signature": "(self, tmp_path)",
-          "line": 1048,
+          "line": 1062,
           "decorators": [],
           "props": []
         },
@@ -4607,7 +4989,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_query_upstream_head_success",
           "signature": "(self)",
-          "line": 1070,
+          "line": 1084,
           "decorators": [],
           "props": []
         },
@@ -4615,7 +4997,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_query_upstream_head_failure",
           "signature": "(self)",
-          "line": 1081,
+          "line": 1095,
           "decorators": [],
           "props": []
         },
@@ -4623,7 +5005,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_subrepo_fresh_when_commit_matches",
           "signature": "(self, tmp_path)",
-          "line": 1092,
+          "line": 1106,
           "decorators": [],
           "props": []
         },
@@ -4631,7 +5013,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_subrepo_stale_with_changes_fails",
           "signature": "(self, tmp_path)",
-          "line": 1112,
+          "line": 1126,
           "decorators": [],
           "props": []
         },
@@ -4639,7 +5021,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_subrepo_stale_without_changes_passes",
           "signature": "(self, tmp_path)",
-          "line": 1134,
+          "line": 1148,
           "decorators": [],
           "props": []
         },
@@ -4647,7 +5029,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_subrepo_check_all_forces_stale_detection",
           "signature": "(self, tmp_path)",
-          "line": 1154,
+          "line": 1168,
           "decorators": [],
           "props": []
         },
@@ -4655,7 +5037,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_subrepo_unreachable_network_handling",
           "signature": "(self, tmp_path)",
-          "line": 1174,
+          "line": 1188,
           "decorators": [],
           "props": []
         },
@@ -4663,7 +5045,7 @@
           "kind": "method",
           "name": "TestSubrepoFreshness.test_main_cli_success",
           "signature": "(self, tmp_path, monkeypatch)",
-          "line": 1197,
+          "line": 1211,
           "decorators": [],
           "props": []
         },
@@ -4671,7 +5053,7 @@
           "kind": "class",
           "name": "TestLoggingTemplateDocs",
           "signature": "",
-          "line": 1219,
+          "line": 1233,
           "decorators": [],
           "props": []
         },
@@ -4679,7 +5061,7 @@
           "kind": "method",
           "name": "TestLoggingTemplateDocs.test_template_documents_metrics_schema",
           "signature": "(self)",
-          "line": 1229,
+          "line": 1243,
           "decorators": [],
           "props": []
         },
@@ -4687,7 +5069,7 @@
           "kind": "method",
           "name": "TestLoggingTemplateDocs.test_template_documents_interruption_schema",
           "signature": "(self)",
-          "line": 1235,
+          "line": 1249,
           "decorators": [],
           "props": []
         },
@@ -4695,7 +5077,7 @@
           "kind": "method",
           "name": "TestLoggingTemplateDocs.test_agent_template_references_logging_template",
           "signature": "(self)",
-          "line": 1249,
+          "line": 1263,
           "decorators": [],
           "props": []
         }
@@ -5754,7 +6136,7 @@
     {
       "path": "context/scripts/validators/workspace_conventions.py",
       "language": "python",
-      "line_count": 674,
+      "line_count": 703,
       "symbols": [
         {
           "kind": "const",
@@ -5885,10 +6267,26 @@
           "props": []
         },
         {
+          "kind": "const",
+          "name": "BODY_EXCLUDED_PREFIXES",
+          "signature": "",
+          "line": 197,
+          "decorators": [],
+          "props": []
+        },
+        {
+          "kind": "function",
+          "name": "_has_explanatory_body",
+          "signature": "(lines: list[str])",
+          "line": 207,
+          "decorators": [],
+          "props": []
+        },
+        {
           "kind": "function",
           "name": "validate_commit_message",
           "signature": "(msg: str, repo_root: str | None=None)",
-          "line": 196,
+          "line": 219,
           "decorators": [],
           "props": []
         },
@@ -5896,7 +6294,7 @@
           "kind": "const",
           "name": "REQUIRED_METRICS_FIELDS",
           "signature": "",
-          "line": 271,
+          "line": 300,
           "decorators": [],
           "props": []
         },
@@ -5904,7 +6302,7 @@
           "kind": "const",
           "name": "VALID_METRICS_EVENTS",
           "signature": "",
-          "line": 272,
+          "line": 301,
           "decorators": [],
           "props": []
         },
@@ -5912,7 +6310,7 @@
           "kind": "const",
           "name": "VALID_TOKEN_SOURCES",
           "signature": "",
-          "line": 273,
+          "line": 302,
           "decorators": [],
           "props": []
         },
@@ -5920,7 +6318,7 @@
           "kind": "function",
           "name": "validate_metrics_entry",
           "signature": "(entry: dict[str, Any], line_num: int)",
-          "line": 276,
+          "line": 305,
           "decorators": [],
           "props": []
         },
@@ -5928,7 +6326,7 @@
           "kind": "function",
           "name": "validate_metrics_file",
           "signature": "(file_path: Path)",
-          "line": 324,
+          "line": 353,
           "decorators": [],
           "props": []
         },
@@ -5936,7 +6334,7 @@
           "kind": "const",
           "name": "INTERRUPTIONS_DIRNAME",
           "signature": "",
-          "line": 354,
+          "line": 383,
           "decorators": [],
           "props": []
         },
@@ -5944,7 +6342,7 @@
           "kind": "const",
           "name": "INTERRUPTION_BASE_FIELDS",
           "signature": "",
-          "line": 356,
+          "line": 385,
           "decorators": [],
           "props": []
         },
@@ -5952,7 +6350,7 @@
           "kind": "const",
           "name": "VALID_INTERRUPTION_TYPES",
           "signature": "",
-          "line": 357,
+          "line": 386,
           "decorators": [],
           "props": []
         },
@@ -5960,7 +6358,7 @@
           "kind": "const",
           "name": "VALID_INTERRUPTION_IMPACTS",
           "signature": "",
-          "line": 358,
+          "line": 387,
           "decorators": [],
           "props": []
         },
@@ -5968,7 +6366,7 @@
           "kind": "const",
           "name": "VALID_INTERRUPTION_DECISIONS",
           "signature": "",
-          "line": 359,
+          "line": 388,
           "decorators": [],
           "props": []
         },
@@ -5976,7 +6374,7 @@
           "kind": "const",
           "name": "INTERRUPTION_TYPE_FIELDS",
           "signature": "",
-          "line": 361,
+          "line": 390,
           "decorators": [],
           "props": []
         },
@@ -5984,7 +6382,7 @@
           "kind": "const",
           "name": "INTERRUPTION_NULLABLE_FIELDS",
           "signature": "",
-          "line": 370,
+          "line": 399,
           "decorators": [],
           "props": []
         },
@@ -5992,7 +6390,7 @@
           "kind": "const",
           "name": "INTERRUPTION_TS_PATTERN",
           "signature": "",
-          "line": 372,
+          "line": 401,
           "decorators": [],
           "props": []
         },
@@ -6000,7 +6398,7 @@
           "kind": "function",
           "name": "is_interruptions_log",
           "signature": "(path: str | Path)",
-          "line": 375,
+          "line": 404,
           "decorators": [],
           "props": []
         },
@@ -6008,7 +6406,7 @@
           "kind": "function",
           "name": "validate_interruptions_entry",
           "signature": "(entry: dict[str, Any], line_num: int)",
-          "line": 381,
+          "line": 410,
           "decorators": [],
           "props": []
         },
@@ -6016,7 +6414,7 @@
           "kind": "function",
           "name": "validate_interruptions_file",
           "signature": "(file_path: Path)",
-          "line": 461,
+          "line": 490,
           "decorators": [],
           "props": []
         },
@@ -6024,7 +6422,7 @@
           "kind": "function",
           "name": "_auto_detect",
           "signature": "(args: list[str])",
-          "line": 538,
+          "line": 567,
           "decorators": [],
           "props": []
         },
@@ -6032,7 +6430,7 @@
           "kind": "function",
           "name": "main",
           "signature": "()",
-          "line": 585,
+          "line": 614,
           "decorators": [],
           "props": []
         }
@@ -6867,39 +7265,127 @@
       "file": "context/scripts/tests/test_runtime_telemetry.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_env_template_extraction",
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestSkillFrontmatterSchema::test_derive_skills_have_valid_frontmatter",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestSkillFrontmatterSchema::test_skill_name_matches_filename_stem",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestSkillFrontmatterSchema::test_skill_globs_is_list_of_glob_strings",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_all_real_workflows_pass_schema",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_rejects_duplicate_phase_ids",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_rejects_unresolvable_depends_on",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_rejects_unknown_agent",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_accepts_at_prefix_and_inline_comment_agents",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_rejects_non_boolean_phase_gate",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_gate_phase_without_quality_gates_entry_is_allowed",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_rejects_quality_gate_unknown_phase",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestWorkflowPhaseSchema::test_accepts_evidence_style_quality_gate_without_gate_key",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestPythonExtraction::test_symbols_and_constants",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestPythonExtraction::test_imports_recorded",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestPythonExtraction::test_route_decorators_produce_api_entries",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestTsJsExtraction::test_components_props_and_usage",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestTsJsExtraction::test_scan_aggregates_ui_components",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestSqlParsing::test_create_table_columns",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestVerifyOnSyntheticRepo::test_verify_passes_index_then_fails_when_source_removed",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestVerifyOnSyntheticRepo::test_verify_doc_checks_cited_file_lines",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestExtractorSmoke::test_invalid_extractor_exits_nonzero",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer.py::TestExtractorSmoke::test_meta_extractors_provenance_populated",
+      "file": "context/scripts/tests/test_spec_indexer.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_env_template_keys_when_env_file_present",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_python_settings_module",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_yaml_config_file",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_scalar_keys_when_yaml_config_present",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_json_config_file",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_scalar_keys_when_json_config_present",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_non_config_files_ignored",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_ignore_non_config_files_when_names_do_not_match",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_precedence_first_source_wins",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_keep_first_source_value_when_key_defined_in_multiple_sources",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_determinism",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_be_deterministic_when_scan_repeated",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigVerify::test_verify_index_covers_config_citations",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestConfigVerify::test_verify_should_fail_when_config_source_removed_after_indexing",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
-      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestRealRepo::test_start_here_env_template_keys_redacted",
+      "node_id": "context/scripts/tests/test_spec_indexer_config.py::TestRealRepo::test_config_should_redact_secrets_when_scanning_real_repo_env_template",
       "file": "context/scripts/tests/test_spec_indexer_config.py"
     },
     {
@@ -6972,6 +7458,10 @@
     },
     {
       "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_too_long",
+      "file": "context/scripts/tests/test_validators.py"
+    },
+    {
+      "node_id": "context/scripts/tests/test_validators.py::TestConventionalCommits::test_invalid_no_body",
       "file": "context/scripts/tests/test_validators.py"
     },
     {
