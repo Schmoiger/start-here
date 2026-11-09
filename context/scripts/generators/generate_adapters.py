@@ -218,7 +218,7 @@ def get_adapter_projections(
                 "- Read `@OPENAI.md` for OpenAI/Codex-specific tool mappings, rules, model and telemetry source guidance."
             )
 
-        source_file = context_dir / "artifacts" / "agents-md.yaml"
+        source_file = context_dir / "workflows" / "agents-md.yaml"
         projections.update(
             generate_agents_md(
                 context,
