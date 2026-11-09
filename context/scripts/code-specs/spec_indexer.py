@@ -33,6 +33,11 @@ Extraction backends (all deterministic, ~0 LLM tokens) selected via ``--extracto
               .env.dist), settings/config Python modules (stdlib ast) and config
               YAML/JSON files: keys + defaults + feature-flag markers (T-016),
               value-hints redacted for secret-looking keys.
+  * History - capped git-log evidence into ``meta.history`` (T-017): last N
+              commit subjects + rename/refactor clues (``git log --name-status``,
+              ``--history N`` bounds the pull, default 200; key absent when the
+              repo has no git metadata). Commit subjects are cheap feature
+              descriptions, especially for unorganised repos.
 
 The index schema is documented in context/skills/analyse-repo.md (§ Consuming repo-index.json).
 """
@@ -1409,6 +1414,12 @@ _CONFIG_TEST_PARTS: frozenset[str] = frozenset(
 )
 _MAX_VALUE_HINT = 120
 
+# --- Git-history evidence (T-017) ------------------------------------------
+_HISTORY_COMMIT_FMT = "%H%x09%ad%x09%s"
+_HISTORY_HASH_RE: re.Pattern[str] = re.compile(r"^[0-9a-f]{40}$")
+_MAX_HISTORY_RENAMES = 500
+MAX_HISTORY_ROWS = 40
+
 
 def _skip_config_path(rel_path: str, name: str) -> bool:
     """Exclude test/fixture material: test modules and anything under tests/ dirs."""
@@ -1667,6 +1678,90 @@ def collect_config(repo: Path) -> list[ConfigEntry]:
     return sorted(entries, key=lambda e: (e.key.lower(), e.key))
 
 
+# ---------------------------------------------------------------------------
+# History extraction (T-017): capped git-log evidence, zero LLM
+# ---------------------------------------------------------------------------
+
+
+def collect_history(repo: Path, limit: int) -> dict[str, Any] | None:
+    """Capped git-history evidence for ``meta.history`` (T-017), zero LLM.
+
+    Returns ``{count, capped, commit_subjects, renames}`` — the last ``limit``
+    commit subjects (newest first) plus rename/refactor clues parsed from
+    ``git log --name-status``. Returns None when the repo has no usable git
+    history (not a git repo, git missing, or no commits yet) so the caller
+    emits ``meta.history`` as absent rather than as empty evidence.
+    """
+    if limit <= 0:
+        return None
+    try:
+        proc = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo),
+                "log",
+                "--name-status",
+                f"--format={_HISTORY_COMMIT_FMT}",
+                "--date=iso-strict",
+                "-n",
+                str(limit),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+
+    commit_subjects: list[str] = []
+    renames: list[dict[str, str]] = []
+    current: tuple[str, str] | None = None  # (hash, subject) of the commit in flight
+    for raw in proc.stdout.splitlines():
+        fields = raw.split("\t")
+        if fields and _HISTORY_HASH_RE.match(fields[0]) and len(fields) >= 3:
+            current = (fields[0], fields[2])
+            commit_subjects.append(fields[2])
+            continue
+        if current is None or not fields:
+            continue
+        status = fields[0]
+        if (
+            status.startswith("R")
+            and len(fields) >= 3
+            and len(renames) < _MAX_HISTORY_RENAMES
+        ):
+            renames.append(
+                {
+                    "commit": current[0],
+                    "subject": current[1],
+                    "old": fields[1],
+                    "new": fields[2],
+                }
+            )
+
+    capped = False
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(repo), "rev-list", "--count", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if proc.returncode == 0 and proc.stdout.strip().isdigit():
+            capped = int(proc.stdout.strip()) > limit
+    except (OSError, subprocess.TimeoutExpired):
+        capped = False
+    return {
+        "count": len(commit_subjects),
+        "capped": capped,
+        "commit_subjects": commit_subjects,
+        "renames": renames,
+    }
+
+
 def _default_out_dir(repo: Path) -> Path:
     build_dir = repo / "artefacts" / "build" / "derived-spec-working"
     return build_dir if build_dir.is_dir() else repo
@@ -1776,6 +1871,29 @@ def render_spec_scan(index: dict[str, Any]) -> str:
             "None detected (no .env*.example/template · settings/config module · config data file)."
         )
 
+    out.append("\n## Recent Git History (evidence)")
+    history = meta.get("history")
+    if history:
+        subjects = history["commit_subjects"]
+        out.append(
+            f"- {len(subjects)} commits (newest first)"
+            + (" · capped — repo has more" if history.get("capped") else "")
+            + f" · renames={len(history.get('renames') or [])}"
+        )
+        for subj in subjects[:MAX_HISTORY_ROWS]:
+            out.append(f"- {subj}")
+        if len(subjects) > MAX_HISTORY_ROWS:
+            out.append(f"… {len(subjects) - MAX_HISTORY_ROWS} more subjects omitted")
+        renames = history.get("renames") or []
+        if renames:
+            out.append("\nRename / refactor clues (cheap feature-intent signals):")
+            for ren in renames[:MAX_HISTORY_ROWS]:
+                out.append(f"- `{ren['old']}` → `{ren['new']}` ({ren['subject']})")
+    else:
+        out.append(
+            "No git metadata — `meta.history` absent; treat as absent, not empty evidence."
+        )
+
     out.append(
         "\n---\nGenerated deterministically by `context/scripts/code-specs/spec_indexer.py scan` "
         "(zero LLM tokens). Consume via `repo-index.json`."
@@ -1784,7 +1902,13 @@ def render_spec_scan(index: dict[str, Any]) -> str:
 
 
 def run_scan(
-    repo: Path, mode: str, out_json: Path, max_files: int, verbose: bool, extractors: str = "auto"
+    repo: Path,
+    mode: str,
+    out_json: Path,
+    max_files: int,
+    verbose: bool,
+    extractors: str = "auto",
+    history_cap: int = 200,
 ) -> int:
     repo = repo.resolve()
     paths, warnings, too_large = find_target_files(repo, max_files)
@@ -1867,6 +1991,13 @@ def run_scan(
 
     config_entries = collect_config(repo)
 
+    history = collect_history(repo, history_cap)
+    if history is None and history_cap > 0:
+        warnings.append(
+            "git history unavailable (not a git repo / git missing / no commits) — "
+            "'meta.history' absent, treat as absent evidence"
+        )
+
     for schema_name in openapi_schemas:
         tables.append(TableDef(table=schema_name, columns=[], file="", line=0))
 
@@ -1890,6 +2021,7 @@ def run_scan(
             "scan_too_large": too_large,
             "extractors": _extractor_meta(avail, plan, reasons),
             "confidence": confidence,
+            **({"history": history} if history is not None else {}),
         },
         "warnings": warnings,
         "docs": [d.to_jsonb() for d in docs],
@@ -1911,7 +2043,8 @@ def run_scan(
     print(
         f"files={len(records)} symbols={sum(len(r.symbols) for r in records)} "
         f"api={len(api)} tables={len(tables)} ui={len(ui)} tests={len(test_nodes)} "
-        f"config={len(config_entries)}"
+        f"config={len(config_entries)} "
+        f"history={len(history['commit_subjects']) if history else 0}"
     )
     if verbose:  # pragma: no cover - informational
         for w in warnings:
@@ -2038,6 +2171,13 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_scan.add_argument("--verbose", action="store_true", help="print warnings")
     p_scan.add_argument(
+        "--history",
+        type=int,
+        default=200,
+        help="bounded git-history evidence into meta.history — last N commit "
+        "subjects + rename clues (default: 200; 0 disables the git pull)",
+    )
+    p_scan.add_argument(
         "--extractors",
         choices=list(EXTRACTOR_CHOICES),
         default="auto",
@@ -2066,7 +2206,13 @@ def main(argv: list[str] | None = None) -> int:
             Path(args.out) if args.out else (_default_out_dir(Path(args.repo)) / "repo-index.json")
         )
         return run_scan(
-            Path(args.repo), args.mode, out, args.max_files, args.verbose, args.extractors
+            Path(args.repo),
+            args.mode,
+            out,
+            args.max_files,
+            args.verbose,
+            args.extractors,
+            args.history,
         )
 
     if not args.index and not args.doc:

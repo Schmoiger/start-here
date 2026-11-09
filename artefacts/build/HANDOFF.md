@@ -1,133 +1,73 @@
-# Handoff: Derive-Spec Harness (spec-agent)
+# Handoff: T-017 — Indexer `meta.history` (capped git-history evidence)
 
-**From**: @orchestrator
+**From**: @orchestrator (default agent, small-task workflow)
 **To**: @human-operator
-**Date**: 2026-05-11
+**Date**: 2026-09-11
 **Workflow**: small-task
-**Phase**: promote
-**Status**: promoted
+**Phase**: hitl
+**Status**: awaiting human APPROVED for commit
 
 ---
 
 ## Summary
 
-T-010 (unit tests for spec-indexer) is **completed and committed** (8fa3ada + d9e98cd). 
-All 22 tests pass; full scripts suite 243/245 green (2 skipped, tree-sitter backend).
+T-017 (Indexer: capped git-history evidence into `meta.history`) is
+**implemented, tested, and validated** against its acceptance criteria:
 
-**T-008: Pilot A — run derive-spec (`mode=both`) on this repo** is **complete**. 
-Drafts staged in `artefacts/build/spec-drafts/` and promoted to 
-`artefacts/build/derived/` (per human Q-001/Q-010 decision to use `build/derived/` 
-instead of `artefacts/{category}/derived/`). All 4 drafts pass `verify --doc`.
-Token ledger measurement: pending (not yet instrumented in repo).
+- `scan` records `meta.history`: `{count, capped, commit_subjects, renames}` —
+  last N commit subjects (newest first) + rename/refactor clues from
+  `git log --name-status` — zero LLM, deterministic.
+- `--history N` bounds the pull (default 200); `--history 0` disables it. The
+  key is **absent** (never empty) when the repo has no git metadata or no
+  commits; a scan warning notes the absence.
+- `spec-scan.md` gains a `## Recent Git History (evidence)` section.
+- Documented in the `analyse-repo` skill (§1.1 flag row, §3.1 schema row, §3.4
+  planned-keys cleanup, new §3.5 consumption guidance, §5 repo-profile bullet)
+  and the workflows README `Commands & Repository Index` list.
+- Reference outputs regenerated (`derived-spec-working/repo-index.json` +
+  `spec-scan.md` — history=200, renames=16) and `verify --index` green.
 
----
+## Changes
 
-## Tasks Completed
+| File | Change |
+|------|--------|
+| `context/scripts/code-specs/spec_indexer.py` | `collect_history()`, `--history` CLI flag, `meta.history` emission, spec-scan history section, module docstring |
+| `context/scripts/tests/test_spec_indexer_history.py` | **new** — 13 tests (synthetic git repos) |
+| `context/skills/analyse-repo.md` | schema row, flag doc, §3.4 planned keys, new §3.5, §5 bullet |
+| `context/workflows/README.md` | `--history` in the command list |
+| `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md` | regenerated reference output |
+| `artefacts/build/tasks-spec-agent.md` | T-017 → completed + amendment log |
 
-| ID | Task | Status | Notes |
-|----|------|--------|-------|
-| T-010 | Unit tests: skill/workflow schema, indexer extraction + verify | completed | committed 8fa3ada + d9e98cd; 22/22 pass |
-| T-008 | Pilot A: run derive-spec (`mode=both`) on this repo | completed | Phase 1-6 complete; Phase 7 human Qs answered; Phase 8 promoted |
+## Validation
 
----
+- `uv run pytest context/scripts/tests/test_spec_indexer_history.py -v` → **13 passed**
+- Full scripts suite → **254 passed, 2 skipped**. The 2 failures
+  (`test_adapter_drift_clean_repo`, `test_packaging.py::test_drift_validator_callable`)
+  were reproduced on the clean committed tree via `git stash` — **pre-existing**
+  (known backlog gap T-007 "Regenerate adapters / validators green", status:
+  won't do), not caused by T-017.
+- `uv run --with ruff ruff check` on changed Python → clean
+- `verify --index artefacts/build/derived-spec-working/repo-index.json` →
+  `OK — all citations resolve` (769 citations)
 
 ## Next Tasks
 
-| ID | Task | Priority | Depends On |
-|----|------|----------|------------|
-| T-020 | Extend `verify` with `--require-coverage` | low | T-010 ✅ |
-
----
-
-## Derive-Spec Intake (Phase 0) — Completed
-
-| Field | Value |
-|-------|-------|
-| Mode | both (product + technical) |
-| Target | . (repo root) |
-| Max files | 2000 (default) |
-| Extractors | stdlib.ast + ast-grep (tree-sitter unavailable in env) |
-| Output drafts | `artefacts/build/spec-drafts/` |
-| Promotion target | `artefacts/build/derived/` (human Q-001/Q-010 override) |
-
----
-
-## Phase Status
-
-| Phase | Name | Status |
-|-------|------|--------|
-| 0 | Intake & Scope | ✅ complete |
-| 1 | Repo & Doc Discovery | ✅ complete (61 files, 731 symbols, 245 tests, 25 docs, 8 config keys) |
-| 2 | Baseline & Drift | ✅ complete (D-001…D-004) |
-| 3 | Evidence Gathering | ✅ complete |
-| 4a | Product Draft | ✅ complete |
-| 4b | Technical Drafts | ✅ complete |
-| 5 | Draft stage | ✅ complete |
-| 6 | Verification | ✅ complete (`verify --index` OK; `verify --doc` OK on all 4 drafts) |
-| 7 | Human confirmation | ✅ complete (Q-001, Q-002, Q-003, Q-010, Q-011, Q-020, Q-022 APPROVED; Q-021, Q-023 remain still-open) |
-| 8 | Promotion | ✅ complete (4 drafts → `artefacts/build/derived/`) |
-
----
-
-## Open Questions (Confirmed / Still-Open)
-
-| ID | Decision |
-|----|----------|
-| Q-001 | Product spec → `build/derived/` (**APPROVED**) |
-| Q-002 | UX flows complete as listed (**APPROVED**) |
-| Q-003 | Runtime Projection kept unified (**APPROVED**) |
-| Q-010 | Architecture → `build/derived/` (**APPROVED**) |
-| Q-011 | 6 components (not 7) (**APPROVED**) |
-| Q-020 | CLI/library-only (no HTTP routes; index api=0) (**APPROVED**) |
-| Q-021 | Remove empty "Request and Response Shapes" subsection? (**still-open**) |
-| Q-023 | Remove empty "Columns and Constraints" subsection? (**still-open**) |
-
----
-
-## Artefacts Created / Modified
-
-### New (T-008)
-- `artefacts/build/spec-drafts/product-spec.md`
-- `artefacts/build/spec-drafts/architecture.md`
-- `artefacts/build/spec-drafts/api-catalogue.md`
-- `artefacts/build/spec-drafts/data-model.md`
-- `artefacts/build/derived/product-spec.md` (promoted)
-- `artefacts/build/derived/architecture.md` (promoted)
-- `artefacts/build/derived/api-catalogue.md` (promoted)
-- `artefacts/build/derived/data-model.md` (promoted)
-
-### Modified (T-008)
-- `artefacts/build/HANDOFF.md`
-
-### Existing (unchanged)
-- `context/scripts/code-specs/spec_indexer.py`
-- `context/scripts/tests/test_spec_indexer.py`
-- `artefacts/product/requirements.md` (example placeholder — D-001)
-- `artefacts/architecture/architecture.md` (example placeholder — D-002)
-- `artefacts/architecture/data-model.md`, `artefacts/architecture/api-catalogue.md`
-
----
-
-## Statistics
-
-- **Tests**: 22/22 (test_spec_indexer.py); full scripts suite 243/245 (2 skipped, tree-sitter backend)
-- **Index**: 731 symbols, 61 Python files, 8 config keys, 245 tests, 25 docs
-- **Verify**: 739 citations resolve; 4 drafts verified OK
-
----
+| ID | Task | Priority | Depends On | Status |
+|----|------|----------|------------|--------|
+| T-018 | Confidence bands + promotion DoD in derived-spec-template | high | T-006 ✅ | pending |
+| T-019 | Pilot B: derive-spec on foreign/unorganised repo | critical | T-008 ✅ | pending |
+| T-020 | `verify --require-coverage` | low | T-010 ✅ | pending |
+| T-021 | Indexer `comments` extraction | high | T-015 ✅ | pending |
 
 ## Key Decisions
 
-- The `quality_gates` schema is intentionally heterogeneous across workflows
-  (bugfix uses `{phase, type, required, criteria}`; derive-spec/small-task use
-  `{phase, gate, ...}`). The phase-schema contract therefore asserts reference
-  integrity (every `quality_gates[].phase` resolves; every phase `gate` is boolean)
-  rather than a uniform shape.
-- T-015 backend-parity tests already live in `test_spec_indexer_extractors.py`;
-  this file adds T-010's core extraction + schema + verify coverage plus an
-  invalid-extractor/provenance smoke test, avoiding duplication.
-- Promotion target overridden to `artefacts/build/derived/` per human Q-001/Q-010
-  (workflow template default is `artefacts/{category}/derived/`).
-- Component count corrected to 6 per human Q-011.
+- **Schema shape**: `meta.history = {count, capped, commit_subjects, renames}`;
+  renames capped at 500; `git rev-list --count HEAD` determines `capped`.
+- **Absent-not-empty contract**: no git metadata / no commits / `--history 0` →
+  key omitted from `meta` plus a scan warning; agents treat it as absent
+  evidence, never empty.
+- **Fitness (small-task)**: H1 AMBER (6 files) — human chose small-task for this
+  single unit at intake; one coherent logical unit (H8 clear); R1/R5/R6/R7 lean
+  small-task; python-scripting skill loaded.
 
 <!-- state: ready for commit -->

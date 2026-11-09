@@ -44,6 +44,7 @@ uv run context/scripts/code-specs/spec_indexer.py scan \
 | `--mode` | derive-spec mode hint recorded in the index: `product`, `technical`, or `both` (default). Shared phases read it from `meta.mode`. |
 | `--out` | Output path for `repo-index.json` (default `<repo>/artefacts/build/derived-spec-working/repo-index.json` when `artefacts/build/derived-spec-working` exists, else repo root). `spec-scan.md` is written beside it. |
 | `--max-files` | Scan-size bound (default 2000); `meta.scan_too_large` is set when the bound is hit. |
+| `--history` | Bounded git-history evidence into `meta.history` (T-017): last N commit subjects + rename/refactor clues from `git log --name-status` (default 200; `0` disables the pull; key absent with no git metadata, §3.5). |
 | `--extractors` | Extraction backend (§6). Default `auto` probes the toolchain and prefers the richest backend per language; `stdlib` is the zero-dependency fallback tier. |
 
 ### 1.2 Phase 1 — full-repo discovery scan
@@ -57,7 +58,9 @@ uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both
 
 Phase 1 also discovers existing spec documents (`docs` key) via the document
 globs — requirements / architecture / API / design docs — and collects the test
-inventory.
+inventory and the capped git-history evidence (`meta.history`, §3.5): last N
+commit subjects + rename/refactor clues as cheap feature descriptions,
+especially for unorganised repos.
 
 ### 1.3 Phase 3 — evidence pass
 
@@ -120,6 +123,7 @@ skipped, not failed.
 | `ui` | `[ {component, file, line, props, usages, kind} ]` from TS/JSX component definitions, aggregated with JSX-tag usage counts |
 | `tests` | `[ {node_id, file} ]` from pytest collection / jest listTests — each test name is a candidate feature name |
 | `config` | user-facing constraints (T-016): `[ {key, source, line, value_hint, feature} ]` from `.env.example`/`.env.template` env files, `settings.py`/`config.*` modules, and config YAML/JSON — secret-looking keys redacted to `<redacted>`; `feature` marks flags/toggles (ENABLE_*/FEATURE_* or boolean); test/fixture paths excluded; feeds product-spec + TSD constraints |
+| `meta.history` | capped git evidence (T-017): `{count, capped, commit_subjects, renames}` from `git log --name-status` — newest-first commit subjects + rename/refactor clues (`{commit, subject, old, new}`); **absent** (never empty) when the repo has no git metadata / no commits, or with `--history 0` (§3.5) |
 
 ### 3.2 `meta.extractors` provenance
 
@@ -141,9 +145,29 @@ indicate a degraded backend rather than absence of the construct.
 
 ### 3.4 Planned keys
 
-`meta.history` (T-017) and `comments` (T-021) are designed into the schema but
-not yet emitted by the indexer; treat them as absent, never as empty evidence.
-(`config` is implemented — see §3.1.)
+`comments` (T-021) is designed into the schema but not yet emitted by the
+indexer; treat it as absent, never as empty evidence. (`config` and
+`meta.history` are implemented — see §3.1 and §3.5.)
+
+### 3.5 `meta.history` — capped git-history evidence (T-017)
+
+`meta.history` carries zero-LLM git evidence captured by `scan`:
+
+- `commit_subjects` — the last N commit subjects, newest first (N = `--history`,
+  default 200). These are cheap **feature descriptions**: a commit subject often
+  states the feature intent that code alone hides — precisely the signal
+  sparse/unorganised repos lack.
+- `renames` — `{commit, subject, old, new}` rename/refactor clues from
+  `git log --name-status` (capped at 500). Batch moves such as
+  `refactor: move X to Y` reveal module boundaries the tree alone does not
+  expose.
+- `count` / `capped` — how many subjects were captured and whether the repo has
+  more commits than the bound (`capped: true`).
+
+The key is **absent**, not empty, when the repo has no git metadata, when `git
+log` has no commits to emit, or when `--history 0` disables the pull (a scan
+warning notes the absence). `verify --index` does not cite history entries —
+commits are evidence of intent, not `file:line` citations.
 
 ---
 
@@ -170,6 +194,9 @@ The indexer does not write `repo-profile.md`; the agent authors it in
   worker scripts, each with `file:line` citations.
 - **Module boundaries** — the coarse module/package split and what each side
   owns, again with citations.
+- **Feature history** — where `meta.history` (§3.5) exists, mine the newest
+  commit subjects and renames for feature intent and refactor clues; cite
+  `meta.history` entries as cheap descriptions when the tree offers none.
 
 Every claim carries `file:line` evidence (§7). The profile is the seed the
 Phase 2–4 synthesis steps build on; an uncitable claim is an open question, not
