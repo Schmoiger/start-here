@@ -5,7 +5,7 @@
 **Date**: 2026-09-11
 **Workflow**: small-task
 **Phase**: complete
-**Status**: completed — human APPROVED; committed `{commit}` (feat), pushed to `feat/spec-agent`
+**Status**: completed — human APPROVED; committed `3c583dc` (docs), pushed to `feat/spec-agent`
 
 ---
 
