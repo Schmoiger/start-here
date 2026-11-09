@@ -1,73 +1,81 @@
-# Handoff: T-017 — Indexer `meta.history` (capped git-history evidence)
+# Handoff: T-018 — Confidence bands + promotion DoD in `derived-spec-template.md`
 
 **From**: @orchestrator (default agent, small-task workflow)
 **To**: @human-operator
 **Date**: 2026-09-11
 **Workflow**: small-task
 **Phase**: complete
-**Status**: completed — human APPROVED; committed `3b67cbd` (feat) + `f089f82` (metrics), pushed to `feat/spec-agent`
+**Status**: completed — human APPROVED; committed `{commit}` (feat), pushed to `feat/spec-agent`
 
 ---
 
 ## Summary
 
-T-017 (Indexer: capped git-history evidence into `meta.history`) is
-**implemented, tested, and validated** against its acceptance criteria:
+T-018 hardens the confidence schema and promotion definition of done that
+T-006 drafted (the template previously said "drafted here, hardened with
+T-018"). The template is now the **single source of truth** consumed by the
+T-005 confirmation-mode exit criteria and the derive-spec Phase 8 promotion
+decision, per the acceptance criteria:
 
-- `scan` records `meta.history`: `{count, capped, commit_subjects, renames}` —
-  last N commit subjects (newest first) + rename/refactor clues from
-  `git log --name-status` — zero LLM, deterministic.
-- `--history N` bounds the pull (default 200); `--history 0` disables it. The
-  key is **absent** (never empty) when the repo has no git metadata or no
-  commits; a scan warning notes the absence.
-- `spec-scan.md` gains a `## Recent Git History (evidence)` section.
-- Documented in the `analyse-repo` skill (§1.1 flag row, §3.1 schema row, §3.4
-  planned-keys cleanup, new §3.5 consumption guidance, §5 repo-profile bullet)
-  and the workflows README `Commands & Repository Index` list.
-- Reference outputs regenerated (`derived-spec-working/repo-index.json` +
-  `spec-scan.md` — history=200, renames=16) and `verify --index` green.
+- **Band table, fixed ranges, evidence per band**: Verified 85–100 (resolving
+  `path:line` citations; usage counts / call chains where material),
+  Needs Confirmation 50–85 (plausible from indexed evidence, requires a human
+  answer — Phase 7 / T-005), Assumed <50 (inference only).
+- **Per-doc Promotion DoD** (itemised): every subsection at Needs Confirmation
+  or above, no blocking still-open question, `verify --doc` pass, review
+  record + drift confirmed, APPROVED gate; recorded-human-override path; each
+  doc promotes independently.
+- **Update rule baked into the subsection template**: confirmed → raise
+  band/% and cite; unanswered → stays Assumed + still-open appendix row;
+  never promote silently.
+- **Consumed by T-005 and Phase 8**: `requirements-elicitation.md` §3.3/§3.4
+  (confirmation-mode exit criteria) and `derive-spec.md` (Confidence Model,
+  Phase 8) now point at the template as the definition; `derive-spec.yaml`
+  already referenced the T-018 DoD.
 
 ## Changes
 
 | File | Change |
 |------|--------|
-| `context/scripts/code-specs/spec_indexer.py` | `collect_history()`, `--history` CLI flag, `meta.history` emission, spec-scan history section, module docstring |
-| `context/scripts/tests/test_spec_indexer_history.py` | **new** — 13 tests (synthetic git repos) |
-| `context/skills/analyse-repo.md` | schema row, flag doc, §3.4 planned keys, new §3.5, §5 bullet |
-| `context/workflows/README.md` | `--history` in the command list |
-| `artefacts/build/derived-spec-working/repo-index.json`, `spec-scan.md` | regenerated reference output |
-| `artefacts/build/tasks-spec-agent.md` | T-017 → completed + amendment log |
+| `context/templates/derived-spec-template.md` | hardened Confidence Schema (band evidence table, itemised Promotion DoD, update rule, consumer references); update rule baked into subsection comment; Promotion DoD row in review record |
+| `context/skills/requirements-elicitation.md` | §3.3 DoD definition pointer + §3.4 exit-criteria bullet (T-018) |
+| `context/skills/derive-spec.md` | Confidence Model Promotion DoD points at the template |
+| `context/README.md` | Template Index description (+ promotion DoD) |
+| `artefacts/build/tasks-spec-agent.md` | T-018 → completed + amendment log |
 
 ## Validation
 
-- `uv run pytest context/scripts/tests/test_spec_indexer_history.py -v` → **13 passed**
-- Full scripts suite → **254 passed, 2 skipped**. The 2 failures
-  (`test_adapter_drift_clean_repo`, `test_packaging.py::test_drift_validator_callable`)
-  were reproduced on the clean committed tree via `git stash` — **pre-existing**
-  (known backlog gap T-007 "Regenerate adapters / validators green", status:
-  won't do), not caused by T-017.
-- `uv run --with ruff ruff check` on changed Python → clean
-- `verify --index artefacts/build/derived-spec-working/repo-index.json` →
-  `OK — all citations resolve` (769 citations)
+- `uv run pytest context/scripts/tests/test_spec_indexer.py -q` → 22 passed
+  (schema tests still green after derive-spec/requirements-elicitation edits)
+- Full scripts suite → **256 passed, 2 skipped, 0 failed** — the two
+  pre-existing adapter-drift failures (`test_adapter_drift_clean_repo`,
+  `test_drift_validator_callable`) are now GREEN: regenerating the (gitignored)
+  adapter projections `.cline/` / `.agents/` / AGENTS.md synced them to the
+  current context sources (no tracked diff; the files are not versioned).
 
 ## Next Tasks
 
 | ID | Task | Priority | Depends On | Status |
 |----|------|----------|------------|--------|
-| T-018 | Confidence bands + promotion DoD in derived-spec-template | high | T-006 ✅ | pending |
 | T-019 | Pilot B: derive-spec on foreign/unorganised repo | critical | T-008 ✅ | pending |
 | T-020 | `verify --require-coverage` | low | T-010 ✅ | pending |
 | T-021 | Indexer `comments` extraction | high | T-015 ✅ | pending |
 
 ## Key Decisions
 
-- **Schema shape**: `meta.history = {count, capped, commit_subjects, renames}`;
-  renames capped at 500; `git rev-list --count HEAD` determines `capped`.
-- **Absent-not-empty contract**: no git metadata / no commits / `--history 0` →
-  key omitted from `meta` plus a scan warning; agents treat it as absent
-  evidence, never empty.
-- **Fitness (small-task)**: H1 AMBER (6 files) — human chose small-task for this
-  single unit at intake; one coherent logical unit (H8 clear); R1/R5/R6/R7 lean
-  small-task; python-scripting skill loaded.
+- Template is the single definition; derive-spec skill and T-005 records keep
+  one-line summaries and point at it (DRY), rather than duplicating the DoD.
+- DoD is itemised and per-doc: one category may promote while another stays in
+  draft; overrides must be recorded (ID + reason) in the review record.
+- **Human review (CHANGES REQUIRED)**: durable docs must survive without the
+  tasks doc, so task-ID provenance was stripped from every doc except
+  `tasks-spec-agent.md` (and this HANDOFF): template, derive-spec /
+  requirements-elicitation skills, product-owner / solution-architect agents,
+  `derive-spec.yaml`, and `drift-candidates.md` now say "Confirmation
+  mode" / "Promotion DoD" without task tags. The generated projections were
+  regenerated via `generate_adapters.py --all` so no stale T-018 text remains in
+  the (gitignored) `.cline/` / `.agents/` copies either.
+- Scope: template + consumer skills/agents + workflow yaml + README + trackers
+  — H1 AMBER, one logical unit, small task, technical-authoring skill applied.
 
 <!-- state: ready for commit -->

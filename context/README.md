@@ -146,7 +146,7 @@ The orchestrator consults this index when constructing a task prompt, references
 | `pr-description-template.md` | Pull request description | GitHub PR body |
 | `domain-rules-template.yaml` | Domain-specific rules and blockers | `services/{domain}/context/domain-rules.yaml` |
 | `architecture-template.md` | System architecture reference | `artefacts/architecture/architecture.md` |
-| `derived-spec-template.md` | Derive-spec draft (confidence schema, open-question appendix, drift section) | `artefacts/build/spec-drafts/{product-spec,architecture,api-catalogue,data-model}.md` |
+| `derived-spec-template.md` | Derive-spec draft (confidence schema + promotion DoD, open-question appendix, drift section) | `artefacts/build/spec-drafts/{product-spec,architecture,api-catalogue,data-model}.md` |
 | `design-template.md` | Feature design document | `artefacts/design/design-{feature}.md` |
 | `agent-template.md` | New agent definition | `context/agents/{name}.md` |
 | `logging-template.md` | Session metrics and interruption log schemas (JSONL) | `artefacts/build/metrics/session-log.jsonl` · `artefacts/build/interruptions/{task-id}.jsonl` |

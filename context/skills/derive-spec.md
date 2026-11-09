@@ -144,8 +144,10 @@ Record at intake:
 - **Update rule**: confirmed answer → raise the band/% and record the
   confirming citation; unanswered question → stays Assumed and remains in the
   open-questions appendix as still-open.
-- **Promotion DoD** (per doc, T-018): no subsection below Needs Confirmation
-  and no blocking still-open questions — or a recorded human override.
+- **Promotion DoD** (per doc; definition and checklist:
+  `context/templates/derived-spec-template.md` § Confidence Schema): no
+  subsection below Needs Confirmation and no blocking still-open questions —
+  or a recorded human override.
 
 ---
 
@@ -189,7 +191,7 @@ Record at intake:
 ## Output Lifecycle
 
 - Drafts: `artefacts/build/derived-spec-working/` (one file per category).
-- Promotion: `artefacts/derived/{category}/` behind human APPROVED (T-018 DoD)
+- Promotion: `artefacts/derived/{category}/` behind human APPROVED
   — e.g. `artefacts/product/derived/product-spec.md`.
 - Canonical docs (`requirements.md`, `architecture.md`, …) are **never
   rewritten** by derive-spec; the drift section records deltas vs canonical

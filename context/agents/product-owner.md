@@ -105,7 +105,7 @@ Workflow:
 4. Build the drift candidate list (doc-vs-code deltas) into the Phase 7 question queue, then gather further evidence and derive the product spec (Phase 4a) with per-subsection confidence (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50)
 5. Stage the draft at `artefacts/build/derived-spec-working/product-spec-draft.md`; run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
 6. Run one batched human confirmation round, drift candidates first — use the `requirements-elicitation` skill's confirmation discipline
-7. Promote to `artefacts/product/derived/` only behind an explicit human **APPROVED** (T-018 DoD); canonical docs are never rewritten
+7. Promote to `artefacts/product/derived/` only behind an explicit human **APPROVED** (Promotion DoD); canonical docs are never rewritten
 
 Deliverables:
 - Product spec draft: `{project-root}/artefacts/build/derived-spec-working/product-spec-draft.md` (promotes to `{project-root}/artefacts/product/derived/` on APPROVED)

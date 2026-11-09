@@ -117,7 +117,7 @@ Workflow:
 4. Build the drift candidate list (doc-vs-code deltas) into the Phase 7 question queue, then gather further evidence and derive the technical specs (Phase 4b — architecture, api-catalogue, data-model) with per-subsection confidence (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50)
 5. Stage drafts at `artefacts/build/derived-spec-working/` (`architecture-draft.md`, `api-catalogue-draft.md`, `data-model-draft.md`); run `verify --index` / `verify --doc` so every `file:line` citation resolves (re-scan before verifying after any edit)
 6. Run one batched human confirmation round, drift candidates first — use the `requirements-elicitation` skill's confirmation discipline
-7. Promote to `artefacts/architecture/derived/` only behind an explicit human **APPROVED** (T-018 DoD) — drafts only; canonical docs (`architecture.md`, `api-catalogue.md`, `data-model.md`) are never rewritten
+7. Promote to `artefacts/architecture/derived/` only behind an explicit human **APPROVED** (Promotion DoD) — drafts only; canonical docs (`architecture.md`, `api-catalogue.md`, `data-model.md`) are never rewritten
 
 Deliverables:
 - Technical spec drafts: `{project-root}/artefacts/build/derived-spec-working/architecture-draft.md`, `api-catalogue-draft.md`, `data-model-draft.md` (promote to `{project-root}/artefacts/architecture/derived/` on APPROVED)

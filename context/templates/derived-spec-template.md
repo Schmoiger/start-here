@@ -26,22 +26,41 @@ Drafts stage in `artefacts/build/spec-drafts/`. Promotion to
 
 ## Confidence Schema (embed in every draft)
 
-<!-- Fixed bands (Q4 · A2). Keep this table in every promoted draft so readers
-     can interpret the tiers without opening the skill or workflow. -->
+<!-- Fixed bands (Q4 · A2). Keep this table in every
+     promoted draft so readers can interpret the tiers without opening the
+     skill, workflow, or template. The Promotion DoD below is the single
+     source of truth consumed by the confirmation-mode records
+     (requirements-elicitation skill §3.3-3.4) and the derive-spec Phase 8
+     promotion gate (derive-spec skill; derive-spec.yaml). -->
 
 | Band | % | Evidence required to claim it |
 |------|---|-------------------------------|
-| **Verified** | 85-100 | directly cited code or doc lines (`path:line`); usage counts or call chains where material; no blocking open question |
-| **Needs Confirmation** | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
-| **Assumed** | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
+| **Verified** | 85–100 | directly cited code or doc lines (`path:line`) that resolve; usage counts or call chains where material (`ui` / `api` / `tests` index rows); no blocking open question |
+| **Needs Confirmation** | 50–85 | plausible from indexed evidence but requires a human answer (Phase 7, confirmation mode); drift candidates land here first |
+| **Assumed** | <50 | reasonable inference only; stays Assumed until a human answer or a confirmed citation raises it |
 
-**Update rule**: a confirmed answer raises the band and percentage and records
-the confirming citation; an unanswered question keeps the subsection Assumed
-and its question stays in the Open-Questions appendix as still-open.
+**Update rule** (baked into every subsection below): a confirmed answer raises
+the band and percentage and records the confirming citation; an unanswered
+question keeps the subsection Assumed and its question stays in the
+Open-Questions appendix as still-open. Never promote a still-open question
+silently.
 
-**Promotion DoD (per doc; drafted here, hardened with T-018)**: a draft is
-promotable when no subsection sits below Needs Confirmation and no blocking
-question is still open, or when the human records an explicit override.
+**Promotion DoD** (per doc): a draft is promotable at Phase 8 when all
+of the following hold:
+
+1. Every subsection sits at **Needs Confirmation or above**, or the human
+   recorded an explicit override for it (override recorded in the Verification
+   and Review record).
+2. No **blocking** open question is still-open in the appendix; non-blocking
+   still-open questions are listed with priority.
+3. `verify --doc` passes on the final draft (all `path:line` citations resolve).
+4. The Verification and Review record shows confirmed answers with their
+   citations, and the drift section reflects confirmed deltas.
+5. Human review gate verdict is **APPROVED** (derive-spec Phase 8);
+   CHANGES REQUIRED returns the doc to the specified phase.
+
+Each doc is promoted independently: one category may meet the DoD and promote
+while another stays in draft.
 
 ---
 
@@ -52,9 +71,10 @@ question is still open, or when the human records an explicit override.
 **Confidence**: {Band} · {NN}% · Evidence: `{path:line}`, `{path:line}`
 
 <!-- 2-4 sentences or a table: what the code does, present tense. Every claim
-     carries a citation. No citation, no claim. On confirmation, raise the band
-     and percentage here and cite the confirming evidence; on an unanswered
-     question, leave the band unchanged and add a row to the appendix. -->
+     carries a citation. No citation, no claim.
+     Update rule: a confirmed answer raises the band/% here and cites
+     the confirming evidence; an unanswered question keeps Assumed and adds a
+     still-open row to the Open-Questions appendix. Never promote silently. -->
 
 {Content.}
 
@@ -163,6 +183,7 @@ question is still open, or when the human records an explicit override.
 |-------|--------|------|
 | `verify --index` (citations resolve) | {pass \| fail} | {DD/MM/YYYY} |
 | `verify --doc` (final drafts) | {pass \| fail} | {DD/MM/YYYY} |
+| Promotion DoD | {met \| override \| not met} | {DD/MM/YYYY} |
 | Human review gate | {APPROVED \| CHANGES REQUIRED} | {DD/MM/YYYY} |
 
 <!-- Promotion copies this draft to artefacts/{category}/derived/ only after

@@ -134,7 +134,9 @@ discovery.
 - **Unanswered question** → claim stays **Assumed** and remains in the open-questions appendix as
   still-open — never silently promoted.
 - **Promotion DoD**: no subsection below Needs Confirmation and no blocking still-open question —
-  or a recorded human override (derive-spec Phase 8).
+  or a recorded human override (derive-spec Phase 8). Definition and per-doc checklist:
+  `context/templates/derived-spec-template.md` § Confidence Schema. Each doc is promoted
+  independently.
 
 ### 3.4 Exit Criteria
 
@@ -143,3 +145,5 @@ Confirmation is complete when all of the following hold:
 - Every question answered, skipped-with-assumption, or recorded still-open — none dropped silently.
 - Confidence bands updated from the answers and the drift section reflects confirmed deltas.
 - Both parties (agent + human) agree on what remains Assumed or still-open before promotion.
+- The template's Promotion DoD (`derived-spec-template.md` § Confidence Schema) holds for
+  each doc slated for promotion in Phase 8.

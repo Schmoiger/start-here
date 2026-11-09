@@ -162,7 +162,7 @@ phases:
     validation:
       - "drafts updated: questions resolved, confirmed bands raised, drift reported"
       - "spec_indexer.py verify --doc on final drafts → all citations resolve"
-      - "human review gate: APPROVED → promote drafts to artefacts/{category}/derived/ and commit (per T-018 DoD); CHANGES REQUIRED → return to the specified phase"
+      - "human review gate: APPROVED → promote drafts to artefacts/{category}/derived/ and commit (per the Promotion DoD); CHANGES REQUIRED → return to the specified phase"
       - "canonical docs never rewritten"
 
 quality_gates:

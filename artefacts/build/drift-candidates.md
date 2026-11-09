@@ -55,4 +55,4 @@ Each drift subsection above will carry a confidence band at promotion:
 - **Needs Confirmation** (50–85%) — once human confirms whether examples should be replaced or preserved
 - **Verified** (85–100%) — only if code citation directly supports the claim (currently none)
 
-**Promotion DoD (per T-018)**: no subsection below Needs Confirmation and no blocking still-open questions — or a recorded human override.
+**Promotion DoD (per doc)**: no subsection below Needs Confirmation and no blocking still-open questions — or a recorded human override.
