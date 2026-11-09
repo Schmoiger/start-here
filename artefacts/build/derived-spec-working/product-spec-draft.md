@@ -93,8 +93,8 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 |------------|--------|-----------------|
 | **Required API Keys** | `.env.template` (lines 12-20) | `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `SUPABASE_ANON_KEY`, `SUPABASE_DB_PASSWORD`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_URL`, `UPSTREAM_PUSH_TOKEN` |
 | **Model Selection** | `context/models.yaml` (not indexed — yaml not in scan) | Per-agent model tiers; `model: large/medium/small` in agent frontmatter |
-| **Token Limits** | `requirements.md:133` (NFR-003) | <2,500 tokens framework overhead per spawn |
-| **Parallel Execution Overhead** | `requirements.md:134` (NFR-004) | <20% token overhead vs sequential |
+| **Token Limits** | `artefacts/product/requirements.md:133` (NFR-003) | <2,500 tokens framework overhead per spawn |
+| **Parallel Execution Overhead** | `artefacts/product/requirements.md:134` (NFR-004) | <20% token overhead vs sequential |
 
 ---
 

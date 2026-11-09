@@ -328,7 +328,8 @@ sequenceDiagram
 ### Commands & Repository Index
 
 The `scan` / `verify` invocations per phase (`--repo`, `--mode`, `--max-files`,
-`--out`, `--extractors`, `--history`, `verify --index` / `verify --doc`), the `repo-index.json`
+`--out`, `--extractors`, `--history`, `verify --index` / `verify --doc` /
+`verify --doc --require-coverage`), the `repo-index.json`
 schema (including `meta.extractors` provenance and the per-file `extractor`
 field), the `spec-scan.md` evidence map, the `repo-profile.md` Phase-1
 deliverable, backend degradation semantics, and the evidence-citation /

@@ -34,7 +34,7 @@ Confidence: {Band} · {NN}% · Evidence: path:line, path:line
 
 ## Tables and Collections
 
-**Confidence**: Assumed · 20% · Evidence: artefacts/build/repo-index.json:schema (0 tables extracted)
+**Confidence**: Assumed · 20% · Evidence: artefacts/build/derived-spec-working/repo-index.json:7467 (0 tables extracted)
 
 No SQL tables or collections were extracted from this repository (index schema=0). The harness is a Python CLI/library repo; there is no database layer.
 
@@ -46,7 +46,7 @@ No SQL tables or collections were extracted from this repository (index schema=0
 
 ## Columns and Constraints
 
-**Confidence**: Assumed · 20% · Evidence: artefacts/build/repo-index.json:schema (0 tables extracted)
+**Confidence**: Assumed · 20% · Evidence: artefacts/build/derived-spec-working/repo-index.json:7467 (0 tables extracted)
 
 Per table: columns, types, keys, unique/not-null/check constraints. Each constraint cites its origin: migration, model, or index row.
 
@@ -56,7 +56,7 @@ No tables exist, so no columns or constraints.
 
 ## Relationships
 
-**Confidence**: Assumed · 20% · Evidence: artefacts/build/repo-index.json:schema (0 tables extracted)
+**Confidence**: Assumed · 20% · Evidence: artefacts/build/derived-spec-working/repo-index.json:7467 (0 tables extracted)
 
 Foreign keys and join paths observed in schema and code; cite both sides.
 

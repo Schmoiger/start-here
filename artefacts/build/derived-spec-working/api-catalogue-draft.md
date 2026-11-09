@@ -34,7 +34,7 @@ Confidence: {Band} · {NN}% · Evidence: path:line, path:line
 
 ## Routes
 
-**Confidence**: Assumed · 20% · Evidence: artefacts/build/repo-index.json:api (0 routes extracted)
+**Confidence**: Assumed · 20% · Evidence: artefacts/build/derived-spec-working/repo-index.json:7466 (0 routes extracted)
 
 This is a catalogue, not a contract: the canonical openapi.yaml is never rewritten.
 
@@ -48,7 +48,7 @@ No HTTP routes were extracted from the repository (index api=0). The harness is 
 
 ## Request and Response Shapes
 
-**Confidence**: Assumed · 20% · Evidence: artefacts/build/repo-index.json:api (0 routes extracted)
+**Confidence**: Assumed · 20% · Evidence: artefacts/build/derived-spec-working/repo-index.json:7466 (0 routes extracted)
 
 Only where schema or handler code evidences the shape; cite the source. Unknown shapes go to the appendix, not to guesswork.
 

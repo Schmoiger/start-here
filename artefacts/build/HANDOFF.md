@@ -1,81 +1,81 @@
-# Handoff: T-018 — Confidence bands + promotion DoD in `derived-spec-template.md`
+# Handoff: T-020 — `verify --require-coverage` (deterministic Phase 6 gate)
 
 **From**: @orchestrator (default agent, small-task workflow)
 **To**: @human-operator
 **Date**: 2026-09-11
 **Workflow**: small-task
-**Phase**: complete
-**Status**: completed — human APPROVED; committed `3c583dc` (docs), pushed to `feat/spec-agent`
+**Phase**: hitl
+**Status**: awaiting human APPROVED for commit
 
 ---
 
 ## Summary
 
-T-018 hardens the confidence schema and promotion definition of done that
-T-006 drafted (the template previously said "drafted here, hardened with
-T-018"). The template is now the **single source of truth** consumed by the
-T-005 confirmation-mode exit criteria and the derive-spec Phase 8 promotion
-decision, per the acceptance criteria:
+`spec_indexer.py verify` gains a deterministic Phase 6 coverage gate,
+implemented, tested, and validated against the acceptance criteria:
 
-- **Band table, fixed ranges, evidence per band**: Verified 85–100 (resolving
-  `path:line` citations; usage counts / call chains where material),
-  Needs Confirmation 50–85 (plausible from indexed evidence, requires a human
-  answer — Phase 7 / T-005), Assumed <50 (inference only).
-- **Per-doc Promotion DoD** (itemised): every subsection at Needs Confirmation
-  or above, no blocking still-open question, `verify --doc` pass, review
-  record + drift confirmed, APPROVED gate; recorded-human-override path; each
-  doc promotes independently.
-- **Update rule baked into the subsection template**: confirmed → raise
-  band/% and cite; unanswered → stays Assumed + still-open appendix row;
-  never promote silently.
-- **Consumed by T-005 and Phase 8**: `requirements-elicitation.md` §3.3/§3.4
-  (confirmation-mode exit criteria) and `derive-spec.md` (Confidence Model,
-  Phase 8) now point at the template as the definition; `derive-spec.yaml`
-  already referenced the T-018 DoD.
+- **`verify --doc --require-coverage`** parses the derived-spec confidence
+  schema and exits non-zero listing every content subsection missing tier /
+  banded % / `file:line`. Content subsections are `##`-`####` headings minus
+  structural sections (Confidence Schema, Subsection Format,
+  Open-Questions Appendix, Drift, Verification and Review Record) and
+  `{placeholder}` headings. Field errors are reported per subsection and
+  band/% consistency is enforced against fixed bands (Verified 85–100 ·
+  Needs Confirmation 50–85 · Assumed <50; 85 valid for the two high tiers).
+- **Deterministic, not agent-discretion**: parsing keys off the template
+  schema (tier + `NN%` + `path.ext:NN`), so Phase 6 question coverage is
+  machine-checked; `derive-spec.yaml` Phase 6 validation now runs
+  `verify --doc --require-coverage` on the staged drafts.
+- **Docs**: analyse-repo §2.1 documents the gate; workflows README command
+  list updated. `_CITATION_RE` now matches `.md` citations too (surfaced and
+  fixed a wrong `requirements.md:133` citation in product-spec).
+- **Run against pilot A draft outputs**: all 4 derived docs + 4 working
+  drafts were repaired to cite real index rows
+  (`derived-spec-working/repo-index.json:452/7466/7467`); all 8 now pass
+  `verify --doc --require-coverage`.
 
 ## Changes
 
 | File | Change |
 |------|--------|
-| `context/templates/derived-spec-template.md` | hardened Confidence Schema (band evidence table, itemised Promotion DoD, update rule, consumer references); update rule baked into subsection comment; Promotion DoD row in review record |
-| `context/skills/requirements-elicitation.md` | §3.3 DoD definition pointer + §3.4 exit-criteria bullet (T-018) |
-| `context/skills/derive-spec.md` | Confidence Model Promotion DoD points at the template |
-| `context/README.md` | Template Index description (+ promotion DoD) |
-| `artefacts/build/tasks-spec-agent.md` | T-018 → completed + amendment log |
+| `context/scripts/code-specs/spec_indexer.py` | `check_doc_coverage()`, `--require-coverage` flag + `--doc` guard, coverage reporting in `run_verify`, `.md` added to `_CITATION_RE` |
+| `context/scripts/tests/test_spec_indexer.py` | **`TestDocCoverage`** — 12 new tests |
+| `context/skills/analyse-repo.md` | §2.1 gate documentation (no task tags) |
+| `context/workflows/README.md` | command list gains `verify --doc --require-coverage` |
+| `context/workflows/derive-spec.yaml` | Phase 6 validation wired to the deterministic gate |
+| `artefacts/build/derived/*.md` (4) + `derived-spec-working/*-draft.md` (4) | evidence repaired to real index file:line citations so coverage+verify pass |
+| `artefacts/build/tasks-spec-agent.md` | T-020 → completed + amendment log |
 
 ## Validation
 
-- `uv run pytest context/scripts/tests/test_spec_indexer.py -q` → 22 passed
-  (schema tests still green after derive-spec/requirements-elicitation edits)
-- Full scripts suite → **256 passed, 2 skipped, 0 failed** — the two
-  pre-existing adapter-drift failures (`test_adapter_drift_clean_repo`,
-  `test_drift_validator_callable`) are now GREEN: regenerating the (gitignored)
-  adapter projections `.cline/` / `.agents/` / AGENTS.md synced them to the
-  current context sources (no tracked diff; the files are not versioned).
+- `uv run pytest context/scripts/tests/test_spec_indexer.py -q` → **34 passed**
+- Full scripts suite → **268 passed, 2 skipped, 0 failed**
+- `verify --doc --require-coverage` on all 4 derived + 4 draft docs → exit 0,
+  coverage OK, citations resolve
+- `--require-coverage` without `--doc` → exit 2 with a clear error
+- `uv run --with ruff ruff check` → clean (spec_indexer.py, test file)
+- Adapter projections regenerated (gitignored) after the source edits so the
+  drift tests stay green.
 
 ## Next Tasks
 
 | ID | Task | Priority | Depends On | Status |
 |----|------|----------|------------|--------|
 | T-019 | Pilot B: derive-spec on foreign/unorganised repo | critical | T-008 ✅ | pending |
-| T-020 | `verify --require-coverage` | low | T-010 ✅ | pending |
 | T-021 | Indexer `comments` extraction | high | T-015 ✅ | pending |
 
 ## Key Decisions
 
-- Template is the single definition; derive-spec skill and T-005 records keep
-  one-line summaries and point at it (DRY), rather than duplicating the DoD.
-- DoD is itemised and per-doc: one category may promote while another stays in
-  draft; overrides must be recorded (ID + reason) in the review record.
-- **Human review (CHANGES REQUIRED)**: durable docs must survive without the
-  tasks doc, so task-ID provenance was stripped from every doc except
-  `tasks-spec-agent.md` (and this HANDOFF): template, derive-spec /
-  requirements-elicitation skills, product-owner / solution-architect agents,
-  `derive-spec.yaml`, and `drift-candidates.md` now say "Confirmation
-  mode" / "Promotion DoD" without task tags. The generated projections were
-  regenerated via `generate_adapters.py --all` so no stale T-018 text remains in
-  the (gitignored) `.cline/` / `.agents/` copies either.
-- Scope: template + consumer skills/agents + workflow yaml + README + trackers
-  — H1 AMBER, one logical unit, small task, technical-authoring skill applied.
+- Coverage treats any `##`-`####` heading as a content subsection unless it is
+  a structural section or a `{placeholder}`; structural names are the template
+  set (Confidence Schema, Subsection Format, Open-Questions Appendix, Drift,
+  Verification and Review Record).
+- A section that HAS a confidence line is "covered" for counting but its line
+  is still field-validated, so malformed lines both count and fail the gate.
+- `.md` added to citation matching: derived specs cite markdown docs (e.g.
+  `orchestrator.md:115-140`); this also made `verify --doc` catch silently
+  skipped dangling citations (fixed two `requirements.md` paths).
+- Scope: indexer + tests + 2 skill/README docs + workflow yaml + pilot A doc
+  repairs — H1 AMBER, one logical unit, small task, python-scripting skill.
 
 <!-- state: ready for commit -->

@@ -130,6 +130,7 @@ phases:
       - artefacts/build/verification-report.md
     validation:
       - "spec_indexer.py verify --index → OK (every cited file:line resolves)"
+      - "spec_indexer.py verify --doc --require-coverage on the staged drafts → OK (every content subsection carries tier · NN% · file:line)"
       - "re-scan rule: index refreshed before verify after any edit (analyse-repo §8)"
       - "question coverage: every subsection has tier + % + citations; unresolved claims fixed or downgraded"
       - "approval required: APPROVED → confirmation; CHANGES REQUIRED → return to draft (or evidence)"

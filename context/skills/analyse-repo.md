@@ -88,7 +88,7 @@ first, and plan only the few targeted line-range reads Phase 3 needs.
 
 ---
 
-## 2. Verify — Citation Resolution (Phases 6 & 8)
+## 2. Verify — Citation Resolution & Coverage Gate (Phases 6 & 8)
 
 `verify` checks that every cited `file:line` still resolves in the working tree.
 
@@ -98,13 +98,38 @@ uv run context/scripts/code-specs/spec_indexer.py verify --index artefacts/build
 
 # Phase 8 — every file:line cited by a final draft resolves
 uv run context/scripts/code-specs/spec_indexer.py verify --doc artefacts/product/derived/product-spec.md
+
+# Phase 6 — deterministic coverage gate: every content subsection carries tier · NN% · file:line
+uv run context/scripts/code-specs/spec_indexer.py verify --doc artefacts/build/derived-spec-working/product-spec-draft.md --require-coverage
 ```
 
 `--doc` accepts any markdown file whose `path.ext:line` citations should be
-validated. `--repo` overrides the root (default: `meta.repo_abs` from the index,
-else cwd). Exit 0 = all citations resolve (`OK — all citations resolve`);
-non-zero lists failures. Lines ≤ 0 (e.g. OpenAPI entries without line info) are
-skipped, not failed.
+validated (`.md` citations included). `--repo` overrides the root (default:
+`meta.repo_abs` from the index, else cwd). Exit 0 = all citations resolve
+(`OK — all citations resolve`); non-zero lists failures. Lines ≤ 0 (e.g.
+OpenAPI entries without line info) are skipped, not failed.
+
+### 2.1 `--require-coverage` — Phase 6 coverage gate
+
+`verify --doc --require-coverage` parses the derived-spec confidence schema
+(`context/templates/derived-spec-template.md` § Confidence Schema) so the
+Phase 6 "question coverage" check is deterministic rather than
+agent-discretionary:
+
+- Content subsections are `##`/`###`/`####` headings that are neither
+  structural sections (Confidence Schema, Subsection Format,
+  Open-Questions Appendix, Drift, Verification and Review Record) nor
+  `{placeholder}` headings.
+- Every content subsection must contain a `**Confidence**:` line carrying:
+  tier (`Verified` · `Needs Confirmation` · `Assumed`), a banded percentage
+  (`NN%`, consistent with the band), and at least one `file:line` citation
+  (`path.ext:NN`, `.md` included). Band/% consistency uses the fixed bands
+  (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50), with 85 accepted
+  for both Verified and Needs Confirmation.
+- Missing tier / percentage / citation, or a band mismatch, is listed per
+  subsection and exits non-zero (`COVERAGE FAIL`). Structural headings and
+  template placeholders are skipped. Running plain `verify --doc` leaves the
+  gate off.
 
 ---
 

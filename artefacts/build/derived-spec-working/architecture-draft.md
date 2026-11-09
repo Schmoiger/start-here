@@ -59,7 +59,7 @@ Core architectural properties:
 
 ## Component Architecture
 
-**Confidence**: Verified · 85% · Evidence: context/scripts/code-specs/spec_indexer.py (731 symbols), context/scripts/generators/, context/scripts/validators/, context/workflows/
+**Confidence**: Verified · 85% · Evidence: artefacts/build/derived-spec-working/repo-index.json:452 (files inventory, 731 symbols), context/scripts/generators/, context/scripts/validators/, context/workflows/
 
 | Component | Purpose | Key Files |
 |-----------|---------|-----------|

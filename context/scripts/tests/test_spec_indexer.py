@@ -15,6 +15,7 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 INDEXER_PATH = Path(__file__).resolve().parents[1] / "code-specs" / "spec_indexer.py"
@@ -433,3 +434,120 @@ class TestExtractorSmoke:
         assert set(meta) == {"ctags", "tree-sitter", "ast-grep", "ts-morph", "stdlib"}
         rec = next(f for f in index["files"] if f["path"] == "a.py")
         assert rec["extractor"] == "stdlib.ast"
+
+
+# ---------------------------------------------------------------------------
+# T-020: verify --doc --require-coverage (deterministic Phase 6 coverage gate)
+# ---------------------------------------------------------------------------
+
+
+def _write_source(tmp_path: Path) -> Path:
+    """Create a repo with app.py long enough to satisfy file:line citations."""
+    lines = "\n".join(f"# line {i}" for i in range(1, 60)) + "\ndef handler():\n    pass\n"
+    (tmp_path / "app.py").write_text(lines, encoding="utf-8")
+    return tmp_path
+
+
+GOOD_DOC = """# Product Spec: Demo (Derived)
+
+## Confidence Schema
+
+| Band | % | Evidence |
+|------|---|----------|
+| Verified | 85-100 | path:line |
+
+## Features and Capabilities
+
+**Confidence**: Verified · 90% · Evidence: `app.py:12`
+
+The app has a feature.
+
+## UX Flows
+
+**Confidence**: **Needs Confirmation** · 60% · Evidence: `app.py:5`
+
+Flow text.
+
+## Open-Questions Appendix
+
+| ID | Status |
+|----|--------|
+| Q-1 | still-open |
+"""
+
+
+class TestDocCoverage:
+    def test_coverage_passes_when_every_content_subsection_confident(self, tmp_path):
+        repo = _write_source(tmp_path)
+        doc = tmp_path / "spec.md"
+        doc.write_text(GOOD_DOC, encoding="utf-8")
+        assert si.run_verify(None, repo, doc, False, True) == 0
+
+    def test_coverage_can_be_disabled_by_default(self, tmp_path):
+        repo = _write_source(tmp_path)
+        doc = tmp_path / "spec.md"
+        doc.write_text("## Features\n\nNo confidence at all.\n", encoding="utf-8")
+        # without require_coverage the plain citation check still succeeds
+        assert si.run_verify(None, repo, doc, False, False) == 0
+
+    def test_coverage_fails_on_missing_confidence_line(self):
+        covered, total, errors = si.check_doc_coverage("## Features\n\nNo confidence here.\n")
+        assert (covered, total) == (0, 1)
+        assert any("Features" in e and "Confidence" in e for e in errors)
+
+    def test_coverage_reports_missing_tier(self):
+        doc = "## Features\n\n**Confidence**: 90% · Evidence: `app.py:12`\n"
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert total == 1 and covered == 1
+        assert any("tier" in e for e in errors)
+
+    def test_coverage_reports_missing_percentage(self):
+        doc = "## Features\n\n**Confidence**: Verified · Evidence: `app.py:12`\n"
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert total == 1 and covered == 1
+        assert any("percentage" in e for e in errors)
+
+    def test_coverage_reports_missing_file_line_citation(self):
+        doc = "## Routes\n\n**Confidence**: Assumed · 20% · Evidence: repo-index.json:api (none)\n"
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert total == 1 and covered == 1
+        assert any("file:line" in e for e in errors)
+
+    def test_coverage_reports_band_mismatch(self):
+        doc = "## Features\n\n**Confidence**: Verified · 60% · Evidence: `app.py:12`\n"
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert any("band mismatch" in e for e in errors)
+
+    def test_coverage_accepts_markdown_file_line_citations(self):
+        doc = "## F\n\n**Confidence**: Verified · 85% · Evidence: `notes.md:2`\n"
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert covered == 1 and errors == []
+
+    def test_coverage_boundary_85_allows_verified_or_needs_confirmation(self):
+        for tier in ("Verified", "Needs Confirmation"):
+            doc = f"## F\n\n**Confidence**: {tier} · 85% · Evidence: `a.md:2`\n"
+            covered, _total, errors = si.check_doc_coverage(doc)
+            assert covered == 1 and errors == []
+
+    def test_coverage_skips_placeholder_and_structural_headings(self):
+        doc = (
+            "## Subsection Format\n\n### {Subsection title}\n\n"
+            "Confidence: {Band} · {NN}% · Evidence: path:line\n\n"
+            "## Drift: Canonical Docs vs Derived Behaviour\n\nSome drift.\n\n"
+            "## Open-Questions Appendix\n\nNo confidence needed.\n\n"
+        )
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert covered == 0 and total == 0 and errors == []
+
+    def test_coverage_fails_via_run_verify_and_lists_subsection(self, tmp_path):
+        repo = _write_source(tmp_path)
+        doc = tmp_path / "bad.md"
+        doc.write_text(
+            "## Routes\n\n**Confidence**: Assumed · 20% · Evidence: repo-index.json:api\n",
+            encoding="utf-8",
+        )
+        assert si.run_verify(None, repo, doc, False, True) == 1
+
+    def test_cli_require_coverage_requires_doc(self):
+        with pytest.raises(SystemExit):
+            si.main(["verify", "--index", "/tmp/nonexistent-index.json", "--require-coverage"])

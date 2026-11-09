@@ -2057,8 +2057,110 @@ def run_scan(
 # ---------------------------------------------------------------------------
 
 _CITATION_RE: re.Pattern[str] = re.compile(
-    r"([\w./\\-]+\.(?:py|ts|tsx|js|jsx|mjs|sql|ya?ml|json)):(\d+)"
+    r"([\w./\\-]+\.(?:py|ts|tsx|js|jsx|mjs|sql|ya?ml|json|md)):(\d+)"
 )
+
+# ---------------------------------------------------------------------------
+# T-020: deterministic coverage gate for derive-spec --doc (parse the
+# confidence schema defined in context/templates/derived-spec-template.md)
+# ---------------------------------------------------------------------------
+
+_COVERAGE_TIERS: dict[str, tuple[int, int]] = {
+    "verified": (85, 100),
+    "needs confirmation": (50, 85),
+    "assumed": (0, 50),
+}
+_COVERAGE_TIER_RE: re.Pattern[str] = re.compile(
+    r"(verified|needs\s+confirmation|assumed)", re.IGNORECASE
+)
+_COVERAGE_PERCENT_RE: re.Pattern[str] = re.compile(r"(\d{1,3})\s*%")
+_COVERAGE_CONFIDENCE_RE: re.Pattern[str] = re.compile(
+    r"\*\*Confidence\*\*\s*:\s*(.*)$", re.IGNORECASE
+)
+_COVERAGE_HEADING_RE: re.Pattern[str] = re.compile(r"^(#{1,4})\s+(.*)$")
+# Structural headings that are never content subsections and therefore never
+# carry a Confidence line of their own.
+_COVERAGE_NON_CONTENT_RE: re.Pattern[str] = re.compile(
+    r"(?i)^(run metadata|confidence schema|subsection format|format|open[- ]questions?(?: appendix)?|"
+    r"appendix|drift.*|verification and review record|review record|metadata)$"
+)
+
+
+def _confidence_line_errors(raw: str, section: str) -> list[str]:
+    """Return per-missing-field errors for one ``**Confidence**`` line (T-020)."""
+    errs: list[str] = []
+    tier_m = _COVERAGE_TIER_RE.search(raw)
+    tier = tier_m.group(1).lower() if tier_m else ""
+    if not tier:
+        errs.append(
+            f"{section}: Confidence line lacks a band tier (Verified | Needs Confirmation | Assumed)"
+        )
+    pct_m = _COVERAGE_PERCENT_RE.search(raw)
+    pct = int(pct_m.group(1)) if pct_m else None
+    if pct is None:
+        errs.append(f"{section}: Confidence line lacks a banded percentage (NN%)")
+    if not _CITATION_RE.search(raw):
+        errs.append(f"{section}: Confidence line lacks a file:line citation (path.ext:NN)")
+    if tier and pct is not None:
+        lo, hi = _COVERAGE_TIERS[tier]
+        in_band = lo <= pct <= hi or (pct == 85 and tier in ("verified", "needs confirmation"))
+        if not in_band:
+            errs.append(
+                f"{section}: band mismatch — '{tier}' implies {lo}-{hi}%, got {pct}%"
+            )
+    return errs
+
+
+def check_doc_coverage(text: str, doc_label: str = "") -> tuple[int, int, list[str]]:
+    """Deterministic Phase 6 coverage gate on a derived-spec markdown doc.
+
+    A content subsection is a ``##``/``###``/``####`` heading that is not a
+    structural section (Confidence Schema, Open-Questions Appendix, Drift,
+    Verification and Review Record, …) and not a ``{placeholder}`` heading. It
+    must contain a ``**Confidence**:`` line carrying tier · NN% · file:line,
+    parsed from the derived-spec-template confidence schema (T-020). Returns
+    ``(covered, total, errors)`` where ``covered`` counts content subsections
+    with a valid confidence line.
+    """
+    errors: list[str] = []
+    covered = 0
+    total = 0
+    current: str | None = None
+    is_content = False
+    has_confidence = False
+
+    def close_section() -> None:
+        nonlocal covered, total, has_confidence
+        if is_content:
+            total += 1
+            if has_confidence:
+                covered += 1
+            else:
+                errors.append(f"{current}: missing **Confidence** line (tier · NN% · file:line)")
+
+    for raw in text.splitlines():
+        line = raw.strip()
+        cm = _COVERAGE_CONFIDENCE_RE.match(line)
+        if cm:
+            errors.extend(_confidence_line_errors(cm.group(1), current or "(prelude)"))
+            if is_content:
+                has_confidence = True
+            continue
+        hm = _COVERAGE_HEADING_RE.match(line)
+        if hm:
+            close_section()
+            level = len(hm.group(1))
+            title = hm.group(2).strip()
+            if (
+                level == 1
+                or "{" in title
+                or _COVERAGE_NON_CONTENT_RE.match(title)
+            ):
+                current, is_content, has_confidence = title, False, False
+            else:
+                current, is_content, has_confidence = title, True, False
+    close_section()
+    return covered, total, errors
 
 
 def _line_text(abs_file: Path, line: int) -> str:
@@ -2076,7 +2178,11 @@ def _line_text(abs_file: Path, line: int) -> str:
 
 
 def run_verify(
-    index_path: Path | None, repo_path: Path, doc_path: Path | None, verbose: bool
+    index_path: Path | None,
+    repo_path: Path,
+    doc_path: Path | None,
+    verbose: bool,
+    require_coverage: bool = False,
 ) -> int:
     index: dict[str, Any] = {}
     if index_path is not None:
@@ -2089,6 +2195,7 @@ def run_verify(
     repo = repo_path.resolve()
     checked = 0
     failures: list[str] = []
+    doc_text = ""
 
     def check(relative: str, line: int) -> None:
         nonlocal checked
@@ -2106,11 +2213,11 @@ def run_verify(
 
     if doc_path is not None:
         try:
-            text = doc_path.read_text(encoding="utf-8")
+            doc_text = doc_path.read_text(encoding="utf-8")
         except OSError as exc:
             print(f"error: cannot read doc {doc_path}: {exc}")
             return 2
-        for m in _CITATION_RE.finditer(text):
+        for m in _CITATION_RE.finditer(doc_text):
             check(m.group(1), int(m.group(2)))
     else:
         for file_rec in index.get("files", []):
@@ -2136,6 +2243,21 @@ def run_verify(
         if extra > 0:
             print(f"… {extra} more failures")
         return 1
+
+    if doc_path is not None and require_coverage:
+        covered, total, coverage_errors = check_doc_coverage(doc_text, str(doc_path))
+        if coverage_errors:
+            print(f"coverage: {covered}/{total} content subsections carry a confidence line")
+            for err in sorted(set(coverage_errors)):
+                print(f"FAIL  {err}")
+            print("COVERAGE FAIL — every content subsection needs tier · NN% · file:line")
+            return 1
+        print(
+            f"coverage OK — {total} content subsections carry tier · NN% · file:line"
+            if total
+            else "coverage OK — no content subsections found"
+        )
+
     print("OK — all citations resolve")
     return 0
 
@@ -2195,6 +2317,13 @@ def main(argv: list[str] | None = None) -> int:
         "--doc", default=None, help="markdown spec to citation-check instead of the index"
     )
     p_verify.add_argument(
+        "--require-coverage",
+        action="store_true",
+        help="with --doc: deterministic Phase 6 coverage gate — every content "
+        "subsection must carry tier · NN%% · file:line (per the derived-spec "
+        "template confidence schema); exits non-zero listing missing subsections",
+    )
+    p_verify.add_argument(
         "--repo", default=None, help="repo root (default: index meta.repo_abs, else cwd)"
     )
     p_verify.add_argument("--verbose", action="store_true")
@@ -2222,6 +2351,9 @@ def main(argv: list[str] | None = None) -> int:
     doc_path = Path(args.doc).resolve() if args.doc else None
     repo_path = Path(args.repo).resolve() if args.repo else None
 
+    if args.require_coverage and doc_path is None:
+        parser.error("--require-coverage requires --doc (coverage is a document gate)")
+
     if repo_path is None and index_path is not None:
         try:
             meta = json.loads(index_path.read_text(encoding="utf-8")).get("meta", {})
@@ -2232,7 +2364,7 @@ def main(argv: list[str] | None = None) -> int:
             pass
     if repo_path is None:
         repo_path = Path.cwd()
-    return run_verify(index_path, repo_path, doc_path, args.verbose)
+    return run_verify(index_path, repo_path, doc_path, args.verbose, args.require_coverage)
 
 
 if __name__ == "__main__":
