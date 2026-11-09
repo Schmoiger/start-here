@@ -164,6 +164,7 @@ def get_adapter_projections(
     context: dict[str, Any],
     repo_root: Path,
     targets: set[str] | None = None,
+    context_dir: Path | None = None,
 ) -> dict[Path, str]:
     """Generates expected file projections in-memory without writing to disk.
 
@@ -171,10 +172,14 @@ def get_adapter_projections(
         context: Canonical context dictionary.
         repo_root: Repository root path.
         targets: Set of normalized target names ('all', 'gemini', 'claude', 'github', 'openai').
+        context_dir: Path to context directory (default: <repo_root>/context).
 
     Returns:
         Mapping of target Path -> generated string content.
     """
+    if context_dir is None:
+        context_dir = repo_root / "context"
+
     if targets is None or "all" in targets:
         active_targets = {"core", "gemini", "claude", "github", "openai", "cline"}
     else:
@@ -191,9 +196,37 @@ def get_adapter_projections(
     projections: dict[Path, str] = {}
 
     if "core" in active_targets:
-        runtime_entry = "CLINE.md" if "cline" in active_targets else None
+        runtime_context_bullets: list[str] = []
+        if "cline" in active_targets:
+            runtime_context_bullets.append(
+                "- Read `@CLINE.md` for Cline-specific tool mappings, rules, model and telemetry source guidance."
+            )
+        if "gemini" in active_targets:
+            runtime_context_bullets.append(
+                "- Read `@GEMINI.md` for Gemini-specific tool mappings, rules, model and telemetry source guidance."
+            )
+        if "claude" in active_targets:
+            runtime_context_bullets.append(
+                "- Read `@CLAUDE.md` for Claude Code-specific tool mappings, rules, model and telemetry source guidance."
+            )
+        if "github" in active_targets:
+            runtime_context_bullets.append(
+                "- Read `@GITHUB.md` for GitHub Copilot-specific tool mappings, rules, model and telemetry source guidance."
+            )
+        if "openai" in active_targets:
+            runtime_context_bullets.append(
+                "- Read `@OPENAI.md` for OpenAI/Codex-specific tool mappings, rules, model and telemetry source guidance."
+            )
+
+        source_file = context_dir / "artifacts" / "agents-md.yaml"
         projections.update(
-            generate_agents_md(context, repo_root, dry_run=True, runtime_entry=runtime_entry)
+            generate_agents_md(
+                context,
+                repo_root,
+                dry_run=True,
+                source_file=source_file,
+                runtime_context_bullets=runtime_context_bullets,
+            )
         )
 
     if "gemini" in active_targets:
@@ -255,7 +288,7 @@ def run_generation(
         context_dir = repo_root / "context"
 
     context = load_canonical_context(str(context_dir))
-    projections = get_adapter_projections(context, repo_root, targets)
+    projections = get_adapter_projections(context, repo_root, targets, context_dir)
 
     created: list[Path] = []
     updated: list[Path] = []
