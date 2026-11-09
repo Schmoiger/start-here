@@ -4,9 +4,9 @@ Navigational index for the workflow definitions in `context/workflows/*.yaml`.
 
 Each workflow YAML is the durable specification — phases, agent assignments,
 validation criteria, quality gates, state recovery. This README overlays it with
-three things: **when to pick a workflow** (§2), **what each workflow contains**
-(§4, diagrams + agent notes), and **how the derive-spec workflow runs its tools**
-(§3.2, §5).
+four things: **when to pick a workflow** (§2), **what each workflow contains**
+(§4, diagrams + agent notes), **how the derive-spec workflow runs its tools**
+(§3.2, §5), and **the AGENTS.md content source** (§6).
 
 ---
 
@@ -437,3 +437,11 @@ approve · split · promote`"]
 - **Fitness pre-flight**: run heuristics H1–H8 (any RED → governing workflow unless the human overrides, recorded in HANDOFF.md), then weigh rubric R1–R7 with the human. When unsure, default heavier.
 - **Overshoot protocol**: pause and let the human choose approve-grown-scope, split into logical units, or promote (transfer package: HANDOFF.md + `tasks-<branch>.md` stub). Never discard the working tree; never spawn cold.
 - Human approval is the gate and cannot be waived — present the diff, obtain an explicit APPROVED verdict, then commit.
+
+---
+
+## AGENTS.md content source
+
+The **AGENTS.md** content lives in `agents-md.yaml`. This lightweight YAML file (no phase DAG `name:` key) is the source of truth for AGENTS.md sections (Runtime Context, On Start, Project Context). Runtime Context bullets are injected dynamically from `.agent-targets` (currently cline, gemini, github). The adapter generator (`generate_adapters.py`) reads it directly via `source_file`; the canonical context loader skips it as a workflow.
+
+**On Add / Edit / Delete**: Edit `agents-md.yaml` sections. Recompile: `uv run python ../scripts/generators/generate_adapters.py -a` and verify output via `diff <generated> <source>`.

@@ -213,16 +213,7 @@ The orchestrator consults this index when constructing a task prompt, references
 - Phase definitions, dependencies, quality gates
 - Each phase lists agents, outputs, validation, and skills
 - Source of truth for phase ordering
-**Workflows** (`workflows/*.yaml`):
 
-- Phase definitions, dependencies, quality gates
-- Each phase lists agents, outputs, validation, and skills
-- Source of truth for phase ordering
-- **On Add / Edit / Delete**: Create or edit phase DAG. All referenced agents must exist in `context/agents/`. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to refresh workflow tables in `AGENTS.md` and `CLAUDE.md`. Verify with `adapter_drift.py`. 
-
-- **AGENTS.md content source** (`workflows/agents-md.yaml`): Lightweight workflow file containing the source of truth for `AGENTS.md` content (sections like Runtime Context, On Start, Project Context). Not a phase DAG — no `name:` key — so the loader skips it as a workflow; the generator reads it directly via `source_file`. Runtime Context bullets are injected dynamically from the active target set (`.agent-targets`).
-
-- **On Add / Edit / Delete**: Edit `workflows/agents-md.yaml` sections. Recompile: `uv run python context/scripts/generators/generate_adapters.py -a` and verify output via `diff <generated> <source>`.
 - **On Add / Edit / Delete**: Create or edit phase DAG. All referenced agents must exist in `context/agents/`. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to refresh workflow tables in `AGENTS.md` and `CLAUDE.md`. Verify with `adapter_drift.py`.
 
 **Framework docs** (`docs/*.md`):

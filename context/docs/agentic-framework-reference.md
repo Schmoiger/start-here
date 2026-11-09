@@ -94,7 +94,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Role |
 |------|----------|------|
-| Authoritative source | `context/agents/*.md`, `context/workflows/*.yaml`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
+| Authoritative source | `context/workflows/agents-md.yaml` (AGENTS.md content source), `context/agents/*.md`, `context/workflows/*.yaml` (phase DAGs), `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/templates/*.md`, `context/persona/*.md`, `context/models.yaml` | These define how the framework behaves. Edit these to change it. |
 | Derived projection | `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, `.agents/skills/`, `.clinerules/`, `.cline/skills/`, `.github/prompts/`, `.openai/` | These surface framework information in runtime-friendly form. Never hand-edit; regenerate from source. |
 | Operator guidance | `context/docs/*.md`, `README.md` | These explain how to use, extend, or evaluate the framework. |
 | Enforcement | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | These keep the repository aligned with the design. |
@@ -135,9 +135,13 @@ The framework cannot enforce this boundary — it sits below the precedence laye
 
 ### `AGENTS.md`
 
-Auto-generated registry of workflows and agents. It acts as the root-level entry point for agent runtimes and humans. The generator script (`context/scripts/generators/generate_agents_md.py`) reads every workflow YAML and every agent definition, then produces `AGENTS.md` as a single derived file containing the phase sequence, agent dispatch rules, spawn patterns, and state recovery procedures. If an agent definition references a rule that does not exist, or a workflow references an agent with no definition, the mismatch surfaces at generation time rather than at runtime.
+Auto-generated registry of workflows and agents. It acts as the root-level entry point for agent runtimes and humans. Content is sourced from `context/workflows/agents-md.yaml`, a lightweight YAML file containing the token-efficient source of truth for AGENTS.md sections (Runtime Context, On Start, Project Context). Runtime Context bullets are injected dynamically from the active target set (`.agent-targets`). The generator script (`context/scripts/generators/generate_agents_md.py`) reads the YAML source file directly via `source_file` and produces `AGENTS.md` as a single derived file. It is not a phase DAG (no `name:` key), so the canonical context loader skips it; only the adapter generator consumes it.
 
-Editing `AGENTS.md` by hand is always wrong. Edit the sources and regenerate.
+Editing `AGENTS.md` by hand is always wrong. Edit `context/workflows/agents-md.yaml` and regenerate:
+
+```bash
+uv run python context/scripts/generators/generate_adapters.py -a
+```
 
 ### `CLAUDE.md`
 
@@ -585,6 +589,7 @@ Workflows are YAML files in `context/workflows/` that encode phase dependencies,
 | content | `content.yaml` | Human-facing writing with personas |
 | continuous-improvement | `continuous-improvement.yaml` | Incident response and retrospective analysis (two modes; framework evolution) |
 | small-task | `small-task.yaml` | Small implementation done directly by the default agent; human approval gate; no delegation |
+| agents-md | `agents-md.yaml` | AGENTS.md content source: lightweight YAML file containing token-efficient sections (Runtime Context, On Start, Project Context). Runtime Context bullets injected from `.agent-targets`. Not a phase DAG — loader skips it; adapter generator reads directly via source_file. |
 
 ### Design (`design.yaml`)
 
