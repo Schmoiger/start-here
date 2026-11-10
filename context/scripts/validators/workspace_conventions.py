@@ -98,6 +98,10 @@ def validate_output_paths(paths: list[str | Path]) -> list[str]:
 VALID_COMMIT_TYPES = r"(feat|fix|test|refactor|docs|chore|perf)"
 COMMIT_SUBJECT_PATTERN = re.compile(rf"^{VALID_COMMIT_TYPES}\([a-z][a-z0-9-]*\): .{{1,}}$")
 COAUTHOR_PATTERN = re.compile(r"^Co-Authored-By: .+ <.+@.+\..+>$")
+# Canonical pointer shown to humans/agents when a commit message is rejected
+# (the rule that governs each failure).
+RULES_REF = "See context/rules/workspace-conventions.md §2 (Git Commits)"
+
 # Tokens= comes from prepare-commit-msg.format_tokens(): no suffix (<1000),
 # 'K' (>=1000), or 'M' (>=1_000_000). Lowercase variants are tolerated too.
 AGENT_SESSION_PATTERN = re.compile(
@@ -576,7 +580,7 @@ def _auto_detect(args: list[str]) -> int:
             return 0
         is_valid, err = validate_commit_message(msg, repo_root=str(Path.cwd()))
         if not is_valid:
-            print(f"❌ Invalid commit message:\n{err}", file=sys.stderr)
+            print(f"❌ Invalid commit message:\n{err}\n{RULES_REF}", file=sys.stderr)
             return 1
         print("✅ Commit message valid")
         return 0
@@ -651,7 +655,7 @@ def main() -> int:
             return 0
         is_valid, err = validate_commit_message(msg, repo_root=str(Path.cwd()))
         if not is_valid:
-            print(f"❌ Invalid commit message:\n{err}", file=sys.stderr)
+            print(f"❌ Invalid commit message:\n{err}\n{RULES_REF}", file=sys.stderr)
             return 1
         print("✅ Commit message valid")
         return 0

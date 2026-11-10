@@ -721,6 +721,15 @@ def select_extractor(declared_tool: Optional[str], repo_root: str) -> BaseExtrac
     return AntigravityExtractor() if AntigravityExtractor().is_available() else ClaudeExtractor()
 
 
+def _coauthor_line(runtime_name: Optional[str]) -> Optional[str]:
+    """Return a git-compatible Co-Authored-By trailer for the detected runtime."""
+    if not runtime_name:
+        return None
+    agent_name = runtime_name.strip().title()
+    email = f"{agent_name.lower()}@users.noreply.github.com"
+    return f"Co-Authored-By: {agent_name} <{email}>"
+
+
 def _set_trailer_field(line: str, key: str, value: str) -> str:
     """Replace `key=<old>` on an Agent-Session line, appending it if absent."""
     if re.search(rf"\b{key}=\S+", line):
@@ -733,12 +742,16 @@ def update_commit_message(
     token_str: Optional[str],
     tool: Optional[str] = None,
     model: Optional[str] = None,
+    runtime: Optional[str] = None,
 ) -> bool:
     """Inject or update runtime-verified tool=/model=/tokens= on the Agent-Session line.
 
     Hand-written tool=/model= values that runtime telemetry can corroborate are
     overwritten with the surviving values; a null token_str removes a stale
     tokens= so the trailer never claims usage the runtime did not record.
+
+    When a runtime is detected and no Co-Authored-By trailer exists, one is
+    appended (the validator requires it for agent commits).
     """
     try:
         with open(msg_file, "r", encoding="utf-8") as f:
@@ -752,6 +765,7 @@ def update_commit_message(
 
     lines = content.split("\n")
     updated = False
+    agent_idx = None
     for i, line in enumerate(lines):
         if line.startswith("Agent-Session:"):
             if tool:
@@ -764,9 +778,19 @@ def update_commit_message(
             elif re.search(r"\btokens=\S+", lines[i]):
                 lines[i] = re.sub(r"\s+tokens=\S+", "", lines[i])
             updated = True
+            agent_idx = i
             break
 
-    if updated:
+    coauthor_injected = False
+    if runtime and agent_idx is not None and not any(
+        l.startswith("Co-Authored-By:") for l in lines
+    ):
+        co = _coauthor_line(runtime)
+        if co:
+            lines.insert(agent_idx + 1, co)
+            coauthor_injected = True
+
+    if updated or coauthor_injected:
         try:
             with open(msg_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(lines))
@@ -830,6 +854,7 @@ def main() -> None:
         token_str,
         tool=extractor.name,
         model=short_model(result.model),
+        runtime=extractor.name,
     )
 
     # Persist watermark updates for next commit
