@@ -48,7 +48,9 @@ def check_supabase_imports(files: list[Path]) -> list[str]:
             if PYTHON_IMPORT_PATTERN.search(text):
                 violations.append(f"{p}: 'supabase' imported outside database service/stores")
         elif p.suffix in [".ts", ".tsx", ".js", ".jsx"] and TS_IMPORT_PATTERN.search(text):
-            violations.append(f"{p}: '@supabase/supabase-js' imported outside database service/stores")
+            violations.append(
+                f"{p}: '@supabase/supabase-js' imported outside database service/stores"
+            )
 
     return violations
 

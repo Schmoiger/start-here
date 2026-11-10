@@ -19,11 +19,23 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 RESTRICTED_PATTERNS = [
     (re.compile(r"-----BEGIN (?:[A-Z0-9_-]+ )?PRIVATE KEY-----"), "Private key block"),
     (re.compile(r"\b(?:AIza[0-9A-Za-z-_]{35})\b"), "Google API Key"),
-    (re.compile(r"\b(?:ghp_[0-9a-zA-Z]{36}|github_pat_[0-9a-zA-Z_]{82})\b"), "GitHub Personal Access Token"),
+    (
+        re.compile(r"\b(?:ghp_[0-9a-zA-Z]{36}|github_pat_[0-9a-zA-Z_]{82})\b"),
+        "GitHub Personal Access Token",
+    ),
     (re.compile(r"\b(?:sk-[a-zA-Z0-9]{32,})\b"), "OpenAI API signature"),
     (re.compile(r"\b(?:AKIA[0-9A-Z]{16})\b"), "AWS Access Key ID"),
-    (re.compile(r"(?:api_key|secret_key|client_secret)\s*[:=]\s*['\"][0-9a-zA-Z_\-]{20,}['\"]", re.IGNORECASE), "Hardcoded API key assignment"),
-    (re.compile(r"(?:password|passwd)\s*[:=]\s*['\"][^'\"]{8,}['\"]", re.IGNORECASE), "Hardcoded password assignment"),
+    (
+        re.compile(
+            r"(?:api_key|secret_key|client_secret)\s*[:=]\s*['\"][0-9a-zA-Z_\-]{20,}['\"]",
+            re.IGNORECASE,
+        ),
+        "Hardcoded API key assignment",
+    ),
+    (
+        re.compile(r"(?:password|passwd)\s*[:=]\s*['\"][^'\"]{8,}['\"]", re.IGNORECASE),
+        "Hardcoded password assignment",
+    ),
 ]
 
 EXEMPT_DIRS = {"tests", "fixtures", "__tests__", ".git", ".venv", "venv", "node_modules"}
@@ -44,7 +56,11 @@ def scan_file_for_secrets(file_path: Path) -> list[str]:
     if file_path.name == ".env" or file_path.name.endswith(".env"):
         try:
             content = file_path.read_text()
-            if any(pat.search(content) for pat, _ in RESTRICTED_PATTERNS) or "KEY=" in content or "SECRET=" in content:
+            if (
+                any(pat.search(content) for pat, _ in RESTRICTED_PATTERNS)
+                or "KEY=" in content
+                or "SECRET=" in content
+            ):
                 violations.append(
                     f"{file_path}: .env files with credentials are strictly forbidden (context/rules/secrets.md §2)"
                 )
@@ -96,7 +112,9 @@ def main() -> int:
         all_violations.extend(scan_file_for_secrets(f))
 
     if all_violations:
-        print("❌ Secrets invariant violations detected (context/rules/secrets.md):", file=sys.stderr)
+        print(
+            "❌ Secrets invariant violations detected (context/rules/secrets.md):", file=sys.stderr
+        )
         for v in all_violations:
             print(f"  {v}", file=sys.stderr)
         return 1

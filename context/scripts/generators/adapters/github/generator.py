@@ -63,9 +63,7 @@ def generate_copilot_instructions(
     return {copilot_instructions_path: content}
 
 
-def generate_scoped_instructions(
-    output_dir: Path, dry_run: bool = False
-) -> dict[Path, str]:
+def generate_scoped_instructions(output_dir: Path, dry_run: bool = False) -> dict[Path, str]:
     """Scans standards for applyTo blocks and generates scoped .instructions.md files."""
     standards_dir = output_dir / "context" / "standards"
     instructions_dir = output_dir / ".github" / "instructions"
@@ -83,15 +81,11 @@ def generate_scoped_instructions(
                 apply_to = None
                 exclude_agent = None
                 comment_idx = i + 1
-                while comment_idx < len(lines) and lines[comment_idx].startswith(
-                    "<!--"
-                ):
+                while comment_idx < len(lines) and lines[comment_idx].startswith("<!--"):
                     m_apply = re.search(r'applyTo:\s*"(.*?)"', lines[comment_idx])
                     if m_apply:
                         apply_to = m_apply.group(1)
-                    m_exclude = re.search(
-                        r'excludeAgent:\s*"(.*?)"', lines[comment_idx]
-                    )
+                    m_exclude = re.search(r'excludeAgent:\s*"(.*?)"', lines[comment_idx])
                     if m_exclude:
                         exclude_agent = m_exclude.group(1)
                     comment_idx += 1
@@ -115,8 +109,7 @@ def generate_scoped_instructions(
 
                     if filename:
                         instr_file = (
-                            instructions_dir
-                            / f"{standard_file.stem}-{filename}.instructions.md"
+                            instructions_dir / f"{standard_file.stem}-{filename}.instructions.md"
                         )
                         frontmatter_lines = ["---", f'applyTo: "{apply_to}"']
                         if exclude_agent:

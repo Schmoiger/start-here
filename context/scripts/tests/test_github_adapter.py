@@ -53,19 +53,13 @@ def test_generate_scoped_instructions(tmp_path: Path):
 
     standard_file = standards_dir / "test-standard.md"
     standard_file.write_text(
-        "## Deployment Safety\n"
-        '<!-- applyTo: "**/*.py" -->\n'
-        "- Safety rule 1\n"
-        "- Safety rule 2\n"
+        '## Deployment Safety\n<!-- applyTo: "**/*.py" -->\n- Safety rule 1\n- Safety rule 2\n'
     )
 
     generate_scoped_instructions(tmp_path)
 
     instr_file = (
-        tmp_path
-        / ".github"
-        / "instructions"
-        / "test-standard-deployment-safety.instructions.md"
+        tmp_path / ".github" / "instructions" / "test-standard-deployment-safety.instructions.md"
     )
     assert instr_file.exists()
     content = instr_file.read_text()
@@ -92,10 +86,7 @@ def test_generate_scoped_instructions_with_exclude_agent(tmp_path: Path):
     generate_scoped_instructions(tmp_path)
 
     instr_file = (
-        tmp_path
-        / ".github"
-        / "instructions"
-        / "test-standard-deployment-safety.instructions.md"
+        tmp_path / ".github" / "instructions" / "test-standard-deployment-safety.instructions.md"
     )
     assert instr_file.exists()
     content = instr_file.read_text()
@@ -110,9 +101,7 @@ def test_generate_workflows(tmp_path: Path):
     templates_dir.mkdir(parents=True)
 
     template_file = templates_dir / "pr-sample-template.yml"
-    template_content = (
-        "name: Sample\non: [push]\njobs:\n  sample:\n    runs-on: ubuntu-latest\n"
-    )
+    template_content = "name: Sample\non: [push]\njobs:\n  sample:\n    runs-on: ubuntu-latest\n"
     template_file.write_text(template_content)
 
     results = generate_workflows(tmp_path)

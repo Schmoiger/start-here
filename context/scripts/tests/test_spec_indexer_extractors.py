@@ -21,7 +21,7 @@ assert _spec.loader is not None
 sys.modules[_spec.name] = si
 _spec.loader.exec_module(si)
 
-TSX_FIXTURE = '''import React, { useState } from "react";
+TSX_FIXTURE = """import React, { useState } from "react";
 import { Button, Input } from "./components";
 import * as Utils from "./utils";
 import api from "./api";
@@ -48,7 +48,7 @@ export const Card = ({ items, onOpen }: CardProps) => {
 };
 
 const plain = 42;
-'''
+"""
 
 
 def _scan(repo: Path, extractors: str, out_dir: Path) -> dict:
@@ -153,10 +153,7 @@ class TestParity:
         }
         for _tool, entry in meta["extractors"].items():
             assert set(entry) == {"available", "used", "reason"}
-        assert all(
-            isinstance(f.get("extractor"), str) and f["extractor"]
-            for f in index["files"]
-        )
+        assert all(isinstance(f.get("extractor"), str) and f["extractor"] for f in index["files"])
 
 
 class TestCtagsBackend:
@@ -233,8 +230,7 @@ class TestAstGrepBackend:
     def test_fixture_interfaces_types_and_consts(self, tmp_path):
         fixture = tmp_path / "sample.ts"
         fixture.write_text(
-            "interface Ui { x: number }\ntype Mode = 'a' | 'b'\n"
-            "const pick = (x: number) => x;\n",
+            "interface Ui { x: number }\ntype Mode = 'a' | 'b'\nconst pick = (x: number) => x;\n",
             encoding="utf-8",
         )
         record, _usage = si.analyze_tsjs_astgrep(fixture, "sample.ts", "typescript")
@@ -245,4 +241,3 @@ class TestAstGrepBackend:
         assert ("type", "Mode") in kinds
         assert ("const_arrow", "pick") in kinds
         assert record.extractor == "ast-grep"
-

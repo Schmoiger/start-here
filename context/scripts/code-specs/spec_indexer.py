@@ -722,9 +722,7 @@ def probe_backends(repo: Path) -> dict[str, bool]:
     """
     out: dict[str, bool] = {}
     out["ctags"] = _cmd_ok(["ctags", "--version"], repo)
-    out["ast-grep"] = _cmd_ok(["ast-grep", "--version"], repo) or _cmd_ok(
-        ["sg", "--version"], repo
-    )
+    out["ast-grep"] = _cmd_ok(["ast-grep", "--version"], repo) or _cmd_ok(["sg", "--version"], repo)
     out["ts-morph"] = _cmd_ok(["node", "-e", "require.resolve('ts-morph')"], repo)
     try:
         import tree_sitter_language_pack  # type: ignore  # noqa: F401
@@ -1011,9 +1009,7 @@ def analyze_tsjs_treesitter(
                         if spec.type == "import_specifier":
                             name = spec.child_by_field_name("name")
                             if name is not None:
-                                record.imports.append(
-                                    name.text.decode("utf-8", errors="replace")
-                                )
+                                record.imports.append(name.text.decode("utf-8", errors="replace"))
             return
         if ntype in ("program", "export_statement"):
             for child in node.named_children:
@@ -1081,9 +1077,7 @@ def analyze_tsjs_treesitter(
                     continue
                 dname = decl.child_by_field_name("name")
                 value = decl.child_by_field_name("value")
-                name = (
-                    dname.text.decode("utf-8", errors="replace") if dname is not None else ""
-                )
+                name = dname.text.decode("utf-8", errors="replace") if dname is not None else ""
                 if value is not None and value.type in ("arrow_function", "function_expression"):
                     params = value.child_by_field_name("parameters")
                     sig, props = params_from(params)
@@ -1118,6 +1112,7 @@ def analyze_tsjs_treesitter(
             # keep walking: opening elements can nest further JSX
         for child in node.named_children:
             walk(child, class_owner)
+
     walk(tree.root_node)
     return record, usages
 
@@ -1501,9 +1496,7 @@ _CONFIG_FEATURE_RE: re.Pattern[str] = re.compile(
 _CONFIG_BOOL_VALUES: frozenset[str] = frozenset(
     {"true", "false", "yes", "no", "on", "off", "1", "0", "enabled", "disabled"}
 )
-_CONFIG_TEST_PARTS: frozenset[str] = frozenset(
-    {"tests", "test", "testing", "fixtures", "fixture"}
-)
+_CONFIG_TEST_PARTS: frozenset[str] = frozenset({"tests", "test", "testing", "fixtures", "fixture"})
 _MAX_VALUE_HINT = 120
 
 # --- Git-history evidence (T-017) ------------------------------------------
@@ -1529,12 +1522,15 @@ def _config_value_hint(key: str, value: str) -> str:
         return ""
     value = value.strip().strip("'\"")
     if len(value) > _MAX_VALUE_HINT:
-        return value[:_MAX_VALUE_HINT - 3] + "..."
+        return value[: _MAX_VALUE_HINT - 3] + "..."
     return value
 
 
 def _config_is_feature(key: str, value: str) -> bool:
-    return bool(_CONFIG_FEATURE_RE.search(key)) or value.strip().strip("'\" ").lower() in _CONFIG_BOOL_VALUES
+    return (
+        bool(_CONFIG_FEATURE_RE.search(key))
+        or value.strip().strip("'\" ").lower() in _CONFIG_BOOL_VALUES
+    )
 
 
 def _config_env_call(node: ast.Call) -> tuple[str, str]:
@@ -1583,7 +1579,7 @@ def _collect_config_env(abs_path: Path, rel_path: str, add: Any) -> None:
         if eq <= 0:
             continue
         key = line[:eq].strip()
-        value = line[eq + 1:].strip()
+        value = line[eq + 1 :].strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
             value = value[1:-1]
         add(key, rel_path, lineno, _config_value_hint(key, value), _config_is_feature(key, value))
@@ -1628,7 +1624,13 @@ def _collect_config_py_module(abs_path: Path, rel_path: str, add: Any) -> None:
         if isinstance(node, ast.Call):
             key, default = _config_env_call(node)
             if key:
-                add(key, rel_path, node.lineno, _config_value_hint(key, default), _config_is_feature(key, default))
+                add(
+                    key,
+                    rel_path,
+                    node.lineno,
+                    _config_value_hint(key, default),
+                    _config_is_feature(key, default),
+                )
 
 
 def _config_key_line(lines: list[str], key: str) -> int:
@@ -1820,11 +1822,7 @@ def collect_history(repo: Path, limit: int) -> dict[str, Any] | None:
         if current is None or not fields:
             continue
         status = fields[0]
-        if (
-            status.startswith("R")
-            and len(fields) >= 3
-            and len(renames) < _MAX_HISTORY_RENAMES
-        ):
+        if status.startswith("R") and len(fields) >= 3 and len(renames) < _MAX_HISTORY_RENAMES:
             renames.append(
                 {
                     "commit": current[0],
@@ -1871,7 +1869,7 @@ _COMMENT_MARKER: dict[str, str] = {"python": "#", "sql": "--", "ts": "//"}
 def _shorten_comment(text: str) -> str:
     if len(text) <= _MAX_COMMENT_TEXT:
         return text
-    return text[:_MAX_COMMENT_TEXT - 3] + "..."
+    return text[: _MAX_COMMENT_TEXT - 3] + "..."
 
 
 def _mask_code_strings(source: str) -> str:
@@ -1926,6 +1924,8 @@ def _clean_comment_text(raw: str, marker: str | None = None, doc_style: bool = F
         if s:
             lines.append(s)
     return _shorten_comment(" | ".join(lines))
+
+
 def _group_comment_lines(
     comments: list[tuple[int, str]], marker: str
 ) -> list[tuple[int, int, str]]:
@@ -1968,8 +1968,7 @@ def _python_comments(source: str) -> tuple[list[tuple[int, str, bool]], list[tup
                     continue
                 line = tok.start[0]
                 standalone = bool(
-                    line - 1 < len(src_lines)
-                    and re.match(r"^\s*#", src_lines[line - 1])
+                    line - 1 < len(src_lines) and re.match(r"^\s*#", src_lines[line - 1])
                 )
                 text = _clean_comment_text(tok.string, marker=_COMMENT_MARKER["python"])
                 if not text:
@@ -1991,7 +1990,11 @@ def _python_comments(source: str) -> tuple[list[tuple[int, str, bool]], list[tup
         [(ln, t) for ln, t, st in line_comments if st], _COMMENT_MARKER["python"]
     )
     return line_comments, blocks
-def _ts_comments(source: str) -> tuple[list[tuple[int, int, str, str]], list[tuple[int, str, bool]]]:
+
+
+def _ts_comments(
+    source: str,
+) -> tuple[list[tuple[int, int, str, str]], list[tuple[int, str, bool]]]:
     """TS/JS comments: ``(blocks, line_comments)`` on string-masked source (v1 regex).
 
     ``blocks`` are ``(start, end, text, kind)`` — kind ``docstring`` for JSDoc
@@ -2025,7 +2028,9 @@ def _ts_comments(source: str) -> tuple[list[tuple[int, int, str, str]], list[tup
     return blocks, line_comments
 
 
-def _sql_comments(source: str) -> tuple[list[tuple[int, int, str, str]], list[tuple[int, str, bool]]]:
+def _sql_comments(
+    source: str,
+) -> tuple[list[tuple[int, int, str, str]], list[tuple[int, str, bool]]]:
     """SQL comments: ``(blocks, line_comments)`` — ``--`` lines + ``/* */`` blocks
     on string-masked source; ``standalone`` = only whitespace before ``--``."""
     masked = _mask_code_strings(source)
@@ -2049,6 +2054,8 @@ def _sql_comments(source: str) -> tuple[list[tuple[int, int, str, str]], list[tu
         )
     )
     return blocks, line_comments
+
+
 def _symbol_ref(sym: Symbol) -> dict[str, Any]:
     return {"kind": sym.kind, "name": sym.name, "line": sym.line}
 
@@ -2145,6 +2152,8 @@ def _attach_sql_leading(
             )
         pending = []
     return attached
+
+
 def collect_comments(
     repo: Path,
     records: list[FileRecord],
@@ -2217,9 +2226,7 @@ def collect_comments(
                     target.comments.append(entry)
                     entries.append(entry)
                 else:
-                    entries.append(
-                        CommentEntry(file=rel_path, line=ln, kind="docstring", text=doc)
-                    )
+                    entries.append(CommentEntry(file=rel_path, line=ln, kind="docstring", text=doc))
             if module_doc:
                 entries.append(
                     CommentEntry(
@@ -2234,9 +2241,7 @@ def collect_comments(
             inline_lines = {e.line for e in attached_inline}
             blocks_py = [(s, e, t, "leading") for s, e, t in blocks]
             candidates = [
-                b
-                for b in blocks_py
-                if not any(ln in inline_lines for ln in range(b[0], b[1] + 1))
+                b for b in blocks_py if not any(ln in inline_lines for ln in range(b[0], b[1] + 1))
             ]
             attached_leading = _attach_leading_blocks(rel_path, symbols, candidates)
             entries.extend(attached_leading)
@@ -2257,9 +2262,7 @@ def collect_comments(
             entries.extend(attached_inline)
             inline_lines = {e.line for e in attached_inline}
             candidates = [
-                b
-                for b in blocks_ts
-                if not any(ln in inline_lines for ln in range(b[0], b[1] + 1))
+                b for b in blocks_ts if not any(ln in inline_lines for ln in range(b[0], b[1] + 1))
             ]
             attached_leading = _attach_leading_blocks(rel_path, symbols, candidates)
             entries.extend(attached_leading)
@@ -2280,13 +2283,9 @@ def collect_comments(
             defs = table_defs_by_file.get(rel_path, [])
             sql_attached = _attach_sql_leading(rel_path, defs, blocks_sql)
             entries.extend(sql_attached)
-            attached_inline = _attach_inline_comments(
-                rel_path, symbols, line_comments_sql
-            )
+            attached_inline = _attach_inline_comments(rel_path, symbols, line_comments_sql)
             entries.extend(attached_inline)
-            attached_lines = {e.line for e in sql_attached} | {
-                e.line for e in attached_inline
-            }
+            attached_lines = {e.line for e in sql_attached} | {e.line for e in attached_inline}
             block_lines = {ln for b in blocks_sql for ln in range(b[0], b[1] + 1)}
             for s, e, t, k in blocks_sql:
                 if s not in attached_lines:
@@ -2305,6 +2304,8 @@ def collect_comments(
         )
         entries = entries[:_MAX_COMMENT_ENTRIES]
     return entries, warnings
+
+
 def _default_out_dir(repo: Path) -> Path:
     build_dir = repo / "artefacts" / "build" / "derived-spec-working"
     return build_dir if build_dir.is_dir() else repo
@@ -2433,30 +2434,23 @@ def render_spec_scan(index: dict[str, Any]) -> str:
             for ren in renames[:MAX_HISTORY_ROWS]:
                 out.append(f"- `{ren['old']}` → `{ren['new']}` ({ren['subject']})")
     else:
-        out.append(
-            "No git metadata — `meta.history` absent; treat as absent, not empty evidence."
-        )
+        out.append("No git metadata — `meta.history` absent; treat as absent, not empty evidence.")
 
     out.append("\n## Comments & Docstrings (intent evidence)")
     comments = index.get("comments", [])
     if comments:
         files_with = {c["file"] for c in comments}
-        out.append(
-            f"- {len(comments)} comment blocks across {len(files_with)} files; first rows:"
-        )
+        out.append(f"- {len(comments)} comment blocks across {len(files_with)} files; first rows:")
         for entry in comments[:MAX_COMMENT_ROWS]:
             att = entry.get("attached")
             suffix = f" → {att['kind']} `{att['name']}`" if att else ""
             out.append(
-                f"  - `{entry['file']}:{entry['line']}` [{entry['kind']}] "
-                f"{entry['text']}{suffix}"
+                f"  - `{entry['file']}:{entry['line']}` [{entry['kind']}] {entry['text']}{suffix}"
             )
         if len(comments) > MAX_COMMENT_ROWS:
             out.append(f"  … {len(comments) - MAX_COMMENT_ROWS} more comment blocks")
     else:
-        out.append(
-            "None detected in indexed sources (no comments/docstrings surfaced)."
-        )
+        out.append("None detected in indexed sources (no comments/docstrings surfaced).")
 
     out.append(
         "\n---\nGenerated deterministically by `context/scripts/code-specs/spec_indexer.py scan` "
@@ -2673,9 +2667,7 @@ def _confidence_line_errors(raw: str, section: str) -> list[str]:
         lo, hi = _COVERAGE_TIERS[tier]
         in_band = lo <= pct <= hi or (pct == 85 and tier in ("verified", "needs confirmation"))
         if not in_band:
-            errs.append(
-                f"{section}: band mismatch — '{tier}' implies {lo}-{hi}%, got {pct}%"
-            )
+            errs.append(f"{section}: band mismatch — '{tier}' implies {lo}-{hi}%, got {pct}%")
     return errs
 
 
@@ -2719,11 +2711,7 @@ def check_doc_coverage(text: str, doc_label: str = "") -> tuple[int, int, list[s
             close_section()
             level = len(hm.group(1))
             title = hm.group(2).strip()
-            if (
-                level == 1
-                or "{" in title
-                or _COVERAGE_NON_CONTENT_RE.match(title)
-            ):
+            if level == 1 or "{" in title or _COVERAGE_NON_CONTENT_RE.match(title):
                 current, is_content, has_confidence = title, False, False
             else:
                 current, is_content, has_confidence = title, True, False

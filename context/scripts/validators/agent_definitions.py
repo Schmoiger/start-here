@@ -116,9 +116,7 @@ def _section_resolves(section: str, headings: list[str]) -> bool:
     ):
         return True
     number = re.match(r"^\d+(?:\s+\d+)*", target)
-    return bool(number) and any(
-        _is_prefix(number.group(0), heading) for heading in headings
-    )
+    return bool(number) and any(_is_prefix(number.group(0), heading) for heading in headings)
 
 
 def _resolve_context_file(name: str, ctx: Path) -> Path | None:
@@ -321,10 +319,7 @@ def main() -> int:
         if not AGENTS_DIR.exists():
             print(f"❌ {AGENTS_DIR} directory not found", file=sys.stderr)
             return 1
-        files = [
-            f for f in AGENTS_DIR.glob("*.md")
-            if f.name not in SKIPPED_FILES
-        ]
+        files = [f for f in AGENTS_DIR.glob("*.md") if f.name not in SKIPPED_FILES]
 
     all_errors: dict[str, list[str]] = {}
     agent_count = 0
@@ -339,7 +334,9 @@ def main() -> int:
             all_errors[agent_file.name] = errors
 
     if all_errors:
-        print(f"❌ Validation failed for {len(all_errors)}/{agent_count} agents:\n", file=sys.stderr)
+        print(
+            f"❌ Validation failed for {len(all_errors)}/{agent_count} agents:\n", file=sys.stderr
+        )
         for fname, errs in all_errors.items():
             print(f"{fname}:", file=sys.stderr)
             for err in errs:

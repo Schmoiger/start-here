@@ -121,7 +121,7 @@ def _validate_workflow(data: dict, known_agents: set[str]) -> list[str]:
                 a = str(agent).split("#", 1)[0].strip().lstrip("@")
                 if a and a not in known_agents:
                     errors.append(f"phase {pid!r} references unknown agent {a!r}")
-        for dep in (ph.get("depends_on") or []):
+        for dep in ph.get("depends_on") or []:
             if dep not in ids:
                 errors.append(f"phase {pid!r} depends_on unknown phase {dep!r}")
 

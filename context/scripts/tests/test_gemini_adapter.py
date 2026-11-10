@@ -52,9 +52,9 @@ class TestGeminiAdapter(unittest.TestCase):
 
     def test_generate_skills_escapes_colon_in_description(self):
         """Descriptions containing ': ' must stay a single YAML scalar."""
-        self.context["agents"]["test-agent"].description = (
-            "Two modes — (1) staging: deploy; (2) production: validate"
-        )
+        self.context["agents"][
+            "test-agent"
+        ].description = "Two modes — (1) staging: deploy; (2) production: validate"
 
         generate_skills(self.context, self.output_dir)
 
@@ -67,14 +67,15 @@ class TestGeminiAdapter(unittest.TestCase):
 
     def test_generate_gemini_md(self):
         generate_gemini_md(self.context, self.output_dir)
-    
+
         gemini_md_path = self.output_dir / "GEMINI.md"
         self.assertTrue(gemini_md_path.exists())
-    
+
         content = gemini_md_path.read_text()
         self.assertIn("Auto-generated", content)
         self.assertIn("@AGENTS.md", content)
         self.assertIn("replace_file_content", content)
+
 
 if __name__ == "__main__":
     unittest.main()

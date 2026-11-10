@@ -73,7 +73,9 @@ class TestConfigSources:
         # empty values still produce a key, with an empty hint
         assert cfg["EMPTY_VALUE"]["value_hint"] == ""
 
-    def test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present(self, tmp_path):
+    def test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present(
+        self, tmp_path
+    ):
         repo = _write_tree(tmp_path, {"settings.py": SETTINGS_PY})
         index = _scan(repo, tmp_path / "out")
         cfg = _config_map(index)
@@ -136,7 +138,9 @@ class TestConfigSources:
         for key in ("X", "IGNORED_KEY", "name", "openapi", "user"):
             assert key not in _config_map(index)
 
-    def test_config_should_keep_first_source_value_when_key_defined_in_multiple_sources(self, tmp_path):
+    def test_config_should_keep_first_source_value_when_key_defined_in_multiple_sources(
+        self, tmp_path
+    ):
         # same key in settings.py (highest precedence) and .env.example
         repo = _write_tree(
             tmp_path,

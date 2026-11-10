@@ -117,7 +117,10 @@ class TestHistoryPresence:
         _init_repo(repo)
         for i in range(5):
             _commit(
-                repo, f"feat: change {i}", {"a.txt": f"content {i}\n"}, f"2026-03-0{i + 1}T10:00:00Z"
+                repo,
+                f"feat: change {i}",
+                {"a.txt": f"content {i}\n"},
+                f"2026-03-0{i + 1}T10:00:00Z",
             )
         index = _scan(repo, tmp_path / "out", history_cap=2)
         history = index["meta"]["history"]

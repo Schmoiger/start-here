@@ -143,7 +143,12 @@ def check_and_fix_file(path: Path, fix: bool = False) -> list[str]:
 
         # Check section separation for level 2 headings '## '
         # (Exclude '# Title', '## Table of Contents', and headings inside typst-skip or code blocks)
-        if stripped.startswith("## ") and not in_typst_skip and not in_mermaid and not in_code_block:
+        if (
+            stripped.startswith("## ")
+            and not in_typst_skip
+            and not in_mermaid
+            and not in_code_block
+        ):
             heading_title = stripped[3:].strip()
             if heading_title.lower() != "table of contents":
                 # Check previous non-blank line in new_lines

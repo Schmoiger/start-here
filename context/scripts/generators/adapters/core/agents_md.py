@@ -1,6 +1,7 @@
-import yaml
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 
 def generate_agents_md(
@@ -42,11 +43,7 @@ def generate_agents_md(
     runtime_context_section = ""
     if runtime_context_bullets:
         bullets = "\n".join(f"{b}" for b in runtime_context_bullets)
-        runtime_context_section = (
-            "---\n\n"
-            "## Runtime Context\n\n"
-            f"{bullets}\n\n"
-        )
+        runtime_context_section = f"---\n\n## Runtime Context\n\n{bullets}\n\n"
 
     # Render remaining sections (skip Runtime Context if already generated above
     # to avoid duplication — the source file should not define Runtime Context

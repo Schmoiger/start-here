@@ -23,7 +23,10 @@ SPELLING_RULES: dict[str, tuple[str, str]] = {
     r"\blabou?r\b": ("labor", "labour"),
     r"\bneighbou?r\b": ("neighbor", "neighbour"),
     r"\bbehaviou?r\b": ("behavior", "behaviour"),
-    r"\b(organ|real|recogn|special|general)i[sz]e\b": ("organize/realize/...", "organise/realise/..."),
+    r"\b(organ|real|recogn|special|general)i[sz]e\b": (
+        "organize/realize/...",
+        "organise/realise/...",
+    ),
     r"\bcente?r\b": ("center", "centre"),
     r"\bmete?r\b": ("meter", "metre"),
     r"\blicen[cs]e\b": ("license (noun)", "licence (noun)"),
@@ -59,16 +62,14 @@ def validate_british_english(file_path: Path) -> list[str]:
             continue
 
         # color vs colour
-        if re.search(r"\bcolor\b", line, re.IGNORECASE) and not re.search(r"\bcolour\b", line, re.IGNORECASE):
-            violations.append(
-                f"Line {i}: Use 'colour' instead of 'color'\n  {line.strip()}"
-            )
+        if re.search(r"\bcolor\b", line, re.IGNORECASE) and not re.search(
+            r"\bcolour\b", line, re.IGNORECASE
+        ):
+            violations.append(f"Line {i}: Use 'colour' instead of 'color'\n  {line.strip()}")
 
         # behavior vs behaviour
         if re.search(r"\bbehavior\b", line, re.IGNORECASE):
-            violations.append(
-                f"Line {i}: Use 'behaviour' instead of 'behavior'\n  {line.strip()}"
-            )
+            violations.append(f"Line {i}: Use 'behaviour' instead of 'behavior'\n  {line.strip()}")
 
         # organize/realize/...
         for word in ["organize", "realize", "recognize", "specialize", "generalize"]:
@@ -80,21 +81,19 @@ def validate_british_english(file_path: Path) -> list[str]:
 
         # center vs centre
         if re.search(r"\bcenter\b", line, re.IGNORECASE):
-            violations.append(
-                f"Line {i}: Use 'centre' instead of 'center'\n  {line.strip()}"
-            )
+            violations.append(f"Line {i}: Use 'centre' instead of 'center'\n  {line.strip()}")
 
         # license (noun) vs licence
-        if re.search(r"\blicense\b", line, re.IGNORECASE) and not re.search(r"\blicen[cs]ing\b", line, re.IGNORECASE):
+        if re.search(r"\blicense\b", line, re.IGNORECASE) and not re.search(
+            r"\blicen[cs]ing\b", line, re.IGNORECASE
+        ):
             violations.append(
                 f"Line {i}: Use 'licence' for noun, 'license' for verb\n  {line.strip()}"
             )
 
         # artifact vs artefact
         if re.search(r"\bartifact\b", line, re.IGNORECASE):
-            violations.append(
-                f"Line {i}: Use 'artefact' instead of 'artifact'\n  {line.strip()}"
-            )
+            violations.append(f"Line {i}: Use 'artefact' instead of 'artifact'\n  {line.strip()}")
 
     return violations
 

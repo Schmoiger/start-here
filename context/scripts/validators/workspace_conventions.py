@@ -50,7 +50,9 @@ def validate_output_path(path: str | Path) -> list[str]:
                 )
             if sub_dir == "test-results" and len(parts) == 3:
                 filename = parts[2]
-                if not (TEST_RESULT_PATTERN.match(filename) or filename.endswith((".txt", ".json"))):
+                if not (
+                    TEST_RESULT_PATTERN.match(filename) or filename.endswith((".txt", ".json"))
+                ):
                     errors.append(
                         f"Test result file '{filename}' should follow 'v2-{{task-id}}-results.txt' convention."
                     )
@@ -151,7 +153,9 @@ def _load_runtime_telemetry():
     return mod
 
 
-def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root: str) -> tuple[bool, str]:
+def corroborate_agent_session(
+    declared_tool: str, declared_model: str, repo_root: str
+) -> tuple[bool, str]:
     """Check declared tool=/model= against runtime session telemetry.
 
     Tools without a framework extractor (unknown third-party tools such as
@@ -176,7 +180,10 @@ def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root
         return False, f"tool='{declared_tool}' cannot be corroborated: extractor error ({exc})"
 
     if not available:
-        return False, f"tool='{declared_tool}' cannot be corroborated: no {declared_tool} runtime telemetry found"
+        return (
+            False,
+            f"tool='{declared_tool}' cannot be corroborated: no {declared_tool} runtime telemetry found",
+        )
 
     try:
         result = extractor.extract_delta(repo_root, {})
@@ -400,7 +407,13 @@ INTERRUPTION_TYPE_FIELDS = {
 
 # Outcome fields may be null when the record is written at the moment of blocking;
 # a `resolution` record is then appended with `ref` pointing at that record's `id`.
-INTERRUPTION_NULLABLE_FIELDS = {"answered_by", "resolution", "decision", "decision_by", "decided_by"}
+INTERRUPTION_NULLABLE_FIELDS = {
+    "answered_by",
+    "resolution",
+    "decision",
+    "decision_by",
+    "decided_by",
+}
 
 INTERRUPTION_TS_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
 
@@ -464,13 +477,9 @@ def validate_interruptions_entry(entry: dict[str, Any], line_num: int) -> list[s
                 or not value
                 or not all(isinstance(option, str) and option.strip() for option in value)
             ):
-                errors.append(
-                    f"Line {line_num}: 'options' must be a non-empty array of strings"
-                )
+                errors.append(f"Line {line_num}: 'options' must be a non-empty array of strings")
         elif not isinstance(value, str) or not value.strip():
-            errors.append(
-                f"Line {line_num}: '{field}' must be a non-empty string or null"
-            )
+            errors.append(f"Line {line_num}: '{field}' must be a non-empty string or null")
 
     if record_type == "tool_approval":
         decision = entry.get("decision")

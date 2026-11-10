@@ -186,11 +186,7 @@ def get_adapter_projections(
         active_targets = set(targets)
         # Gemini, Claude, and Cline reference @AGENTS.md, so include core if
         # any of them is targeted.
-        if (
-            "gemini" in active_targets
-            or "claude" in active_targets
-            or "cline" in active_targets
-        ):
+        if "gemini" in active_targets or "claude" in active_targets or "cline" in active_targets:
             active_targets.add("core")
 
     projections: dict[Path, str] = {}
@@ -486,7 +482,9 @@ def main() -> None:
         selected_targets.add("cline")
 
     if not selected_targets:
-        repo_root = args.repo_root or (Path.cwd() if (Path.cwd() / "context").is_dir() else _REPO_ROOT)
+        repo_root = args.repo_root or (
+            Path.cwd() if (Path.cwd() / "context").is_dir() else _REPO_ROOT
+        )
         configured = load_configured_targets(repo_root)
         selected_targets = configured if configured else {"all"}
 

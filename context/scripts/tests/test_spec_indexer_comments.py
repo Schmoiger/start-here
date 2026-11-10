@@ -92,8 +92,7 @@ class TestPythonCommentsTokenize:
         index = _scan(repo, tmp_path / "out")
         # the doc block above MAX_RETRIES must be exactly the standalone line
         lead = next(
-            c for c in _entries(index, "app.py")
-            if c["kind"] == "leading" and c.get("attached")
+            c for c in _entries(index, "app.py") if c["kind"] == "leading" and c.get("attached")
         )
         assert lead["text"] == "retry budget for the connect path"
         assert lead["line"] == 3
@@ -111,8 +110,7 @@ class TestPythonCommentsTokenize:
         repo = _write(tmp_path, {"app.py": PY_FIXTURE})
         index = _scan(repo, tmp_path / "out")
         orphans = [
-            c for c in _entries(index, "app.py")
-            if c["text"] == "standalone orphan near nothing"
+            c for c in _entries(index, "app.py") if c["text"] == "standalone orphan near nothing"
         ]
         assert len(orphans) == 1
         assert orphans[0]["attached"] is None
@@ -132,20 +130,17 @@ class TestPythonDocstrings:
         index = _scan(repo, tmp_path / "out")
         sym = _symbol(index, "app.py", "run")
         assert sym["docstring"] == "Run the pipeline."
-        doc = next(
-            c for c in sym["comments"] if c["kind"] == "docstring"
-        )
+        doc = next(c for c in sym["comments"] if c["kind"] == "docstring")
         assert doc["text"] == "Run the pipeline."
         stream = next(
-            c for c in _entries(index, "app.py")
-            if c["kind"] == "docstring" and c.get("attached")
+            c for c in _entries(index, "app.py") if c["kind"] == "docstring" and c.get("attached")
         )
         assert stream["attached"] == {"kind": "function", "name": "run", "line": 10}
 
     def test_class_and_method_docstrings_attach(self, tmp_path):
         src = (
             'class Service:\n    """Service doc."""\n\n'
-            "    def run(self):\n        \"\"\"Run it.\"\"\"\n        return 1\n"
+            '    def run(self):\n        """Run it."""\n        return 1\n'
         )
         repo = _write(tmp_path, {"svc.py": src})
         index = _scan(repo, tmp_path / "out")
@@ -153,7 +148,7 @@ class TestPythonDocstrings:
         assert _symbol(index, "svc.py", "Service.run")["docstring"] == "Run it."
 
 
-TS_FIXTURE = '''/**
+TS_FIXTURE = """/**
  * Card component.
  * Renders an item card.
  */
@@ -168,7 +163,7 @@ export function helper(a: number): number {
 }
 /* legacy header block */
 const x = 1;
-'''
+"""
 
 
 class TestTsJsComments:
@@ -200,7 +195,7 @@ class TestTsJsComments:
         assert block["attached"] is None
 
 
-SQL_FIXTURE = '''-- users table
+SQL_FIXTURE = """-- users table
 CREATE TABLE users (
   -- unique id
   id SERIAL PRIMARY KEY
@@ -210,27 +205,21 @@ CREATE TABLE users (
 CREATE TABLE posts (
   id INT PRIMARY KEY
 );
-'''
+"""
 
 
 class TestSqlComments:
     def test_double_dash_comment_attaches_to_nearest_table(self, tmp_path):
         repo = _write(tmp_path, {"schema.sql": SQL_FIXTURE})
         index = _scan(repo, tmp_path / "out")
-        entry = next(
-            c for c in _entries(index, "schema.sql")
-            if c["text"] == "users table"
-        )
+        entry = next(c for c in _entries(index, "schema.sql") if c["text"] == "users table")
         assert entry["kind"] == "leading"
         assert entry["attached"] == {"kind": "table", "name": "users", "line": 2}
 
     def test_column_comment_attaches_to_nearest_column(self, tmp_path):
         repo = _write(tmp_path, {"schema.sql": SQL_FIXTURE})
         index = _scan(repo, tmp_path / "out")
-        entry = next(
-            c for c in _entries(index, "schema.sql")
-            if c["text"] == "unique id"
-        )
+        entry = next(c for c in _entries(index, "schema.sql") if c["text"] == "unique id")
         assert entry["attached"] == {"kind": "column", "name": "users.id", "line": 4}
 
     def test_block_comment_attaches_to_nearest_table(self, tmp_path):
@@ -327,9 +316,7 @@ class TestIndexIntegration:
     def test_cli_scan_emits_comments_key(self, tmp_path):
         repo = _write(tmp_path, {"app.py": PY_FIXTURE})
         out = tmp_path / "cli" / "repo-index.json"
-        code = si.main(
-            ["scan", "--repo", str(repo), "--out", str(out), "--extractors", "stdlib"]
-        )
+        code = si.main(["scan", "--repo", str(repo), "--out", str(out), "--extractors", "stdlib"])
         assert code == 0
         index = json.loads(out.read_text(encoding="utf-8"))
         assert index["comments"]
@@ -342,9 +329,9 @@ class TestRealRepo:
             REPO_ROOT, [], [], ["context/scripts/code-specs/spec_indexer.py"]
         )
         docs = [e for e in entries if e.kind == "docstring"]
-        assert any(
-            e.text.startswith("Deterministic codebase indexer") for e in docs
-        ), "spec_indexer.py module docstring must be indexed"
+        assert any(e.text.startswith("Deterministic codebase indexer") for e in docs), (
+            "spec_indexer.py module docstring must be indexed"
+        )
 
     def test_real_repo_comment_stream_uses_exact_file_lines(self):
         entries, _warnings = si.collect_comments(
