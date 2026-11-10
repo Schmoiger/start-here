@@ -63,7 +63,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -84,7 +84,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -105,7 +105,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -123,7 +123,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -138,7 +138,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -155,7 +155,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -173,7 +173,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -192,7 +192,7 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -209,7 +209,7 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -233,7 +233,7 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -251,7 +251,7 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -273,7 +273,7 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -307,7 +307,7 @@ before/after comparison is the acceptance metric):
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -327,7 +327,7 @@ before/after comparison is the acceptance metric):
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -343,7 +343,7 @@ before/after comparison is the acceptance metric):
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -362,7 +362,7 @@ before/after comparison is the acceptance metric):
 
 ### Workflow
 
- build
+ small-task
 
 **Status**: completed 2026-01-11 — `--extractors` (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph) implemented in `spec_indexer.py`; tree-sitter TS/TSX walker (multiline props, JSX usage, decorators); ast-grep rule patterns; ctags JSON for foreign langs; `ts_extract.mjs` ts-morph helper (skipped quietly when absent); `meta.extractors` provenance + `meta.confidence` tier + per-file `extractor` field. Tests: auto/stdlib Python parity + auto⊇stdlib superset + fixtures (13 passed, 2 skipped without tree-sitter; 15/15 with `uv run --with tree-sitter --with tree-sitter-language-pack`).
 
@@ -398,7 +398,7 @@ before/after comparison is the acceptance metric):
 
 ### Workflow
 
- build
+ small-task
 
 **Status**: completed 2026-01-11 — ctags 6.2.1 ✓, ast-grep 0.51.0 ✓ (use `ast-grep`; `sg` deprecated), tree-sitter loads via `uv run --with tree-sitter --with tree-sitter-language-pack` (typescript + python parsers) ✓, ts-morph absent → skipped quietly.
 
@@ -429,7 +429,7 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -449,7 +449,7 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
@@ -489,7 +489,7 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 
 ### Workflow
 
- build
+ small-task
 
 #### Acceptance Criteria
 
