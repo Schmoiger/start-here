@@ -58,9 +58,11 @@ uv run context/scripts/code-specs/spec_indexer.py scan --repo . --mode both
 
 Phase 1 also discovers existing spec documents (`docs` key) via the document
 globs — requirements / architecture / API / design docs — and collects the test
-inventory and the capped git-history evidence (`meta.history`, §3.5): last N
+inventory, the capped git-history evidence (`meta.history`, §3.5): last N
 commit subjects + rename/refactor clues as cheap feature descriptions,
-especially for unorganised repos.
+especially for unorganised repos, and the comment/docstring evidence
+(`comments`, §3.6): author-intent "why" notes, doc-comments, and
+magic-number explanations.
 
 ### 1.3 Phase 3 — evidence pass
 
@@ -149,6 +151,7 @@ agent-discretionary:
 | `tests` | `[ {node_id, file} ]` from pytest collection / jest listTests — each test name is a candidate feature name |
 | `config` | user-facing constraints (T-016): `[ {key, source, line, value_hint, feature} ]` from `.env.example`/`.env.template` env files, `settings.py`/`config.*` modules, and config YAML/JSON — secret-looking keys redacted to `<redacted>`; `feature` marks flags/toggles (ENABLE_*/FEATURE_* or boolean); test/fixture paths excluded; feeds product-spec + TSD constraints |
 | `meta.history` | capped git evidence (T-017): `{count, capped, commit_subjects, renames}` from `git log --name-status` — newest-first commit subjects + rename/refactor clues (`{commit, subject, old, new}`); **absent** (never empty) when the repo has no git metadata / no commits, or with `--history 0` (§3.5) |
+| `comments` | author-intent evidence (T-021): `[ {file, line, kind, text, attached} ]` — Python `#` via stdlib `tokenize` (comments inside strings never leak) + docstrings via `ast.get_docstring`; TS/JS JSDoc `/** */` + `//`; SQL `--` / `/* */` (strings masked). `kind` ∈ `docstring │ leading │ inline │ block`; `attached` points at an owning symbol/table `{kind, name, line}` or is absent for orphans (TODOs, licence headers, magic-number notes). Symbols carry `docstring` + `comments` too — read them before any source read (§3.6) |
 
 ### 3.2 `meta.extractors` provenance
 
@@ -170,9 +173,8 @@ indicate a degraded backend rather than absence of the construct.
 
 ### 3.4 Planned keys
 
-`comments` (T-021) is designed into the schema but not yet emitted by the
-indexer; treat it as absent, never as empty evidence. (`config` and
-`meta.history` are implemented — see §3.1 and §3.5.)
+None — `config` (§3.1), `meta.history` (§3.5), and `comments` (§3.6) are all
+implemented. Treat an absent key as absent evidence, never as an empty list.
 
 ### 3.5 `meta.history` — capped git-history evidence (T-017)
 
@@ -193,6 +195,35 @@ The key is **absent**, not empty, when the repo has no git metadata, when `git
 log` has no commits to emit, or when `--history 0` disables the pull (a scan
 warning notes the absence). `verify --index` does not cite history entries —
 commits are evidence of intent, not `file:line` citations.
+
+### 3.6 `comments` & docstrings — consumption
+
+`scan` extracts author-intent evidence into the top-level `comments` stream
+**and** onto symbols themselves (all zero-LLM, exact `file:line`):
+
+- `symbols[].docstring` — the doc-comment / `ast.get_docstring` text for that
+  definition: a Python docstring, TS JSDoc `/** */`, or a contiguous `#` / `//`
+  block immediately above it.
+- `symbols[].comments` — attached units `{text, line, kind}`: `docstring`,
+  `leading` (doc-comment block above a definition), `inline` (comment on a line
+  inside the definition's span or trailing), `block` (multi-line `/* */`).
+- top-level `comments` — every comment: `{file, line, kind, text, attached}`.
+  `attached = {kind, name, line}` for symbol-owned comments (SQL comments attach
+  to the nearest table/column); orphans — `attached` absent — are TODOs,
+  licence headers, magic-number explanations, and module docstrings.
+
+Consumption rules:
+
+- **Read the index text first**; only read the exact cited range when the index
+  text is insufficient (agent-sandbox tool policy).
+- Python `#` capture is exact via stdlib `tokenize`: a `#` inside a string
+  literal is a string, never a comment. TS/JS and SQL scan string-masked source.
+- Feeds: business intent + domain rules → product spec; magic numbers / limits
+  (e.g. "retry budget", "provider limit") → TSD constraints; JSDoc semantics →
+  api-catalogue draft; deprecation / TODO comments → drift candidates + open
+  questions.
+- A claim backed by a comment rather than code may reach *Needs Confirmation* —
+  comments state intent, not implementation; confirm before Verified.
 
 ---
 

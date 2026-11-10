@@ -37,7 +37,7 @@ Output location: artefacts/build/spec-drafts/product-spec.md
 ## Subsection Format
 ### Actors and Roles
 
-**Confidence**: Verified · 90% · Evidence: `context/scripts/code-specs/spec_indexer.py:2092`, `context/agents/*.md` (34 agent definitions indexed), `context/workflows/*.yaml` (11 workflows)
+**Confidence**: Verified · 90% · Evidence: `context/scripts/code-specs/spec_indexer.py:7`, `context/agents/*.md` (34 agent definitions indexed), `context/workflows/*.yaml` (11 workflows)
 
 The harness defines **34 specialised agents** across **11 workflow YAMLs** (build, bugfix, content, continuous-improvement, deploy, design, derive-spec, full-test, prototype, small-task). Agent frontmatter specifies `model: large/medium/small`, `skills:`, and `rules:` lists. The `@orchestrator` is the central coordinator; it delegates implementation to sub-agents (`@python-coder`, `@functional-tester`, `@tech-lead`, `@code-reviewer`, `@principles-reviewer`, `@ui-tester`, `@security-tester`, `@devops`, `@documentation`, `@harness-analyst`, `@solution-architect`, `@product-owner`, `@ui-designer`, `@typescript-coder`, `@orchestrator`) but **never implements directly** except in `small-task` workflow (which lifts this boundary per `context/workflows/small-task.yaml:128`). 
 
@@ -60,11 +60,11 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 
 ### Features and Capabilities
 
-**Confidence**: Verified · 90% · Evidence: `context/scripts/code-specs/spec_indexer.py:437-2092`, `context/scripts/generators/generate_adapters.py:428`, `context/workflows/*.yaml` (11 workflows), `context/scripts/validators/*.py` (11 validators)
+**Confidence**: Verified · 90% · Evidence: `context/scripts/code-specs/spec_indexer.py:495-2840`, `context/scripts/generators/generate_adapters.py:428`, `context/workflows/*.yaml` (11 workflows), `context/scripts/validators/*.py` (11 validators)
 
 | Feature | Description | Evidence |
 |---------|-------------|----------|
-| **Spec Indexer (scan/verify)** | Deterministic, zero-LLM indexer extracting Python symbols (731), config (8 keys), tests (245), docs (25); `scan --repo --mode`, `verify --index/--doc` | `context/scripts/code-specs/spec_indexer.py:437` (analyze_python), `context/scripts/code-specs/spec_indexer.py:2015` (main CLI) |
+| **Spec Indexer (scan/verify)** | Deterministic, zero-LLM indexer extracting Python symbols (731), config (8 keys), tests (245), docs (25); `scan --repo --mode`, `verify --index/--doc` | `context/scripts/code-specs/spec_indexer.py:495` (analyze_python), `context/scripts/code-specs/spec_indexer.py:2840` (main CLI) |
 | **Adapter Generators** | Compile canonical `context/` assets into runtime-specific instructions for Claude Code, Cline, Gemini, GitHub Copilot, OpenAI Codex | `context/scripts/generators/generate_adapters.py:428` (main CLI) |
 | **Workflow Engine** | 11 YAML-defined workflows with phases, agent assignments, quality gates, state recovery | `context/workflows/README.md` phase diagrams |
 | **Rules/Standards Split** | Binary rules (<200 tokens) + reference standards (2000-5000 tokens); orchestrator glob-matches task scope | `context/agents/orchestrator.md` |
@@ -81,7 +81,7 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 | **Derive Spec (mode=both)** | Human → Orchestrator → product-owner + solution-architect | 1. Intake (mode=both recorded) → 2. Scan (spec_indexer) → 3. Repo Profile → 4. Baseline/Drift → 5. Evidence → 6. Product Spec (4a) + Technical Spec (4b) → 7. Verify → 8. Confirmation → 9. Finalise/Promote | Active T-008 Pilot A |
 | **Adapter Generation** | Human → Orchestrator → generate_adapters.py | 1. CLI invoke → 2. Read canonical context/ → 3. Project to runtime adapters → 4. Write to .claude/, .cline/, etc. | `context/scripts/generators/generate_adapters.py:428` main entry |
 | **Agent Spawn & Delegate** | Orchestrator → Sub-agent | 1. Read agent definition → 2. Resolve rules by glob → 3. Assign disjoint file scope → 4. Spawn with task prompt template → 5. Sub-agent reports → 6. Orchestrator commits | `context/agents/orchestrator.md:115-140`, `context/templates/task-prompt-template.md` |
-| **State Recovery** | Orchestrator (post-compaction) | 1. Re-read HANDOFF.md (Workflow/Phase) → 2. Re-read repo-index.json + spec-scan.md → 3. Re-read repo-profile.md → 4. Resume from drift-candidates.md + spec-drafts/ | `context/agents/orchestrator.md:215-222`, `context/workflows/derive-spec.yaml:187-198` |
+| **State Recovery** | Orchestrator (post-compaction) | 1. Re-read HANDOFF.md (Workflow/Phase) → 2. Re-read repo-index.json + spec-scan.md → 3. Re-read repo-profile.md → 4. Resume from drift-candidates.md + spec-drafts/ | `context/agents/orchestrator.md:215-222`, `context/workflows/derive-spec.yaml:188-198` |
 
 ---
 

@@ -38,6 +38,15 @@ Extraction backends (all deterministic, ~0 LLM tokens) selected via ``--extracto
               ``--history N`` bounds the pull, default 200; key absent when the
               repo has no git metadata). Commit subjects are cheap feature
               descriptions, especially for unorganised repos.
+  * Comments - comment/docstring extraction into the ``comments`` key (T-021):
+              Python ``#`` comments via stdlib ``tokenize`` (COMMENT tokens are
+              exact; string contents never leak) plus docstrings via
+              ``ast.get_docstring`` on module/class/function nodes; TS/JS JSDoc
+              ``/** */`` + ``//`` and SQL ``--`` / ``/* */`` on string-masked
+              source lines. Intent evidence is attached to symbols
+              (``symbols[].docstring`` + ``symbols[].comments``) and orphan
+              comments (TODOs, licence headers, magic-number notes) surface
+              only in the top-level ``comments`` stream.
 
 The index schema is documented in context/skills/analyse-repo.md (§ Consuming repo-index.json).
 """
@@ -46,10 +55,12 @@ from __future__ import annotations
 
 import argparse
 import ast
+import io
 import json
 import os
 import re
 import subprocess
+import tokenize
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -173,6 +184,35 @@ _TS_REQUIRE: re.Pattern[str] = re.compile(
 
 
 @dataclass
+class CommentEntry:
+    """One comment/docstring block (T-021): ``{file, line, kind, text, attached}``.
+
+    ``kind`` is ``docstring`` (Python docstring / TS JSDoc), ``leading``
+    (contiguous comment block immediately above a definition), ``inline``
+    (comment on a line inside a definition's span / trailing), or ``block``
+    (multi-line ``/* */``). ``attached`` points at the owning symbol/table via
+    ``{kind, name, line}``, or is ``None`` for orphan comments (TODOs, licence
+    headers, magic-number explanations) which surface only in the top-level
+    ``comments`` stream.
+    """
+
+    file: str
+    line: int
+    kind: str
+    text: str
+    attached: dict[str, Any] | None = None
+
+    def to_jsonb(self) -> dict[str, Any]:
+        return {
+            "file": self.file,
+            "line": self.line,
+            "kind": self.kind,
+            "text": self.text,
+            "attached": self.attached,
+        }
+
+
+@dataclass
 class Symbol:
     kind: str  # class | function | method | component | interface | type | const
     name: str
@@ -180,16 +220,27 @@ class Symbol:
     line: int = 0
     decorators: list[str] = field(default_factory=list)
     props: list[str] = field(default_factory=list)
+    end_line: int = 0  # T-021: last body line (0 when the backend provides none)
+    docstring: str = ""  # T-021: doc-comment / ast docstring text (truncated)
+    comments: list[CommentEntry] = field(default_factory=list)  # T-021: attached entries
 
     def to_jsonb(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "kind": self.kind,
             "name": self.name,
             "signature": self.signature,
             "line": self.line,
+            "end_line": self.end_line,
             "decorators": self.decorators,
             "props": self.props,
         }
+        if self.docstring:
+            out["docstring"] = self.docstring
+        if self.comments:
+            out["comments"] = [
+                {"text": c.text, "line": c.line, "kind": c.kind} for c in self.comments
+            ]
+        return out
 
 
 @dataclass
@@ -234,9 +285,10 @@ class ApiEntry:
 class ColumnDef:
     name: str
     type: str = ""
+    line: int = 0  # T-021: source line of the column definition (0 = unknown)
 
     def to_jsonb(self) -> dict[str, Any]:
-        return {"name": self.name, "type": self.type}
+        return {"name": self.name, "type": self.type, "line": self.line}
 
 
 @dataclass
@@ -435,6 +487,7 @@ def _method_body(owner: str, node: ast.FunctionDef | ast.AsyncFunctionDef) -> Sy
         name=f"{owner}.{node.name}",
         signature=f"({args_text})",
         line=node.lineno,
+        end_line=node.end_lineno or 0,
         decorators=_decorator_names(node.decorator_list),
     )
 
@@ -466,6 +519,7 @@ def analyze_python(abs_path: Path, rel_path: str) -> tuple[FileRecord, list[ApiE
                     name=node.name,
                     signature=f"({_unparse(node.args)})",
                     line=node.lineno,
+                    end_line=node.end_lineno or 0,
                     decorators=_decorator_names(node.decorator_list),
                 )
             )
@@ -475,7 +529,13 @@ def analyze_python(abs_path: Path, rel_path: str) -> tuple[FileRecord, list[ApiE
                     api.append(ApiEntry(route[0], route[1], node.name, rel_path, node.lineno))
         elif isinstance(node, ast.ClassDef):
             record.symbols.append(
-                Symbol(kind="class", name=node.name, signature="", line=node.lineno)
+                Symbol(
+                    kind="class",
+                    name=node.name,
+                    signature="",
+                    line=node.lineno,
+                    end_line=node.end_lineno or 0,
+                )
             )
             for item in node.body:
                 if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -883,6 +943,12 @@ def analyze_tsjs_treesitter(
     def node_line(node: Any) -> int:
         return node.start_point[0] + 1
 
+    def node_end_line(node: Any) -> int:
+        try:
+            return node.end_point[0] + 1
+        except (AttributeError, IndexError, TypeError):  # pragma: no cover
+            return 0
+
     def field_text(node: Any, field: str) -> str:
         child = node.child_by_field_name(field)
         return child.text.decode("utf-8", errors="replace") if child is not None else ""
@@ -963,6 +1029,7 @@ def analyze_tsjs_treesitter(
                     name=name,
                     signature=sig,
                     line=node_line(node),
+                    end_line=node_end_line(node),
                     decorators=decorators_before(node),
                     props=props,
                 )
@@ -975,6 +1042,7 @@ def analyze_tsjs_treesitter(
                     kind="class",
                     name=name,
                     line=node_line(node),
+                    end_line=node_end_line(node),
                     decorators=decorators_before(node),
                 )
             )
@@ -992,6 +1060,7 @@ def analyze_tsjs_treesitter(
                     name=display,
                     signature=msig,
                     line=node_line(node),
+                    end_line=node_end_line(node),
                     decorators=decorators_before(node),
                 )
             )
@@ -1024,12 +1093,20 @@ def analyze_tsjs_treesitter(
                             name=name,
                             signature=sig,
                             line=node_line(decl),
+                            end_line=node_end_line(decl),
                             props=props,
                             decorators=decorators_before(decl),
                         )
                     )
                 else:
-                    record.symbols.append(Symbol(kind="const", name=name, line=node_line(decl)))
+                    record.symbols.append(
+                        Symbol(
+                            kind="const",
+                            name=name,
+                            line=node_line(decl),
+                            end_line=node_end_line(decl),
+                        )
+                    )
             # fall through to walk the initializers (arrow bodies contain JSX)
         if ntype in ("jsx_opening_element", "jsx_self_closing_element"):
             first = node.named_children[0] if node.named_children else None
@@ -1111,10 +1188,14 @@ def analyze_tsjs_astgrep(
             if not rm:
                 continue
             line = 0
+            end_line = 0
             rng = match.get("range") or {}
             start = (rng.get("start") or {}) if isinstance(rng, dict) else {}
             if isinstance(start, dict) and isinstance(start.get("line"), int):
                 line = start["line"] + 1
+            end = (rng.get("end") or {}) if isinstance(rng, dict) else {}
+            if isinstance(end, dict) and isinstance(end.get("line"), int):
+                end_line = end["line"] + 1
             key = (kind, rm.group(1))
             if key in seen:
                 continue
@@ -1130,7 +1211,14 @@ def analyze_tsjs_astgrep(
                 sig = f"({rm.group(2) or rm.group(3) or ''})"
                 props = _destructured_props(sig)
             record.symbols.append(
-                Symbol(kind=kind, name=rm.group(1), signature=sig, line=line, props=props)
+                Symbol(
+                    kind=kind,
+                    name=rm.group(1),
+                    signature=sig,
+                    line=line,
+                    end_line=end_line,
+                    props=props,
+                )
             )
 
     # JSX usage via the cheap line scan (ast-grep has no reliable JSX pattern set).
@@ -1224,7 +1312,11 @@ def analyze_sql(abs_path: Path, rel_path: str) -> list[TableDef]:
         cm = re.match(r"^([`\"\w]+)\s+([^\s,]+.*?)\s*$", stripped)
         if cm:
             current.columns.append(
-                ColumnDef(name=cm.group(1).strip('`"'), type=cm.group(2).strip())
+                ColumnDef(
+                    name=cm.group(1).strip('`"'),
+                    type=cm.group(2).strip(),
+                    line=lineno,
+                )
             )
     return tables
 
@@ -1762,6 +1854,457 @@ def collect_history(repo: Path, limit: int) -> dict[str, Any] | None:
     }
 
 
+# --- Comment / docstring extraction (T-021) ---
+_MAX_COMMENT_TEXT = 240
+# | Python ``#`` via stdlib tokenize (exact COMMENT tokens; string contents never
+# | leak) + docstrings via ast.get_docstring; TS/JS JSDoc ``/** */`` + ``//`` and
+# | SQL ``--`` / ``/* */`` on string-masked source. Intent evidence attaches to
+# | symbols (symbols[].docstring / symbols[].comments); orphans stay in the
+# | top-level stream.
+MAX_COMMENT_ROWS = 60  # spec-scan.md render cap
+_LEADING_GAP = 3  # max distance from a leading comment block to a definition
+_MAX_COMMENT_ENTRIES = 2000  # soft cap on the top-level stream (deterministic)
+
+_COMMENT_MARKER: dict[str, str] = {"python": "#", "sql": "--", "ts": "//"}
+
+
+def _shorten_comment(text: str) -> str:
+    if len(text) <= _MAX_COMMENT_TEXT:
+        return text
+    return text[:_MAX_COMMENT_TEXT - 3] + "..."
+
+
+def _mask_code_strings(source: str) -> str:
+    """Blank string contents so comment markers inside strings never match.
+
+    Preserves newlines and lengths (so line numbers stay exact). Used by the
+    TS/JS and SQL passes and as the Python fallback when tokenize fails.
+    """
+    out: list[str] = []
+    i, n = 0, len(source)
+    quote: str | None = None
+    while i < n:
+        ch = source[i]
+        if quote is not None:
+            if ch == "\\":  # escaped char inside a string: keep the pair masked
+                out.append("  ")
+                i += 2
+                continue
+            if ch == quote:
+                out.append(ch)
+                quote = None
+            elif ch == "\n":
+                out.append("\n")
+            else:
+                out.append(" ")
+            i += 1
+            continue
+        if ch in ("'", '"', "`"):
+            quote = ch
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _clean_comment_text(raw: str, marker: str | None = None, doc_style: bool = False) -> str:
+    """Normalise one comment block into a single marker-stripped, truncated line."""
+    lines: list[str] = []
+    for ln in raw.splitlines():
+        s = ln.strip()
+        if marker and s.startswith(marker):
+            s = s[len(marker) :].strip()
+        if s.startswith("*/"):
+            s = s[2:].strip()
+        if s.startswith("/*"):
+            s = s[2:].strip()
+        if s.endswith("*/") and len(s) > 2:
+            s = s[:-2].rstrip()
+        if doc_style:
+            while s.startswith(("/", "*")):
+                s = s[1:]
+            s = s.strip()
+        if s:
+            lines.append(s)
+    return _shorten_comment(" | ".join(lines))
+def _group_comment_lines(
+    comments: list[tuple[int, str]], marker: str
+) -> list[tuple[int, int, str]]:
+    """Group consecutive same-marker comment lines into ``(start, end, text)`` blocks."""
+    blocks: list[tuple[int, int, str]] = []
+    if not comments:
+        return blocks
+    start, last = comments[0][0], comments[0][0]
+    raw_lines = [comments[0][1]]
+    for line, raw in comments[1:]:
+        if line == last + 1:
+            last = line
+            raw_lines.append(raw)
+            continue
+        blocks.append((start, last, _clean_comment_text("\n".join(raw_lines), marker)))
+        start, last = line, line
+        raw_lines = [raw]
+    blocks.append((start, last, _clean_comment_text("\n".join(raw_lines), marker)))
+    return blocks
+
+
+def _python_comments(source: str) -> tuple[list[tuple[int, str, bool]], list[tuple[int, int, str]]]:
+    """Python comments from stdlib ``tokenize``.
+
+    Returns ``(line_comments, blocks)``. ``line_comments`` is every ``#``
+    comment ``(line, text, standalone)`` — ``standalone`` means only whitespace
+    precedes the ``#`` (a trailing comment never joins a doc-block). ``blocks``
+    groups consecutive *standalone* comment lines into ``(start, end, text)``.
+    COMMENT tokens are exact — a ``#`` inside a string is a STRING token and is
+    never captured. Falls back to a string-masked ``#`` scan when tokenize chokes
+    (malformed source); never raises, never drops evidence. Shebang lines are
+    skipped as noise.
+    """
+    line_comments: list[tuple[int, str, bool]] = []
+    src_lines = source.splitlines()
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(source).readline):
+            if tok.type == tokenize.COMMENT:
+                if tok.string.startswith("#!"):
+                    continue
+                line = tok.start[0]
+                standalone = bool(
+                    line - 1 < len(src_lines)
+                    and re.match(r"^\s*#", src_lines[line - 1])
+                )
+                text = _clean_comment_text(tok.string, marker=_COMMENT_MARKER["python"])
+                if not text:
+                    continue
+                line_comments.append((line, text, standalone))
+    except (tokenize.TokenError, IndentationError, SyntaxError):
+        masked = _mask_code_strings(source).splitlines()
+        for lineno, raw in enumerate(src_lines, 1):
+            if lineno - 1 >= len(masked):
+                break
+            idx = masked[lineno - 1].find("#")
+            if idx < 0:
+                continue
+            text = _clean_comment_text(raw[idx:], marker=_COMMENT_MARKER["python"])
+            if text.startswith("!"):
+                continue
+            line_comments.append((lineno, text, raw[:idx].strip() == ""))
+    blocks = _group_comment_lines(
+        [(ln, t) for ln, t, st in line_comments if st], _COMMENT_MARKER["python"]
+    )
+    return line_comments, blocks
+def _ts_comments(source: str) -> tuple[list[tuple[int, int, str, str]], list[tuple[int, str, bool]]]:
+    """TS/JS comments: ``(blocks, line_comments)`` on string-masked source (v1 regex).
+
+    ``blocks`` are ``(start, end, text, kind)`` — kind ``docstring`` for JSDoc
+    ``/** */``, ``block`` for ``/* */``, ``leading`` for grouped standalone
+    ``//`` lines; ``line_comments`` are the individual ``//`` lines
+    ``(line, text, standalone)`` (``standalone`` = only whitespace before `//`).
+    """
+    masked = _mask_code_strings(source)
+    blocks: list[tuple[int, int, str, str]] = []
+    for m in re.finditer(r"/\*[\s\S]*?\*/", masked):
+        start_line = masked.count("\n", 0, m.start()) + 1
+        end_line = masked.count("\n", 0, m.end()) + 1
+        raw_block = m.group(0)
+        doc_style = raw_block.startswith("/**")
+        text = _clean_comment_text(raw_block, doc_style=doc_style)
+        blocks.append((start_line, end_line, text, "docstring" if doc_style else "block"))
+    line_comments: list[tuple[int, str, bool]] = []
+    for m in re.finditer(r"//[^\n]*", masked):
+        line = masked.count("\n", 0, m.start()) + 1
+        text = _clean_comment_text(m.group(0), marker=_COMMENT_MARKER["ts"])
+        if not text:
+            continue
+        pre = masked[: m.start()].rsplit("\n", 1)[-1]
+        line_comments.append((line, text, pre.strip() == ""))
+    blocks.extend(
+        (s, e, t, "leading")
+        for s, e, t in _group_comment_lines(
+            [(ln, t) for ln, t, st in line_comments if st], _COMMENT_MARKER["ts"]
+        )
+    )
+    return blocks, line_comments
+
+
+def _sql_comments(source: str) -> tuple[list[tuple[int, int, str, str]], list[tuple[int, str, bool]]]:
+    """SQL comments: ``(blocks, line_comments)`` — ``--`` lines + ``/* */`` blocks
+    on string-masked source; ``standalone`` = only whitespace before ``--``."""
+    masked = _mask_code_strings(source)
+    blocks: list[tuple[int, int, str, str]] = []
+    for m in re.finditer(r"/\*[\s\S]*?\*/", masked):
+        start_line = masked.count("\n", 0, m.start()) + 1
+        end_line = masked.count("\n", 0, m.end()) + 1
+        blocks.append((start_line, end_line, _clean_comment_text(m.group(0)), "block"))
+    line_comments: list[tuple[int, str, bool]] = []
+    for m in re.finditer(r"--[^\n]*", masked):
+        line = masked.count("\n", 0, m.start()) + 1
+        text = _clean_comment_text(m.group(0), marker=_COMMENT_MARKER["sql"])
+        if not text:
+            continue
+        pre = masked[: m.start()].rsplit("\n", 1)[-1]
+        line_comments.append((line, text, pre.strip() == ""))
+    blocks.extend(
+        (s, e, t, "leading")
+        for s, e, t in _group_comment_lines(
+            [(ln, t) for ln, t, st in line_comments if st], _COMMENT_MARKER["sql"]
+        )
+    )
+    return blocks, line_comments
+def _symbol_ref(sym: Symbol) -> dict[str, Any]:
+    return {"kind": sym.kind, "name": sym.name, "line": sym.line}
+
+
+def _attach_leading_blocks(
+    rel_path: str,
+    symbols: list[Symbol],
+    blocks: list[tuple[int, int, str, str]],
+) -> list[CommentEntry]:
+    """Doc-comment style attachment: a block ending at row ``e`` attaches to the
+    first symbol with ``line > e`` and ``line - e <= _LEADING_GAP`` (blank lines
+    / decorators allowed). The text fills ``symbol.docstring`` when it is still
+    empty (docstring/leading kinds) and is recorded in ``symbol.comments``.
+    """
+    attached: list[CommentEntry] = []
+    pending: list[tuple[int, int, str, str]] = []
+    j = 0
+    blocks = sorted(blocks, key=lambda b: (b[0], b[1]))
+    for sym in sorted(symbols, key=lambda s: s.line):
+        while j < len(blocks) and blocks[j][1] < sym.line:
+            pending.append(blocks[j])
+            j += 1
+        chosen: tuple[int, int, str, str] | None = None
+        for b in pending:
+            if sym.line - b[1] <= _LEADING_GAP:
+                chosen = b  # nearest qualifying block wins
+        if chosen is not None:
+            entry = CommentEntry(
+                file=rel_path,
+                line=chosen[0],
+                kind=chosen[3],
+                text=chosen[2],
+                attached=_symbol_ref(sym),
+            )
+            if not sym.docstring and chosen[3] in ("docstring", "leading", "block"):
+                sym.docstring = chosen[2]
+            sym.comments.append(entry)
+            attached.append(entry)
+        pending = []
+    return attached
+
+
+def _attach_inline_comments(
+    rel_path: str, symbols: list[Symbol], line_comments: list[tuple[int, str, bool]]
+) -> list[CommentEntry]:
+    """Line-range overlap attachment: a comment on a definition's start line
+    (trailing) or inside its recorded ``[line, end_line]`` span is ``inline``."""
+    attached: list[CommentEntry] = []
+    for line, text, _standalone in line_comments:
+        for sym in symbols:
+            if line == sym.line or (sym.end_line > 0 and sym.line <= line <= sym.end_line):
+                entry = CommentEntry(
+                    file=rel_path,
+                    line=line,
+                    kind="inline",
+                    text=text,
+                    attached=_symbol_ref(sym),
+                )
+                sym.comments.append(entry)
+                attached.append(entry)
+                break  # first spanning symbol wins
+    return attached
+
+
+def _attach_sql_leading(
+    rel_path: str,
+    defs: list[tuple[int, str, str]],
+    blocks: list[tuple[int, int, str, str]],
+) -> list[CommentEntry]:
+    """Attach SQL comment blocks to the nearest table/column definition below
+    them (same gap rule). ``defs`` is ``(line, kind, name)`` — kind ``table``
+    or ``column``."""
+    attached: list[CommentEntry] = []
+    pending: list[tuple[int, int, str, str]] = []
+    j = 0
+    blocks = sorted(blocks, key=lambda b: (b[0], b[1]))
+    for line, kind, name in sorted(defs, key=lambda d: d[0]):
+        while j < len(blocks) and blocks[j][1] < line:
+            pending.append(blocks[j])
+            j += 1
+        chosen: tuple[int, int, str, str] | None = None
+        for b in pending:
+            if line - b[1] <= _LEADING_GAP:
+                chosen = b
+        if chosen is not None:
+            attached.append(
+                CommentEntry(
+                    file=rel_path,
+                    line=chosen[0],
+                    kind=chosen[3],
+                    text=chosen[2],
+                    attached={"kind": kind, "name": name, "line": line},
+                )
+            )
+        pending = []
+    return attached
+def collect_comments(
+    repo: Path,
+    records: list[FileRecord],
+    tables: list[TableDef],
+    paths: list[str],
+) -> tuple[list[CommentEntry], list[str]]:
+    """Zero-LLM comment/docstring evidence for the top-level ``comments`` key.
+
+    Walks the same target files as the symbol pass: Python ``#`` via stdlib
+    ``tokenize`` + docstrings via ``ast.get_docstring``, TS/JS JSDoc ``/** */``
+    + ``//``, SQL ``--`` / ``/* */`` (strings masked). Doc-comment blocks and
+    inline comments attach to symbols (``symbols[].docstring`` /
+    ``symbols[].comments``) and SQL comments attach to the nearest table/column;
+    orphans (TODOs, licence headers, magic-number notes) stay in the returned
+    stream with ``attached=None``. Deterministic: sorted by ``(file, line)``
+    and soft-capped at ``_MAX_COMMENT_ENTRIES`` (cap noted in a warning).
+    """
+    sym_by_file: dict[str, list[Symbol]] = {}
+    for rec in records:
+        sym_by_file.setdefault(rec.path, []).extend(rec.symbols)
+    table_defs_by_file: dict[str, list[tuple[int, str, str]]] = {}
+    for t in tables:
+        defs = table_defs_by_file.setdefault(t.file, [])
+        if t.line:
+            defs.append((t.line, "table", t.table))
+        for col in t.columns:
+            if col.line:
+                defs.append((col.line, "column", f"{t.table}.{col.name}"))
+
+    entries: list[CommentEntry] = []
+
+    for rel_path in sorted(paths):
+        lang = language_of(rel_path)
+        if lang not in ("python", "sql") and lang not in TS_LANGS:
+            continue
+        abs_path = repo / rel_path
+        try:
+            source = abs_path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        symbols = sym_by_file.get(rel_path, [])
+
+        if lang == "python":
+            line_comments, blocks = _python_comments(source)
+            try:
+                tree = ast.parse(source, filename=str(abs_path))
+            except (SyntaxError, ValueError):
+                tree = None
+            doc_hits: dict[int, str] = {}
+            module_doc = ""
+            if tree is not None:
+                module_doc = (ast.get_docstring(tree, clean=True) or "").strip()
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                        doc = (ast.get_docstring(node, clean=True) or "").strip()
+                        if doc:
+                            doc_hits[node.lineno] = _shorten_comment(doc)
+            for ln, doc in sorted(doc_hits.items()):
+                target = next((s for s in symbols if s.line == ln), None)
+                if target is not None:
+                    if not target.docstring:
+                        target.docstring = doc
+                    entry = CommentEntry(
+                        file=rel_path,
+                        line=ln,
+                        kind="docstring",
+                        text=doc,
+                        attached=_symbol_ref(target),
+                    )
+                    target.comments.append(entry)
+                    entries.append(entry)
+                else:
+                    entries.append(
+                        CommentEntry(file=rel_path, line=ln, kind="docstring", text=doc)
+                    )
+            if module_doc:
+                entries.append(
+                    CommentEntry(
+                        file=rel_path,
+                        line=1,
+                        kind="docstring",
+                        text=_shorten_comment(module_doc),
+                    )
+                )
+            attached_inline = _attach_inline_comments(rel_path, symbols, line_comments)
+            entries.extend(attached_inline)
+            inline_lines = {e.line for e in attached_inline}
+            blocks_py = [(s, e, t, "leading") for s, e, t in blocks]
+            candidates = [
+                b
+                for b in blocks_py
+                if not any(ln in inline_lines for ln in range(b[0], b[1] + 1))
+            ]
+            attached_leading = _attach_leading_blocks(rel_path, symbols, candidates)
+            entries.extend(attached_leading)
+            attached_lines = inline_lines | {e.line for e in attached_leading}
+            block_lines = {ln for b in blocks_py for ln in range(b[0], b[1] + 1)}
+            for s, e, t, k in blocks_py:
+                if s not in attached_lines and not any(
+                    ln in inline_lines for ln in range(s, e + 1)
+                ):
+                    entries.append(CommentEntry(file=rel_path, line=s, kind=k, text=t))
+            for line, text, standalone in line_comments:
+                if line not in attached_lines and line not in block_lines:
+                    kind = "leading" if standalone else "inline"
+                    entries.append(CommentEntry(file=rel_path, line=line, kind=kind, text=text))
+        elif lang in TS_LANGS:
+            blocks_ts, line_comments_ts = _ts_comments(source)
+            attached_inline = _attach_inline_comments(rel_path, symbols, line_comments_ts)
+            entries.extend(attached_inline)
+            inline_lines = {e.line for e in attached_inline}
+            candidates = [
+                b
+                for b in blocks_ts
+                if not any(ln in inline_lines for ln in range(b[0], b[1] + 1))
+            ]
+            attached_leading = _attach_leading_blocks(rel_path, symbols, candidates)
+            entries.extend(attached_leading)
+            attached_lines = inline_lines | {e.line for e in attached_leading}
+            block_lines = {ln for b in blocks_ts for ln in range(b[0], b[1] + 1)}
+            for s, e, t, k in blocks_ts:
+                if s not in attached_lines and not any(
+                    ln in inline_lines for ln in range(s, e + 1)
+                ):
+                    entries.append(CommentEntry(file=rel_path, line=s, kind=k, text=t))
+            for line, text, standalone in line_comments_ts:
+                if line not in attached_lines and line not in block_lines:
+                    kind = "leading" if standalone else "inline"
+                    entries.append(CommentEntry(file=rel_path, line=line, kind=kind, text=text))
+
+        else:  # sql
+            blocks_sql, line_comments_sql = _sql_comments(source)
+            defs = table_defs_by_file.get(rel_path, [])
+            sql_attached = _attach_sql_leading(rel_path, defs, blocks_sql)
+            entries.extend(sql_attached)
+            attached_inline = _attach_inline_comments(
+                rel_path, symbols, line_comments_sql
+            )
+            entries.extend(attached_inline)
+            attached_lines = {e.line for e in sql_attached} | {
+                e.line for e in attached_inline
+            }
+            block_lines = {ln for b in blocks_sql for ln in range(b[0], b[1] + 1)}
+            for s, e, t, k in blocks_sql:
+                if s not in attached_lines:
+                    entries.append(CommentEntry(file=rel_path, line=s, kind=k, text=t))
+            for line, text, standalone in line_comments_sql:
+                if line not in attached_lines and line not in block_lines:
+                    kind = "leading" if standalone else "inline"
+                    entries.append(CommentEntry(file=rel_path, line=line, kind=kind, text=text))
+
+    entries.sort(key=lambda c: (c.file, c.line, c.kind, c.text))
+    warnings: list[str] = []
+    if len(entries) > _MAX_COMMENT_ENTRIES:
+        warnings.append(
+            f"comments: capped top-level stream at {_MAX_COMMENT_ENTRIES} entries "
+            f"({len(entries)} extracted); symbol-level attachments are unaffected"
+        )
+        entries = entries[:_MAX_COMMENT_ENTRIES]
+    return entries, warnings
 def _default_out_dir(repo: Path) -> Path:
     build_dir = repo / "artefacts" / "build" / "derived-spec-working"
     return build_dir if build_dir.is_dir() else repo
@@ -1894,6 +2437,27 @@ def render_spec_scan(index: dict[str, Any]) -> str:
             "No git metadata — `meta.history` absent; treat as absent, not empty evidence."
         )
 
+    out.append("\n## Comments & Docstrings (intent evidence)")
+    comments = index.get("comments", [])
+    if comments:
+        files_with = {c["file"] for c in comments}
+        out.append(
+            f"- {len(comments)} comment blocks across {len(files_with)} files; first rows:"
+        )
+        for entry in comments[:MAX_COMMENT_ROWS]:
+            att = entry.get("attached")
+            suffix = f" → {att['kind']} `{att['name']}`" if att else ""
+            out.append(
+                f"  - `{entry['file']}:{entry['line']}` [{entry['kind']}] "
+                f"{entry['text']}{suffix}"
+            )
+        if len(comments) > MAX_COMMENT_ROWS:
+            out.append(f"  … {len(comments) - MAX_COMMENT_ROWS} more comment blocks")
+    else:
+        out.append(
+            "None detected in indexed sources (no comments/docstrings surfaced)."
+        )
+
     out.append(
         "\n---\nGenerated deterministically by `context/scripts/code-specs/spec_indexer.py scan` "
         "(zero LLM tokens). Consume via `repo-index.json`."
@@ -1998,6 +2562,9 @@ def run_scan(
             "'meta.history' absent, treat as absent evidence"
         )
 
+    comment_entries, comment_warnings = collect_comments(repo, records, tables, paths)
+    warnings.extend(comment_warnings)
+
     for schema_name in openapi_schemas:
         tables.append(TableDef(table=schema_name, columns=[], file="", line=0))
 
@@ -2031,6 +2598,7 @@ def run_scan(
         "ui": [u.to_jsonb() for u in ui],
         "tests": [TestNode(node_id=n, file=n.split("::")[0]).to_jsonb() for n in test_nodes],
         "config": [e.to_jsonb() for e in config_entries],
+        "comments": [e.to_jsonb() for e in comment_entries],
     }
 
     out_json.parent.mkdir(parents=True, exist_ok=True)
@@ -2043,7 +2611,7 @@ def run_scan(
     print(
         f"files={len(records)} symbols={sum(len(r.symbols) for r in records)} "
         f"api={len(api)} tables={len(tables)} ui={len(ui)} tests={len(test_nodes)} "
-        f"config={len(config_entries)} "
+        f"config={len(config_entries)} comments={len(comment_entries)} "
         f"history={len(history['commit_subjects']) if history else 0}"
     )
     if verbose:  # pragma: no cover - informational
@@ -2231,6 +2799,8 @@ def run_verify(
             check(comp.get("file", ""), comp.get("line", 0))
         for entry in index.get("config", []):
             check(entry.get("source", ""), entry.get("line", 0))
+        for entry in index.get("comments", []):
+            check(entry.get("file", ""), entry.get("line", 0))
 
     print(
         f"checked {checked} citations "

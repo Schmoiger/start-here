@@ -305,7 +305,7 @@ sequenceDiagram
 |-------|----------------|-------------------|
 | Phase 1 · Discovery + scan | `git ls-files`, language detection, doc globs | Confirms the discovered doc list; writes `repo-profile.md` |
 | Phase 2 · Existing-spec extraction | doc classification | Reads the prose docs (small); builds drift candidates |
-| Phase 3 · Evidence gathering | stdlib `ast` (Python), TS/JSX heuristics, SQL `CREATE TABLE` parser, PyYAML OpenAPI, `pytest --collect-only`, `yarn test --listTests` (+ `config`/`history` keys, T-016/T-017) | Cross-index reasoning over `repo-index.json`; targeted line-range reads only |
+| Phase 3 · Evidence gathering | stdlib `ast` (Python), TS/JSX heuristics, SQL `CREATE TABLE` parser, PyYAML OpenAPI, `pytest --collect-only`, `yarn test --listTests` (+ `config`/`history`/`comments` keys, T-016/T-017/T-021) | Cross-index reasoning over `repo-index.json`; targeted line-range reads only |
 | Phase 4a · Product derivation | component/prop inventory (UI) | Features from UI inventory; roles/actors (`reverse-spec.md` §1.1); UX flows via call chains |
 | Phase 4b · Technical derivation | route/schema/API inventory | Architecture, api-catalogue draft, data-model draft |
 | Phase 5 · Draft + confidence | — | Subsections: tier + banded % + citations; open questions; drift |
@@ -330,8 +330,9 @@ sequenceDiagram
 The `scan` / `verify` invocations per phase (`--repo`, `--mode`, `--max-files`,
 `--out`, `--extractors`, `--history`, `verify --index` / `verify --doc` /
 `verify --doc --require-coverage`), the `repo-index.json`
-schema (including `meta.extractors` provenance and the per-file `extractor`
-field), the `spec-scan.md` evidence map, the `repo-profile.md` Phase-1
+schema (including `meta.extractors` provenance, the per-file `extractor`
+field, and the `config` / `history` / `comments` index keys), the
+`spec-scan.md` evidence map, the `repo-profile.md` Phase-1
 deliverable, backend degradation semantics, and the evidence-citation /
 confidence-band discipline are documented in the **`analyse-repo`** skill —
 `context/skills/analyse-repo.md`. Invoke the indexer through that skill; do not

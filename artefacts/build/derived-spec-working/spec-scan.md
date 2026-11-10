@@ -1,8 +1,8 @@
 # Spec Scan: start-here
-Generated: 2026-11-09T15:09:22Z · mode: both · 63 files · languages: javascript, python
+Generated: 2026-11-10T21:02:13Z · mode: both · 63 files · languages: javascript, python
 
 ## Scan Warnings
-- pytest: 258 collected (uv)
+- pytest: 292 collected (py3)
 
 ## Existing Spec Documents
 | Path | Kind |
@@ -34,12 +34,11 @@ Generated: 2026-11-09T15:09:22Z · mode: both · 63 files · languages: javascri
 | `tests/context-unit-tests/README.md` | readme |
 
 ## Repository Map (symbols)
-- `.openai/runner.py` (48 lines): function run_agent(6)
-- `context/scripts/code-specs/spec_indexer.py` (2243 lines): const LANG_BY_SUFFIX(67), const FOREIGN_LANG_SUFFIXES(78), const FOREIGN_LANGS(93), const TS_LANGS(94), const DOC_GLOBS(97), const DOC_BASENAME_PATTERNS(109), const EXCLUDED_DIRS(120), const ROUTE_METHOD_ATTRS(143), const _JSX_TAG_RE(147), const _TS_IMPORT_NAMED(150), const _TS_IMPORT_DEFAULT(153), const _TS_FUNC(156), const _TS_ARROW(159), const _TS_CLASS(163), const _TS_IFACE(164), const _TS_TYPE(165), const _TS_REQUIRE(166), class Symbol(176), method Symbol.to_jsonb(184), class FileRecord(196), method FileRecord.to_jsonb(204), class ApiEntry(216), method ApiEntry.to_jsonb(223), class ColumnDef(234), method ColumnDef.to_jsonb(238), class TableDef(243), method TableDef.to_jsonb(249), class UiComponent(259), method UiComponent.to_jsonb(267), class TestNode(279), method TestNode.to_jsonb(283), class DocRecord(288), method DocRecord.to_jsonb(292), class ConfigEntry(297), method ConfigEntry.to_jsonb(306), function rel(321), function language_of(326), function find_target_files(333), function _unparse(391), function _decorator_names(398), function _route_from_decorator(406), function _method_body(431), function analyze_python(442), function _destructured_props(514), function _is_component(527), function analyze_tsjs(531), const EXTRACTOR_CHOICES(619), const BACKEND_LANG_COVERAGE(629), const _EXTRACTOR_LABEL(637), function _cmd_ok(649), function probe_backends(657), function _likely_backend(678), function _stdlib_for(699), function resolve_plan(709), function _extractor_meta(758), function _ctags_kind(780), function analyze_ctags(799), const _TS_PACK_LANG(850), function analyze_tsjs_treesitter(859), const _ASTGREP_PATTERNS(1049), const _ASTGREP_KIND_RE(1057), const _ASTGREP_LANG_FLAG(1066), function analyze_tsjs_astgrep(1075), function analyze_tsjs_tsmorph(1143), const _SQL_CREATE(1188), const _SQL_SKIP_COLUMN(1192), function analyze_sql(1199), function _run(1237), function collect_tests(1245), function discover_docs(1303), function analyze_openapi(1335), const MAX_MAP_ROWS(1373), const MAX_API_ROWS(1374), const MAX_UI_ROWS(1375), const MAX_TEST_ROWS(1376), const MAX_SCHEMA_ROWS(1377), const MAX_CONFIG_ROWS(1378), const _CONFIG_ENV_NAMES(1385), const _CONFIG_PY_STEM_RE(1388), const _CONFIG_DATA_STEM_RE(1393), const _CONFIG_DATA_EXCLUDE_RE(1398), const _CONFIG_SECRET_RE(1402), const _CONFIG_FEATURE_RE(1406), const _CONFIG_BOOL_VALUES(1409), const _CONFIG_TEST_PARTS(1412), const _MAX_VALUE_HINT(1415), const _HISTORY_COMMIT_FMT(1418), const _HISTORY_HASH_RE(1419), const _MAX_HISTORY_RENAMES(1420), const MAX_HISTORY_ROWS(1421), function _skip_config_path(1424), function _config_value_hint(1432), function _config_is_feature(1444), function _config_env_call(1448), function _collect_config_env(1480), function _collect_config_py_module(1500), function _config_key_line(1542), function _collect_config_data_file(1555), function collect_config(1587), function collect_history(1686), function _default_out_dir(1765), function render_spec_scan(1770), function run_scan(1904), const _CITATION_RE(2059), function _line_text(2064), function run_verify(2078), function main(2148)
+- `context/scripts/code-specs/spec_indexer.py` (2945 lines): const LANG_BY_SUFFIX(78), const FOREIGN_LANG_SUFFIXES(89), const FOREIGN_LANGS(104), const TS_LANGS(105), const DOC_GLOBS(108), const DOC_BASENAME_PATTERNS(120), const EXCLUDED_DIRS(131), const ROUTE_METHOD_ATTRS(154), const _JSX_TAG_RE(158), const _TS_IMPORT_NAMED(161), const _TS_IMPORT_DEFAULT(164), const _TS_FUNC(167), const _TS_ARROW(170), const _TS_CLASS(174), const _TS_IFACE(175), const _TS_TYPE(176), const _TS_REQUIRE(177), class CommentEntry(187), method CommentEntry.to_jsonb(205), class Symbol(216), method Symbol.to_jsonb(227), class FileRecord(247), method FileRecord.to_jsonb(255), class ApiEntry(267), method ApiEntry.to_jsonb(274), class ColumnDef(285), method ColumnDef.to_jsonb(290), class TableDef(295), method TableDef.to_jsonb(301), class UiComponent(311), method UiComponent.to_jsonb(319), class TestNode(331), method TestNode.to_jsonb(335), class DocRecord(340), method DocRecord.to_jsonb(344), class ConfigEntry(349), method ConfigEntry.to_jsonb(358), function rel(373), function language_of(378), function find_target_files(385), function _unparse(443), function _decorator_names(450), function _route_from_decorator(458), function _method_body(483), function analyze_python(495), function _destructured_props(574), function _is_component(587), function analyze_tsjs(591), const EXTRACTOR_CHOICES(679), const BACKEND_LANG_COVERAGE(689), const _EXTRACTOR_LABEL(697), function _cmd_ok(709), function probe_backends(717), function _likely_backend(738), function _stdlib_for(759), function resolve_plan(769), function _extractor_meta(818), function _ctags_kind(840), function analyze_ctags(859), const _TS_PACK_LANG(910), function analyze_tsjs_treesitter(919), const _ASTGREP_PATTERNS(1126), const _ASTGREP_KIND_RE(1134), const _ASTGREP_LANG_FLAG(1143), function analyze_tsjs_astgrep(1152), function analyze_tsjs_tsmorph(1231), const _SQL_CREATE(1276), const _SQL_SKIP_COLUMN(1280), function analyze_sql(1287), function _run(1329), function collect_tests(1337), function discover_docs(1395), function analyze_openapi(1427), const MAX_MAP_ROWS(1465), const MAX_API_ROWS(1466), const MAX_UI_ROWS(1467), const MAX_TEST_ROWS(1468), const MAX_SCHEMA_ROWS(1469), const MAX_CONFIG_ROWS(1470), const _CONFIG_ENV_NAMES(1477), const _CONFIG_PY_STEM_RE(1480), const _CONFIG_DATA_STEM_RE(1485), const _CONFIG_DATA_EXCLUDE_RE(1490), const _CONFIG_SECRET_RE(1494), const _CONFIG_FEATURE_RE(1498), const _CONFIG_BOOL_VALUES(1501), const _CONFIG_TEST_PARTS(1504), const _MAX_VALUE_HINT(1507), const _HISTORY_COMMIT_FMT(1510), const _HISTORY_HASH_RE(1511), const _MAX_HISTORY_RENAMES(1512), const MAX_HISTORY_ROWS(1513), function _skip_config_path(1516), function _config_value_hint(1524), function _config_is_feature(1536), function _config_env_call(1540), function _collect_config_env(1572), function _collect_config_py_module(1592), function _config_key_line(1634), function _collect_config_data_file(1647), function collect_config(1679), function collect_history(1778), const _MAX_COMMENT_TEXT(1858), const MAX_COMMENT_ROWS(1864), const _LEADING_GAP(1865), const _MAX_COMMENT_ENTRIES(1866), const _COMMENT_MARKER(1868), function _shorten_comment(1871), function _mask_code_strings(1877), function _clean_comment_text(1909), function _group_comment_lines(1929), function _python_comments(1950), function _ts_comments(1994), function _sql_comments(2028), function _symbol_ref(2052), function _attach_leading_blocks(2056), function _attach_inline_comments(2094), function _attach_sql_leading(2116), function collect_comments(2148), function _default_out_dir(2308), function render_spec_scan(2313), function run_scan(2468), const _CITATION_RE(2627), const _COVERAGE_TIERS(2636), const _COVERAGE_TIER_RE(2641), const _COVERAGE_PERCENT_RE(2644), const _COVERAGE_CONFIDENCE_RE(2645), const _COVERAGE_HEADING_RE(2648), const _COVERAGE_NON_CONTENT_RE(2651), function _confidence_line_errors(2657), function check_doc_coverage(2682), function _line_text(2734), function run_verify(2748), function main(2840)
 - `context/scripts/code-specs/ts_extract.mjs` (122 lines): function push(35)
 - `context/scripts/generators/adapters/claude/generator.py` (92 lines): function _extract_model_mappings(8), function generate_claude_md(34), function generate_subagent_prompts(60)
 - `context/scripts/generators/adapters/cline/generator.py` (151 lines): function _extract_cline_model_mappings(10), function generate_cline_md(39), function generate_cline_rules(71), function generate_cline_skills(97)
-- `context/scripts/generators/adapters/core/agents_md.py` (149 lines): function _trim_purpose(11), function generate_workflow_table(19), function generate_agent_dispatch_all(31), function generate_skill_table(60), function generate_agents_md(73)
+- `context/scripts/generators/adapters/core/agents_md.py` (73 lines): function generate_agents_md(6)
 - `context/scripts/generators/adapters/core/budget.py` (31 lines): class DeliveryStrategy(4), class TokenEstimator(10), method TokenEstimator.__init__(15), method TokenEstimator.estimate_tokens(18), method TokenEstimator.recommend_strategy(24)
 - `context/scripts/generators/adapters/core/loader.py` (125 lines): function extract_frontmatter(14), function normalise_tools(22), function load_canonical_context(49)
 - `context/scripts/generators/adapters/core/models.py` (58 lines): class CanonicalRule(5), class CanonicalStandard(11), class CanonicalSkill(17), class CanonicalAgent(25), class CanonicalPersona(39), class Phase(46), class WorkflowDAG(54)
@@ -47,7 +46,7 @@ Generated: 2026-11-09T15:09:22Z · mode: both · 63 files · languages: javascri
 - `context/scripts/generators/adapters/gemini/generator.py` (135 lines): function generate_skills(9), function _extract_model_mappings(85), function generate_gemini_md(111)
 - `context/scripts/generators/adapters/github/generator.py` (180 lines): function generate_prompts(8), function generate_copilot_instructions(44), function generate_scoped_instructions(66), function generate_workflows(143)
 - `context/scripts/generators/adapters/openai/generator.py` (133 lines): function generate_system_prompts(8), function generate_tool_schemas(46), function generate_runner_harness(75)
-- `context/scripts/generators/generate_adapters.py` (468 lines): const _REPO_ROOT(24), const SUPPORTED_TARGETS(55), const TARGET_ALIASES(57), const IGNORED_BLOCK(74), function ensure_root_gitignore(91), function normalize_target(128), function load_configured_targets(137), function get_adapter_projections(163), function run_generation(226), function build_parser(308), function main(428)
+- `context/scripts/generators/generate_adapters.py` (508 lines): const _REPO_ROOT(24), const SUPPORTED_TARGETS(55), const TARGET_ALIASES(57), const IGNORED_BLOCK(74), function ensure_root_gitignore(91), function normalize_target(128), function load_configured_targets(137), function get_adapter_projections(163), function run_generation(266), function build_parser(348), function main(468)
 - `context/scripts/prepare-commit-msg.py` (848 lines): class ExtractionResult(40), function format_tokens(51), function short_model(60), function get_git_repo_root(68), function get_watermark_path(79), function read_watermark(84), function write_watermark(95), function _decode_varint(109), function parse_protobuf_fields(125), class BaseExtractor(163), method BaseExtractor.is_available(167), method BaseExtractor.find_active_session(171), method BaseExtractor.extract_delta(175), class AntigravityExtractor(180), method AntigravityExtractor.__init__(184), method AntigravityExtractor.is_available(191), method AntigravityExtractor.find_active_session(194), method AntigravityExtractor.extract_delta(219), class CopilotExtractor(298), method CopilotExtractor.__init__(302), method CopilotExtractor.is_available(311), method CopilotExtractor.find_active_session(314), method CopilotExtractor.extract_delta(349), class ClaudeExtractor(421), method ClaudeExtractor.is_available(425), method ClaudeExtractor.find_active_session(428), method ClaudeExtractor.extract_delta(443), class CodexExtractor(514), method CodexExtractor.is_available(518), method CodexExtractor.find_active_session(521), method CodexExtractor.extract_delta(524), class ClineExtractor(528), method ClineExtractor.__init__(546), method ClineExtractor.is_available(560), method ClineExtractor._load_session_meta(564), method ClineExtractor.find_active_session(572), method ClineExtractor.extract_delta(597), const EXTRACTORS(681), function select_extractor(694), function _set_trailer_field(724), function update_commit_message(731), function main(779)
 - `context/scripts/tests/conftest.py` (131 lines): function fixtures_dir(8), function valid_commit(14), function invalid_commit_no_scope(20), function invalid_commit_too_long(26), function invalid_commit_past_tense(32), function valid_commit_with_agent_session(38), function merge_commit(44), function invalid_commit_no_body(50), function valid_requirements(56), function invalid_requirements(62), function valid_british_english(68), function invalid_british_english(74), function valid_metrics(80), function invalid_metrics(86), function valid_interruptions(92), function invalid_interruptions(98), function test_workflow(104), function valid_agent(110), function invalid_agent_no_frontmatter(116), function invalid_agent_hardcoded_paths(122), function invalid_agent_missing_sections(128)
 - `context/scripts/tests/test_adapter_drift.py` (172 lines): function test_adapter_drift_clean_repo(8), function test_adapter_drift_detects_modified_file(16), function test_adapter_drift_detects_missing_file(47), function test_adapter_drift_detects_orphaned_file(76), function test_adapter_drift_with_agent_targets_file(110), function test_adapter_drift_cline_managed_dirs(138)
@@ -62,7 +61,8 @@ Generated: 2026-11-09T15:09:22Z · mode: both · 63 files · languages: javascri
 - `context/scripts/tests/test_openai_adapter.py` (61 lines): function test_generate_system_prompts(12), function test_generate_tool_schemas(38), function test_generate_runner_harness(51)
 - `context/scripts/tests/test_packaging.py` (49 lines): function test_pyproject_toml_exists(8), function test_generator_entrypoint_parser(20), function test_drift_validator_callable(38)
 - `context/scripts/tests/test_runtime_telemetry.py` (620 lines): const EXTRACTORS(45), function test_format_tokens(54), function test_protobuf_wire_format_parsing(63), function _encode_varint(76), function _encode_field(90), function test_antigravity_synthetic_extraction(101), function test_copilot_synthetic_extraction(161), function test_commit_message_updating(217), function test_live_antigravity_storage_sanity(244), function test_live_copilot_storage_sanity(285), function test_live_claude_storage_sanity(322), function _make_cline_session(360), function test_cline_extract_delta_counts_assistant_metrics(380), function test_cline_extract_delta_accepts_wrapped_messages(414), function test_cline_extract_delta_session_switch_resets(438), function test_cline_extract_delta_falls_back_to_session_model(462), function test_cline_extract_delta_error_paths(478), function test_cline_find_active_session_matches_repo_and_picks_newest(502), function test_cline_registry_and_selection(529), function test_short_model_strips_provider_prefix(540), function test_update_commit_message_injects_tool_and_model(547), function test_update_commit_message_removes_stale_tokens(562), function test_live_cline_storage_sanity(577)
-- `context/scripts/tests/test_spec_indexer.py` (436 lines): const INDEXER_PATH(20), const REPO_ROOT(21), const CONTEXT_DIR(22), const SKILLS_DIR(23), const AGENTS_DIR(24), const WORKFLOWS_DIR(25), const KNOWN_AGENTS(34), const SKILL_FILES(37), const TSX_FIXTURE(39), function _parse_frontmatter(60), function _validate_skill(73), function _validate_workflow(87), function _valid_workflow(143), function _scan(160), class TestSkillFrontmatterSchema(173), method TestSkillFrontmatterSchema.test_derive_skills_have_valid_frontmatter(174), method TestSkillFrontmatterSchema.test_skill_name_matches_filename_stem(179), method TestSkillFrontmatterSchema.test_skill_globs_is_list_of_glob_strings(184), class TestWorkflowPhaseSchema(196), method TestWorkflowPhaseSchema.test_all_real_workflows_pass_schema(197), method TestWorkflowPhaseSchema.test_rejects_duplicate_phase_ids(203), method TestWorkflowPhaseSchema.test_rejects_unresolvable_depends_on(209), method TestWorkflowPhaseSchema.test_rejects_unknown_agent(215), method TestWorkflowPhaseSchema.test_accepts_at_prefix_and_inline_comment_agents(221), method TestWorkflowPhaseSchema.test_rejects_non_boolean_phase_gate(226), method TestWorkflowPhaseSchema.test_gate_phase_without_quality_gates_entry_is_allowed(232), method TestWorkflowPhaseSchema.test_rejects_quality_gate_unknown_phase(238), method TestWorkflowPhaseSchema.test_accepts_evidence_style_quality_gate_without_gate_key(244), class TestPythonExtraction(256), method TestPythonExtraction.test_symbols_and_constants(282), method TestPythonExtraction.test_imports_recorded(296), method TestPythonExtraction.test_route_decorators_produce_api_entries(303), class TestTsJsExtraction(320), method TestTsJsExtraction.test_components_props_and_usage(321), method TestTsJsExtraction.test_scan_aggregates_ui_components(336), class TestSqlParsing(355), method TestSqlParsing.test_create_table_columns(369), class TestVerifyOnSyntheticRepo(389), method TestVerifyOnSyntheticRepo.test_verify_passes_index_then_fails_when_source_removed(390), method TestVerifyOnSyntheticRepo.test_verify_doc_checks_cited_file_lines(401), class TestExtractorSmoke(419), method TestExtractorSmoke.test_invalid_extractor_exits_nonzero(420), method TestExtractorSmoke.test_meta_extractors_provenance_populated(425)
+- `context/scripts/tests/test_spec_indexer.py` (554 lines): const INDEXER_PATH(21), const REPO_ROOT(22), const CONTEXT_DIR(23), const SKILLS_DIR(24), const AGENTS_DIR(25), const WORKFLOWS_DIR(26), const KNOWN_AGENTS(35), const SKILL_FILES(38), const TSX_FIXTURE(40), function _parse_frontmatter(61), function _validate_skill(74), function _validate_workflow(88), function _valid_workflow(144), function _scan(161), class TestSkillFrontmatterSchema(174), method TestSkillFrontmatterSchema.test_derive_skills_have_valid_frontmatter(175), method TestSkillFrontmatterSchema.test_skill_name_matches_filename_stem(180), method TestSkillFrontmatterSchema.test_skill_globs_is_list_of_glob_strings(185), class TestWorkflowPhaseSchema(197), method TestWorkflowPhaseSchema.test_all_real_workflows_pass_schema(198), method TestWorkflowPhaseSchema.test_rejects_duplicate_phase_ids(204), method TestWorkflowPhaseSchema.test_rejects_unresolvable_depends_on(210), method TestWorkflowPhaseSchema.test_rejects_unknown_agent(216), method TestWorkflowPhaseSchema.test_accepts_at_prefix_and_inline_comment_agents(222), method TestWorkflowPhaseSchema.test_rejects_non_boolean_phase_gate(227), method TestWorkflowPhaseSchema.test_gate_phase_without_quality_gates_entry_is_allowed(233), method TestWorkflowPhaseSchema.test_rejects_quality_gate_unknown_phase(239), method TestWorkflowPhaseSchema.test_accepts_evidence_style_quality_gate_without_gate_key(245), class TestPythonExtraction(257), method TestPythonExtraction.test_symbols_and_constants(283), method TestPythonExtraction.test_imports_recorded(297), method TestPythonExtraction.test_route_decorators_produce_api_entries(304), class TestTsJsExtraction(321), method TestTsJsExtraction.test_components_props_and_usage(322), method TestTsJsExtraction.test_scan_aggregates_ui_components(337), class TestSqlParsing(356), method TestSqlParsing.test_create_table_columns(370), class TestVerifyOnSyntheticRepo(390), method TestVerifyOnSyntheticRepo.test_verify_passes_index_then_fails_when_source_removed(391), method TestVerifyOnSyntheticRepo.test_verify_doc_checks_cited_file_lines(402), class TestExtractorSmoke(420), method TestExtractorSmoke.test_invalid_extractor_exits_nonzero(421), method TestExtractorSmoke.test_meta_extractors_provenance_populated(426), function _write_source(444), const GOOD_DOC(451), class TestDocCoverage(479), method TestDocCoverage.test_coverage_passes_when_every_content_subsection_confident(480), method TestDocCoverage.test_coverage_can_be_disabled_by_default(486), method TestDocCoverage.test_coverage_fails_on_missing_confidence_line(493), method TestDocCoverage.test_coverage_reports_missing_tier(498), method TestDocCoverage.test_coverage_reports_missing_percentage(504), method TestDocCoverage.test_coverage_reports_missing_file_line_citation(510), method TestDocCoverage.test_coverage_reports_band_mismatch(516), method TestDocCoverage.test_coverage_accepts_markdown_file_line_citations(521), method TestDocCoverage.test_coverage_boundary_85_allows_verified_or_needs_confirmation(526), method TestDocCoverage.test_coverage_skips_placeholder_and_structural_headings(532), method TestDocCoverage.test_coverage_fails_via_run_verify_and_lists_subsection(542), method TestDocCoverage.test_cli_require_coverage_requires_doc(551)
+- `context/scripts/tests/test_spec_indexer_comments.py` (358 lines): const INDEXER_PATH(19), const REPO_ROOT(20), function _write(30), function _scan(38), function _entries(46), function _symbol(50), const PY_FIXTURE(55), class TestPythonCommentsTokenize(72), method TestPythonCommentsTokenize.test_comment_markers_inside_strings_are_never_captured(73), method TestPythonCommentsTokenize.test_doc_block_above_definition_attaches_leading_and_fills_docstring(82), method TestPythonCommentsTokenize.test_trailing_comment_does_not_join_the_doc_block(90), method TestPythonCommentsTokenize.test_body_comments_attach_inline_within_symbol_span(102), method TestPythonCommentsTokenize.test_orphan_comments_stay_in_the_stream_unattached(110), class TestPythonDocstrings(121), method TestPythonDocstrings.test_module_docstring_is_an_orphan_docstring_entry(122), method TestPythonDocstrings.test_function_docstring_attaches_to_symbol(130), method TestPythonDocstrings.test_class_and_method_docstrings_attach(145), const TS_FIXTURE(156), class TestTsJsComments(174), method TestTsJsComments.test_jsdoc_attaches_as_docstring_and_sets_symbol_docstring(175), method TestTsJsComments.test_line_comment_inside_string_is_masked(182), method TestTsJsComments.test_line_doc_block_above_function_attaches_leading(188), method TestTsJsComments.test_block_comment_is_orphan_until_attached(195), const SQL_FIXTURE(203), class TestSqlComments(216), method TestSqlComments.test_double_dash_comment_attaches_to_nearest_table(217), method TestSqlComments.test_column_comment_attaches_to_nearest_column(227), method TestSqlComments.test_block_comment_attaches_to_nearest_table(236), class TestIndexIntegration(247), method TestIndexIntegration.test_comments_key_sorted_and_deterministic(248), method TestIndexIntegration.test_verify_index_checks_comment_citations(259), method TestIndexIntegration.test_render_spec_scan_shows_comment_map(267), method TestIndexIntegration.test_render_spec_scan_says_none_when_no_comments(307), method TestIndexIntegration.test_cli_scan_emits_comments_key(327), class TestRealRepo(339), method TestRealRepo.test_real_repo_module_docstring_is_indexed(340), method TestRealRepo.test_real_repo_comment_stream_uses_exact_file_lines(349)
 - `context/scripts/tests/test_spec_indexer_config.py` (183 lines): const INDEXER_PATH(12), const REPO_ROOT(13), const ENV_TEMPLATE(21), const SETTINGS_PY(29), function _write_tree(40), function _scan(48), function _config_map(56), class TestConfigSources(60), method TestConfigSources.test_config_should_extract_env_template_keys_when_env_file_present(61), method TestConfigSources.test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present(76), method TestConfigSources.test_config_should_extract_scalar_keys_when_yaml_config_present(91), method TestConfigSources.test_config_should_extract_scalar_keys_when_json_config_present(112), method TestConfigSources.test_config_should_ignore_non_config_files_when_names_do_not_match(124), method TestConfigSources.test_config_should_keep_first_source_value_when_key_defined_in_multiple_sources(139), method TestConfigSources.test_config_should_be_deterministic_when_scan_repeated(151), class TestConfigVerify(165), method TestConfigVerify.test_verify_should_fail_when_config_source_removed_after_indexing(166), class TestRealRepo(176), method TestRealRepo.test_config_should_redact_secrets_when_scanning_real_repo_env_template(177)
 - `context/scripts/tests/test_spec_indexer_extractors.py` (249 lines): const INDEXER_PATH(14), const REPO_ROOT(15), const TSX_FIXTURE(24), function _scan(54), function _all_symbols(62), function _python_symbols(70), class TestProbeAndPlan(74), method TestProbeAndPlan.test_probe_backends_never_raises(75), method TestProbeAndPlan.test_auto_plan_python_uses_stdlib_ast(80), method TestProbeAndPlan.test_auto_plan_ts_prefers_treesitter_when_available(87), method TestProbeAndPlan.test_auto_plan_ts_degrades_to_astgrep_then_regex(93), method TestProbeAndPlan.test_explicit_unavailable_backend_is_an_error(104), method TestProbeAndPlan.test_explicit_ts_morph_unavailable_degrades_quietly(111), method TestProbeAndPlan.test_cli_rejects_unknown_extractor(118), class TestParity(124), method TestParity.test_auto_and_stdlib_python_symbols_identical(125), method TestParity.test_auto_is_superset_of_stdlib(134), method TestParity.test_meta_provenance_fields_present(143), class TestCtagsBackend(162), method TestCtagsBackend.test_python_file_yields_symbols(163), method TestCtagsBackend.test_ts_file_method_scoped_names(175), class TestTreeSitterBackend(186), method TestTreeSitterBackend.test_fixture_richer_than_regex(187), method TestTreeSitterBackend.test_fixture_symbols_kinds(217), class TestAstGrepBackend(232), method TestAstGrepBackend.test_fixture_interfaces_types_and_consts(233)
 - `context/scripts/tests/test_spec_indexer_history.py` (264 lines): const INDEXER_PATH(21), const REPO_ROOT(22), function _git(31), function _init_repo(41), function _commit(48), function _scan(58), class TestHistoryPresence(66), method TestHistoryPresence.test_history_should_list_commit_subjects_newest_first(67), method TestHistoryPresence.test_history_should_record_rename_clues_when_files_moved(84), method TestHistoryPresence.test_history_should_respect_history_cap_with_capped_flag(115), method TestHistoryPresence.test_history_should_be_deterministic_across_scans(128), class TestHistoryAbsent(138), method TestHistoryAbsent.test_history_should_be_absent_when_repo_has_no_git_metadata(139), method TestHistoryAbsent.test_history_should_be_absent_when_git_repo_has_no_commits(146), method TestHistoryAbsent.test_history_cap_zero_should_disable_the_git_pull(153), class TestHistoryCli(161), method TestHistoryCli.test_cli_history_flag_should_wire_into_run_scan(162), method TestHistoryCli.test_cli_default_history_cap_should_be_200(175), class TestRenderHistory(186), method TestRenderHistory.test_render_spec_scan_should_list_subjects_and_renames(187), method TestRenderHistory.test_render_spec_scan_should_say_absent_when_no_history(224), class TestRealRepo(246), method TestRealRepo.test_history_for_real_repo_should_match_latest_commit_subject(247), method TestRealRepo.test_history_for_real_repo_should_include_rename_clues(258)
@@ -210,6 +210,40 @@ None detected (no TS/JSX component definitions found).
 - context/scripts/tests/test_spec_indexer.py::TestVerifyOnSyntheticRepo::test_verify_doc_checks_cited_file_lines
 - context/scripts/tests/test_spec_indexer.py::TestExtractorSmoke::test_invalid_extractor_exits_nonzero
 - context/scripts/tests/test_spec_indexer.py::TestExtractorSmoke::test_meta_extractors_provenance_populated
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_passes_when_every_content_subsection_confident
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_can_be_disabled_by_default
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_fails_on_missing_confidence_line
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_reports_missing_tier
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_reports_missing_percentage
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_reports_missing_file_line_citation
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_reports_band_mismatch
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_accepts_markdown_file_line_citations
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_boundary_85_allows_verified_or_needs_confirmation
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_skips_placeholder_and_structural_headings
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_coverage_fails_via_run_verify_and_lists_subsection
+- context/scripts/tests/test_spec_indexer.py::TestDocCoverage::test_cli_require_coverage_requires_doc
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonCommentsTokenize::test_comment_markers_inside_strings_are_never_captured
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonCommentsTokenize::test_doc_block_above_definition_attaches_leading_and_fills_docstring
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonCommentsTokenize::test_trailing_comment_does_not_join_the_doc_block
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonCommentsTokenize::test_body_comments_attach_inline_within_symbol_span
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonCommentsTokenize::test_orphan_comments_stay_in_the_stream_unattached
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonDocstrings::test_module_docstring_is_an_orphan_docstring_entry
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonDocstrings::test_function_docstring_attaches_to_symbol
+- context/scripts/tests/test_spec_indexer_comments.py::TestPythonDocstrings::test_class_and_method_docstrings_attach
+- context/scripts/tests/test_spec_indexer_comments.py::TestTsJsComments::test_jsdoc_attaches_as_docstring_and_sets_symbol_docstring
+- context/scripts/tests/test_spec_indexer_comments.py::TestTsJsComments::test_line_comment_inside_string_is_masked
+- context/scripts/tests/test_spec_indexer_comments.py::TestTsJsComments::test_line_doc_block_above_function_attaches_leading
+- context/scripts/tests/test_spec_indexer_comments.py::TestTsJsComments::test_block_comment_is_orphan_until_attached
+- context/scripts/tests/test_spec_indexer_comments.py::TestSqlComments::test_double_dash_comment_attaches_to_nearest_table
+- context/scripts/tests/test_spec_indexer_comments.py::TestSqlComments::test_column_comment_attaches_to_nearest_column
+- context/scripts/tests/test_spec_indexer_comments.py::TestSqlComments::test_block_comment_attaches_to_nearest_table
+- context/scripts/tests/test_spec_indexer_comments.py::TestIndexIntegration::test_comments_key_sorted_and_deterministic
+- context/scripts/tests/test_spec_indexer_comments.py::TestIndexIntegration::test_verify_index_checks_comment_citations
+- context/scripts/tests/test_spec_indexer_comments.py::TestIndexIntegration::test_render_spec_scan_shows_comment_map
+- context/scripts/tests/test_spec_indexer_comments.py::TestIndexIntegration::test_render_spec_scan_says_none_when_no_comments
+- context/scripts/tests/test_spec_indexer_comments.py::TestIndexIntegration::test_cli_scan_emits_comments_key
+- context/scripts/tests/test_spec_indexer_comments.py::TestRealRepo::test_real_repo_module_docstring_is_indexed
+- context/scripts/tests/test_spec_indexer_comments.py::TestRealRepo::test_real_repo_comment_stream_uses_exact_file_lines
 - context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_env_template_keys_when_env_file_present
 - context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_module_constants_and_env_defaults_when_settings_module_present
 - context/scripts/tests/test_spec_indexer_config.py::TestConfigSources::test_config_should_extract_scalar_keys_when_yaml_config_present
@@ -261,41 +295,7 @@ None detected (no TS/JSX component definitions found).
 - context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_requires_coauthor
 - context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_tokens_mega_suffix
 - context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_tokens_lowercase_suffix
-- context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_hook_appended_form
-- context/scripts/tests/test_validators.py::TestConventionalCommits::test_agent_session_malformed_tokens_fails
-- context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_model_corroborated_for_cline
-- context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_model_contradicting_runtime_fails
-- context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_unconfirmable_model_fails
-- context/scripts/tests/test_validators.py::TestAgentSessionCorroboration::test_third_party_tool_not_adjudicated
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_valid_requirements
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_invalid_requirements
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_ubiquitous_pattern
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_event_pattern
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_state_pattern
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_optional_pattern
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_forbidden_pattern
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_complex_pattern
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_non_ears_requirement
-- context/scripts/tests/test_validators.py::TestEARSNotation::test_code_blocks_ignored
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_valid_british_english
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_invalid_american_english
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_color_vs_colour
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_behavior_vs_behaviour
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_organize_vs_organise
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_code_blocks_ignored
-- context/scripts/tests/test_validators.py::TestBritishEnglish::test_inline_code_ignored
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_valid_metrics
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_metrics
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_metrics_log_location_under_build
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_metrics_log_requires_jsonl_suffix
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_metrics_log_rejects_repository_root
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_missing_required_field
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_timestamp
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_event
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_invalid_token_source
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_missing_tokens_fields
-- context/scripts/tests/test_validators.py::TestMetricsLogging::test_handoff_requires_to_field
-… 58 more test node-ids
+… 92 more test node-ids
 
 ## Config Settings & Feature Flags
 - `ANTHROPIC_API_KEY` = <redacted> @.env.template:18
@@ -308,7 +308,25 @@ None detected (no TS/JSX component definitions found).
 - `UPSTREAM_PUSH_TOKEN` = <redacted> @.env.template:9
 
 ## Recent Git History (evidence)
-- 200 commits (newest first) · capped — repo has more · renames=16
+- 200 commits (newest first) · capped — repo has more · renames=17
+- Merge pull request #25 from Schmoiger/feat/new-agentmd
+- chore(repo): rerun init script
+- feat(harness): deterministic runtime-context bullets for AGENTS.md
+- feat(harness): streamline AGENTS.md source
+- feat(docs): add new model tiers
+- feat(docs): trim to reduce token cost
+- feat(docs): update PR template
+- docs(context): move AGENTS.md detail into workflows README
+- docs(context): document agents-md.yaml as AGENTS.md source
+- feat(context): move agents-md.yaml to workflows directory
+- feat(context): generate AGENTS.md from agents-md.yaml YAML source file
+- docs(spec): mark T-020 handoff complete
+- feat(spec): verify --require-coverage deterministic Phase 6 gate (T-020)
+- docs(spec): mark T-018 handoff complete
+- docs(spec): harden confidence bands + promotion DoD template (T-018)
+- docs(spec): mark T-017 handoff complete
+- chore(spec): append T-017 session metrics
+- feat(spec): indexer meta.history git-history evidence (T-017)
 - test(bugs): bugs  after task 008
 - fix(docs): move output location
 - refactor(spec): move working artefacts to derived-spec-working
@@ -331,27 +349,10 @@ None detected (no TS/JSX component definitions found).
 - docs(spec): add Cline tool-hygiene bugs B-006/B-007
 - docs(spec): record process bugs + backfill session metrics (B-001..B-005)
 - test(spec): rename config tests to should convention
-- feat(spec): indexer config extraction into config key (T-016)
-- feat(spec): wire indexer into derive-spec workflow phases (T-013)
-- feat(spec): add derive-spec workflow YAML (T-002)
-- feat(spec): add derive-spec skill (T-001)
-- feat(spec): wrap indexer tool usage in analyse-repo skill (T-014)
-- feat(spec): implement T-015 extraction backends (--extractors)
-- docs(spec): mark T-SETUP completed, reword T-015 ast-grep command
-- docs(spec): add T-021 comment/docstring extraction design
-- docs(spec): align task detail headings with task index table
-- docs(spec): record A1-A4 decisions, add T-016..T-020, phase-align diagrams
-- docs(feat): updated tasks doc
-- chore(docs): example output from the current spec_indexer.py script
-- feat(tasks): add T-015 extraction backends with graceful fallback (ctags, tree-sitter, ast-grep, ts-morph)
-- chore(spec): log indexer final relocation
-- refactor(spec): relocate spec indexer to context/scripts/code-specs
-- refactor(spec): relocate spec indexer to context/scripts/code-specs
-- chore(spec): log indexer relocation
-- refactor(spec): relocate spec indexer to scripts/code-specs
 … 160 more subjects omitted
 
 Rename / refactor clues (cheap feature-intent signals):
+- `context/artifacts/agents-md.yaml` → `context/workflows/agents-md.yaml` (feat(context): move agents-md.yaml to workflows directory)
 - `artefacts/build/spec-drafts/api-catalogue.md` → `artefacts/build/derived-spec-working/api-catalogue-draft.md` (fix(docs): move output location)
 - `artefacts/build/spec-drafts/architecture.md` → `artefacts/build/derived-spec-working/architecture-draft.md` (fix(docs): move output location)
 - `artefacts/build/spec-drafts/data-model.md` → `artefacts/build/derived-spec-working/data-model-draft.md` (fix(docs): move output location)
@@ -368,6 +369,92 @@ Rename / refactor clues (cheap feature-intent signals):
 - `context/agents/workflow-analyst.md` → `context/skills/workflow-analysis.md` (refactor(agents): merge both analysts into harness-analyst)
 - `metrics/session-log.jsonl` → `artefacts/build/metrics/session-log.jsonl` (refactor(metrics): relocate session log under artefacts/build)
 - `context/templates/tasks-template.md` → `context/templates/tasks-doc-template.md` (renamed to tasks-doc-template for clarity (differentiates from task-prompt-template))
+
+## Comments & Docstrings (intent evidence)
+- 866 comment blocks across 59 files; first rows:
+  - `context/__init__.py:1` [docstring] Canonical context package for Agentic Orchestration Harness.
+  - `context/scripts/__init__.py:1` [docstring] Scripts package for Agentic Orchestration Harness.
+  - `context/scripts/code-specs/spec_indexer.py:1` [docstring] Deterministic codebase indexer for the derive-spec workflow.
+
+Zero-LLM extraction of a structural map of a repository so that agents spawned
+by the derive-spec workflow spend their token budget on synthesis and judgement
+instead of file ...
+  - `context/scripts/code-specs/spec_indexer.py:1` [leading] /// script | dependencies = [ | "pyyaml>=6.0", | ] | ///
+  - `context/scripts/code-specs/spec_indexer.py:70` [inline] type: ignore
+  - `context/scripts/code-specs/spec_indexer.py:71` [inline] pragma: no cover - declared in PEP 723 metadata
+  - `context/scripts/code-specs/spec_indexer.py:74` [leading] --------------------------------------------------------------------------- | Constants | --------------------------------------------------------------------------- → const `LANG_BY_SUFFIX`
+  - `context/scripts/code-specs/spec_indexer.py:88` [leading] Foreign languages handled by the universal-ctags backend (T-015) when available. → const `FOREIGN_LANG_SUFFIXES`
+  - `context/scripts/code-specs/spec_indexer.py:107` [leading] (relative glob, kind) pairs for the Phase-1 existing-document discovery. → const `DOC_GLOBS`
+  - `context/scripts/code-specs/spec_indexer.py:160` [leading] --- TS/JS heuristics -------------------------------------------------------- → const `_TS_IMPORT_NAMED`
+  - `context/scripts/code-specs/spec_indexer.py:181` [leading] --------------------------------------------------------------------------- | Data model | ---------------------------------------------------------------------------
+  - `context/scripts/code-specs/spec_indexer.py:187` [docstring] One comment/docstring block (T-021): ``{file, line, kind, text, attached}``.
+
+``kind`` is ``docstring`` (Python docstring / TS JSDoc), ``leading``
+(contiguous comment block immediately above a definition), ``inline``
+(comment on a line i... → class `CommentEntry`
+  - `context/scripts/code-specs/spec_indexer.py:217` [inline] class | function | method | component | interface | type | const → class `Symbol`
+  - `context/scripts/code-specs/spec_indexer.py:223` [inline] T-021: last body line (0 when the backend provides none) → class `Symbol`
+  - `context/scripts/code-specs/spec_indexer.py:224` [inline] T-021: doc-comment / ast docstring text (truncated) → class `Symbol`
+  - `context/scripts/code-specs/spec_indexer.py:225` [inline] T-021: attached entries → class `Symbol`
+  - `context/scripts/code-specs/spec_indexer.py:253` [inline] T-015: backend that produced this record (e.g. "tree-sitter") → class `FileRecord`
+  - `context/scripts/code-specs/spec_indexer.py:288` [inline] T-021: source line of the column definition (0 = unknown) → class `ColumnDef`
+  - `context/scripts/code-specs/spec_indexer.py:349` [docstring] One env/config/feature-flag key (T-016): ``{key, source, line, value_hint, feature}``. → class `ConfigEntry`
+  - `context/scripts/code-specs/spec_indexer.py:355` [inline] <redacted> for secret-looking keys; '' when only the key matters → class `ConfigEntry`
+  - `context/scripts/code-specs/spec_indexer.py:356` [inline] ENABLE_*/FEATURE_* naming or boolean-like value → class `ConfigEntry`
+  - `context/scripts/code-specs/spec_indexer.py:368` [leading] --------------------------------------------------------------------------- | Repository walking | --------------------------------------------------------------------------- → function `rel`
+  - `context/scripts/code-specs/spec_indexer.py:373` [docstring] Return path relative to the repo root, using forward slashes. → function `rel`
+  - `context/scripts/code-specs/spec_indexer.py:385` [docstring] Return (relative paths, warnings, too_large) for files to index.
+
+Prefers git-tracked files (respects .gitignore, skips untracked junk).
+Falls back to a bounded os.walk when the repo has no git metadata. → function `find_target_files`
+  - `context/scripts/code-specs/spec_indexer.py:438` [leading] --------------------------------------------------------------------------- | Python extraction (stdlib ast) | --------------------------------------------------------------------------- → function `_unparse`
+  - `context/scripts/code-specs/spec_indexer.py:446` [inline] pragma: no cover - defensive against odd nodes → function `_unparse`
+  - `context/scripts/code-specs/spec_indexer.py:458` [docstring] Extract (METHOD, path) from FastAPI/Flask route decorators. → function `_route_from_decorator`
+  - `context/scripts/code-specs/spec_indexer.py:495` [docstring] Parse a Python module with stdlib ast; return record plus API routes. → function `analyze_python`
+  - `context/scripts/code-specs/spec_indexer.py:569` [leading] --------------------------------------------------------------------------- | TypeScript / JavaScript extraction (v1 line heuristics; tree-sitter later) | --------------------------------------------------------------------------- → function `_destructured_props`
+  - `context/scripts/code-specs/spec_indexer.py:574` [docstring] Extract prop names from a destructured parameter list, e.g. `({a, b}: Props)`. → function `_destructured_props`
+  - `context/scripts/code-specs/spec_indexer.py:591` [docstring] Return record plus jsx-tag usage list for UI aggregation. → function `analyze_tsjs`
+  - `context/scripts/code-specs/spec_indexer.py:666` [inline] props for component consts/functions (from earlier pass) → function `analyze_tsjs`
+  - `context/scripts/code-specs/spec_indexer.py:674` [leading] --------------------------------------------------------------------------- | Backend selection (T-015): --extractors flag, probing, provenance | --------------------------------------------------------------------------- → const `EXTRACTOR_CHOICES`
+  - `context/scripts/code-specs/spec_indexer.py:688` [leading] Which backends can cover which languages. → const `BACKEND_LANG_COVERAGE`
+  - `context/scripts/code-specs/spec_indexer.py:717` [docstring] Report which external extractors are available. Every probe is wrapped; never raises.
+
+tree-sitter is provided on demand via
+``uv run --with tree-sitter --with tree-sitter-language-pack``. → function `probe_backends`
+  - `context/scripts/code-specs/spec_indexer.py:730` [inline] type: ignore  # noqa: F401 → function `probe_backends`
+  - `context/scripts/code-specs/spec_indexer.py:738` [docstring] Auto-mode per-language choice: (backend, reason). → function `_likely_backend`
+  - `context/scripts/code-specs/spec_indexer.py:769` [docstring] Map each present language to an extractor.
+
+Returns (plan, reasons, errors, warnings). A non-auto selection of an
+unavailable backend is an error (the CLI exits non-zero), except ts-morph
+which degrades quietly by design. → function `resolve_plan`
+  - `context/scripts/code-specs/spec_indexer.py:859` [docstring] universal-ctags JSON backend (primary for languages without a dedicated parser). → function `analyze_ctags`
+  - `context/scripts/code-specs/spec_indexer.py:887` [inline] interface-member noise; skip → function `analyze_ctags`
+  - `context/scripts/code-specs/spec_indexer.py:919` [docstring] Real-AST pass for TS/TSX via tree-sitter. Richer than the regex backend:
+multiline destructured props, JSX usage counts, decorators, named imports.
+
+Requires tree-sitter, provided on demand via
+``uv run --with tree-sitter --with tree-sit... → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:928` [inline] type: ignore → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:949` [inline] pragma: no cover → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:983` [docstring] Return (signature, destructured props) from a formal_parameters node.
+  - `context/scripts/code-specs/spec_indexer.py:1037` [inline] fall through: walk the body so JSX inside functions is captured → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:1067` [inline] fall through to walk the method body (JSX) → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:1110` [inline] fall through to walk the initializers (arrow bodies contain JSX) → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:1118` [inline] keep walking: opening elements can nest further JSX → function `analyze_tsjs_treesitter`
+  - `context/scripts/code-specs/spec_indexer.py:1125` [leading] ast-grep rule patterns for TS/JS (degraded-mode backend; tree-sitter preferred). → const `_ASTGREP_PATTERNS`
+  - `context/scripts/code-specs/spec_indexer.py:1152` [docstring] Rule-driven TS/JS pass via ast-grep, used when tree-sitter is unavailable. → function `analyze_tsjs_astgrep`
+  - `context/scripts/code-specs/spec_indexer.py:1224` [inline] JSX usage via the cheap line scan (ast-grep has no reliable JSX pattern set). → function `analyze_tsjs_astgrep`
+  - `context/scripts/code-specs/spec_indexer.py:1231` [docstring] Optional Node/ts-morph backend; skipped quietly when node or ts-morph is absent. → function `analyze_tsjs_tsmorph`
+  - `context/scripts/code-specs/spec_indexer.py:1272` [leading] --------------------------------------------------------------------------- | SQL extraction (migrations) | --------------------------------------------------------------------------- → const `_SQL_CREATE`
+  - `context/scripts/code-specs/spec_indexer.py:1324` [leading] --------------------------------------------------------------------------- | Test inventory (candidate features at ~0 tokens) | --------------------------------------------------------------------------- → function `_run`
+  - `context/scripts/code-specs/spec_indexer.py:1337` [docstring] Return (test node-ids, warnings). Best effort; never fails the scan. → function `collect_tests`
+  - `context/scripts/code-specs/spec_indexer.py:1390` [leading] --------------------------------------------------------------------------- | Existing document discovery (Phase 1 input) | --------------------------------------------------------------------------- → function `discover_docs`
+  - `context/scripts/code-specs/spec_indexer.py:1422` [leading] --------------------------------------------------------------------------- | OpenAPI extraction | --------------------------------------------------------------------------- → function `analyze_openapi`
+  - `context/scripts/code-specs/spec_indexer.py:1427` [docstring] Parse openapi*.yaml/json documents into API entries + schema names. → function `analyze_openapi`
+  - `context/scripts/code-specs/spec_indexer.py:1442` [inline] io / yaml / json errors — skip non-conforming docs → function `analyze_openapi`
+  - `context/scripts/code-specs/spec_indexer.py:1461` [leading] --------------------------------------------------------------------------- | scan: orchestrate extraction + write index artefacts | --------------------------------------------------------------------------- → const `MAX_MAP_ROWS`
+  … 806 more comment blocks
 
 ---
 Generated deterministically by `context/scripts/code-specs/spec_indexer.py scan` (zero LLM tokens). Consume via `repo-index.json`.
