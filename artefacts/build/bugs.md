@@ -15,8 +15,8 @@
 | B-001 | critical | mitigated | TDD discipline | RED-first ordering reversed in T-015/T-016 — tests written after implementation |
 | B-002 | high | fixed | Workspace conventions | Session metrics never appended to `artefacts/build/metrics/session-log.jsonl` for T-014→T-016 and T-015 |
 | B-003 | medium | open | Context acquisition | Matching skill/rule not loaded before code tasks — root cause of B-001 |
-| B-004 | low | partial | Code hygiene | ruff not run/enforced on `context/scripts/` — 228 findings in indexer code/tests |
-| B-005 | low | open | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
+| B-004 | low | fixed | Code hygiene | ruff not run/enforced on `context/scripts/` — 228 findings in indexer code/tests |
+| B-005 | low | fixed | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
 | B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
 | B-007 | medium | open | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
 | B-008 | high | open | Output | Content at front of derived docs should be in the appendix |
