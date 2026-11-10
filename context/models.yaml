@@ -2,13 +2,13 @@
 # Canonical mapping of abstract intent tiers to provider model families and runtime telemetry sources.
 # Models are pinned to unversioned family classes; precise versions are resolved at runtime by platform adapters.
 
-version: "1.1"
+last_updated: "2026-10-11"
 
 # -----------------------------------------------------------------------------
 # Runtime Resolution Strategy
 # -----------------------------------------------------------------------------
 # Rule: Do NOT hardcode transient point-in-time model versions (e.g. 2.5, 3.5) in agent definitions or this LUT.
-# Agents declare abstract intent tiers ('small', 'medium', 'large').
+# Agents declare abstract intent tiers ('decision', 'small', 'medium', 'large').
 # Runtimes and platform adapters resolve family aliases to the active environment's latest production version.
 resolution_strategy:
   mode: "runtime_adapter_resolution"
@@ -19,11 +19,26 @@ resolution_strategy:
 # Abstract Model Intent Tiers
 # -----------------------------------------------------------------------------
 tiers:
+  decision:
+    name: "Decision (Structured / Typed / Instant)"
+    description: "Fast structured decision model for routing, classification, and decision points — returns a typed, predictable answer rather than generated prose."
+    cost_tier: "low"
+    token_budget_guideline: "up to 1k tokens per decision"
+    typical_tasks:
+      - Request/model routing and agent tool-call gating
+      - Classification and tagging at scale
+      - Structured yes/no and precedence decisions before dispatching heavier tiers
+    providers:
+      typesafe:
+        family: "jev"
+        runtime_alias: "~typesafe/jev-latest"
+        resolution: "Active production Jev structured-decision class — unversioned alias that always redirects to the latest model in the Jev family (e.g. Jev 1.14, TypeSafe System One)"
+
   small:
     name: "Small (Lightweight / Fast / High-Throughput)"
     description: "Fast, economical model for focused mechanical execution, browser tests, command execution, and light refactoring."
     cost_tier: "low"
-    token_budget_guideline: "10k-30k tokens per task"
+    token_budget_guideline: "up to 80k tokens per task"
     typical_tasks:
       - Browser UI testing (@ui-tester)
       - Simple mechanical file refactors and formatting
@@ -41,12 +56,20 @@ tiers:
         family: "mini"
         runtime_alias: "gpt-mini"
         resolution: "Active production Mini class (e.g. GPT-4o-mini, o3-mini-low)"
+      openrouter:
+        family: "auto"
+        runtime_alias: "openrouter-auto"
+        resolution: "Operator-selected routed model via OpenRouter (auto routing); economical class for mechanical tasks"
+      openrouter-free:
+        family: "free"
+        runtime_alias: "openrouter-free"
+        resolution: "Operator-selected free endpoint via OpenRouter (zero-cost routed class) for smoke checks and high-throughput mechanical work"
 
   medium:
     name: "Medium (Standard / Workhorse / Balanced)"
     description: "Balanced reasoning, code generation accuracy, and contextual precision for core engineering tasks."
     cost_tier: "medium"
-    token_budget_guideline: "30k-80k tokens per task"
+    token_budget_guideline: "up to 200k tokens per task"
     typical_tasks:
       - UI and visual design, design systems, and mockups (@ui-designer)
       - Production backend and frontend coding (@python-coder, @typescript-coder)
@@ -64,17 +87,21 @@ tiers:
       google:
         family: "pro"
         runtime_alias: "gemini-pro"
-        resolution: "Active production Pro class (e.g. Gemini 2.5/3.x Pro)"
+        resolution: "Active production Pro class (e.g. Gemini 4.0 Pro)"
       openai:
         family: "standard"
         runtime_alias: "gpt-standard"
         resolution: "Active production standard flagship class (e.g. GPT-4o, GPT-4.5)"
+      deepseek:
+        family: "flash"
+        runtime_alias: "deepseek-flash-latest"
+        resolution: "Active production DeepSeek flash class (e.g. V4)"
 
   large:
-    name: "Large (Deep Reasoning / Orchestration / Complex Architecture)"
-    description: "Highest reasoning capacity, extended thinking, and meta-coordination capabilities for high-ambiguity or system-level tasks."
+    name: "Large (Pro / Advanced Engineering / Orchestration)"
+    description: "Provider pro-tier models for complex engineering, architecture, orchestration, and synthesis — top-of-class standard reasoning without extended-thinking mode."
     cost_tier: "high"
-    token_budget_guideline: "80k-150k+ tokens per task"
+    token_budget_guideline: "up to 600k tokens per task"
     typical_tasks:
       - Central multi-agent workflow coordination (@orchestrator)
       - High-level system architecture and domain decomposition (@solution-architect)
@@ -86,18 +113,43 @@ tiers:
       anthropic:
         family: "opus"
         runtime_alias: "claude-opus"
-        extended_thinking_alias: "claude-thinking"
-        resolution: "Active production Opus class or Sonnet with Extended Thinking"
+        resolution: "Active production Opus class (e.g. Opus 4.x)"
       google:
-        family: "thinking"
-        runtime_alias: "gemini-thinking"
-        extended_thinking_alias: "gemini-pro-thinking"
-        resolution: "Active production Gemini reasoning/thinking class"
+        family: "pro"
+        runtime_alias: "gemini-pro"
+        resolution: "Active production Gemini pro class (e.g. Gemini Pro)"
       openai:
         family: "reasoning"
         runtime_alias: "o-series"
-        extended_thinking_alias: "o-series-high"
-        resolution: "Active production reasoning class (e.g. o1, o3)"
+        resolution: "Active production reasoning class (e.g. o1, o3, o4)"
+
+  thinking:
+    name: "Thinking (Extended Reasoning / Deep Meta-Cognition)"
+    description: "Maximum reasoning capacity via extended-thinking mode and meta-coordination for highest-ambiguity, system-level, or long-horizon tasks beyond the large tier."
+    cost_tier: "high"
+    token_budget_guideline: "up to 1M tokens per task"
+    typical_tasks:
+      - Extended-thinking analysis of high-ambiguity system-level problems
+      - Multi-session root-cause diagnosis across runtime telemetry and distributed systems
+      - Open-ended research, planning, and meta-coordination where depth outweighs latency
+      - Deep decomposition of novel or underspecified problem spaces
+    providers:
+      anthropic:
+        family: "opus-thinking"
+        runtime_alias: "claude-thinking"
+        resolution: "Active production Opus extended-thinking class (e.g. Opus Thinking)"
+      google:
+        family: "pro-thinking"
+        runtime_alias: "gemini-pro-thinking"
+        resolution: "Active production Gemini Pro deep-thinking class (e.g. Gemini Pro Thinking)"
+      openai:
+        family: "reasoning-high"
+        runtime_alias: "o-series-high"
+        resolution: "Active production maximum reasoning-effort class (e.g. o-series at high effort)"
+      deepseek:
+        family: "reasoner"
+        runtime_alias: "deepseek-reasoner"
+        resolution: "Active production DeepSeek reasoning class (e.g. R1, R1.1)"
 
 # -----------------------------------------------------------------------------
 # Runtime Telemetry & Observation Sources

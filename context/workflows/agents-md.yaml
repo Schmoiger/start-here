@@ -1,0 +1,23 @@
+---
+title: AGENTS.md
+description: Bootstrap workflow for all agents
+sections:
+  - name: Harness Context
+    content: |
+      - Read `artefacts/README.md` to understand the project structure.
+      - Read `context/agents/orchestrator.md` to understand your tools and constraints.
+      - Determine the active execution workflow as the variable {workflow} following these steps:
+        1. Parse explicit instructions provided directly in the user's initial prompt.
+        2. If absent from the prompt, check for the existence of `artefacts/build/HANDOFF.md` and parse the value of the `Workflow:` field.
+        3. If no workflow is specified or file exists, halt execution and ask the user which workflow to follow, presenting reasonable options.
+      - Load `context/workflows/{workflow}.yaml`.
+
+  - name: Project Context
+    content: |
+      - Run `git branch --show-current` and store the output as the variable {branch}.
+      - If it exists, read `artefacts/build/tasks-{branch}.md` for the tasks list.
+      - Run `git log --oneline -5` to extract and review recent commit history context.
+      - If it exists read `artefacts/build/HANDOFF.md` to understand the last work done.
+      - Read `context/skills/agent-sandbox.md` and `context/rules/bash-environment.md` for how to interact within the local runtime (shell).
+      - Open `context/README.md` and locate the 'Table of Contents' for the inventory of harness context files.
+      - Read `context/rules/workspace-conventions.md` for how to work within the repo.
