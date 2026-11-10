@@ -34,7 +34,7 @@ phases:
       - Never discard the working tree; never spawn cold
       - Commit after each human-approved logical unit — git history is the residual context
       # Quality and gate
-      - LESS/TDD may be relaxed for the small scope — but the human MUST approve before commit
+      - LESS/TDD should be followed by default — ask the human for approval to relax this if you think the task size or complexity will not benefit from this rigour
       - "Human approval is the gate: present the diff, obtain an explicit APPROVED verdict before committing"
       - You are the implementer; do not commit on behalf of a sub-agent (there are none)
 
