@@ -2,13 +2,6 @@
 title: AGENTS.md
 description: Bootstrap workflow for all agents
 sections:
-  - name: Runtime Context
-    content: |
-      - Determine active LLM runtime as the variable {llm}:
-        1. Read the system prompt header or extension metadata to identify the active model (e.g., Sonnet 3.5, Claude 3.7, Haiku, GPT-4o, DeepSeek v4-flash).
-        2. If executing via local/offline runner, curl `http://localhost:11434/api/tags` to map available local weights.
-      - Read `{llm}.md` for runtime-specific tool mappings, rules, model and telemetry source guidance.
-
   - name: Harness Context
     content: |
       - Read `artefacts/README.md` to understand the project structure.
@@ -21,8 +14,8 @@ sections:
 
   - name: Project Context
     content: |
-      - If it exists, read `artefacts/build/tasks-{branch}.md` for the tasks list.
       - Run `git branch --show-current` and store the output as the variable {branch}.
+      - If it exists, read `artefacts/build/tasks-{branch}.md` for the tasks list.
       - Run `git log --oneline -5` to extract and review recent commit history context.
       - If it exists read `artefacts/build/HANDOFF.md` to understand the last work done.
       - Read `context/skills/agent-sandbox.md` and `context/rules/bash-environment.md` for how to interact within the local runtime (shell).

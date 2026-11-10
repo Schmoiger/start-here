@@ -442,6 +442,6 @@ approve · split · promote`"]
 
 ## AGENTS.md content source
 
-The **AGENTS.md** content lives in `agents-md.yaml`. This lightweight YAML file (no phase DAG `name:` key) is the source of truth for AGENTS.md sections (Runtime Context, On Start, Project Context). Runtime Context bullets are injected dynamically from `.agent-targets` (currently cline, gemini, github). The adapter generator (`generate_adapters.py`) reads it directly via `source_file`; the canonical context loader skips it as a workflow.
+The **AGENTS.md** content lives in `agents-md.yaml`. This lightweight YAML file (no phase DAG `name:` key) is the source of truth for AGENTS.md prose sections (Harness Context, Project Context). The Runtime Context section is generator-owned, not authored in the YAML: it is rendered as self-identifying conditional bullets injected from `.agent-targets` (currently cline, gemini, github), each pointing at one runtime's real projection path. The adapter generator (`generate_adapters.py`) reads it directly via `source_file`; the canonical context loader skips it as a workflow.
 
 **On Add / Edit / Delete**: Edit `agents-md.yaml` sections. Recompile: `uv run python ../scripts/generators/generate_adapters.py -a` and verify output via `diff <generated> <source>`.

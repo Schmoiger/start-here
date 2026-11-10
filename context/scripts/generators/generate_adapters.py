@@ -196,26 +196,33 @@ def get_adapter_projections(
     projections: dict[Path, str] = {}
 
     if "core" in active_targets:
+        # Self-identifying Runtime Context bullets: each active runtime gets a
+        # conditional entry pointing at its real projection path, so an agent
+        # resolves "which file should I read?" by runtime lookup, not inference.
         runtime_context_bullets: list[str] = []
         if "cline" in active_targets:
             runtime_context_bullets.append(
-                "- Read `@CLINE.md` for Cline-specific tool mappings, rules, model and telemetry source guidance."
+                "- If this is a Cline session, read `@CLINE.md` for Cline-specific tool mappings, rules, model and telemetry source guidance."
             )
         if "gemini" in active_targets:
             runtime_context_bullets.append(
-                "- Read `@GEMINI.md` for Gemini-specific tool mappings, rules, model and telemetry source guidance."
+                "- If this is a Gemini CLI / Antigravity session, read `@GEMINI.md` for Gemini-specific tool mappings, rules, model and telemetry source guidance."
             )
         if "claude" in active_targets:
             runtime_context_bullets.append(
-                "- Read `@CLAUDE.md` for Claude Code-specific tool mappings, rules, model and telemetry source guidance."
+                "- If this is a Claude Code session, read `@CLAUDE.md` for Claude Code-specific tool mappings, rules, model and telemetry source guidance."
             )
         if "github" in active_targets:
             runtime_context_bullets.append(
-                "- Read `@GITHUB.md` for GitHub Copilot-specific tool mappings, rules, model and telemetry source guidance."
+                "- If this is a GitHub Copilot session, read `.github/copilot-instructions.md` for GitHub Copilot-specific tool mappings, rules, model and telemetry source guidance."
             )
         if "openai" in active_targets:
             runtime_context_bullets.append(
-                "- Read `@OPENAI.md` for OpenAI/Codex-specific tool mappings, rules, model and telemetry source guidance."
+                "- If this is an OpenAI / Codex session, read `.openai/` (per-agent prompts, tool schemas, runner harness) for OpenAI/Codex-specific mappings."
+            )
+        if runtime_context_bullets:
+            runtime_context_bullets.append(
+                "- If none of the above runtimes matches this session, rely on `AGENTS.md` alone."
             )
 
         source_file = context_dir / "workflows" / "agents-md.yaml"
