@@ -57,6 +57,10 @@ a task transitions — do not batch status updates.
 
 {TASK-ID}: {task-description}
 
+### Workflow
+
+Follow {workflow}
+
 ### Acceptance Criteria
 
 - {Criterion 1}

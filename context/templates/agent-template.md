@@ -33,6 +33,7 @@ The `{standards}` / `{rules}` / `{skills}` placeholders resolve to the frontmatt
 Inspect the incoming prompt for the following mandatory headers:
 - `## File Scope`
 - `## Task`
+- `### Workflow`
 - `### Acceptance Criteria`
 - `### Primary Output Path`
 
