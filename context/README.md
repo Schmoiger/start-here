@@ -167,14 +167,14 @@ The orchestrator consults this index when constructing a task prompt, references
 - Specialised `orchestrator.md` defines orchestrator behaviour; this is the first agent to spawn so must read at session start
 - Frontmatter lists: allowed `model`, allowed `tools`, should follow `standards`, must follow `rules`, available `skills`
 - Body lists: what to do before starting work, what to do whilst doing work, where to create deliverables. Orchestrator agent will append specific tasks at invocation.
-- **On Add / Edit / Delete**: Create from `templates/agent-template.md` with required frontmatter. Validate via `uv run python context/scripts/validators/agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to project to `AGENTS.md` and vendor-specific runtimes. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create from `templates/agent-template.md` with required frontmatter. Validate via `uv run python context/scripts/validators/agent_definitions.py`. Update any `workflows/*.yaml` referencing the agent. See [Implementing Changes](#implementing-changes).
 
 **Personas** (`persona/*.md`):
 
 - Writing voice/style for human-facing content (blogs, papers, marketing)
 - NOT for technical handoffs (README, API docs, architecture)
 - See `docs/agentic-framework-reference.md` (Writing Personas) for when and how to use them
-- **On Add / Edit / Delete**: Create or edit persona file (`name`, `description`, `traits`). No adapter recompilation needed.
+- **On Add / Edit / Delete**: Create or edit persona file (`name`, `description`, `traits`).
 
 **Model Profiles** & Runtime Telemetry LUT (`models.yaml`):
 
@@ -182,13 +182,13 @@ The orchestrator consults this index when constructing a task prompt, references
 - Defines abstract intent tiers (`small`, `medium`, `large`) mapped to model families
 - Delegates precise model resolution to runtime adapters / environment configurations
 - Catalogues multi-platform telemetry locations (Git trailers, Claude JSONL & Managed Agents Dreams, Antigravity transcripts)
-- **On Add / Edit / Delete**: Update provider model names or aliases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update model mappings in vendor-specific runtimes. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Update provider model names or aliases. See [Implementing Changes](#implementing-changes).
 
 **Skills** (`skills/*.md`):
 
 - Technology-specific procedural instructions and operational safeguards (Python scripting, git-subrepo, etc.)
 - Injected just-in-time into subagent prompts based on matched file scopes or workflow hints
-- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). Ensure `---` precedes `##` headings (Typst rule). Bind to relevant `agents/*.md` under `skills:` or workflow phases. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to update the `## Skills` index in `AGENTS.md` and project runtime skills in `.agents/skills/<name>/SKILL.md` and `.cline/skills/<name>/SKILL.md`, plus runtime rules in `.clinerules/`. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create or edit file with frontmatter (`name`, `description`, `globs`). See [Implementing Changes](#implementing-changes).
 
 #### Context Definition Files
 
@@ -197,7 +197,7 @@ The orchestrator consults this index when constructing a task prompt, references
 - Invariant boundaries and constraints that **break** if not followed
 - Self-contained, actionable, binary (followed or not)
 - Pre-commit hooks enforce these locally before any commit is recorded
-- **On Add / Edit / Delete**: Create or edit with frontmatter (`description`, `globs`, `alwaysApply`). When adding or deleting, update applicable `agents/*.md` under `rules:`, then recompile adapters (`uv run python context/scripts/generators/generate_adapters.py`) and verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create or edit with frontmatter (`description`, `globs`, `alwaysApply`). See [Implementing Changes](#implementing-changes).
 
 **Standards** (`standards/*.md`):
 
@@ -206,7 +206,7 @@ The orchestrator consults this index when constructing a task prompt, references
 - Agents read on-demand (too verbose to preload)
 - Examples: Python patterns, TDD philosophy, architecture decisions
 
-- **On Add / Edit / Delete**: Create or edit ensuring `---` precedes all `##` headings (Typst rule). Add to `context/README.md` Quick Reference and the [Standards Map](#standards-map), and reference in applicable `agents/*.md` under `standards:`. If agent frontmatter was modified, recompile adapters (`generate_adapters.py`) and verify drift.
+- **On Add / Edit / Delete**: Check if this repo's architectural documentation (normally in `artefacts/architecture/`) should be updated to match. See [Implementing Changes](#implementing-changes).
 
 **Workflows** (`workflows/*.yaml`):
 
@@ -214,14 +214,14 @@ The orchestrator consults this index when constructing a task prompt, references
 - Each phase lists agents, outputs, validation, and skills
 - Source of truth for phase ordering
 
-- **On Add / Edit / Delete**: Create or edit phase DAG. All referenced agents must exist in `context/agents/`. **Mandatory recompile**: run `uv run python context/scripts/generators/generate_adapters.py` to refresh workflow tables in `AGENTS.md` and `CLAUDE.md`. Verify with `adapter_drift.py`.
+- **On Add / Edit / Delete**: Create or edit phase DAG. All referenced agents must exist in `context/agents/`. See [Implementing Changes](#implementing-changes).
 
 **Framework docs** (`docs/*.md`):
 
 - Architectural companion paper (`docs/agentic-framework.md`): core concepts, verification split, and invariants
 - Reference manual (`docs/agentic-framework-reference.md`): phase-by-phase workflows, orchestration patterns, agent catalogue, telemetry
 - Delivery cadence (`docs/rhythm-of-delivery.md`): iteration rhythm, shipping cadence, and delivery loops
-- **On Add / Edit / Delete**: Update architectural documentation. Verify documentation freshness with `uv run python context/scripts/validators/framework_docs_staleness.py`.
+- **On Add / Edit / Delete**: Check if this repo's architectural documentation (normally in `artefacts/architecture/`) should be updated to match.
 
 #### Output Definition Files
 
@@ -230,7 +230,7 @@ The orchestrator consults this index when constructing a task prompt, references
 - Output formats for artefacts, handoffs, reviews, git, and agent definitions
 - The orchestrator selects the appropriate template when constructing a task prompt; agents use whichever template the task prompt specifies
 - See the [Template Index](#template-index) in this README for the full list
-- **On Add / Edit / Delete**: Create or edit template files. Update the [Template Index](#template-index) in this README. No adapter recompilation needed.
+- **On Add / Edit / Delete**: Create or edit template files. Update the [Template Index](#template-index) in this README.
 
 **Scripts** (`scripts/`):
 
@@ -238,19 +238,11 @@ The orchestrator consults this index when constructing a task prompt, references
 - Validators (`validators/`): Pre-commit hooks mapping to canonical rules in `context/rules/*.md` (workspace conventions, tech writing, UI development, Supabase, testing, TypeScript environment, UI testing, secrets) plus repository integrity utilities (adapter drift, Typst formatting, framework docs staleness)
 - Generators (`generators/`): Auto-generate CLAUDE.md/AGENTS.md from agent definitions and workflows
 - Tests (`tests/`): Test suite for validators, runtime adapters, and telemetry extractors
-- **On Add / Edit / Delete**: For standalone scripts, declare dependencies via PEP 723 inline metadata (`# /// script`). Add accompanying tests in `context/scripts/tests/`. Run test suite: `uv run --with pytest pytest context/scripts/tests/ -v`. If generator logic was altered, run `generate_adapters.py` and `adapter_drift.py`.
+- **On Add / Edit / Delete**: For standalone scripts, declare dependencies via PEP 723 inline metadata (`# /// script`). Add accompanying tests in `context/scripts/tests/`. See [Implementing Changes](#implementing-changes).
 
 ### Making Changes
 
-Do not make changes to vendor-specific runtimes e.g. agent/SKILL.md or CLAUDE.md. Instead, make changes only to the canonical context files, recompile projections and verify zero drift:
-
-```bash
-uv run python context/scripts/validators/adapter_drift.py
-```
-
-Check that this readme, and especially the inventory, is still valid.
-
-If any of `model LUT`, `tools`, `standards`, `rules`, `skills` has been added or deleted, you should check the frontmatter for each agent to see if any changes should be made.
+Do not make changes to this context harness without human intervention - always set out the harness failure mode, the remediation, and await permission to proceed.
 
 #### Adding New Rules
 
@@ -273,6 +265,21 @@ When a task domain needs repeated specialised work:
 5. Add to workflow YAML if part of standard process
 6. Regenerate adapter projections: `uv run python context/scripts/generators/generate_adapters.py`
 
+#### Implementing Changes
+
+Do not make changes to vendor-specific runtimes e.g. agent/SKILL.md or CLAUDE.md. Instead, make changes only to the canonical context files.
+
+Check that this readme, especially the inventory section, is still correct.
+
+If any of `model LUT`, `tools`, `standards`, `rules`, `skills` has been added or deleted, you should check the frontmatter for each agent in `context/agents/` to see if any changes should be made.
+
+Check if the framework docs `context/docs/agentic-framework.md` and `context/docs/agentic-framework-reference.md` should be changed either in content or count. Any changes should be concise. Making changes to context files without updating the framework will fail the pre-commit check `context/scripts/validators/framework_docs_staleness.py`.
+
+After making changes, recompile projections and verify zero drift:
+
+```bash
+uv run python context/scripts/validators/adapter_drift.py
+```
 
 ### Downstream Synchronisation
 
