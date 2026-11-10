@@ -59,7 +59,7 @@ a task transitions — do not batch status updates.
 
 ### Workflow
 
-Follow {workflow}
+{workflow}
 
 ### Acceptance Criteria
 

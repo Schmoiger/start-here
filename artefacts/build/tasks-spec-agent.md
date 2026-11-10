@@ -61,6 +61,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### T-001: Create skill `context/skills/derive-spec.md` (modes: product, technical, both)
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - Frontmatter matches skill schema: `name`, `description`, `globs` (target: `**/*.py`, `**/*.ts`, `**/*.tsx`, `**/*.sql`, `**/openapi*.yaml`, `repo-index.json`)
@@ -77,6 +81,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 ---
 
 ### T-002: Create workflow `context/workflows/derive-spec.yaml` (modes, phases, gates, state recovery)
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -95,6 +103,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### T-003: Extend `context/agents/product-owner.md` — Mode 3 derive (loads derive-spec skill)
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - New Mode (derive) declared alongside existing modes: loads `derive-spec.md`, runs product derivation, writes drafts, bats MC questions (Q2 format), updates per answers
@@ -109,6 +121,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### T-004: Extend `context/agents/solution-architect.md` — derive mode (drafts only)
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - Derive mode: architecture / API / data-model drafting from index evidence, drafts only (`*.derived.md`), canonical ownership boundary preserved (`openapi.yaml` untouched)
@@ -119,6 +135,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 `context/agents/solution-architect.md`
 
 ### T-005: Add confirmation mode to `context/skills/requirements-elicitation.md`
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -133,6 +153,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### T-006: Add `context/templates/derived-spec-template.md` (confidence schema + open-question appendix)
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - Subsection skeletons for product-spec / architecture / data model / api catalogue with confidence fields (tier + banded % + evidence `path:line`)
@@ -146,6 +170,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 ---
 
 ### T-018: Confidence bands + promotion DoD in `derived-spec-template.md` (Verified 85–100 · Needs Confirmation 50–85 · Assumed <50; unanswered stays Assumed)
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -162,6 +190,10 @@ Q0 recorded on 2026-10-30 during planning (Q1–Q10). A1–A4 recorded 2026-01-1
 
 ### T-007: Regenerate adapters; run validators green
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - `uv run python context/scripts/generators/generate_adapters.py` reflects the new skill/workflow in AGENTS.md/CLINE.md/GEMINI.md registries (if projection applies)
@@ -174,6 +206,10 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 ---
 
 ### T-010: Unit tests: skill/workflow schema, indexer extraction + verify
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -195,6 +231,10 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 
 ### T-020: Extend `verify` with `--require-coverage` (deterministic Phase 6 gate: tier + % + citation per subsection)
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - `spec_indexer.py verify --doc --require-coverage` exits non-zero listing subsections missing tier / banded % / `file:line` in a derived-spec doc
@@ -208,6 +248,10 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 ---
 
 ### T-021: Indexer comment & docstring extraction (`comments` key)
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -226,6 +270,10 @@ Generated registry files; commit message in `/tmp/T-007_commit_msg.txt`
 ---
 
 ### T-008: Pilot A: run derive-spec (`mode=both`) on this repo; measure token ledger before/after; outputs land in `derived/`
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -257,6 +305,10 @@ before/after comparison is the acceptance metric):
 
 ### T-019: Pilot B: derive-spec on the human-chosen foreign/unorganised repo; validate Phases 1–2 + `derived/` landing
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - Run derive-spec end-to-end (`mode=both`) on the human-chosen foreign repo (repo + URL recorded in HANDOFF.md at pilot start; not organised like start-here — no harness artefacts layout)
@@ -273,6 +325,10 @@ before/after comparison is the acceptance metric):
 
 ### T-009: Optional: register derive-spec as a `build.yaml` precursor phase
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - derive-spec gate completes before build `task-planning` when specs missing; disabled otherwise
@@ -284,6 +340,10 @@ before/after comparison is the acceptance metric):
 ---
 
 ### T-013: Wire indexer into `derive-spec.yaml` Phases 1 & 3 (agent `tool_scope` = index + cited ranges)
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -299,6 +359,10 @@ before/after comparison is the acceptance metric):
 ---
 
 ### T-015: Tool-backed extraction backends with graceful fallback (`--extractors`: ctags, tree-sitter, ast-grep, ts-morph)
+
+### Workflow
+
+ build
 
 **Status**: completed 2026-01-11 — `--extractors` (auto/stdlib/ctags/tree-sitter/ast-grep/ts-morph) implemented in `spec_indexer.py`; tree-sitter TS/TSX walker (multiline props, JSX usage, decorators); ast-grep rule patterns; ctags JSON for foreign langs; `ts_extract.mjs` ts-morph helper (skipped quietly when absent); `meta.extractors` provenance + `meta.confidence` tier + per-file `extractor` field. Tests: auto/stdlib Python parity + auto⊇stdlib superset + fixtures (13 passed, 2 skipped without tree-sitter; 15/15 with `uv run --with tree-sitter --with tree-sitter-language-pack`).
 
@@ -332,6 +396,10 @@ before/after comparison is the acceptance metric):
 
 ### T-SETUP: Install / verify toolchain dependencies (human-run) before implementation starts
 
+### Workflow
+
+ build
+
 **Status**: completed 2026-01-11 — ctags 6.2.1 ✓, ast-grep 0.51.0 ✓ (use `ast-grep`; `sg` deprecated), tree-sitter loads via `uv run --with tree-sitter --with tree-sitter-language-pack` (typescript + python parsers) ✓, ts-morph absent → skipped quietly.
 
 #### Acceptance Criteria
@@ -359,6 +427,10 @@ Environment only — verify via the acceptance criteria; record completion in HA
 
 ### T-016: Indexer `config` extraction (env / config / feature flags)
 
+### Workflow
+
+ build
+
 #### Acceptance Criteria
 
 - `scan` collects env-style keys and defaults from `.env.example`, `settings.py` / `config.*` modules, and YAML/JSON config files into a new `config` key: `[ {key, source(file:line), value-hint} ]`
@@ -374,6 +446,10 @@ Environment only — verify via the acceptance criteria; record completion in HA
 ---
 
 ### T-017: Indexer `meta.history` (capped git-history evidence)
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
@@ -410,6 +486,10 @@ One commit per task on `feat/spec-agent`, conventional messages (`feat(spec): �
 ---
 
 ### T-014: Wrap indexer tool usage in skill `context/skills/analyse-repo.md` (documents the actual backends)
+
+### Workflow
+
+ build
 
 #### Acceptance Criteria
 
