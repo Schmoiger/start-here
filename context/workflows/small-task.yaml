@@ -20,23 +20,22 @@ phases:
     gate: true
     notes:
       # Mode
-      - The orchestrator IS the default agent here — implement directly, do not delegate, do not spawn sub-agents
+      - Implement directly, do not delegate, do not spawn sub-agents
       - Do not combine with any other workflows in one run; promotion is the sanctioned exit (Overshoot Protocol below)
       - All context artefacts except other workflows are available
       # Skill duty — work type is not a discriminator
       - Load and follow the matching skill before implementing; scan context/README.md §Inventory — e.g. python-scripting (Python), typescript-development (TypeScript/Yarn), database-design (schema), git-subrepo-operations (context/ subrepo), technical-authoring (docs/), typst-pipeline (typesetting), ui-development (UI)
       - If no skill, standard, or rule covers the dominant work class, surface the harness gap to the human — do not improvise, do not auto-delegate
       # Fitness (see fitness: block)
-      - Run the numeric heuristic (H1–H8) pre-flight; any RED defaults to the governing workflow unless the human overrides (record override in HANDOFF.md)
+      - Run the numeric heuristic (H1–H8) pre-flight; if RED escalate to the human with options - (a) continue, or (b) refactor with a tasks doc in a new branch. Record the decision in `artefacts/build/HANDOFF.md`
       - On AMBER/GREEN weigh the inference rubric (R1–R7) with the human; when unsure default to the heavier workflow
       # Overshoot — pause, never reset
-      - "If actuals cross the flags or a RED surfaces mid-run: PAUSE and present options to the human — (a) approve grown scope in-session, (b) split into logical units (approval + commit each), (c) promote via transfer package"
+      - If actuals cross the flags or a RED surfaces mid-run escalate to the human with options — (a) approve grown scope in-session, (b) split into logical units (approval + commit each), (c) promote via transfer package
       - Never discard the working tree; never spawn cold
       - Commit after each human-approved logical unit — git history is the residual context
       # Quality and gate
       - LESS/TDD should be followed by default — ask the human for approval to relax this if you think the task size or complexity will not benefit from this rigour
-      - "Human approval is the gate: present the diff, obtain an explicit APPROVED verdict before committing"
-      - You are the implementer; do not commit on behalf of a sub-agent (there are none)
+      - Human approval is the gate. Present the diff, obtain an explicit APPROVED verdict before committing
 
 fitness:
   heuristic:

@@ -5,7 +5,7 @@ sections:
   - name: Harness Context
     content: |
       - Read `artefacts/README.md` to understand the project structure.
-      - Read `context/agents/orchestrator.md` to understand your tools and constraints.
+      - By default you are an Orchestrator agent even if you choose not to delegate your task. Read `context/agents/orchestrator.md` to understand your tools and constraints.
       - Read `context/skills/agent-sandbox.md` and `context/rules/bash-environment.md` for how to interact within the local runtime (shell).
       - Open `context/README.md` and locate the 'Table of Contents' for the inventory of harness context files.
       - Read `context/rules/workspace-conventions.md` for how to work within the repo.
@@ -21,4 +21,5 @@ sections:
         2. If it exists, parse `artefacts/build/tasks-{branch}.md` for the value in the `Workflow` subsection in the current task.
         3. If it exists, parse `artefacts/build/HANDOFF.md` for the value of the `Workflow:` field.
         4. If no workflow is specified or file exists, halt execution and ask the user which workflow to follow, presenting reasonable options.
+        5. Only do not follow a workflow if the human explicitly approves; record decision in `artefacts/build/HANDOFF.md`
       - Load `context/workflows/{workflow}.yaml`.
