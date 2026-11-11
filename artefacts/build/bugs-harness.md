@@ -23,6 +23,7 @@
 | B-008 | high | fixed | Output | Content at front of derived docs should be in the appendix |
 | B-009 | high | fixed | Output | Architecture process model is currently text instead should be Mermaid |
 | B-010 | high | fixed | Workflow | After open questions have been answered, docs should be updated with answers and confidence band improved |
+| B-011 | high | open | Tooling | Git output (e.g. reviewing commits) pages across more than one screen; shell hangs waiting for input to show the next page |
 
 ---
 
