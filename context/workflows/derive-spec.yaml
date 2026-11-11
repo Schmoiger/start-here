@@ -48,7 +48,7 @@ phases:
       - product-owner
       - solution-architect
     outputs:
-      - artefacts/build/drift-from-baseline.md
+      - artefacts/build/derived-spec-working/drift-from-baseline.md
     validation:
       - "drift candidates listed (existing-doc vs code deltas) as the Phase 7 question queue, ordered first"
       - "no existing docs → annotated empty-extraction (code-derived only)"
@@ -191,7 +191,7 @@ state_recovery:
     - "Read artefacts/build/HANDOFF.md — the Workflow: derive-spec and Phase: fields identify the active phase"
     - "Read artefacts/build/derived-spec-working/repo-index.json + artefacts/build/derived-spec-working/spec-scan.md for the indexed evidence (Phase ≥ 1)"
     - "Read artefacts/build/derived-spec-working/repo-profile.md for the Phase 1 deliverable (app type, entry points, module boundaries)"
-    - "Read artefacts/build/drift-candidates.md for the Phase 2/7 question queue; read artefacts/build/derived-spec-working/ for staged drafts (Phase ≥ 5)"
+    - "Read artefacts/build/derived-spec-workfing/drift-candidates.md for the Phase 2/7 question queue; read artefacts/build/derived-spec-working/ for staged drafts (Phase ≥ 5)"
   critical_files:
     - artefacts/build/HANDOFF.md
     - artefacts/build/derived-spec-working/repo-index.json
