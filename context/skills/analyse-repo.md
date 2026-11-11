@@ -260,7 +260,7 @@ an assertion.
 
 ---
 
-## 6. Extraction Backends & Degradation (T-015)
+## 6. Extraction Backends & Degradation
 
 ### 6.1 `--extractors` choices
 

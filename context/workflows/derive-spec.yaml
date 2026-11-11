@@ -42,13 +42,13 @@ phases:
       - "repo-profile.md is the Phase 1 deliverable, wired as an input to Phases 2-5 (app type, entry points, module boundaries)"
 
   - id: baseline-drift
-    name: Phase 2 · Baseline & Drift
+    name: Phase 2 · Drift from Baseline
     depends_on: [discovery]
     agents:
       - product-owner
       - solution-architect
     outputs:
-      - artefacts/build/drift-candidates.md
+      - artefacts/build/drift-from-baseline.md
     validation:
       - "drift candidates listed (existing-doc vs code deltas) as the Phase 7 question queue, ordered first"
       - "no existing docs → annotated empty-extraction (code-derived only)"
