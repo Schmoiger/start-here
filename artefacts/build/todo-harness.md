@@ -43,6 +43,6 @@
 [x] Add telemetry source to projection script
 [x] Fully revise AGENTS.md (its generator) as it is currently a repeat of inventory of agents so not DRY. Instead it should list the base workflow e.g. system one, system two; workflow selection, if multi-agent.
 [x] Improve use of HANDOFF.md: orchestrator only maintains build/HANDOFF.md but agents maintain service-scoped HANDOFF.md. Should be described in multi-agent skill. How is HANDOFF.md different to the status payload the sub-agent returns to the orchestrator.
-[x] TDD skill should enforce commit after each phase (not assuming this will be by the orchestrator) - WON'T DO
+[WON'TDO] TDD skill should enforce commit after each phase (not assuming this will be by the orchestrator)
 [x] Committing is token-intesive. Investigate and rationalise.
 [x] Model selection should be per-task, not per-agent. Model should persist for task to make use of cached context economies.
