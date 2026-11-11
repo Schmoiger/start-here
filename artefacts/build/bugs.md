@@ -1,6 +1,7 @@
 # Bugs: derive-spec harness work — process & compliance defects
 
 **Branch**: feat/spec-agent
+**Workflow**: bugfix or small-task, depending on complexity of bug
 **Status**: In Progress
 **Scope**: Process and compliance defects found by auditing the shipped spec-agent work (T-014 → T-016) against the harness's own rules/standards/skills — tdd-workflow.md, testing.md, python-environment.md, python-scripting.md, secrets.md, tech-writing.md, doc-standards.md, workspace-conventions.md. Also records Cline tool-hygiene defects observed during the same work (editor chunk limit, terminal heredocs).
 **Audited**: 2026-02-11 — post-hoc context-acquisition sweep (triggered by the failure chain recorded in B-001)
@@ -18,7 +19,7 @@
 | B-004 | low | fixed | Code hygiene | ruff not run/enforced on `context/scripts/` — 228 findings in indexer code/tests |
 | B-005 | low | fixed | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
 | B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
-| B-007 | medium | open | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
+| B-007 | medium | in progress | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
 | B-008 | high | open | Output | Content at front of derived docs should be in the appendix |
 | B-009 | high | open | Output | Architecture process model is currently text instead should be Mermaid |
 | B-010 | high | open | Workflow | After open questions have been answered, docs should be updated with answers and confidence band improved |
@@ -173,17 +174,19 @@ Long heredoc bodies passed to `run_command` do not complete reliably through she
 
 1. Long stdin-fed scripts (heredocs) rely on interactive prompt handling that the non-interactive command runner does not support reliably.
 2. The runner reports "no result signal" instead of a clean success/failure, and per the core rules a no-signal result must be treated as unknown — the failure continued to a second attempt instead of switching tools.
-3. The workaround (editor-created files, one-line commands) is known but was not applied on first attempt.
+3. **Context-acquisition gap (same family as B-003).** The heredoc/tool-substitution ban lived only in `context/rules/bash-environment.md`, reachable via `CLINE.md`/agent-sandbox on-demand reads; the Cline always-on rules (`.clinerules/00-core.md`) did not carry it, so nothing guaranteed it was in context when the first `run_command` heredoc was issued. The original "known but not applied" reading assumed the rule was loaded — that assumption is unsupported.
 
 #### Fix
 
 - Never pipe multi-line content through `run_command` heredocs: write message files and content via the `editor` tool, keep shell commands single-line (`git add && git commit -F <file>`, `git log --oneline -3`).
 - After any "no result signal" from a command, verify true state with git (`git log`/`git status`) before retrying or proceeding (per core rules "treat no result signal as unknown, not failed").
 - Use `git commit -F /tmp/<file>` with an editor-written message file for every commit.
+- **Always-on projection (harness fix).** The Cline adapter now projects every `alwaysApply: true` rule into `.clinerules/` (frontmatter-less, active every session), so `bash-environment.md`'s tool-substitution ban is guaranteed in context; the agent-sandbox routing bullet moved from `CLINE.md` into `00-core.md` (`context/scripts/generators/adapters/cline/generator.py`).
 
 #### Acceptance Criteria
 
 - [x] Recorded with evidence (this section)
+- [x] Tool-substitution ban (heredoc / `echo >` / `cat`) is present in the Cline always-on rules via `.clinerules/bash-environment.md`
 - [ ] No heredoc bodies sent through `run_command` in future sessions; message files created via the editor
 - [ ] After a no-signal command, state verified via `git log`/`git status` before proceeding
 

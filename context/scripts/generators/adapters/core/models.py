@@ -4,7 +4,11 @@ from dataclasses import dataclass, field
 @dataclass
 class CanonicalRule:
     name: str
-    key_points: str
+    key_points: str = ""
+    description: str = ""
+    globs: list[str] = field(default_factory=list)
+    alwaysApply: bool = False
+    body: str = ""
 
 
 @dataclass
