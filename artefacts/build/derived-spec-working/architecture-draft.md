@@ -78,9 +78,45 @@ Core architectural properties:
 
 **Confidence**: Verified · 85% · Evidence: context/workflows/*.yaml (phase definitions), context/agents/orchestrator.md:115-140
 
-**Agent spawn & delegate**: 1. Read agent definition from context/agents/*.md. 2. Resolve applicable rules by glob-matching task scope (context/rules/*.mdc). 3. Assign disjoint file scopes to prevent write conflicts. 4. Spawn sub-agent via structured task prompt template. 5. Sub-agent works within tool_scope = repo-index.json + cited line ranges. 6. Sub-agent reports verdict + artefacts; orchestrator commits.
+**Agent spawn & delegate**
 
-**Workflow execution**: Phases with depends_on DAG execution. Quality gates (gate: true) require explicit APPROVED verdict. State recovery: HANDOFF.md + repo-index.json + spec-scan.md + repo-profile.md.
+```mermaid
+flowchart TD
+    A["`Read agent definition
+from context/agents/*.md`"]
+    B["`Resolve applicable rules
+by glob-matching task scope`"]
+    C["`Assign disjoint
+file scopes`"]
+    D["`Spawn sub-agent via
+structured task prompt`"]
+    E["`Work within tool_scope
+(repo-index.json + cited lines)`"]
+    F["`Report verdict + artefacts;
+orchestrator commits`"]
+    A --> B --> C --> D --> E --> F
+```
+
+**Workflow execution**
+
+```mermaid
+flowchart TD
+    Phase["Phase"]
+    DAG["`depends_on
+DAG execution`"]
+    Gate{"Quality gate"}
+    Next["Next phase"]
+    Rework["CHANGES REQUIRED"]
+    Recover["`State recovery
+HANDOFF.md + repo-index.json + spec-scan.md + repo-profile.md`"]
+    Phase --> DAG
+    DAG --> Gate
+    Gate -->|APPROVED| Next
+    Gate -->|CHANGES REQUIRED| Rework
+    Rework --> DAG
+    Phase -.->|context compaction| Recover
+    Recover --> Phase
+```
 
 ---
 

@@ -21,7 +21,7 @@
 | B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
 | B-007 | medium | in progress | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
 | B-008 | high | open | Output | Content at front of derived docs should be in the appendix |
-| B-009 | high | open | Output | Architecture process model is currently text instead should be Mermaid |
+| B-009 | high | fixed | Output | Architecture process model is currently text instead should be Mermaid |
 | B-010 | high | open | Workflow | After open questions have been answered, docs should be updated with answers and confidence band improved |
 
 ---
@@ -189,6 +189,25 @@ Long heredoc bodies passed to `run_command` do not complete reliably through she
 - [x] Tool-substitution ban (heredoc / `echo >` / `cat`) is present in the Cline always-on rules via `.clinerules/bash-environment.md`
 - [ ] No heredoc bodies sent through `run_command` in future sessions; message files created via the editor
 - [ ] After a no-signal command, state verified via `git log`/`git status` before proceeding
+
+---
+
+## B-009: Architecture process model written as text instead of Mermaid
+
+#### Symptom
+
+The `## Process Model` section of the derived architecture doc (`artefacts/build/derived/architecture.md`, and its working draft in `derived-spec-working/`) described the agent spawn/delegate and workflow-execution flows as inline numbered prose, while `doc-standards.md` §6.1 mandates Mermaid for all diagrams and the canonical `artefacts/architecture/architecture.md` models the same processes as `flowchart TD` diagrams.
+
+#### Fix
+
+- Replaced the two prose blocks with `flowchart TD` Mermaid diagrams (`mermaid-authoring` skill conventions: backtick-markdown multi-line labels, decision diamonds for quality gates, default `TD` layout).
+- Applied identically to the promoted copy and the working draft so they stay in sync.
+
+#### Acceptance Criteria
+
+- [x] `## Process Model` in the derived architecture doc renders as Mermaid
+- [x] Working draft and promoted copy are in sync
+- [ ] `spec_indexer.py verify --doc` still resolves citations (pending, as recorded in the doc's own review record)
 
 ---
 
