@@ -118,7 +118,7 @@ phases:
     notes:
       - "Mode-conditional: depends_on resolves to the derivation phase(s) active for the recorded mode — inactive branches are skipped at intake"
       - "staged in artefacts/build/spec-drafts/ — one file per artefacts category; never touch canonical docs"
-      - "Inputs: repo-index.json + repo-profile.md + drift-candidates.md — draft subsections cite from the index, never from memory"
+      - "Inputs: repo-index.json + repo-profile.md + drift-from-baseline.md — draft subsections cite from the index, never from memory"
 
   - id: verification
     name: Phase 6 · Verification Pass
@@ -191,7 +191,7 @@ state_recovery:
     - "Read artefacts/build/HANDOFF.md — the Workflow: derive-spec and Phase: fields identify the active phase"
     - "Read artefacts/build/derived-spec-working/repo-index.json + artefacts/build/derived-spec-working/spec-scan.md for the indexed evidence (Phase ≥ 1)"
     - "Read artefacts/build/derived-spec-working/repo-profile.md for the Phase 1 deliverable (app type, entry points, module boundaries)"
-    - "Read artefacts/build/derived-spec-workfing/drift-candidates.md for the Phase 2/7 question queue; read artefacts/build/derived-spec-working/ for staged drafts (Phase ≥ 5)"
+    - "Read artefacts/build/derived-spec-working/drift-from-baseline.md for the Phase 2/7 question queue; read artefacts/build/derived-spec-working/ for staged drafts (Phase ≥ 5)"
   critical_files:
     - artefacts/build/HANDOFF.md
     - artefacts/build/derived-spec-working/repo-index.json
