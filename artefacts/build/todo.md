@@ -2,20 +2,16 @@
 [ ] Investigate Comprehensive Pre-Commit Validators: Upgrade british_english.py beyond a hardcoded list to comprehensive dictionary-based checks (e.g. pyspelling/Hunspell) and add pre-commit enforcement against forbidden toolchains.
 [ ] Replace per-repo context in existing repositories (e.g. bollinger) with the canonical standards subrepo (`git subrepo clone git@github.com:Schmoiger/start-here.git context -b standards`).
 [ ] Configure GitHub Actions secrets and variables in repository settings (`ANTHROPIC_API_KEY`, `RUN_LLM_TESTS` in .env) to support CI LLM consistency testing.
-[ ] Framework has token bloat for simple tasks. Implement system 1 thinking (Jev) to pre-classify the work: use Jev to pick which workflow to follow. Add system one models to model LUT.
 [ ] revise Persona to be formatted the same (as author.md)
-[ ] Fully revise AGENTS.md (its generator) as it is currently a repeat of inventory of agents so not DRY. Instead it should list the base workflow e.g. system one, system two; workflow selection, if multi-agent.
-[ ] Improve use of HANDOFF.md: orchestrator only maintains build/HANDOFF.md but agents maintain service-scoped HANDOFF.md. Should be described in multi-agent skill. How is HANDOFF.md different to the status payload the sub-agent returns to the orchestrator.
 [ ] Analyise low level logs (see Openrouter or Langfuse) to optimise the context delivery (there's a lot going on, not all relevant).
-[ ] TDD skill should enforce commit after each phase (not assuming this will be by the orchestrator)
-[ ] Committing is token-intesive. Investigate and rationalise.
 [ ] Do we need context/agents/cursor-workflow-helper.mdc? Is it created by the Cursor runtime projection? Check.
 [ ] How to project skills as Claude superpowers? Do we even need to, as skills will be available anyway.
 [ ] Add projection to OpenRouter runtime e.g. new telemetry location
-[ ] Model selection should be per-task, not per-agent. Model should persist for task to make use of cached context economies.
 [ ] Update harness to work with Intent Driven Design
-[ ] Add telemetry source to projection script
-[ ] Simplify AGENTS.md as it currently isn't DRY
+[ ] Build model routing. At the moment, whilst the harness recognises different models for different tasks, if Cline harness is used they all route through the single chosen model.
+[ ] Orchestrator model is large which is unsuitable for small-tasks. Model router should be administered by a small Jev model. This will mean changes to AGENTS.md
+[ ] Framework has token bloat for simple tasks. Implement system 1 thinking (Jev) to pre-classify the work: use Jev to pick which workflow to follow. Add system one models to model LUT.
+[ ] build#schema-migration workflow step assumes Supabase.
 
 ## Done
 
@@ -44,3 +40,9 @@
 [WON'TDO] Retire the code-reviewer agent into a coder-executed code-review skill — self-review loses the independent gate (REQ-WF-003). Kept the gate agent and extracted context/skills/code-review.md instead (TASK-020).
 [x] Fix the hard-coded `Co-Authored-By: Claude <noreply@anthropic.com>` trailer — agents write it literally (the one in 160f756 was chosen by hand) while `context/scripts/validators/workspace_conventions.py:77` only validates the shape `^Co-Authored-By: .+ <.+@.+\..+>$`. Derive it from git config or runtime identity instead of hardcoding it.
 [x] Add new workflow for trivial work, uses a general purpose agent. 
+[x] Add telemetry source to projection script
+[x] Fully revise AGENTS.md (its generator) as it is currently a repeat of inventory of agents so not DRY. Instead it should list the base workflow e.g. system one, system two; workflow selection, if multi-agent.
+[x] Improve use of HANDOFF.md: orchestrator only maintains build/HANDOFF.md but agents maintain service-scoped HANDOFF.md. Should be described in multi-agent skill. How is HANDOFF.md different to the status payload the sub-agent returns to the orchestrator.
+[x] TDD skill should enforce commit after each phase (not assuming this will be by the orchestrator) - WON'T DO
+[x] Committing is token-intesive. Investigate and rationalise.
+[x] Model selection should be per-task, not per-agent. Model should persist for task to make use of cached context economies.
