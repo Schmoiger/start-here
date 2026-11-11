@@ -18,8 +18,8 @@
 | B-003 | medium | open | Context acquisition | Matching skill/rule not loaded before code tasks — root cause of B-001 |
 | B-004 | low | fixed | Code hygiene | ruff not run/enforced on `context/scripts/` — 228 findings in indexer code/tests |
 | B-005 | low | fixed | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
-| B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
-| B-007 | medium | in progress | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
+| B-006 | medium | fixed | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
+| B-007 | medium | fixed | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
 | B-008 | high | fixed | Output | Content at front of derived docs should be in the appendix |
 | B-009 | high | fixed | Output | Architecture process model is currently text instead should be Mermaid |
 | B-010 | high | open | Workflow | After open questions have been answered, docs should be updated with answers and confidence band improved |
@@ -151,10 +151,12 @@ Related: one `insert_line`-based append (derive-spec.md §3.4, §7-§9) landed i
 - Always chunk file creation/append into ≤6000-char edits planned in advance (frontmatter+overview → sections → tail), using unique `old_text` anchors for sequential appends.
 - Never use `insert_line` for appends without first reading the file's exact end; verify structure (grep section headers / `wc -l`) after any multi-edit sequence.
 - Adopt the chunking habit for every new file, including future T-017/T-021 and docs work.
+- **Durable rule (2026-11-11)**: added to `context/rules/bash-environment.md` §Editor & Command Hygiene, so it is in context via the always-on `.clinerules/bash-environment.md` projection and via `AGENTS.md` → `context/rules/bash-environment.md`.
 
 #### Acceptance Criteria
 
 - [x] Recorded with evidence (this section)
+- [x] Chunking rule is a durable always-on rule in `context/rules/bash-environment.md` (projected to `.clinerules/bash-environment.md`)
 - [ ] No "Editor input too large" rejection occurs in T-017/T-021 implementation
 - [ ] No `insert_line`-induced duplicate/misplaced content in future multi-edit sequences
 
