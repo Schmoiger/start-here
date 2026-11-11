@@ -12,6 +12,7 @@
 [ ] Orchestrator model is large which is unsuitable for small-tasks. Model router should be administered by a small Jev model. This will mean changes to AGENTS.md
 [ ] Framework has token bloat for simple tasks. Implement system 1 thinking (Jev) to pre-classify the work: use Jev to pick which workflow to follow. Add system one models to model LUT.
 [ ] build#schema-migration workflow step assumes Supabase.
+[ ] AlwaysApply: True is only available for Cursor, Windsurf runtime. Each runtime will need its own implementation. Done for Cline.
 
 ## Done
 
