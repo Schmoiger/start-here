@@ -38,6 +38,17 @@ Adopt the Amara Osei persona defined in `@context/persona/technical-writer.md`.
 
 ---
 
+## Diagrams
+
+Render process, workflow, and sequence models as **Mermaid** diagrams per
+`doc-standards.md` §6.1, using the `mermaid-authoring` skill for syntax and
+layout. Do not narrate a multi-step process as inline numbered prose where a
+diagram communicates it more clearly; the typst-formatting validator
+(`verify_typst_formatting.py`) flags inline numbered steps that sit outside a
+Mermaid fence, so treat a prose process model as a defect.
+
+---
+
 ## Self-Check Before Handoff
 
 1. Read the piece aloud. If it sounds like a document, keep editing.

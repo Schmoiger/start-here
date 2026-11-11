@@ -127,6 +127,11 @@ Record at intake:
 
 - Every subsection carries **tier + banded % + `file:line` citations**
   (confidence model below).
+- Render process, workflow, and sequence models as **Mermaid** diagrams:
+  `doc-standards.md` §6.1 mandates Mermaid for all diagrams and the
+  `mermaid-authoring` skill governs syntax/layout. A subsection that narrates
+  steps inline ("1. … 2. … 3. …") instead of a `mermaid` block is a
+  process-model defect (B-009) — flag it rather than ship prose.
 - Append the **open-questions appendix** (per subsection, priority, MC options)
   and the **drift section** (canonical docs vs derived behaviour).
 - Stage drafts in `artefacts/build/derived-spec-working/` — one file per artefacts
