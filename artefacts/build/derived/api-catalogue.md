@@ -1,35 +1,5 @@
 # API Catalogue: Agentic Orchestration Harness (Derived)
 
-Mode: technical (mode=both run)
-Target: . (repo root)
-Index provenance: repo-index.json (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep)
-Baseline docs: artefacts/architecture/api-catalogue.md, artefacts/api/api-design-guide.md
-Output location: artefacts/build/derived/api-catalogue.md
-
----
-
-## Confidence Schema
-
-| Band | % | Evidence required to claim it |
-|------|---|-------------------------------|
-| Verified | 85-100 | directly cited code or doc lines (path:line); usage counts or call chains where material; no blocking open question |
-| Needs Confirmation | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
-| Assumed | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
-
-Update rule: a confirmed answer raises the band and percentage and records the confirming citation; an unanswered question keeps the subsection Assumed and its question stays in the Open-Questions appendix as still-open.
-
-Promotion DoD: a draft is promotable when no subsection sits below Needs Confirmation and no blocking question is still open, or when the human records an explicit override.
-
----
-
-## Subsection Format
-
-### {Subsection title}
-
-Confidence: {Band} · {NN}% · Evidence: path:line, path:line
-
-{Content.}
-
 ---
 
 ## Routes
@@ -56,7 +26,45 @@ No request/response shapes are evidenced. The harness is a CLI/library with no H
 
 ---
 
-## Open-Questions Appendix
+## Appendices
+
+### Appendix A · Run Metadata
+
+| Field | Value |
+|-------|-------|
+| Mode | technical (mode=both run) |
+| Target | . (repo root) |
+| Index provenance | repo-index.json (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep) |
+| Baseline docs | artefacts/architecture/api-catalogue.md, artefacts/api/api-design-guide.md |
+| Output location | artefacts/build/derived/api-catalogue.md |
+
+---
+
+### Appendix B · Confidence Schema
+
+| Band | % | Evidence required to claim it |
+|------|---|-------------------------------|
+| Verified | 85-100 | directly cited code or doc lines (path:line); usage counts or call chains where material; no blocking open question |
+| Needs Confirmation | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
+| Assumed | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
+
+Update rule: a confirmed answer raises the band and percentage and records the confirming citation; an unanswered question keeps the subsection Assumed and its question stays in the Open-Questions appendix as still-open.
+
+Promotion DoD: a draft is promotable when no subsection sits below Needs Confirmation and no blocking question is still open, or when the human records an explicit override.
+
+---
+
+### Appendix C · Subsection Format
+
+### {Subsection title}
+
+Confidence: {Band} · {NN}% · Evidence: path:line, path:line
+
+{Content.}
+
+---
+
+### Appendix D · Open Questions
 
 | ID | Subsection | Priority | Question | Options | Status |
 |----|------------|----------|----------|---------|--------|
@@ -65,7 +73,7 @@ No request/response shapes are evidenced. The harness is a CLI/library with no H
 
 ---
 
-## Verification and Review Record
+### Appendix E · Verification and Review Record
 
 | Check | Result | Date |
 |-------|--------|------|

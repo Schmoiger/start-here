@@ -5,80 +5,20 @@ derive-spec draft template. The deriving agent copies this template once per art
 
   mode=product    -> product-spec.md      (@product-owner, Phase 4a)
   mode=technical  -> architecture.md, api-catalogue.md, data-model.md
-                                             (@solution-architect, Phase 4b)
+                                              (@solution-architect, Phase 4b)
   mode=both       -> all four
 
-Drafts stage in `artefacts/build/spec-drafts/`. Promotion to
+Layout rule (B-008): the shipped doc opens with the content subsections —
+never with boilerplate. Fill the matching skeleton below in place, strip the
+`## Skeleton:` wrapper and the `{placeholder}` rows, then close with the
+`## Drift` section (only when baseline docs exist) and finally the
+`## Appendices` container (run metadata · confidence schema · subsection
+format · open questions · verification and review record). Delete this
+comment block from the shipped doc.
+
+Drafts stage in `artefacts/build/derived-spec-working/`. Promotion to
 `artefacts/{category}/derived/` happens only behind a human APPROVED verdict. Canonical docs are never rewritten by derive-spec.
 -->
-
-**Run metadata**
-
-| Field | Value |
-|-------|-------|
-| Mode | {product \| technical \| both} |
-| Target | {repo or service root, `--repo` value} |
-| Index provenance | `repo-index.json` ({scan date}; extractors: {meta.extractors}) |
-| Baseline docs | {discovered spec docs, or "none: code-derived only"} |
-| Output location | `artefacts/build/spec-drafts/{category}.md` |
-
----
-
-## Confidence Schema (embed in every draft)
-
-<!-- Fixed bands (Q4 · A2). Keep this table in every
-     promoted draft so readers can interpret the tiers without opening the
-     skill, workflow, or template. The Promotion DoD below is the single
-     source of truth consumed by the confirmation-mode records
-     (requirements-elicitation skill §3.3-3.4) and the derive-spec Phase 8
-     promotion gate (derive-spec skill; derive-spec.yaml). -->
-
-| Band | % | Evidence required to claim it |
-|------|---|-------------------------------|
-| **Verified** | 85–100 | directly cited code or doc lines (`path:line`) that resolve; usage counts or call chains where material (`ui` / `api` / `tests` index rows); no blocking open question |
-| **Needs Confirmation** | 50–85 | plausible from indexed evidence but requires a human answer (Phase 7, confirmation mode); drift candidates land here first |
-| **Assumed** | <50 | reasonable inference only; stays Assumed until a human answer or a confirmed citation raises it |
-
-**Update rule** (baked into every subsection below): a confirmed answer raises
-the band and percentage and records the confirming citation; an unanswered
-question keeps the subsection Assumed and its question stays in the
-Open-Questions appendix as still-open. Never promote a still-open question
-silently.
-
-**Promotion DoD** (per doc): a draft is promotable at Phase 8 when all
-of the following hold:
-
-1. Every subsection sits at **Needs Confirmation or above**, or the human
-   recorded an explicit override for it (override recorded in the Verification
-   and Review record).
-2. No **blocking** open question is still-open in the appendix; non-blocking
-   still-open questions are listed with priority.
-3. `verify --doc` passes on the final draft (all `path:line` citations resolve).
-4. The Verification and Review record shows confirmed answers with their
-   citations, and the drift section reflects confirmed deltas.
-5. Human review gate verdict is **APPROVED** (derive-spec Phase 8);
-   CHANGES REQUIRED returns the doc to the specified phase.
-
-Each doc is promoted independently: one category may meet the DoD and promote
-while another stays in draft.
-
----
-
-## Subsection Format (repeat for every subsection)
-
-### {Subsection title}
-
-**Confidence**: {Band} · {NN}% · Evidence: `{path:line}`, `{path:line}`
-
-<!-- 2-4 sentences or a table: what the code does, present tense. Every claim
-     carries a citation. No citation, no claim.
-     Update rule: a confirmed answer raises the band/% here and cites
-     the confirming evidence; an unanswered question keeps Assumed and adds a
-     still-open row to the Open-Questions appendix. Never promote silently. -->
-
-{Content.}
-
----
 
 ## Skeleton: product-spec.md (mode product | both)
 
@@ -149,7 +89,90 @@ while another stays in draft.
 
 ---
 
-## Open-Questions Appendix (required in every draft)
+## Drift: Canonical Docs vs Derived Behaviour (required when baseline docs exist)
+
+<!-- One row per delta where an existing doc says X and the code does Y. Omit
+     this section only when the repo had no discoverable spec docs; then the
+     Run metadata appendix records "none: code-derived only". Drift rows are
+     asked first in the Phase 7 confirmation round. -->
+
+| ID | Canonical source (`path:line`) | Says | Code does (`path:line`) | Question raised |
+|----|-------------------------------|------|-------------------------|-----------------|
+| D-001 | `{path:line}` | {documented claim} | {observed behaviour} | Q-001 |
+
+---
+
+## Appendices
+
+### Appendix A · Run Metadata
+
+| Field | Value |
+|-------|-------|
+| Mode | {product \| technical \| both} |
+| Target | {repo or service root, `--repo` value} |
+| Index provenance | `repo-index.json` ({scan date}; extractors: {meta.extractors}) |
+| Baseline docs | {discovered spec docs, or "none: code-derived only"} |
+| Output location | `artefacts/build/derived-spec-working/{category}.md` |
+
+---
+
+### Appendix B · Confidence Schema
+
+<!-- Fixed bands (Q4 · A2). Keep this table in every
+     promoted draft so readers can interpret the tiers without opening the
+     skill, workflow, or template. The Promotion DoD below is the single
+     source of truth consumed by the confirmation-mode records
+     (requirements-elicitation skill §3.3-3.4) and the derive-spec Phase 8
+     promotion gate (derive-spec skill; derive-spec.yaml). -->
+
+| Band | % | Evidence required to claim it |
+|------|---|-------------------------------|
+| **Verified** | 85–100 | directly cited code or doc lines (`path:line`) that resolve; usage counts or call chains where material (`ui` / `api` / `tests` index rows); no blocking open question |
+| **Needs Confirmation** | 50–85 | plausible from indexed evidence but requires a human answer (Phase 7, confirmation mode); drift candidates land here first |
+| **Assumed** | <50 | reasonable inference only; stays Assumed until a human answer or a confirmed citation raises it |
+
+**Update rule** (baked into every subsection below): a confirmed answer raises
+the band and percentage and records the confirming citation; an unanswered
+question keeps the subsection Assumed and its question stays in the
+Open-Questions appendix as still-open. Never promote a still-open question
+silently.
+
+**Promotion DoD** (per doc): a draft is promotable at Phase 8 when all
+of the following hold:
+
+1. Every subsection sits at **Needs Confirmation or above**, or the human
+   recorded an explicit override for it (override recorded in the Verification
+   and Review record).
+2. No **blocking** open question is still-open in the appendix; non-blocking
+   still-open questions are listed with priority.
+3. `verify --doc` passes on the final draft (all `path:line` citations resolve).
+4. The Verification and Review record shows confirmed answers with their
+   citations, and the drift section reflects confirmed deltas.
+5. Human review gate verdict is **APPROVED** (derive-spec Phase 8);
+   CHANGES REQUIRED returns the doc to the specified phase.
+
+Each doc is promoted independently: one category may meet the DoD and promote
+while another stays in draft.
+
+---
+
+### Appendix C · Subsection Format
+
+### {Subsection title}
+
+**Confidence**: {Band} · {NN}% · Evidence: `{path:line}`, `{path:line}`
+
+<!-- 2-4 sentences or a table: what the code does, present tense. Every claim
+     carries a citation. No citation, no claim.
+     Update rule: a confirmed answer raises the band/% here and cites
+     the confirming evidence; an unanswered question keeps Assumed and adds a
+     still-open row to the Open-Questions appendix. Never promote silently. -->
+
+{Content.}
+
+---
+
+### Appendix D · Open Questions
 
 <!-- One row per question raised during derivation or drift analysis. Options
      are numbered multiple-choice with "Other" (Q2 · reverse-spec.md Step 3),
@@ -164,20 +187,7 @@ while another stays in draft.
 
 ---
 
-## Drift: Canonical Docs vs Derived Behaviour (required when baseline docs exist)
-
-<!-- One row per delta where an existing doc says X and the code does Y. Omit
-     this section only when the repo had no discoverable spec docs; then the
-     Run metadata records "none: code-derived only". Drift rows are asked
-     first in the Phase 7 confirmation round. -->
-
-| ID | Canonical source (`path:line`) | Says | Code does (`path:line`) | Question raised |
-|----|-------------------------------|------|-------------------------|-----------------|
-| D-001 | `{path:line}` | {documented claim} | {observed behaviour} | Q-001 |
-
----
-
-## Verification and Review Record
+### Appendix E · Verification and Review Record
 
 | Check | Result | Date |
 |-------|--------|------|

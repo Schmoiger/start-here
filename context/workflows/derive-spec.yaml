@@ -112,6 +112,7 @@ phases:
       - artefacts/build/derived-spec-working/data-model-draft.md    # modes technical | both
     validation:
       - "every subsection carries tier + banded % + file:line evidence (Verified 85-100 · Needs Confirmation 50-85 · Assumed <50)"
+      - "content-first layout: content subsections open the doc; boilerplate (run metadata, confidence schema, subsection format, open questions, review record) is in the Appendices container (B-008)"
       - "open-questions appendix present (per subsection, priority, MC options)"
       - "drift section present (canonical docs vs derived behaviour)"
     notes:

@@ -1,45 +1,5 @@
 # Architecture: Agentic Orchestration Harness (Derived)
 
-Mode: technical (mode=both run)
-Target: . (repo root)
-Index provenance: repo-index.json (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep)
-Baseline docs: architecture.md (example), data-model.md, api-catalogue.md, openapi.yaml
-Output location: artefacts/build/derived/architecture.md
-
----
-
-**Run metadata**
-
-| Field | Value |
-|-------|-------|
-| Mode | both (product + technical) |
-| Target | . (repo root) |
-| Index provenance | repo-index.json (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep) |
-| Baseline docs | architecture.md (example), data-model.md, api-catalogue.md, openapi.yaml |
-| Output location | artefacts/build/derived/architecture.md |
-
----
-
-## Confidence Schema
-
-| Band | % | Evidence required to claim it |
-|------|---|-------------------------------|
-| Verified | 85-100 | directly cited code or doc lines (path:line); usage counts or call chains where material; no blocking open question |
-| Needs Confirmation | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
-| Assumed | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
-
-Update rule: a confirmed answer raises the band and percentage and records the confirming citation; an unanswered question keeps the subsection Assumed and its question stays in the Open-Questions appendix as still-open.
-
-Promotion DoD: a draft is promotable when no subsection sits below Needs Confirmation and no blocking question is still open, or when the human records an explicit override.
-
----
-
-## Subsection Format
-
-### {Subsection title}
-
-Confidence: {Band} · {NN}% · Evidence: path:line, path:line
-
 ---
 
 ## System Overview
@@ -97,6 +57,7 @@ orchestrator commits`"]
     A --> B --> C --> D --> E --> F
 ```
 
+
 **Workflow execution**
 
 ```mermaid
@@ -118,6 +79,7 @@ HANDOFF.md + repo-index.json + spec-scan.md + repo-profile.md`"]
     Recover --> Phase
 ```
 
+
 ---
 
 ## Deployment-Relevant Seams
@@ -133,7 +95,43 @@ HANDOFF.md + repo-index.json + spec-scan.md + repo-profile.md`"]
 
 ---
 
-## Open-Questions Appendix
+## Appendices
+
+### Appendix A · Run Metadata
+
+| Field | Value |
+|-------|-------|
+| Mode | both (product + technical) |
+| Target | . (repo root) |
+| Index provenance | repo-index.json (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep) |
+| Baseline docs | architecture.md (example), data-model.md, api-catalogue.md, openapi.yaml |
+| Output location | artefacts/build/derived/architecture.md |
+
+---
+
+### Appendix B · Confidence Schema
+
+| Band | % | Evidence required to claim it |
+|------|---|-------------------------------|
+| Verified | 85-100 | directly cited code or doc lines (path:line); usage counts or call chains where material; no blocking open question |
+| Needs Confirmation | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
+| Assumed | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
+
+Update rule: a confirmed answer raises the band and percentage and records the confirming citation; an unanswered question keeps the subsection Assumed and its question stays in the Open-Questions appendix as still-open.
+
+Promotion DoD: a draft is promotable when no subsection sits below Needs Confirmation and no blocking question is still open, or when the human records an explicit override.
+
+---
+
+### Appendix C · Subsection Format
+
+### {Subsection title}
+
+Confidence: {Band} · {NN}% · Evidence: path:line, path:line
+
+---
+
+### Appendix D · Open Questions
 
 | ID | Subsection | Priority | Question | Options | Status |
 |----|------------|----------|----------|---------|--------|
@@ -142,7 +140,7 @@ HANDOFF.md + repo-index.json + spec-scan.md + repo-profile.md`"]
 
 ---
 
-## Verification and Review Record
+### Appendix E · Verification and Review Record
 
 | Check | Result | Date |
 |-------|--------|------|

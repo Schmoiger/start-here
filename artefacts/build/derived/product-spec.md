@@ -1,40 +1,5 @@
 # Product Specification: Agentic Orchestration Harness (Derived)
 
-<!--
-Mode: product (mode=both run)
-Target: . (repo root)
-Index provenance: repo-index.json (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep)
-Baseline docs: discovered — requirements.md (example), architecture.md (example), data-model.md, api-catalogue.md, openapi.yaml, user-stories.md, open-questions.md
-Output location: artefacts/build/spec-drafts/product-spec.md
--->
-
-**Run metadata**
-
-| Field | Value |
-|-------|-------|
-| Mode | both (product + technical) |
-| Target | . (repo root) |
-| Index provenance | `repo-index.json` (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep) |
-| Baseline docs | requirements.md (example), architecture.md (example), data-model.md, api-catalogue.md, openapi.yaml, user-stories.md, open-questions.md |
-| Output location | `artefacts/build/derived/product-spec.md` |
-
----
-
-## Confidence Schema
-
-| Band | % | Evidence required to claim it |
-|------|---|-------------------------------|
-| **Verified** | 85-100 | directly cited code or doc lines (`path:line`); usage counts or call chains where material; no blocking open question |
-| **Needs Confirmation** | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
-| **Assumed** | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
-
-**Update rule**: a confirmed answer raises the band and percentage and records the confirming citation; an unanswered question keeps the subsection Assumed and its question stays in the Open-Questions appendix as still-open.
-
-**Promotion DoD**: a draft is promotable when no subsection sits below Needs Confirmation and no blocking question is still open, or when the human records an explicit override.
-
----
-
-## Subsection Format
 ### Actors and Roles
 
 **Confidence**: Verified · 90% · Evidence: `context/scripts/code-specs/spec_indexer.py:7`, `context/agents/*.md` (34 agent definitions indexed), `context/workflows/*.yaml` (11 workflows)
@@ -55,8 +20,6 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 - **DevOps**: physical data layer, deployment targets
 - **Documentation**: user-facing docs, API references, guides
 - **Harness Analyst**: agent effectiveness, token economics, model-tier conformance
-
----
 
 ### Features and Capabilities
 
@@ -83,8 +46,6 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 | **Agent Spawn & Delegate** | Orchestrator → Sub-agent | 1. Read agent definition → 2. Resolve rules by glob → 3. Assign disjoint file scope → 4. Spawn with task prompt template → 5. Sub-agent reports → 6. Orchestrator commits | `context/agents/orchestrator.md:115-140`, `context/templates/task-prompt-template.md` |
 | **State Recovery** | Orchestrator (post-compaction) | 1. Re-read HANDOFF.md (Workflow/Phase) → 2. Re-read repo-index.json + spec-scan.md → 3. Re-read repo-profile.md → 4. Resume from drift-candidates.md + spec-drafts/ | `context/agents/orchestrator.md:215-222`, `context/workflows/derive-spec.yaml:188-198` |
 
----
-
 ### User-Facing Constraints
 
 **Confidence**: Verified · 85% · Evidence: `artefacts/build/repo-index.json:config` (8 keys from .env.template), `context/scripts/code-specs/spec_indexer.py:1194` (analyze_sql config extraction), `.env.template`
@@ -95,16 +56,6 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 | **Model Selection** | `context/models.yaml` (not indexed — yaml not in scan) | Per-agent model tiers; `model: large/medium/small` in agent frontmatter |
 | **Token Limits** | `artefacts/product/requirements.md:133` (NFR-003) | <2,500 tokens framework overhead per spawn |
 | **Parallel Execution Overhead** | `artefacts/product/requirements.md:134` (NFR-004) | <20% token overhead vs sequential |
-
----
-
-## Open-Questions Appendix
-
-| ID | Subsection | Priority | Question | Options | Status |
-|----|------------|----------|----------|---------|--------|
-| Q-001 | Actors and Roles | blocking | Should the derived product spec go to `build/derived/` instead of `product/derived/`? | 1. Go to `build/derived/` · 2. Keep in `product/derived/` · Other | **APPROVED** |
-| Q-002 | UX Flows | high | Are the 4 UX flows complete, or are there additional user-facing flows (e.g. onboarding, subrepo update)? | 1. Flows complete as listed · 2. Add onboarding flow · 3. Add subrepo update flow · Other | **APPROVED** |
-| Q-003 | Features | high | Should "Runtime Projection" be split into separate features per runtime (Claude, Cline, Gemini, Copilot, Codex)? | 1. Keep unified · 2. Split per runtime · Other | **APPROVED** |
 
 ---
 
@@ -119,7 +70,45 @@ The harness defines **34 specialised agents** across **11 workflow YAMLs** (buil
 
 ---
 
-## Verification and Review Record
+## Appendices
+
+### Appendix A · Run Metadata
+
+| Field | Value |
+|-------|-------|
+| Mode | both (product + technical) |
+| Target | . (repo root) |
+| Index provenance | `repo-index.json` (2026-11-05T13:24:38Z; extractors: stdlib.ast, ast-grep) |
+| Baseline docs | requirements.md (example), architecture.md (example), data-model.md, api-catalogue.md, openapi.yaml, user-stories.md, open-questions.md |
+| Output location | `artefacts/build/derived/product-spec.md` |
+
+---
+
+### Appendix B · Confidence Schema
+
+| Band | % | Evidence required to claim it |
+|------|---|-------------------------------|
+| **Verified** | 85-100 | directly cited code or doc lines (`path:line`); usage counts or call chains where material; no blocking open question |
+| **Needs Confirmation** | 50-85 | plausible from evidence but requires human confirmation; drift candidates land here first |
+| **Assumed** | <50 | reasonable inference only; stays Assumed until a human answer confirms it |
+
+**Update rule**: a confirmed answer raises the band and percentage and records the confirming citation; an unanswered question keeps the subsection Assumed and its question stays in the Open-Questions appendix as still-open.
+
+**Promotion DoD**: a draft is promotable when no subsection sits below Needs Confirmation and no blocking question is still open, or when the human records an explicit override.
+
+---
+
+### Appendix D · Open Questions
+
+| ID | Subsection | Priority | Question | Options | Status |
+|----|------------|----------|----------|---------|--------|
+| Q-001 | Actors and Roles | blocking | Should the derived product spec go to `build/derived/` instead of `product/derived/`? | 1. Go to `build/derived/` · 2. Keep in `product/derived/` · Other | **APPROVED** |
+| Q-002 | UX Flows | high | Are the 4 UX flows complete, or are there additional user-facing flows (e.g. onboarding, subrepo update)? | 1. Flows complete as listed · 2. Add onboarding flow · 3. Add subrepo update flow · Other | **APPROVED** |
+| Q-003 | Features | high | Should "Runtime Projection" be split into separate features per runtime (Claude, Cline, Gemini, Copilot, Codex)? | 1. Keep unified · 2. Split per runtime · Other | **APPROVED** |
+
+---
+
+### Appendix E · Verification and Review Record
 
 | Check | Result | Date |
 |-------|--------|------|

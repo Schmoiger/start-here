@@ -539,6 +539,22 @@ class TestDocCoverage:
         covered, total, errors = si.check_doc_coverage(doc)
         assert covered == 0 and total == 0 and errors == []
 
+    def test_coverage_skips_appendices_container_and_items(self):
+        # B-008: boilerplate lives in a trailing ``## Appendices`` container, so
+        # its container heading and every ``### Appendix …`` item are structural
+        # (never content subsections) regardless of what they carry.
+        doc = (
+            "## System Overview\n\n**Confidence**: Verified · 90% · Evidence: `app.py:12`\n\n"
+            "## Appendices\n\n"
+            "### Appendix A · Run Metadata\n\nMetadata table.\n\n"
+            "### Appendix B · Confidence Schema\n\nSchema table.\n\n"
+            "### Appendix C · Subsection Format\n\n### {Subsection title}\n\n"
+            "### Appendix D · Open Questions\n\nNo confidence needed.\n\n"
+            "### Appendix E · Verification and Review Record\n\nReview table.\n\n"
+        )
+        covered, total, errors = si.check_doc_coverage(doc)
+        assert covered == 1 and total == 1 and errors == []
+
     def test_coverage_fails_via_run_verify_and_lists_subsection(self, tmp_path):
         repo = _write_source(tmp_path)
         doc = tmp_path / "bad.md"

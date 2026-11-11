@@ -119,9 +119,9 @@ Phase 6 "question coverage" check is deterministic rather than
 agent-discretionary:
 
 - Content subsections are `##`/`###`/`####` headings that are neither
-  structural sections (Confidence Schema, Subsection Format,
-  Open-Questions Appendix, Drift, Verification and Review Record) nor
-  `{placeholder}` headings.
+  structural sections (Appendices container, `Appendix …` items, Run Metadata,
+  Confidence Schema, Subsection Format, Open Questions, Drift,
+  Verification and Review Record) nor `{placeholder}` headings.
 - Every content subsection must contain a `**Confidence**:` line carrying:
   tier (`Verified` · `Needs Confirmation` · `Assumed`), a banded percentage
   (`NN%`, consistent with the band), and at least one `file:line` citation

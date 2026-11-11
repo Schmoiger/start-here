@@ -2641,10 +2641,14 @@ _COVERAGE_CONFIDENCE_RE: re.Pattern[str] = re.compile(
 )
 _COVERAGE_HEADING_RE: re.Pattern[str] = re.compile(r"^(#{1,4})\s+(.*)$")
 # Structural headings that are never content subsections and therefore never
-# carry a Confidence line of their own.
+# carry a Confidence line of their own. Covers both the derived-doc
+# ``Appendices`` container and its ``Appendix …`` items (B-008): boilerplate
+# (run metadata · confidence schema · subsection format · open questions ·
+# verification and review record) lives in the appendix so content opens the
+# document.
 _COVERAGE_NON_CONTENT_RE: re.Pattern[str] = re.compile(
-    r"(?i)^(run metadata|confidence schema|subsection format|format|open[- ]questions?(?: appendix)?|"
-    r"appendix|drift.*|verification and review record|review record|metadata)$"
+    r"(?i)^(appendices|appendix.*|run metadata|confidence schema|subsection format|format|"
+    r"open[- ]questions?(?: appendix)?|drift.*|verification and review record|review record|metadata)$"
 )
 
 
@@ -2675,7 +2679,8 @@ def check_doc_coverage(text: str, doc_label: str = "") -> tuple[int, int, list[s
     """Deterministic Phase 6 coverage gate on a derived-spec markdown doc.
 
     A content subsection is a ``##``/``###``/``####`` heading that is not a
-    structural section (Confidence Schema, Open-Questions Appendix, Drift,
+    structural section (Appendices / ``Appendix …`` items, Run Metadata,
+    Confidence Schema, Subsection Format, Open Questions, Drift,
     Verification and Review Record, …) and not a ``{placeholder}`` heading. It
     must contain a ``**Confidence**:`` line carrying tier · NN% · file:line,
     parsed from the derived-spec-template confidence schema (T-020). Returns

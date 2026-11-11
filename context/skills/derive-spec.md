@@ -132,8 +132,11 @@ Record at intake:
   `mermaid-authoring` skill governs syntax/layout. A subsection that narrates
   steps inline ("1. … 2. … 3. …") instead of a `mermaid` block is a
   process-model defect (B-009) — flag it rather than ship prose.
-- Append the **open-questions appendix** (per subsection, priority, MC options)
-  and the **drift section** (canonical docs vs derived behaviour).
+- Open the doc with content, never boilerplate (B-008): ship the content
+  subsections first, then the **drift section** (canonical docs vs derived
+  behaviour), then the **Appendices** container holding the boilerplate (open
+  questions, run metadata, confidence schema, subsection format, verification
+  and review record — order per `context/templates/derived-spec-template.md`).
 - Stage drafts in `artefacts/build/derived-spec-working/` — one file per artefacts
   category (`product-spec-draft.md` · `architecture-draft.md` · `api-catalogue-draft.md` ·
   `data-model-draft.md`).

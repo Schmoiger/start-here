@@ -20,7 +20,7 @@
 | B-005 | low | fixed | Coverage evidence | pytest-cov absent — Coverage % per testing.md §1.1 cannot be reported |
 | B-006 | medium | open | Cline tooling | Cline forgets to chunk edits — repeatedly exceeds the editor 6000-char limit and retries, wasting tokens |
 | B-007 | medium | in progress | Cline tooling | Cline hangs on some terminal commands — long heredocs through `run_command` leave the shell in prompt state |
-| B-008 | high | open | Output | Content at front of derived docs should be in the appendix |
+| B-008 | high | fixed | Output | Content at front of derived docs should be in the appendix |
 | B-009 | high | fixed | Output | Architecture process model is currently text instead should be Mermaid |
 | B-010 | high | open | Workflow | After open questions have been answered, docs should be updated with answers and confidence band improved |
 
@@ -208,6 +208,33 @@ The `## Process Model` section of the derived architecture doc (`artefacts/build
 - [x] `## Process Model` in the derived architecture doc renders as Mermaid
 - [x] Working draft and promoted copy are in sync
 - [ ] `spec_indexer.py verify --doc` still resolves citations (pending, as recorded in the doc's own review record)
+
+## B-008: Content at front of derived docs should be in the appendix
+
+The derived docs are intended for humans and agents. They should be structured to get to the useful content as soon as possible. Boilerplate should be in the appendix as reading them first is token burn.
+
+These sections are examples of boilerplate that should be put in an appendix:
+
+- confidence schema
+- subsection format
+- open questions
+- change (review, verification) log
+- run metadata
+
+#### Fix
+
+- `context/templates/derived-spec-template.md` restructured: content skeletons now open the document; `## Drift` (when baseline docs exist) precedes a trailing `## Appendices` container holding run metadata (·A), confidence schema (·B), subsection format (·C), open questions (·D) and verification and review record (·E). Template instruction comment now states the content-first layout rule so future runs reproduce it.
+- `spec_indexer.py` coverage gate (`_COVERAGE_NON_CONTENT_RE`) extended to treat the `Appendices` container and `Appendix …` items as structural (the old anchored exact-title match would otherwise have turned them into un-cited content subsections); docstring updated; regression test `test_coverage_skips_appendices_container_and_items` added.
+- Skills/docs synced: `analyse-repo.md` §2.1 structural list, `derive-spec.md` Phase 5 (content-first wording), `derive-spec.yaml` Phase 5 validation (content-first layout check); adapter projections regenerated.
+- All 8 pilot docs (`derived/` + `derived-spec-working/` drafts) restructured in place, byte-preserving every body line — content opens, Drift before Appendices, all five boilerplate sections relocated into the appendices.
+
+#### Acceptance Criteria
+
+- [x] Content subsections open every derived doc; run metadata / confidence schema / subsection format / open questions / review record sit in a trailing `## Appendices` container
+- [x] `verify --doc --require-coverage` outcome unchanged vs baseline: api-catalogue + data-model green; product-spec + architecture carry the same pre-existing stale citations (`generate_adapters.py:428` blank line, `derive-spec.yaml:188`) that fail identically at HEAD
+- [x] Full scripts suite: 295 passed / 2 skipped / 3 failed — same pre-existing set as before (2 e2e compilation drift + `agents-md.yaml` workflow-schema)
+- [x] ruff check + format clean; `tech_writing.py spelling` clean on all 8 docs, template and skills; adapter projections in sync (`adapter_drift.py` ✅)
+- [x] Making this rule durable: analyse-repo / derive-spec skills + template layout comment + derive-spec.yaml validation all say content-first
 
 ---
 
