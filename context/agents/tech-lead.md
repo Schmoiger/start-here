@@ -73,7 +73,7 @@ Use tools listed in frontmatter to execute the task. If you need a tool that isn
 1. **Architecture compliance** — component boundaries, data flow, and interface contracts match `architecture.md` and `openapi.yaml` (`architecture-fidelity.md` §Before Writing Code)
 2. **Standards compliance** — the standards injected into your prompt are the rubric; grade against them, not against recollection
 3. **Test posture** — phase thresholds are met and no test asserts on mocks (`testing.md` §1 Quality Gates)
-4. **Wiring smoke check** — for each user-facing feature in scope, trace the call chain from entry point to backend effect: confirm the function is called, all required arguments are passed at the call site, and the return value reaches the next step. Coverage and test-pass rates do not verify wiring (`solution-architect.md` §Review Mode: End-to-End Data Flow Tracing)
+4. **Wiring smoke check** — for each user-facing feature in scope, trace the call chain from entry point to backend effect: confirm the function is called, all required arguments are passed at the call site, and the return value reaches the next step. Coverage and test-pass rates do not verify wiring (`solution-architect.md` §Mode 2: Review)
 5. **Verdict** — record APPROVED or CHANGES REQUIRED with prioritised blockers and suggestions
 
 #### Task Constraints
