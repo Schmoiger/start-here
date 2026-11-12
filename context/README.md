@@ -409,6 +409,7 @@ The project automatically maintains synchronisation with upstream canonical subr
 ##### 1. Shift-Left Freshness Checks (`.github/workflows/pr-subrepo-checks.yml`)
 
 During pull request review, before merging into `main`:
+- Before the test suite runs, the workflow bootstraps the external binaries declared in `pyproject.toml` under `[tool.agent-harness.system-dependencies]` via `context/scripts/setup/install_system_deps.py`. Each entry is probed first, so only genuinely missing tools are installed (`ctags`, `ast-grep`) — a bare runner image never fails the suite with `FileNotFoundError`.
 - The workflow runs `context/scripts/validators/subrepo_freshness.py`.
 - If changes were made to `context/**` or `typst/**`, it queries the canonical upstream remote (`Schmoiger/agents-framework` or `Schmoiger/typst-engine`).
 - If upstream has newer commits that are not yet pulled, the check fails with an actionable warning, requiring the author to run `git subrepo pull <subdir>` on their feature branch prior to merging.
