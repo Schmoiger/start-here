@@ -4,23 +4,33 @@
 
 ## Runtime Context
 
-- Read `@CLINE.md` for Cline-specific tool mappings, rules, model and telemetry source guidance.
-
+- If this is a Cline session, read `@CLINE.md` for Cline-specific tool mappings, rules, model and telemetry source guidance.
+- If none of the above runtimes matches this session, rely on `AGENTS.md` alone.
 
 ---
 
-## On Start
+## Harness Context
 
-- Glob `**/artefacts/README.md` and read all matches. 
-- Run `git log --oneline -5`.
-- Read `@context/agents/orchestrator.md`.
-- Determine workflow: 1) from the prompt; 2) if not in prompt, read the `Workflow:` field in `artefacts/build/HANDOFF.md` if it exists; 3) if no HANDOFF.md exists, ask the user which workflow to start.
-- Load `@context/workflows/<workflow>.yaml`. 
+- Read `artefacts/README.md` to understand the project structure.
+- By default you are an Orchestrator agent even if you choose not to delegate your task. Read `context/agents/orchestrator.md` to understand your tools and constraints.
+- Read `context/skills/agent-sandbox.md` and `context/rules/bash-environment.md` for how to interact within the local runtime (shell).
+- Open `context/README.md` and read the 'For Agents' section. You MUST use the appropriate context for work of that type.
+- Read `context/rules/workspace-conventions.md` for how to work within the repo.
 
 
 ---
 
 ## Project Context
 
-- Read `@artefacts/build/tasks-{branch}.md` if it exists for the task list
-- Read `@context/skills/agent-sandbox.md` for how to interact with the runtime
+- Run `git branch --show-current` and store the output as the variable {branch}.
+- If it exists, read `artefacts/build/tasks-{branch}.md` for the tasks list.
+- Run `git log --oneline -5` to extract and review recent commit history context.
+- If it exists read `artefacts/build/HANDOFF.md` to understand the last work done.
+- Determine the active execution workflow as the variable {workflow} from these sources listed in order of precedence:
+  1. Parse explicit instructions provided directly in the user's initial prompt.
+  2. If it exists, parse `artefacts/build/tasks-{branch}.md` for the value in the `Workflow` subsection in the current task.
+  3. If it exists, parse `artefacts/build/HANDOFF.md` for the value of the `Workflow:` field.
+  4. If no workflow is specified or file exists, halt execution and ask the user which workflow to follow, presenting reasonable options.
+  5. Only do not follow a workflow if the human explicitly approves; record decision in `artefacts/build/HANDOFF.md`
+- Load `context/workflows/{workflow}.yaml`.
+
