@@ -196,10 +196,28 @@ class TestSkillFrontmatterSchema:
 
 class TestWorkflowPhaseSchema:
     def test_all_real_workflows_pass_schema(self):
+        checked = 0
         for path in sorted(WORKFLOWS_DIR.glob("*.yaml")):
-            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            # Mirror the canonical loader (context/scripts/generators/adapters/core/
+            # loader.py): only YAML carrying a top-level ``name`` is a phase DAG.
+            # Non-DAG sources such as agents-md.yaml (the AGENTS.md content source)
+            # are deliberately skipped rather than validated as workflows.
+            if "name" not in data:
+                continue
             errors = _validate_workflow(data, KNOWN_AGENTS)
             assert errors == [], f"{path.name} failed: {errors}"
+            checked += 1
+        assert checked > 0, "no workflow YAML files were validated"
+
+    def test_agents_md_source_should_be_skipped_as_a_workflow(self):
+        source = WORKFLOWS_DIR / "agents-md.yaml"
+        assert source.is_file(), "context/workflows/agents-md.yaml is the AGENTS.md source"
+
+        data = yaml.safe_load(source.read_text(encoding="utf-8"))
+
+        assert "name" not in data, "agents-md.yaml must stay a non-DAG document source"
+        assert "sections" in data
 
     def test_rejects_duplicate_phase_ids(self):
         wf = _valid_workflow()
