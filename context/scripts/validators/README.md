@@ -34,7 +34,7 @@ The following rules govern real-time agent execution choices or runtime protocol
 
 - **`agent_definitions.py`**: Validates agent definition frontmatter, references to rules/standards/skills, and structural integrity in `context/agents/*.md` — including the canonical `Context Acquisition` body section, the one-log-per-task interruption log path (`artefacts/build/interruptions/{task-id}.jsonl`), and body attributions: every `Source` cell in a body rule table and every inline `file.md §section` citation must resolve to a file (and, when named, a heading) that exists.
 - **`adapter_drift.py`**: Validates synchronisation between canonical `context/` definitions and on-disk runtime adapter projections (`AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `CLINE.md`, `.claude/`, `.clinerules/`, `.cline/skills/`, `.github/`, `.openai/`, `.agents/skills/`).
-- **`verify_typst_formatting.py`**: Enforces Typst-friendly Markdown formatting (at least 2 blank lines after mermaid code fences, horizontal rule `---` before `##` section headings).
+- **`verify_typst_formatting.py`**: Enforces Typst-friendly Markdown formatting (at least 2 blank lines after mermaid code fences, horizontal rule `---` before `##` section headings) and process-model hygiene — a non-table prose line inside a Process/Flow/Workflow/Sequence section carrying three or more inline numbered steps (e.g. the B-009 architecture Process Model) must be rendered as a Mermaid diagram (`doc-standards.md` §6.1); the violation message points the fixing agent at the `mermaid-authoring` skill (`context/skills/mermaid-authoring.md`).
 - **`framework_docs_staleness.py`**: Ensures architectural documentation (`agentic-framework-reference.md`, `agentic-framework.md`) is updated alongside changes to `context/`.
 
 ---
@@ -126,7 +126,7 @@ uv run pre-commit run --all-files
 
 Validates invariants from `context/rules/workspace-conventions.md`.
 
-- **Commit Messages**: `{type}({scope}): {description}` subject, max 72 chars, imperative mood, lowercase alphanumeric scope.
+- **Commit Messages**: `{type}({scope}): {description}` subject, max 72 chars, imperative mood, lowercase alphanumeric scope; explanatory body required (trailers only are rejected).
 - **Agent Trailers**: Validates `Agent-Session: tool=... model=... agents=...` and ensures `Co-Authored-By:` is present.
 - **Metrics Logging**: Ensures JSONL entries in `artefacts/build/metrics/` match schema (`ts`, `task`, `agent`, `event`, `tokens`), valid events (`start`, `handoff`, `escalate`, `complete`, `blocked`), and `to` field for handoffs. Metrics logs are build records, so a repository-root `metrics/` path is rejected.
 - **Interruption Logging**: Ensures logs in `artefacts/build/interruptions/` follow the schema in `context/templates/logging-template.md` § Interruption Log: `id`, `ts` (ISO 8601 UTC), `agent` (no `@`), `task_id`, and `type` (`question`, `tool_approval`, `escalation`, `resolution`), plus the per-type fields. Outcome fields may be `null` when a record is written at the moment of blocking, provided a `resolution` record later references it via `ref`. Record ids must be unique, `ref` must resolve within the same log, and the filename stem must equal the `task_id` — one rolling log per task, so legacy `{agent-name}-{task-id}-{timestamp}.jsonl` names fail.

@@ -38,10 +38,21 @@ alwaysApply: true
 ## 2. Git Commits
 
 1. **Who Commits**: If invoked directly by a human, **commit directly**. If spawned as a subagent by an Orchestrator, **DO NOT commit** — write your message to `/tmp/{task-id}_commit_msg.txt` and return the file paths.
-2. **Pre-Commit**: Always format before staging (e.g. `uv run ruff format {files}` or `yarn biome check --write {files}`). If a hook reverts your changes, read the formatted file and commit it.
-3. **Message Format**: Commits MUST follow `{type}({scope}): {description}`.
-4. **Agent Trailers**: Commits MUST include the `Agent-Session` trailer and `Co-Authored-By` for AI-authored work.
-5. **Hook-Owned Trailer Fields**: `tool=`, `model=`, and `tokens=` in the `Agent-Session` trailer are populated by the `prepare-commit-msg` hook from runtime session telemetry (Claude Code, Antigravity, Copilot, Codex, Cline). Do not hand-write them: the `commit-msg` validator rejects values that runtime telemetry contradicts or cannot corroborate.
+2. **When to Commit**: If following a workflow, commit after conclusion of every workflow step, in logical groups. If not following a workflow, commit when human directs.
+3. **Pre-Commit**: Always format before staging (e.g. `uv run ruff format {files}` or `yarn biome check --write {files}`). If a hook reverts your changes, read the formatted file and commit it.
+4. **Message Format**: Commit header MUST follow `{type}({scope}): {description}` and less than 72 characters. Separate commit body MUST be present and follow `context/templates/commit-message-template.md`.
+5. **Agent Trailers**: Do not guess the data for the agent trailer (`Agent-Session` and `Co-Authored-By`); use `context/scripts/prepare-commit-msg.sh`.
+   - `Co-Authored-By` must match `^Co-Authored-By: .+ <.+@.+\..+>$` — a real email-shaped address. Placeholders such as `<[EMAIL]>` seen in rendered templates/fixtures are **not** validator-valid; they are render-layer redactions of a real address.
+   - `tool=`, `model=`, and `tokens=` in `Agent-Session` are populated by `prepare-commit-msg.sh` from runtime session telemetry. Do not hand-write them: the validator rejects values that runtime telemetry contradicts or cannot corroborate.
+   - `prepare-commit-msg.sh` also appends a compliant `Co-Authored-By:` line when one is absent and an agent runtime was detected, so the failure cannot recur.
+6. **Pre-validate before committing**: run
+   ```bash
+   cp /tmp/{task-id}_commit_msg.txt /tmp/commit_msg.txt
+   bash context/scripts/prepare-commit-msg.sh /tmp/commit_msg.txt
+   uv run python context/scripts/validators/workspace_conventions.py commit-msg /tmp/commit_msg.txt
+   ```
+   then `git commit -F /tmp/commit_msg.txt`. The hook-owned trailers must be injected via `prepare-commit-msg.sh`, not hand-written.
+   
 
 ---
 

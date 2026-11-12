@@ -1,6 +1,5 @@
 import shutil
 from pathlib import Path
-import pytest
 
 from context.scripts.validators.adapter_drift import check_adapter_drift
 
@@ -19,16 +18,12 @@ def test_adapter_drift_detects_modified_file(tmp_path: Path):
     context_dir = repo_root / "context"
 
     # Create a shadow environment in tmp_path
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     # Run generator in tmp_path to create fresh baseline
     from context.scripts.generators.generate_adapters import run_generation
 
-    run_generation(
-        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"}
-    )
+    run_generation(repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"})
 
     # Mutate CLAUDE.md
     claude_md = tmp_path / "CLAUDE.md"
@@ -49,15 +44,11 @@ def test_adapter_drift_detects_missing_file(tmp_path: Path):
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
 
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     from context.scripts.generators.generate_adapters import run_generation
 
-    run_generation(
-        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"}
-    )
+    run_generation(repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"})
 
     # Delete CLAUDE.md
     claude_md = tmp_path / "CLAUDE.md"
@@ -78,15 +69,11 @@ def test_adapter_drift_detects_orphaned_file(tmp_path: Path):
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
 
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     from context.scripts.generators.generate_adapters import run_generation
 
-    run_generation(
-        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"}
-    )
+    run_generation(repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"})
 
     # Add orphaned prompt
     orphaned_prompt = tmp_path / ".claude" / "prompts" / "deprecated-agent.md"
@@ -102,9 +89,7 @@ def test_adapter_drift_detects_orphaned_file(tmp_path: Path):
     )
 
     assert not is_synced
-    assert any(
-        "ORPHANED" in issue and "deprecated-agent.md" in issue for issue in drift_issues
-    )
+    assert any("ORPHANED" in issue and "deprecated-agent.md" in issue for issue in drift_issues)
 
 
 def test_adapter_drift_with_agent_targets_file(tmp_path: Path):
@@ -112,9 +97,7 @@ def test_adapter_drift_with_agent_targets_file(tmp_path: Path):
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
 
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     from context.scripts.generators.generate_adapters import run_generation
 
@@ -122,9 +105,7 @@ def test_adapter_drift_with_agent_targets_file(tmp_path: Path):
     (tmp_path / ".agent-targets").write_text("claude\n")
 
     # Generate only claude projections
-    run_generation(
-        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"}
-    )
+    run_generation(repo_root=tmp_path, context_dir=tmp_path / "context", targets={"claude"})
 
     # Check drift without specifying targets argument -> should pick up .agent-targets
     is_synced, drift_issues = check_adapter_drift(
@@ -140,15 +121,11 @@ def test_adapter_drift_cline_managed_dirs(tmp_path: Path):
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
 
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     from context.scripts.generators.generate_adapters import run_generation
 
-    run_generation(
-        repo_root=tmp_path, context_dir=tmp_path / "context", targets={"cline"}
-    )
+    run_generation(repo_root=tmp_path, context_dir=tmp_path / "context", targets={"cline"})
 
     # Clean state: cline projections on disk match expectations.
     is_synced, drift_issues = check_adapter_drift(

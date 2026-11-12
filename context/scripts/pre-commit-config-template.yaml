@@ -23,6 +23,27 @@ repos:
         args: [--fix]
       - id: ruff-format
         name: Ruff (format)
+repos:
+  # Python: Ruff (format + lint) and Pyright (type checking)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.1
+    hooks:
+      - id: ruff-check
+        name: Ruff (lint)
+        files: ^services/.*\.py$
+        args: [--fix]
+      - id: ruff-format
+        name: Ruff (format)
+        files: ^services/.*\.py$
+
+      # Ruff for context/scripts/ (validator & generator code)
+      - id: ruff-check
+        name: Ruff (lint) - context/scripts
+        files: ^context/scripts/.*\.py$
+        args: [--fix]
+      - id: ruff-format
+        name: Ruff (format) - context/scripts
+        files: ^context/scripts/.*\.py$
         files: ^services/.*\.py$
 
   # Pyright: run per-service (cd services/<name> && uv run pyright)

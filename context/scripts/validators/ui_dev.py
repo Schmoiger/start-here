@@ -77,12 +77,15 @@ def check_raw_hex(path: Path, content: str) -> list[tuple[int, str]]:
         line_clean = line.strip()
         if line_clean.startswith(("//", "/*", "*")):
             continue
-        if "d=\"M" in line or "d='M" in line:
+        if 'd="M' in line or "d='M" in line:
             continue
         for m in RAW_HEX_PATTERN.finditer(line):
             hex_val = m.group(0)
             violations.append(
-                (i, f"  Line {i}: raw hex colour '{hex_val}' is forbidden — use DaisyUI semantic tokens (context/rules/ui-dev.md)")
+                (
+                    i,
+                    f"  Line {i}: raw hex colour '{hex_val}' is forbidden — use DaisyUI semantic tokens (context/rules/ui-dev.md)",
+                )
             )
     return violations
 
@@ -110,7 +113,10 @@ def check_concrete_colours(path: Path, content: str) -> list[tuple[int, str]]:
     for i, line in enumerate(content.splitlines(), 1):
         for m in CONCRETE_COLOUR_PATTERN.finditer(line):
             violations.append(
-                (i, f"  Line {i}: concrete colour '{m.group(0).strip()}' — use DaisyUI semantic (e.g. text-success, text-error)")
+                (
+                    i,
+                    f"  Line {i}: concrete colour '{m.group(0).strip()}' — use DaisyUI semantic (e.g. text-success, text-error)",
+                )
             )
     return violations
 
@@ -123,7 +129,10 @@ def check_heroicons_import(path: Path, content: str) -> list[tuple[int, str]]:
     for i, line in enumerate(content.splitlines(), 1):
         if HEROICONS_IMPORT_PATTERN.search(line):
             violations.append(
-                (i, f"  Line {i}: import from '@heroicons/react' — use barrel from components/icons/HeroIcons.tsx")
+                (
+                    i,
+                    f"  Line {i}: import from '@heroicons/react' — use barrel from components/icons/HeroIcons.tsx",
+                )
             )
     return violations
 

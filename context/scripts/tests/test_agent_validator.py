@@ -227,9 +227,9 @@ model: sonnet
 2. Write to {{project-root}}/artefacts/output.md
 """)
         errors = validate_agent_definition(good_agent)
-        path_errors = [e for e in errors if
-                      "hardcoded" in e.lower() or
-                      "relative paths" in e.lower()]
+        path_errors = [
+            e for e in errors if "hardcoded" in e.lower() or "relative paths" in e.lower()
+        ]
         assert len(path_errors) == 0
 
     def test_nonexistent_standards_flagged(self, tmp_path):
@@ -336,9 +336,9 @@ model: medium
 | Stop and ask the human | `handoff-hygiene.md` |
 """)
         errors = validate_agent_definition(agent)
-        assert any(
-            "handoff-hygiene.md" in e and "doesn't exist" in e for e in errors
-        ), f"Expected a phantom body source error, got: {errors}"
+        assert any("handoff-hygiene.md" in e and "doesn't exist" in e for e in errors), (
+            f"Expected a phantom body source error, got: {errors}"
+        )
 
     def test_body_table_source_should_fail_when_section_does_not_exist(self, tmp_path):
         """A body 'Source' section that no heading matches must error."""
@@ -356,9 +356,9 @@ model: medium
 | Stop and ask the human | `tech-writing.md` §Nonexistent Section |
 """)
         errors = validate_agent_definition(agent)
-        assert any(
-            "Nonexistent Section" in e and "doesn't exist" in e for e in errors
-        ), f"Expected an unresolved section error, got: {errors}"
+        assert any("Nonexistent Section" in e and "doesn't exist" in e for e in errors), (
+            f"Expected an unresolved section error, got: {errors}"
+        )
 
     def test_body_table_source_should_pass_when_citations_resolve(self, tmp_path):
         """Resolvable body sources — including numbered and named sections — pass."""
@@ -394,9 +394,9 @@ model: medium
 - Follow the escalation protocol (`escalation.md` §1 Provisioning)
 """)
         errors = validate_agent_definition(agent)
-        assert any(
-            "escalation.md" in e and "doesn't exist" in e for e in errors
-        ), f"Expected a phantom citation error, got: {errors}"
+        assert any("escalation.md" in e and "doesn't exist" in e for e in errors), (
+            f"Expected a phantom citation error, got: {errors}"
+        )
 
     def test_body_citation_should_fail_when_section_does_not_exist(self, tmp_path):
         """An inline citation to a section the rule file lacks must error."""
@@ -412,9 +412,9 @@ model: medium
 - Read the phantom phase (`tdd-workflow.md` §9 Phase 9: Phantom Phase)
 """)
         errors = validate_agent_definition(agent)
-        assert any(
-            "Phase 9" in e and "doesn't exist" in e for e in errors
-        ), f"Expected an unresolved section error, got: {errors}"
+        assert any("Phase 9" in e and "doesn't exist" in e for e in errors), (
+            f"Expected an unresolved section error, got: {errors}"
+        )
 
     def test_body_citation_should_pass_when_section_resolves(self, tmp_path):
         """An inline citation that resolves to a real heading passes."""

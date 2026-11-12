@@ -1,148 +1,69 @@
 from pathlib import Path
 from typing import Any
 
-from context.scripts.generators.adapters.core.models import (
-    CanonicalAgent,
-    CanonicalSkill,
-    WorkflowDAG,
-)
-
-
-def _trim_purpose(text: str) -> str:
-    """Extract core purpose: first sentence, parentheticals removed."""
-    import re
-    idx = text.find('.')
-    sentence = text[:idx].strip() if idx != -1 else text.strip()
-    return re.sub(r'\s*\([^)]*\)', '', sentence).strip()
-
-
-def generate_workflow_table(workflows: dict[str, WorkflowDAG]) -> str:
-    """Generate workflow index table."""
-    rows = [
-        "| Workflow | Purpose |",
-        "|----------|---------|",
-    ]
-    for name, data in sorted(workflows.items()):
-        desc = _trim_purpose(data.description)
-        rows.append(f"| `{name}` | {desc} |")
-    return '\n'.join(rows)
-
-
-def generate_agent_dispatch_all(agents: dict[str, CanonicalAgent]) -> str:
-    """Render agent dispatch table."""
-    category_order = [
-        'product-owner',
-        'solution-architect', 'ui-designer',
-        'functional-tester', 'python-coder', 'typescript-coder',
-        'tech-lead', 'code-reviewer', 'principles-reviewer',
-        'ui-tester', 'security-tester',
-        'devops',
-        'documentation',
-        'harness-analyst',
-    ]
-    
-    # Sort by predefined order, then alphabetically for the rest
-    ordered = [a for a in category_order if a in agents]
-    remainder = sorted(set(agents.keys()) - set(ordered))
-    all_agent_names = ordered + remainder
-    
-    rows = [
-        "| Agent | Purpose |",
-        "|-------|---------|",
-    ]
-    for agent_name in all_agent_names:
-        agent_data = agents[agent_name]
-        purpose = _trim_purpose(agent_data.description)
-        rows.append(f"| `@{agent_name}` | {purpose} |")
-    return '\n'.join(rows)
-
-
-def generate_skill_table(skills: dict[str, CanonicalSkill]) -> str:
-    """Generate skills index table."""
-    rows = [
-        "| Skill | Purpose | Globs / Triggers |",
-        "|-------|---------|------------------|",
-    ]
-    for name, data in sorted(skills.items()):
-        desc = _trim_purpose(data.description)
-        globs_str = ", ".join(f"`{g}`" for g in data.globs) if data.globs else "_None_"
-        rows.append(f"| `{name}` | {desc} | {globs_str} |")
-    return '\n'.join(rows)
+import yaml
 
 
 def generate_agents_md(
     context: dict[str, Any],
     output_dir: Path,
     dry_run: bool = False,
-    runtime_entry: str | None = None,
+    source_file: Path | None = None,
+    runtime_context_bullets: list[str] | None = None,
 ) -> dict[Path, str]:
-    """Generates the unified AGENTS.md orchestrator file.
+    """Generates AGENTS.md from a YAML source file.
 
-    runtime_entry: when set (e.g. "CLINE.md"), appends a Runtime Entry
-    section pointing agents at the runtime-specific instruction file.
-    Default (None) keeps output identical to the historical projection.
+    Args:
+        context: Canonical context dictionary (retained for signature compatibility,
+          but not used when source_file is provided).
+        output_dir: Directory to write AGENTS.md into.
+        dry_run: Preview only, do not write.
+        source_file: Required path to YAML file defining AGENTS.md sections.
+        runtime_context_bullets: Optional list of bullet lines injected into the
+          "Runtime Context" section.
+
+    Raises:
+        ValueError: If source_file is None.
+        FileNotFoundError: If source_file does not exist.
     """
-    agents = context.get("agents", {})
-    workflows = context.get("workflows", {})
-    skills = context.get("skills", {})
+    if source_file is None:
+        raise ValueError("source_file is required for AGENTS.md generation")
 
-    skills_section = ""
-    if skills:
-        skills_section = f"---\n\n## Skills\n\n{generate_skill_table(skills)}\n\n"
+    if not source_file.is_file():
+        raise FileNotFoundError(f"AGENTS.md source file not found: {source_file}")
 
-    runtime_section = ""
-    if runtime_entry:
-        runtime_section = (
-            "\n---\n\n"
-            "## Runtime Entry\n\n"
-            f"- Read `@{runtime_entry}` for Cline-specific tool mappings, rules, and model guidance."
-        )
-    
+    with source_file.open("r", encoding="utf-8") as fh:
+        data = yaml.safe_load(fh) or {}
+
+    sections = data.get("sections", [])
+    if not sections:
+        raise ValueError(f"No sections found in source file: {source_file}")
+
+    # Build Runtime Context section dynamically if bullets are provided.
+    runtime_context_section = ""
+    if runtime_context_bullets:
+        bullets = "\n".join(f"{b}" for b in runtime_context_bullets)
+        runtime_context_section = f"---\n\n## Runtime Context\n\n{bullets}\n\n"
+
+    # Render remaining sections (skip Runtime Context if already generated above
+    # to avoid duplication — the source file should not define Runtime Context
+    # when runtime_context_bullets is supplied).
+    body_parts: list[str] = []
+    for section in sections:
+        name = section.get("name", "Untitled")
+        if name == "Runtime Context" and runtime_context_section:
+            # Source-defined Runtime Context is superseded by dynamic bullets.
+            continue
+        content = section.get("content", "")
+        body_parts.append(f"---\n\n## {name}\n\n{content}\n\n")
+
+    # Insert Runtime Context section at the top if we have dynamic bullets.
+    if runtime_context_section:
+        body_parts.insert(0, runtime_context_section)
+
     agents_path = output_dir / "AGENTS.md"
-    
-    content = f"""# AGENTS.md
+    content = "# AGENTS.md\n\n" + "".join(body_parts)
 
----
-
-## System Instructions
-Always follow the specific instructions in the `context/` directory.
-
----
-
-## Standards
-INLINE_COMPREHENSIVE
-
----
-
-## Tool Mappings
-- Use `replace_file_content` for editing contiguous blocks of code.
-- Use `run_command` for executing terminal commands.
-- Use `call_mcp_tool` for MCP interactions.
-
----
-
-## On Start
-Glob `**/artefacts/README.md` and read all matches. Run `git log --oneline -5`.
-Read `@context/agents/orchestrator.md`.
-Read `artefacts/build/HANDOFF.md` if it exists — the `Workflow:` field identifies the active workflow.
-Load `@context/workflows/<workflow>.yaml`. If no HANDOFF.md exists, ask the user which workflow to start.
-
----
-
-## Workflows
-
-{generate_workflow_table(workflows)}
-
----
-
-## Agents
-
-{generate_agent_dispatch_all(agents)}
-
-{skills_section}**Spawn**: `"Read @context/agents/{{name}}.md before starting. [task]"`
-{runtime_section}
-_Auto-generated by context/scripts/generators/generate_adapters.py — do not edit manually_
-"""
     if not dry_run:
         agents_path.write_text(content)
     return {agents_path: content}

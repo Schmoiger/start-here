@@ -1,15 +1,16 @@
-import time
 import shutil
+import time
 from pathlib import Path
+
 import pytest
 
+from context.scripts.generators.adapters.core.loader import load_canonical_context
 from context.scripts.generators.generate_adapters import (
     build_parser,
+    get_adapter_projections,
     normalize_target,
     run_generation,
-    get_adapter_projections,
 )
-from context.scripts.generators.adapters.core.loader import load_canonical_context
 
 
 def test_target_normalization():
@@ -65,9 +66,7 @@ def test_dry_run_leaves_disk_untouched(tmp_path: Path):
     """Verify that --dry-run produces no files on disk."""
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     result = run_generation(
         repo_root=tmp_path,
@@ -87,9 +86,7 @@ def test_smart_update_preserves_unchanged_files(tmp_path: Path):
     """Verify default smart update preserves mtime of unchanged files."""
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     # Initial generation
     result1 = run_generation(
@@ -147,7 +144,6 @@ def test_ensure_root_gitignore(tmp_path: Path):
     """Verify that ensure_root_gitignore creates or updates .gitignore appropriately."""
     from context.scripts.generators.generate_adapters import (
         ensure_root_gitignore,
-        IGNORED_BLOCK,
     )
 
     # Case 1: dry_run leaves disk untouched

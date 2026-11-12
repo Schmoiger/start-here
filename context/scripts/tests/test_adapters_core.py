@@ -95,9 +95,7 @@ This is the body of the markdown.
         # Create rules directory
         rules_dir = self.context_path / "rules"
         rules_dir.mkdir(parents=True)
-        (rules_dir / "test-rule.md").write_text(
-            "---\nname: test-rule\nkey_points: some rule\n---"
-        )
+        (rules_dir / "test-rule.md").write_text("---\nname: test-rule\nkey_points: some rule\n---")
 
         # Create standards directory
         standards_dir = self.context_path / "standards"
@@ -157,9 +155,7 @@ class TestToolNormalisation(unittest.TestCase):
 
     def test_annotated_mapping_form(self):
         """The template form (`- tool-name: purpose`) yields tool names only."""
-        tools = self._load_tools(
-            "tools:\n  - bash: run tests\n  - context7 MCP: library docs\n"
-        )
+        tools = self._load_tools("tools:\n  - bash: run tests\n  - context7 MCP: library docs\n")
         self.assertEqual(tools, ["bash", "context7 MCP"])
         self.assertTrue(all(isinstance(tool, str) for tool in tools))
 

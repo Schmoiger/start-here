@@ -50,7 +50,9 @@ def validate_output_path(path: str | Path) -> list[str]:
                 )
             if sub_dir == "test-results" and len(parts) == 3:
                 filename = parts[2]
-                if not (TEST_RESULT_PATTERN.match(filename) or filename.endswith((".txt", ".json"))):
+                if not (
+                    TEST_RESULT_PATTERN.match(filename) or filename.endswith((".txt", ".json"))
+                ):
                     errors.append(
                         f"Test result file '{filename}' should follow 'v2-{{task-id}}-results.txt' convention."
                     )
@@ -98,6 +100,10 @@ def validate_output_paths(paths: list[str | Path]) -> list[str]:
 VALID_COMMIT_TYPES = r"(feat|fix|test|refactor|docs|chore|perf)"
 COMMIT_SUBJECT_PATTERN = re.compile(rf"^{VALID_COMMIT_TYPES}\([a-z][a-z0-9-]*\): .{{1,}}$")
 COAUTHOR_PATTERN = re.compile(r"^Co-Authored-By: .+ <.+@.+\..+>$")
+# Canonical pointer shown to humans/agents when a commit message is rejected
+# (the rule that governs each failure).
+RULES_REF = "See context/rules/workspace-conventions.md §2 (Git Commits)"
+
 # Tokens= comes from prepare-commit-msg.format_tokens(): no suffix (<1000),
 # 'K' (>=1000), or 'M' (>=1_000_000). Lowercase variants are tolerated too.
 AGENT_SESSION_PATTERN = re.compile(
@@ -147,7 +153,9 @@ def _load_runtime_telemetry():
     return mod
 
 
-def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root: str) -> tuple[bool, str]:
+def corroborate_agent_session(
+    declared_tool: str, declared_model: str, repo_root: str
+) -> tuple[bool, str]:
     """Check declared tool=/model= against runtime session telemetry.
 
     Tools without a framework extractor (unknown third-party tools such as
@@ -172,7 +180,10 @@ def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root
         return False, f"tool='{declared_tool}' cannot be corroborated: extractor error ({exc})"
 
     if not available:
-        return False, f"tool='{declared_tool}' cannot be corroborated: no {declared_tool} runtime telemetry found"
+        return (
+            False,
+            f"tool='{declared_tool}' cannot be corroborated: no {declared_tool} runtime telemetry found",
+        )
 
     try:
         result = extractor.extract_delta(repo_root, {})
@@ -191,6 +202,29 @@ def corroborate_agent_session(declared_tool: str, declared_model: str, repo_root
             f"tool='{declared_tool}' (actual: {runtime_model}); write model= via prepare-commit-msg"
         )
     return True, ""
+
+
+# Trailer/footer prefixes that are metadata, not an explanatory body.
+BODY_EXCLUDED_PREFIXES = (
+    "Tasks:",
+    "Agent-Session:",
+    "Co-Authored-By:",
+    "Blocker-Resolved:",
+    "Reviewed-By:",
+    "Signed-off-by:",
+)
+
+
+def _has_explanatory_body(lines: list[str]) -> bool:
+    """A body exists when at least one non-empty, non-trailer line follows the subject."""
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith(BODY_EXCLUDED_PREFIXES):
+            continue
+        return True
+    return False
 
 
 def validate_commit_message(msg: str, repo_root: str | None = None) -> tuple[bool, str]:
@@ -262,6 +296,12 @@ def validate_commit_message(msg: str, repo_root: str | None = None) -> tuple[boo
         )
         if not ok:
             return False, reason
+
+    if not _has_explanatory_body(lines[1:]):
+        return False, (
+            "Missing explanatory body: add at least one line describing what changed and why. "
+            "Trailers only (Tasks / Agent-Session / Co-Authored-By) are not a body."
+        )
 
     return True, ""
 
@@ -367,7 +407,13 @@ INTERRUPTION_TYPE_FIELDS = {
 
 # Outcome fields may be null when the record is written at the moment of blocking;
 # a `resolution` record is then appended with `ref` pointing at that record's `id`.
-INTERRUPTION_NULLABLE_FIELDS = {"answered_by", "resolution", "decision", "decision_by", "decided_by"}
+INTERRUPTION_NULLABLE_FIELDS = {
+    "answered_by",
+    "resolution",
+    "decision",
+    "decision_by",
+    "decided_by",
+}
 
 INTERRUPTION_TS_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
 
@@ -431,13 +477,9 @@ def validate_interruptions_entry(entry: dict[str, Any], line_num: int) -> list[s
                 or not value
                 or not all(isinstance(option, str) and option.strip() for option in value)
             ):
-                errors.append(
-                    f"Line {line_num}: 'options' must be a non-empty array of strings"
-                )
+                errors.append(f"Line {line_num}: 'options' must be a non-empty array of strings")
         elif not isinstance(value, str) or not value.strip():
-            errors.append(
-                f"Line {line_num}: '{field}' must be a non-empty string or null"
-            )
+            errors.append(f"Line {line_num}: '{field}' must be a non-empty string or null")
 
     if record_type == "tool_approval":
         decision = entry.get("decision")
@@ -547,7 +589,7 @@ def _auto_detect(args: list[str]) -> int:
             return 0
         is_valid, err = validate_commit_message(msg, repo_root=str(Path.cwd()))
         if not is_valid:
-            print(f"❌ Invalid commit message:\n{err}", file=sys.stderr)
+            print(f"❌ Invalid commit message:\n{err}\n{RULES_REF}", file=sys.stderr)
             return 1
         print("✅ Commit message valid")
         return 0
@@ -622,7 +664,7 @@ def main() -> int:
             return 0
         is_valid, err = validate_commit_message(msg, repo_root=str(Path.cwd()))
         if not is_valid:
-            print(f"❌ Invalid commit message:\n{err}", file=sys.stderr)
+            print(f"❌ Invalid commit message:\n{err}\n{RULES_REF}", file=sys.stderr)
             return 1
         print("✅ Commit message valid")
         return 0

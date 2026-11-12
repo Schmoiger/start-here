@@ -10,7 +10,11 @@ from context.scripts.generators.adapters.cline.generator import (
     generate_cline_rules,
     generate_cline_skills,
 )
-from context.scripts.generators.adapters.core.models import CanonicalAgent, CanonicalSkill
+from context.scripts.generators.adapters.core.models import (
+    CanonicalAgent,
+    CanonicalRule,
+    CanonicalSkill,
+)
 
 
 class TestClineAdapter(unittest.TestCase):
@@ -35,6 +39,29 @@ class TestClineAdapter(unittest.TestCase):
                     body="# Demo Skill\n\nDemo instructions.",
                 )
             },
+            "rules": {
+                "bash-environment": CanonicalRule(
+                    name="bash-environment",
+                    description="Bash invocation safety",
+                    globs=[],
+                    alwaysApply=True,
+                    body=(
+                        "# Bash Environment\n\n"
+                        "**Applies to**: All bash commands and file operations\n\n"
+                        "---\n\n"
+                        "| Action | Correct | Wrong |\n"
+                        "|--------|---------|-------|\n"
+                        "| Create file | Write tool | `echo` > file, heredoc |"
+                    ),
+                ),
+                "secrets": CanonicalRule(
+                    name="secrets",
+                    description="Secrets handling",
+                    globs=["**/.env"],
+                    alwaysApply=False,
+                    body="# Secrets\n\nNever commit secrets.",
+                ),
+            },
         }
         self.output_dir = Path(self.temp_dir)
 
@@ -51,6 +78,8 @@ class TestClineAdapter(unittest.TestCase):
         self.assertIn("Auto-generated", content)
         self.assertIn("@AGENTS.md", content)
         self.assertIn("execute_command", content)
+        # The agent-sandbox routing bullet lives in the always-on .clinerules.
+        self.assertNotIn("consult the **agent-sandbox**", content)
 
     def test_generate_cline_rules(self):
         generate_cline_rules(self.context, self.output_dir)
@@ -63,6 +92,19 @@ class TestClineAdapter(unittest.TestCase):
         self.assertFalse(content.startswith("---\n"))
         self.assertIn("yarn", content)
         self.assertIn("unknown", content)
+        # Routing bullet directs terminal work to the agent-sandbox skill.
+        self.assertIn("agent-sandbox", content)
+
+        # alwaysApply: true rules are projected as frontmatter-less always-on files.
+        bash_rule = self.output_dir / ".clinerules" / "bash-environment.md"
+        self.assertTrue(bash_rule.exists())
+        bash_content = bash_rule.read_text()
+        self.assertFalse(bash_content.startswith("---\n"))
+        self.assertIn("heredoc", bash_content)
+        self.assertIn("Auto-generated", bash_content)
+
+        # Non-alwaysApply rules are NOT projected into always-on rules.
+        self.assertFalse((self.output_dir / ".clinerules" / "secrets.md").exists())
 
     def test_generate_cline_skills(self):
         generate_cline_skills(self.context, self.output_dir)

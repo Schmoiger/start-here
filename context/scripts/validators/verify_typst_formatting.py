@@ -6,6 +6,11 @@ Rules enforced:
 1. Double line spacing (at least 2 blank lines) following mermaid diagrams / diagram blocks.
 2. Horizontal rule ('---') preceding major section headings (level 2 headings '## '),
    ensuring consistent section separation for Typst document generation.
+3. Process-model hygiene: a non-table prose line inside a Process/Flow/Workflow/
+   Sequence section carrying three or more inline numbered steps ("1. … 2. … 3. …")
+   is a prose process model and must be rendered as a Mermaid diagram instead
+   (doc-standards.md §6.1; hint at the `mermaid-authoring` skill,
+   `context/skills/mermaid-authoring.md`, in the violation message).
 
 Usage:
     uv run python context/scripts/validators/verify_typst_formatting.py [files...]
@@ -16,9 +21,27 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+# Matches an inline numbered step marker (placed at line start or after
+# whitespace) where the step begins with a capital letter, e.g. "1. Read",
+# "2. Resolve". Only the step number is captured.
+PROCESS_STEP_MARKER_RE = re.compile(r"(?:^|\s)(\d{1,2})\.\s+[A-Z]")
+
+# A single line needs this many inline step markers to be treated as a prose
+# process model rather than ordinary prose that happens to mention "1. x 2. y".
+# A single line needs this many inline step markers to be treated as a prose
+# process model rather than ordinary prose that happens to mention "1. x 2. y".
+PROCESS_MODEL_STEP_THRESHOLD = 3
+
+# Section headings (##/###) whose title contains one of these mark a
+# process-model context; only prose there is checked, so MC-option lists
+# (appendix) and task-file enumerations are not flagged.
+PROCESS_HEADING_KEYWORDS = ("process", "flow", "workflow", "sequence")
+PROCESS_MODEL_STEP_THRESHOLD = 3
 
 
 def get_repo_root() -> Path:
@@ -66,6 +89,75 @@ def get_tracked_markdown_files(repo_root: Path) -> list[Path]:
         if dir_path.is_dir():
             files.extend(sorted(dir_path.rglob("*.md")))
     return files
+
+
+def check_prose_process_models(path: Path) -> list[str]:
+    """Flag prose lines that read as process models inside process sections.
+
+    A non-table prose line inside a Process/Flow/Workflow/Sequence section
+    that carries three or more inline numbered steps ("1. do X 2. do Y 3. do Z",
+    as in the B-009 architecture Process Model) is a prose process model and
+    should be rendered as a Mermaid diagram (doc-standards.md §6.1;
+    mermaid-authoring skill). Table rows, Mermaid / other code fences,
+    `<!-- typst-skip -->` regions, and prose outside a process-marked section
+    are excluded to avoid flagging MC-option lists and task-file enumerations.
+    """
+    errors: list[str] = []
+    try:
+        content = path.read_text(encoding="utf-8")
+    except OSError:
+        return errors
+
+    in_mermaid = False
+    in_code_block = False
+    in_typst_skip = False
+    in_process_section = False
+
+    for lineno, line in enumerate(content.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped == "<!-- typst-skip-start -->":
+            in_typst_skip = True
+            continue
+        if stripped == "<!-- typst-skip-end -->":
+            in_typst_skip = False
+            continue
+        if stripped == "```mermaid":
+            in_mermaid = True
+            in_code_block = True
+            continue
+        if stripped.startswith("```"):
+            if in_mermaid:
+                in_mermaid = False
+                in_code_block = False
+            else:
+                in_code_block = not in_code_block
+            continue
+
+        # Track process-model section context from ATX headings.
+        if stripped.startswith("#") and not in_code_block and not in_typst_skip:
+            heading_title = re.sub(r"^#{1,6}\s*", "", stripped).lower()
+            in_process_section = any(
+                kw in heading_title for kw in PROCESS_HEADING_KEYWORDS
+            )
+            continue
+
+        if in_typst_skip or in_mermaid or in_code_block:
+            continue
+        # Tabular flow representation (Markdown table rows) is not prose.
+        if stripped.startswith("|"):
+            continue
+        if not in_process_section:
+            continue
+
+        markers = PROCESS_STEP_MARKER_RE.findall(line)
+        if len(markers) >= PROCESS_MODEL_STEP_THRESHOLD:
+            errors.append(
+                f"{path}:{lineno} Prose process model (inline numbered steps "
+                f"{', '.join(markers)}) should be rendered as a Mermaid diagram "
+                "(doc-standards.md §6.1). See the **mermaid-authoring** skill at "
+                "`context/skills/mermaid-authoring.md` for syntax and layout"
+            )
+    return errors
 
 
 def check_and_fix_file(path: Path, fix: bool = False) -> list[str]:
@@ -143,7 +235,12 @@ def check_and_fix_file(path: Path, fix: bool = False) -> list[str]:
 
         # Check section separation for level 2 headings '## '
         # (Exclude '# Title', '## Table of Contents', and headings inside typst-skip or code blocks)
-        if stripped.startswith("## ") and not in_typst_skip and not in_mermaid and not in_code_block:
+        if (
+            stripped.startswith("## ")
+            and not in_typst_skip
+            and not in_mermaid
+            and not in_code_block
+        ):
             heading_title = stripped[3:].strip()
             if heading_title.lower() != "table of contents":
                 # Check previous non-blank line in new_lines
@@ -204,11 +301,20 @@ def main() -> int:
         target_files = get_tracked_markdown_files(repo_root)
 
     all_errors: list[str] = []
+    process_errors: list[str] = []
     for file_path in target_files:
         if not file_path.exists() or file_path.suffix != ".md":
             continue
-        errs = check_and_fix_file(file_path, fix=args.fix)
-        all_errors.extend(errs)
+        all_errors.extend(check_and_fix_file(file_path, fix=args.fix))
+        process_errors.extend(check_prose_process_models(file_path))
+
+    # Process-model violations are not auto-fixable, so they always fail.
+    if process_errors:
+        print("Process-model check failed:", file=sys.stderr)
+        for err in process_errors:
+            print(f"  - {err}", file=sys.stderr)
+        print("\nRender the flagged process model as a Mermaid diagram.", file=sys.stderr)
+        return 1
 
     if all_errors and not args.fix:
         print("Typst formatting check failed:", file=sys.stderr)

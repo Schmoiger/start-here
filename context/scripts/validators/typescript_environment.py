@@ -162,7 +162,10 @@ def main() -> int:
         violations.extend(check_workspaces(REPO_ROOT))
 
     if violations:
-        print("❌ TypeScript environment violations (context/rules/typescript-environment.md):", file=sys.stderr)
+        print(
+            "❌ TypeScript environment violations (context/rules/typescript-environment.md):",
+            file=sys.stderr,
+        )
         for v in violations:
             print(f"  {v}", file=sys.stderr)
         return 1

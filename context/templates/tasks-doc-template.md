@@ -4,20 +4,28 @@ The tasks doc should be named `{project-root}/artefacts/build/tasks-{branch-name
 
 ---
 
-## Header
+## Project Context
 
-Every task file begins with structured metadata:
+This section will be read by every agent for every task. Write an inventory of the files needed for every task. Remember DRY: agents already have repo context through their definitions and will have task context in the task prompt; this section is for project context only.
 
+For example:
 ```markdown
-**Branch**: `{branch-name}`
-**Status**: Planning | In Progress | Complete
-**Scope**: {1–2 sentence summary of what the feature delivers}
-**Design**: {path to design doc, or "N/A"}
-**Created**: {YYYY-MM-DD}
-**Amended**: {YYYY-MM-DD — brief summary of changes}
+- `artefacts/build/tasks-{branch}.md` — task definition
 ```
 
-Update **Status** as the feature progresses. Update **Amended** whenever the task file is revised after creation.
+---
+
+## Decisions
+
+This section will be read by every agent for every task. Write an inventory of the execution decisions that must be persisted for every task. Remember DRY: agents already have standards and skills to guide them and will design decisions in the architecture doc; this section is for project execution decisions only.
+
+For example:
+```markdown
+| D | Decision | Rationale |
+|---|----------|-----------|
+| D1 | Ignore context drift pre-commit hook `context/scripts/validators/adapter_drift.py` | This project needs a non-canonical variant of AGENTS.md |
+| D2 | Do not regenerate canonical context | This project needs a non-canonical variant of AGENTS.md |
+```
 
 ---
 
@@ -43,13 +51,15 @@ a task transitions — do not batch status updates.
 **Every task in the index must have a matching specification section** using the exact intake validation headers and defining a primary output path for state recovery:
 
 ```markdown
-## File Scope
-
-- `{path}` — {what the agent may write here}
+---
 
 ## Task
 
 {TASK-ID}: {task-description}
+
+### Workflow
+
+{workflow}
 
 ### Acceptance Criteria
 
@@ -200,3 +210,20 @@ git commit         →  Per-commit (Agent-Session line)
     ↓ aggregate
 PR description     →  Per-PR rollup
 ```
+
+---
+
+## Change Log
+
+Every task file ends with structured metadata:
+
+```markdown
+**Branch**: `{branch-name}`
+**Status**: Planning | In Progress | Complete
+**Scope**: {1–2 sentence summary of what the feature delivers}
+**Design**: {path to design doc, or "N/A"}
+**Created**: {YYYY-MM-DD}
+**Amended**: {YYYY-MM-DD — brief summary of changes}
+```
+
+Update **Status** as the feature progresses. Update **Amended** whenever the task file is revised after creation.

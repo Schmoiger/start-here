@@ -53,6 +53,12 @@ jobs:
         if: ${{ hashFiles('context/scripts/validators/**/*.py') != '' }}
         run: uv run --with ruff ruff check context/scripts/validators/
 
+      - name: Install System Dependencies
+        # Bootstraps the external binaries declared in pyproject.toml under
+        # [tool.agent-harness.system-dependencies] (ctags, ast-grep). Every entry is
+        # probed first, so an image that already ships the tooling only pays one probe.
+        run: uv run python context/scripts/setup/install_system_deps.py
+
       - name: Generate Runtime Projections
         run: uv run python context/scripts/generators/generate_adapters.py
 

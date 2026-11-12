@@ -120,7 +120,7 @@ Not all framework files carry equal authority. Some define behaviour; others pro
 
 | Tier | Examples | Action |
 |------|----------|--------|
-| **Authoritative** | `context/workflows/*.yaml`, `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/models.yaml` | Edit these to change framework behaviour |
+| **Authoritative** | `context/workflows/agents-md.yaml` (AGENTS.md content source), phase workflows (`context/workflows/*.yaml`), `context/agents/*.md`, `context/rules/*.mdc`, `context/standards/*.md`, `context/skills/*.md`, `context/models.yaml` | Edit these to change framework behaviour. `context/workflows/agents-md.yaml` is a lightweight content file (no phase DAG `name:` key) that the adapter generator reads as the source of truth for AGENTS.md. |
 | **Derived** | `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, `.agents/skills/`, `.clinerules/`, `.cline/skills/`, `.github/prompts/`, `.openai/` | Read for orientation; never hand-edit. Regenerate from source. |
 | **Operator guidance** | `context/docs/*.md`, `README.md`, this document | Use to understand and apply the framework |
 | **Enforcement** | `context/scripts/validators/*`, `context/scripts/prepare-commit-msg.*` | Use to keep the repository aligned with the design |
@@ -165,7 +165,9 @@ Each agent's frontmatter declares which rules and standards it requires. The orc
 
 This produces narrow, focused prompts with clear handoff boundaries. The roster is extensible: copy the agent template, fill in the frontmatter, add the agent to a workflow phase, and regenerate.
 
-**Adapters are generated, not authored.** The `generate_adapters.py` CLI compiles all five native runtime projections (Antigravity/Gemini, Claude Code, Cline, GitHub Copilot, and OpenAI/Codex) from the same canonical sources in a single invocation, with smart change detection and per-target filtering. This is a unified CLI, not a single-file generator. It produces `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, and runtime-specific prompts and skills. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing derived projections by hand is always wrong; editing the sources and regenerating is the only valid path.
+**Adapters are generated, not authored.** The `generate_adapters.py` CLI compiles all five native runtime projections (Antigravity/Gemini, Claude Code, Cline, GitHub Copilot, and OpenAI/Codex) from the same canonical sources in a single invocation, with smart change detection and per-target filtering. This is a unified CLI, not a single-file generator. It produces `AGENTS.md`, `CLAUDE.md`, `CLINE.md`, `GEMINI.md`, and runtime-specific prompts and skills.
+
+The `AGENTS.md` projection reads its content from `context/workflows/agents-md.yaml` — a lightweight workflow file containing the token-efficient source of truth for AGENTS.md prose sections (Harness Context, Project Context). It is not a phase DAG (no `name:` key) so the canonical loader skips it; the adapter generator reads it directly via `source_file`. The Runtime Context section is generator-owned, rendered as self-identifying conditional bullets from the active target set (`.agent-targets`), each pointing at one runtime's real projection path. The generator is a thin adapter; the sources are the portable asset. The generator is also the enforcement point for consistency. If an agent definition references a rule that does not exist, or a workflow references an agent that has no definition, the mismatch surfaces at generation time rather than at runtime. Editing derived projections by hand is always wrong; editing the sources and regenerating is the only valid path.
 
 ---
 
@@ -316,5 +318,6 @@ The framework's design principles are not novel; they adapt ideas from distribut
 | 0.1.0   | 2026-04-13 | Initial   | First publication: coordination problem framing, design principles, layer model, execution model, source-of-truth hierarchy, rules/standards/skills split, agent roster, workflow architecture, templates and validators, limitations, further reading. |
 | 0.4.0   | 2026-09-12 | Editorial | Document skills layer in design principles, layer model, source-of-truth hierarchy, and the rules/standards/skills split section. |
 | 0.5.0   | 2026-09-15 | AS        | Restate rules/skills/standards split by verification mechanism: rules verified at zero token cost by code; skills verified by LLM-as-a-judge; standards serve as judge rubrics. Update rule overhead to ~1,300 tokens (<1% of 128k–200k windows). Add `python-scripting` skill as third-agent example. Update `adapter_drift.py` description to reflect that all generated projections are gitignored. |
+| 0.6.0   | 2026-09-11 | AS        | Add `context/workflows/agents-md.yaml` as authoritative source of truth for AGENTS.md content. Document token-efficient, DRY generation from YAML source with dynamic Runtime Context bullets from `.agent-targets`. Update Source of Truth Hierarchy and Adapters section. |
 
 <!-- typst-skip-end -->

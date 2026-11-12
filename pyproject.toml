@@ -30,6 +30,7 @@ agent-drift = "context.scripts.validators.adapter_drift:main"
 [project.optional-dependencies]
 test = [
     "pytest>=9.0.3",
+    "pytest-cov>=5.0.0",
 ]
 
 [dependency-groups]
@@ -57,6 +58,24 @@ ignore = [
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["context/scripts/tests"]
+
+# ── System (non-Python) dependencies ──────────────────────────────────────────
+# External binaries the test suite and the spec indexer rely on. This table is the
+# single source of truth: `context/scripts/setup/install_system_deps.py` probes each
+# entry and installs only the missing ones. `.github/workflows/pr-subrepo-checks.yml`
+# runs that script before the test suite, so a bare runner image bootstraps itself
+# from the manifest instead of failing a test with FileNotFoundError.
+#
+#   probe   — command used to detect the binary (exit code 0 == available)
+#   install — shell command per platform.system().lower() key; `default` is a fallback
+
+[tool.agent-harness.system-dependencies.ctags]
+probe = ["ctags", "--version"]
+install = { linux = "sudo apt-get update -qq && sudo apt-get install -y universal-ctags", darwin = "brew install universal-ctags" }
+
+[tool.agent-harness.system-dependencies.ast-grep]
+probe = ["ast-grep", "--version"]
+install = { linux = "sudo npm install --global @ast-grep/cli", darwin = "brew install ast-grep" }
 
 [tool.hatch.build.targets.wheel]
 packages = ["context"]

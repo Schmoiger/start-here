@@ -5,7 +5,9 @@ Status, Context, Decision, and Consequences (see `context/standards/doc-standard
 
 ---
 
-## ADR-001: Canonical OpenAPI specification lives under `artefacts/architecture/`
+## ADR-001: EXAMPLE - Canonical OpenAPI specification lives under `artefacts/architecture/`
+
+THIS SECTION IS POPULATED AS AN EXAMPLE. THIS IS A DECISION FROM THE AGENTIC HARNESS PROJECT AND SHOULD BE REPLACED BY DECISIONS FOR YOUR PROJECT.
 
 - **Date**: 25 Oct 2026
 - **Status**: Accepted

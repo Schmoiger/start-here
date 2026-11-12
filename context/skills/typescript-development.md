@@ -64,6 +64,19 @@ echo "npx tsc --noEmit" >> .husky/pre-commit
 ---
 
 
+## 4. Validator Error Messages (Best Practice)
+
+Validator diagnostics must be actionable for the agent that has to fix a failure:
+- State the violation concisely and cite the file/line.
+- Name the rule or standard the failure violates (e.g. `doc-standards.md` §6.1).
+- Where a doc or skill will help the agent fix it, point to it by path — for
+  example, "See `context/skills/mermaid-authoring.md` for syntax and layout".
+
+A bare "check failed" message forces the fixing agent to guess; naming the rule
+and a fix reference makes the failure self-serve and the fix verifiable.
+
+---
+
 ## 5. Procedural Execution Commands
 
 ### Setup and Environment

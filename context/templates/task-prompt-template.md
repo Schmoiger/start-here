@@ -44,6 +44,10 @@ Do NOT run `git add` or `git commit` — the orchestrator commits on your behalf
 
 {task-id}: {task-description}
 
+### Workflow
+
+{workflow}
+
 ### Acceptance Criteria
 
 {bulleted-acceptance-criteria}

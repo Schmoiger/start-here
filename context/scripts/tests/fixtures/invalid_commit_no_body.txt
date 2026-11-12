@@ -1,0 +1,4 @@
+feat(data-service): add yfinance integration
+
+Tasks: DATA-001
+Co-Authored-By: Agent <a@b.c>

@@ -20,25 +20,25 @@ The hook NEVER exits with non-zero exit code to avoid blocking git commit.
 
 from __future__ import annotations
 
-import json
 import glob
+import json
 import os
 import re
 import sqlite3
 import subprocess
 import sys
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any, Optional, Tuple
-
 
 # =============================================================================
 # Data Models & Utilities
 # =============================================================================
 
+
 @dataclass
 class ExtractionResult:
     """Result of a runtime telemetry extraction."""
+
     tokens_in: int = 0
     tokens_out: int = 0
     thinking_tokens: int = 0
@@ -106,6 +106,7 @@ def write_watermark(watermark_path: str, data: dict[str, Any]) -> None:
 # Pure-Python Lightweight Protobuf Decoder (for Antigravity SQLite telemetry)
 # =============================================================================
 
+
 def _decode_varint(data: bytes, offset: int) -> Tuple[int, int]:
     """Decode a variable-length integer from protobuf wire format."""
     res = 0
@@ -138,16 +139,16 @@ def parse_protobuf_fields(data: bytes) -> list[Tuple[int, str, Any]]:
             val, offset = _decode_varint(data, offset)
             fields.append((field_num, "varint", val))
         elif wire_type == 1:  # 64-bit
-            val = data[offset:offset + 8]
+            val = data[offset : offset + 8]
             offset += 8
             fields.append((field_num, "fixed64", val))
         elif wire_type == 2:  # Length-delimited (string, bytes, embedded message)
             length, offset = _decode_varint(data, offset)
-            val = data[offset:offset + length]
+            val = data[offset : offset + length]
             offset += length
             fields.append((field_num, "length_delimited", val))
         elif wire_type == 5:  # 32-bit
-            val = data[offset:offset + 4]
+            val = data[offset : offset + 4]
             offset += 4
             fields.append((field_num, "fixed32", val))
         else:
@@ -160,8 +161,10 @@ def parse_protobuf_fields(data: bytes) -> list[Tuple[int, str, Any]]:
 # Runtime Extractors
 # =============================================================================
 
+
 class BaseExtractor:
     """Abstract base class for platform-specific telemetry extractors."""
+
     name: str = "base"
 
     def is_available(self) -> bool:
@@ -179,6 +182,7 @@ class BaseExtractor:
 
 class AntigravityExtractor(BaseExtractor):
     """Extractor for Google Antigravity / Gemini IDE SQLite conversation telemetry."""
+
     name = "antigravity"
 
     def __init__(self):
@@ -274,7 +278,7 @@ class AntigravityExtractor(BaseExtractor):
                                 output_tokens = varints.get(3, 0)
                                 thinking = varints.get(9, 0)
 
-                                delta_in += (prompt_tokens + cached_tokens)
+                                delta_in += prompt_tokens + cached_tokens
                                 delta_out += output_tokens
                                 delta_thinking += thinking
             except Exception:
@@ -297,6 +301,7 @@ class AntigravityExtractor(BaseExtractor):
 
 class CopilotExtractor(BaseExtractor):
     """Extractor for GitHub Copilot Chat telemetry stored in VS Code workspaceStorage."""
+
     name = "copilot"
 
     def __init__(self):
@@ -371,6 +376,7 @@ class CopilotExtractor(BaseExtractor):
                         continue
                     try:
                         record = json.loads(line)
+
                         # Recursive search for token usage metrics
                         def scan(obj: Any):
                             nonlocal delta_in, delta_out, delta_thinking, resolved_model
@@ -379,7 +385,9 @@ class CopilotExtractor(BaseExtractor):
                                     delta_in += obj["promptTokens"]
                                 if "outputTokens" in obj and isinstance(obj["outputTokens"], int):
                                     delta_out += obj["outputTokens"]
-                                elif "completionTokens" in obj and isinstance(obj["completionTokens"], int):
+                                elif "completionTokens" in obj and isinstance(
+                                    obj["completionTokens"], int
+                                ):
                                     delta_out += obj["completionTokens"]
                                 if "thinking" in obj and isinstance(obj["thinking"], dict):
                                     t = obj["thinking"].get("tokens", 0)
@@ -387,7 +395,11 @@ class CopilotExtractor(BaseExtractor):
                                         delta_thinking += t
                                 if "resolvedModel" in obj and isinstance(obj["resolvedModel"], str):
                                     resolved_model = obj["resolvedModel"]
-                                elif "modelId" in obj and isinstance(obj["modelId"], str) and not resolved_model:
+                                elif (
+                                    "modelId" in obj
+                                    and isinstance(obj["modelId"], str)
+                                    and not resolved_model
+                                ):
                                     resolved_model = obj["modelId"]
 
                                 for v in obj.values():
@@ -420,6 +432,7 @@ class CopilotExtractor(BaseExtractor):
 
 class ClaudeExtractor(BaseExtractor):
     """Extractor for Anthropic Claude Code session telemetry (~/.claude/projects/)."""
+
     name = "claude-code"
 
     def is_available(self) -> bool:
@@ -431,9 +444,7 @@ class ClaudeExtractor(BaseExtractor):
         if not os.path.isdir(claude_dir):
             return None
 
-        session_dirs = [
-            d for d in glob.glob(os.path.join(claude_dir, "*/")) if os.path.isdir(d)
-        ]
+        session_dirs = [d for d in glob.glob(os.path.join(claude_dir, "*/")) if os.path.isdir(d)]
         if not session_dirs:
             return None
         session_dirs.sort(key=os.path.getmtime, reverse=True)
@@ -513,6 +524,7 @@ class ClaudeExtractor(BaseExtractor):
 
 class CodexExtractor(BaseExtractor):
     """Fallback extractor for OpenAI Codex / API run steps."""
+
     name = "codex"
 
     def is_available(self) -> bool:
@@ -541,6 +553,7 @@ class ClineExtractor(BaseExtractor):
     The session json is authoritative for repo association (cwd match) and the
     declared model; the messages file carries granular per-call usage for deltas.
     """
+
     name = "cline"
 
     def __init__(self) -> None:
@@ -648,7 +661,14 @@ class ClineExtractor(BaseExtractor):
                 continue
             metrics_int = {
                 key: metrics[key]
-                for key in ("inputTokens", "outputTokens", "cacheReadTokens", "cacheWriteTokens", "thinkingTokens", "reasoningTokens")
+                for key in (
+                    "inputTokens",
+                    "outputTokens",
+                    "cacheReadTokens",
+                    "cacheWriteTokens",
+                    "thinkingTokens",
+                    "reasoningTokens",
+                )
                 if isinstance(metrics.get(key), int)
             }
             delta_in += (
@@ -657,7 +677,9 @@ class ClineExtractor(BaseExtractor):
                 + metrics_int.get("cacheWriteTokens", 0)
             )
             delta_out += metrics_int.get("outputTokens", 0)
-            delta_thinking += metrics_int.get("thinkingTokens", 0) or metrics_int.get("reasoningTokens", 0)
+            delta_thinking += metrics_int.get("thinkingTokens", 0) or metrics_int.get(
+                "reasoningTokens", 0
+            )
 
         return ExtractionResult(
             tokens_in=delta_in,
@@ -721,6 +743,15 @@ def select_extractor(declared_tool: Optional[str], repo_root: str) -> BaseExtrac
     return AntigravityExtractor() if AntigravityExtractor().is_available() else ClaudeExtractor()
 
 
+def _coauthor_line(runtime_name: Optional[str]) -> Optional[str]:
+    """Return a git-compatible Co-Authored-By trailer for the detected runtime."""
+    if not runtime_name:
+        return None
+    agent_name = runtime_name.strip().title()
+    email = f"{agent_name.lower()}@users.noreply.github.com"
+    return f"Co-Authored-By: {agent_name} <{email}>"
+
+
 def _set_trailer_field(line: str, key: str, value: str) -> str:
     """Replace `key=<old>` on an Agent-Session line, appending it if absent."""
     if re.search(rf"\b{key}=\S+", line):
@@ -733,12 +764,16 @@ def update_commit_message(
     token_str: Optional[str],
     tool: Optional[str] = None,
     model: Optional[str] = None,
+    runtime: Optional[str] = None,
 ) -> bool:
     """Inject or update runtime-verified tool=/model=/tokens= on the Agent-Session line.
 
     Hand-written tool=/model= values that runtime telemetry can corroborate are
     overwritten with the surviving values; a null token_str removes a stale
     tokens= so the trailer never claims usage the runtime did not record.
+
+    When a runtime is detected and no Co-Authored-By trailer exists, one is
+    appended (the validator requires it for agent commits).
     """
     try:
         with open(msg_file, "r", encoding="utf-8") as f:
@@ -752,6 +787,7 @@ def update_commit_message(
 
     lines = content.split("\n")
     updated = False
+    agent_idx = None
     for i, line in enumerate(lines):
         if line.startswith("Agent-Session:"):
             if tool:
@@ -764,9 +800,21 @@ def update_commit_message(
             elif re.search(r"\btokens=\S+", lines[i]):
                 lines[i] = re.sub(r"\s+tokens=\S+", "", lines[i])
             updated = True
+            agent_idx = i
             break
 
-    if updated:
+    coauthor_injected = False
+    if (
+        runtime
+        and agent_idx is not None
+        and not any(line.startswith("Co-Authored-By:") for line in lines)
+    ):
+        co = _coauthor_line(runtime)
+        if co:
+            lines.insert(agent_idx + 1, co)
+            coauthor_injected = True
+
+    if updated or coauthor_injected:
         try:
             with open(msg_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(lines))
@@ -830,6 +878,7 @@ def main() -> None:
         token_str,
         tool=extractor.name,
         model=short_model(result.model),
+        runtime=extractor.name,
     )
 
     # Persist watermark updates for next commit

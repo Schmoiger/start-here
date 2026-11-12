@@ -5,6 +5,7 @@ import yaml
 
 from context.scripts.generators.adapters.core.models import (
     CanonicalAgent,
+    CanonicalRule,
     CanonicalSkill,
     Phase,
     WorkflowDAG,
@@ -58,6 +59,7 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
     agents: dict[str, CanonicalAgent] = {}
     workflows: dict[str, WorkflowDAG] = {}
     skills: dict[str, CanonicalSkill] = {}
+    rules: dict[str, CanonicalRule] = {}
 
     # Parse agents
     agents_dir = context_path / "agents"
@@ -92,6 +94,21 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
                     body=body.strip(),
                 )
 
+    # Parse rules
+    rules_dir = context_path / "rules"
+    if rules_dir.exists():
+        for file_path in sorted(rules_dir.glob("*.md")):
+            content = file_path.read_text()
+            frontmatter, body = extract_frontmatter(content)
+            rules[file_path.stem] = CanonicalRule(
+                name=file_path.stem,
+                key_points=frontmatter.get("key_points", ""),
+                description=frontmatter.get("description", ""),
+                globs=frontmatter.get("globs", []),
+                alwaysApply=frontmatter.get("alwaysApply", False),
+                body=body.strip(),
+            )
+
     # Parse workflows
     workflows_dir = context_path / "workflows"
     if workflows_dir.exists():
@@ -121,4 +138,4 @@ def load_canonical_context(context_dir_path: str) -> dict[str, Any]:
                     phases=phases,
                 )
 
-    return {"agents": agents, "workflows": workflows, "skills": skills}
+    return {"agents": agents, "workflows": workflows, "skills": skills, "rules": rules}

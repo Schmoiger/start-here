@@ -121,11 +121,12 @@ def query_upstream_head(remote: str, branch: str, timeout_seconds: int = 15) -> 
             if parts:
                 return parts[0]
         elif res.stderr.strip():
-            print(f"Notice: git ls-remote failed for {remote}: {res.stderr.strip()}", file=sys.stderr)
+            print(
+                f"Notice: git ls-remote failed for {remote}: {res.stderr.strip()}", file=sys.stderr
+            )
     except (subprocess.SubprocessError, OSError) as exc:
         print(f"Warning: Failed to reach remote {remote}: {exc}", file=sys.stderr)
     return None
-
 
 
 def check_subrepo_freshness(

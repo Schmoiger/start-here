@@ -25,6 +25,15 @@ repos:
         name: Ruff (format)
         files: ^services/.*\.py$
 
+      # Ruff for context/scripts/ (validator & generator code)
+      - id: ruff-check
+        name: Ruff (lint) - context/scripts
+        files: ^context/scripts/.*\.py$
+        args: [--fix]
+      - id: ruff-format
+        name: Ruff (format) - context/scripts
+        files: ^context/scripts/.*\.py$
+
   # Pyright: run per-service (cd services/<name> && uv run pyright)
   # - repo: https://github.com/RobertCraigie/pyright-python
   #   rev: v1.1.408

@@ -54,9 +54,7 @@ def check_forbidden_ui_test_deps(package_json_path: Path) -> list[str]:
             continue
         for pkg_name in deps:
             if pkg_name in BANNED_PACKAGES:
-                violations.append(
-                    f"{package_json_path} [{sec}]: {BANNED_PACKAGES[pkg_name]}"
-                )
+                violations.append(f"{package_json_path} [{sec}]: {BANNED_PACKAGES[pkg_name]}")
 
     return violations
 

@@ -1,9 +1,48 @@
 """Tests for validation scripts."""
 
 import json
+import subprocess
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
+from context.scripts.validators.secrets import (
+    scan_file_for_secrets,
+)
+from context.scripts.validators.subrepo_freshness import (
+    check_subrepo_freshness,
+    find_subrepos,
+    query_upstream_head,
+)
+from context.scripts.validators.subrepo_freshness import (
+    main as subrepo_freshness_main,
+)
+from context.scripts.validators.supabase import (
+    check_migration_audit,
+    check_supabase_imports,
+)
+from context.scripts.validators.tech_writing import (
+    is_ears_requirement,
+    validate_british_english,
+    validate_requirements_file,
+)
+from context.scripts.validators.testing import (
+    check_forbidden_mocks,
+)
+from context.scripts.validators.typescript_environment import (
+    check_package_lock,
+    check_tsconfig_strictness,
+    check_workspaces,
+)
+from context.scripts.validators.ui_dev import (
+    check_css_files,
+    check_important,
+    check_raw_hex,
+)
+from context.scripts.validators.ui_testing import (
+    check_forbidden_ui_test_deps,
+)
+from context.scripts.validators.verify_typst_formatting import check_and_fix_file
 from context.scripts.validators.workspace_conventions import (
     INTERRUPTION_BASE_FIELDS,
     INTERRUPTION_TYPE_FIELDS,
@@ -14,7 +53,6 @@ from context.scripts.validators.workspace_conventions import (
     VALID_METRICS_EVENTS,
     VALID_TOKEN_SOURCES,
     is_interruptions_log,
-    main as workspace_conventions_main,
     validate_commit_message,
     validate_interruptions_entry,
     validate_interruptions_file,
@@ -23,43 +61,9 @@ from context.scripts.validators.workspace_conventions import (
     validate_output_path,
     validate_output_paths,
 )
-from context.scripts.validators.tech_writing import (
-    validate_british_english,
-    is_ears_requirement,
-    validate_requirements_file,
+from context.scripts.validators.workspace_conventions import (
+    main as workspace_conventions_main,
 )
-from context.scripts.validators.ui_dev import (
-    check_important,
-    check_raw_hex,
-    check_css_files,
-)
-from context.scripts.validators.supabase import (
-    check_supabase_imports,
-    check_migration_audit,
-)
-from context.scripts.validators.testing import (
-    check_forbidden_mocks,
-)
-from context.scripts.validators.typescript_environment import (
-    check_package_lock,
-    check_tsconfig_strictness,
-    check_workspaces,
-)
-from context.scripts.validators.ui_testing import (
-    check_forbidden_ui_test_deps,
-)
-from context.scripts.validators.secrets import (
-    scan_file_for_secrets,
-)
-from context.scripts.validators.verify_typst_formatting import check_and_fix_file
-from context.scripts.validators.subrepo_freshness import (
-    find_subrepos,
-    query_upstream_head,
-    check_subrepo_freshness,
-    main as subrepo_freshness_main,
-)
-from unittest.mock import patch
-import subprocess
 
 
 class TestConventionalCommits:
@@ -86,6 +90,13 @@ class TestConventionalCommits:
         assert not is_valid
         assert "too long" in error
 
+    def test_invalid_no_body(self, invalid_commit_no_body):
+        """Test that a commit without an explanatory body fails validation."""
+        msg = invalid_commit_no_body.read_text()
+        is_valid, error = validate_commit_message(msg)
+        assert not is_valid
+        assert "body" in error.lower()
+
     def test_invalid_past_tense(self, invalid_commit_past_tense):
         """Test that past tense description fails validation."""
         msg = invalid_commit_past_tense.read_text()
@@ -103,7 +114,7 @@ class TestConventionalCommits:
         """Test that merge commits don't require validation."""
         # Note: Main script skips merge commits, so we test the detection
         msg = merge_commit.read_text()
-        assert msg.startswith('Merge ')
+        assert msg.startswith("Merge ")
 
     def test_empty_commit_fails(self):
         """Test that empty commit message fails."""
@@ -148,6 +159,8 @@ Agent-Session: tool=cursor model=sonnet agents=python-coder duration=5m tokens=1
         """prepare-commit-msg formats >=1M token counts with an M suffix."""
         msg = """feat(test): valid subject
 
+Implements the endpoint under test.
+
 Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=3.59M/7.4K
 Co-Authored-By: Agent <a@b.c>"""
         is_valid, error = validate_commit_message(msg)
@@ -157,6 +170,8 @@ Co-Authored-By: Agent <a@b.c>"""
         """Lowercase k/m token suffixes are accepted."""
         msg = """feat(test): valid subject
 
+Implements the endpoint under test.
+
 Agent-Session: tool=cursor model=sonnet agents=python-coder tokens=1m/2k
 Co-Authored-By: Agent <a@b.c>"""
         is_valid, error = validate_commit_message(msg)
@@ -165,6 +180,8 @@ Co-Authored-By: Agent <a@b.c>"""
     def test_agent_session_hook_appended_form(self):
         """prepare-commit-msg appends tool=/model=/tokens= when the author omits them."""
         msg = """feat(test): valid subject
+
+Implements the endpoint under test.
 
 Agent-Session: agents=python-coder dispatch=human interactions=2 approvals=0 tool=cursor model=sonnet tokens=35.01M/47.2K
 Co-Authored-By: Agent <a@b.c>"""
@@ -212,6 +229,7 @@ class TestAgentSessionCorroboration:
     def _agent_commit(tool: str, model: str) -> str:
         return (
             f"feat(test): subject\n\n"
+            f"Implements the feature under test.\n\n"
             f"Agent-Session: tool={tool} model={model} agents=python-coder\n\n"
             f"Co-Authored-By: Agent <a@b.c>"
         )
@@ -219,7 +237,9 @@ class TestAgentSessionCorroboration:
     def test_model_corroborated_for_cline(self, tmp_path, monkeypatch):
         """A cline session matching the runtime reports the declared model: valid."""
         monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "cline"))
-        self._cline_session_for_repo(tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model")
+        self._cline_session_for_repo(
+            tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model"
+        )
         is_valid, error = validate_commit_message(
             self._agent_commit("cline", "test-model"), repo_root=str(tmp_path)
         )
@@ -228,7 +248,9 @@ class TestAgentSessionCorroboration:
     def test_model_contradicting_runtime_fails(self, tmp_path, monkeypatch):
         """A model that contradicts the runtime session is rejected."""
         monkeypatch.setenv("CLINE_DATA_DIR", str(tmp_path / "cline"))
-        self._cline_session_for_repo(tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model")
+        self._cline_session_for_repo(
+            tmp_path / "cline", "sess1", str(tmp_path), "deepseek/test-model"
+        )
         is_valid, error = validate_commit_message(
             self._agent_commit("cline", "sonnet"), repo_root=str(tmp_path)
         )
@@ -331,7 +353,8 @@ class TestBritishEnglish:
         """Test color/colour detection."""
         # Create temp file with American spelling
         from tempfile import NamedTemporaryFile
-        with NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+
+        with NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write("The color is red\n")
             f.flush()
             violations = validate_british_english(Path(f.name))
@@ -342,7 +365,8 @@ class TestBritishEnglish:
     def test_behavior_vs_behaviour(self):
         """Test behavior/behaviour detection."""
         from tempfile import NamedTemporaryFile
-        with NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+
+        with NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write("The behavior is normal\n")
             f.flush()
             violations = validate_british_english(Path(f.name))
@@ -353,7 +377,8 @@ class TestBritishEnglish:
     def test_organize_vs_organise(self):
         """Test organize/organise detection."""
         from tempfile import NamedTemporaryFile
-        with NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+
+        with NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write("Users can organize their files\n")
             f.flush()
             violations = validate_british_english(Path(f.name))
@@ -433,7 +458,7 @@ class TestMetricsLogging:
             "task": "TEST-001",
             "agent": "test-agent",
             "event": "start",
-            "tokens": {"in": 100, "out": 50, "source": "api_response"}
+            "tokens": {"in": 100, "out": 50, "source": "api_response"},
         }
         errors = validate_metrics_entry(entry, 1)
         assert len(errors) > 0
@@ -446,7 +471,7 @@ class TestMetricsLogging:
             "task": "TEST-001",
             "agent": "test-agent",
             "event": "invalid-event",
-            "tokens": {"in": 100, "out": 50, "source": "api_response"}
+            "tokens": {"in": 100, "out": 50, "source": "api_response"},
         }
         errors = validate_metrics_entry(entry, 1)
         assert len(errors) > 0
@@ -459,7 +484,7 @@ class TestMetricsLogging:
             "task": "TEST-001",
             "agent": "test-agent",
             "event": "start",
-            "tokens": {"in": 100, "out": 50, "source": "invalid"}
+            "tokens": {"in": 100, "out": 50, "source": "invalid"},
         }
         errors = validate_metrics_entry(entry, 1)
         assert len(errors) > 0
@@ -472,7 +497,7 @@ class TestMetricsLogging:
             "task": "TEST-001",
             "agent": "test-agent",
             "event": "start",
-            "tokens": {"source": "api_response"}  # Missing 'in' and 'out'
+            "tokens": {"source": "api_response"},  # Missing 'in' and 'out'
         }
         errors = validate_metrics_entry(entry, 1)
         assert len(errors) > 0
@@ -486,7 +511,7 @@ class TestMetricsLogging:
             "agent": "test-agent",
             "event": "handoff",
             # Missing 'to' field
-            "tokens": {"in": 100, "out": 50, "source": "api_response"}
+            "tokens": {"in": 100, "out": 50, "source": "api_response"},
         }
         errors = validate_metrics_entry(entry, 1)
         assert len(errors) > 0
@@ -619,13 +644,14 @@ class TestInterruptionsLogging:
         errors = validate_interruptions_entry(entry, 1)
         assert any("'options'" in e for e in errors)
 
-
     def test_mixed_tasks_rejected(self, tmp_path):
         """Test that a log may not mix records from different tasks."""
         log = tmp_path / "TASK-004.jsonl"
         log.write_text(
-            json.dumps(self._question()) + "\n"
-            + json.dumps(self._question(id="a1f4", task_id="TASK-005")) + "\n"
+            json.dumps(self._question())
+            + "\n"
+            + json.dumps(self._question(id="a1f4", task_id="TASK-005"))
+            + "\n"
         )
         errors = validate_interruptions_file(log)
         assert any("multiple tasks" in e for e in errors)
@@ -648,7 +674,8 @@ class TestInterruptionsLogging:
         """Test that a resolution record must reference an existing record id."""
         log = tmp_path / "TASK-004.jsonl"
         log.write_text(
-            json.dumps(self._question()) + "\n"
+            json.dumps(self._question())
+            + "\n"
             + json.dumps(
                 {
                     "id": "d5e6",
@@ -670,7 +697,8 @@ class TestInterruptionsLogging:
         """Test that a resolution record referencing a real id passes."""
         log = tmp_path / "TASK-004.jsonl"
         log.write_text(
-            json.dumps(self._question(answered_by=None, resolution=None)) + "\n"
+            json.dumps(self._question(answered_by=None, resolution=None))
+            + "\n"
             + json.dumps(
                 {
                     "id": "d5e6",
@@ -793,11 +821,7 @@ class TestTypstFormatting:
     def test_section_heading_without_separator(self, tmp_path):
         """Test that level 2 heading without --- separator fails and can be fixed."""
         md_file = tmp_path / "heading_bad.md"
-        md_file.write_text(
-            "# Title\n\n"
-            "## Section Without Rule\n\n"
-            "Some content.\n"
-        )
+        md_file.write_text("# Title\n\n## Section Without Rule\n\nSome content.\n")
         errors = check_and_fix_file(md_file, fix=False)
         assert len(errors) == 1
         assert "must be preceded by '---' horizontal rule" in errors[0]
@@ -813,10 +837,7 @@ class TestTypstFormatting:
         """Test that headings inside typst-skip blocks are not flagged."""
         md_file = tmp_path / "skipped.md"
         md_file.write_text(
-            "# Title\n\n"
-            "<!-- typst-skip-start -->\n"
-            "## Skipped Heading\n"
-            "<!-- typst-skip-end -->\n"
+            "# Title\n\n<!-- typst-skip-start -->\n## Skipped Heading\n<!-- typst-skip-end -->\n"
         )
         errors = check_and_fix_file(md_file, fix=False)
         assert len(errors) == 0
@@ -882,7 +903,7 @@ class TestUIDev:
     def test_raw_hex_forbidden(self, tmp_path):
         """Test that raw hex colours are flagged."""
         p = tmp_path / "Button.tsx"
-        content = "<button className=\"bg-[#1a2b3c]\">Click</button>"
+        content = '<button className="bg-[#1a2b3c]">Click</button>'
         violations = check_raw_hex(p, content)
         assert len(violations) > 0
         assert "raw hex colour" in violations[0][1]
@@ -1028,7 +1049,9 @@ class TestSecrets:
     def test_private_key_flagged(self, tmp_path):
         """Test that private key block is flagged."""
         key_file = tmp_path / "key.pem"
-        key_file.write_text("-----BEGIN RSA PRIVATE KEY-----\nMIIE...\n-----END RSA PRIVATE KEY-----")
+        key_file.write_text(
+            "-----BEGIN RSA PRIVATE KEY-----\nMIIE...\n-----END RSA PRIVATE KEY-----"
+        )
         violations = scan_file_for_secrets(key_file)
         assert len(violations) == 1
         assert "Private key block" in violations[0]
@@ -1250,4 +1273,3 @@ class TestLoggingTemplateDocs:
         """Test that the agent template points at the schema instead of restating it."""
         text = (self.TEMPLATES / "agent-template.md").read_text()
         assert "context/templates/logging-template.md" in text
-

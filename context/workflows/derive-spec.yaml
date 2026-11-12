@@ -1,0 +1,199 @@
+name: derive-spec
+description: "Derive product and/or technical specifications from a codebase (organised or not) via deterministic indexer + agent synthesis with confidence tiers — modes: product, technical, both"
+
+# Derive fresh product and/or technical specs from an existing repo. The deterministic
+# spec_indexer (analyse-repo skill) extracts the index; agents synthesise with confidence
+# tiers (derive-spec skill), a batched human confirmation round, and a review gate before
+# promotion to derived/. Shared phases 0-3 and 5-8 run once; derivation branches 4a
+# (product) / 4b (technical) after evidence gathering, per the recorded mode
+# (index.meta.mode). Canonical docs are never rewritten.
+
+phases:
+  - id: intake
+    name: Phase 0 · Intake & Scope
+    agents:
+      - orchestrator  # Records mode/target/limits/output; writes HANDOFF.md before the first spawn
+    outputs:
+      - artefacts/build/HANDOFF.md
+    validation:
+      - "mode recorded: product | technical | both"
+      - "target recorded: repo root, or --repo <service-root> for monorepos (one run per repo/service)"
+      - "limits recorded: --max-files bound; scan_too_large flag surfaces large repos for human scoping"
+      - "output location recorded: drafts → artefacts/build/derived-spec-working/, promotion → artefacts/{category}/derived/"
+
+  - id: discovery
+    name: Phase 1 · Repo & Doc Discovery
+    depends_on: [intake]
+    agents:
+      - product-owner      # modes product | both
+      - solution-architect # mode technical
+    outputs:
+      - artefacts/build/derived-spec-working/repo-index.json
+      - artefacts/build/derived-spec-working/spec-scan.md
+      - artefacts/build/derived-spec-working/repo-profile.md
+    validation:
+      - "scan --repo --mode (via analyse-repo skill) wrote repo-index.json + spec-scan.md; meta.mode recorded"
+      - "spec-doc candidates discovered by glob (artefacts/product/**, artefacts/architecture/**, docs/**, **/README.md, PRD*, *spec*.md, openapi*.yaml) and confirmed by the human — never silent"
+      - "repo-profile.md written: app type, entry points, module boundaries, every claim file:line"
+      - "agent tool_scope restricted to repo-index.json + spec-scan.md + cited line ranges — no unfettered repo reads"
+    notes:
+      - "Mode dispatch: product|both → @product-owner; technical → @solution-architect; both → shared phases run once under one HANDOFF"
+      - "Invoke tools via the analyse-repo skill; tool_scope = repo-index.json + cited line ranges"
+      - "repo-profile.md is the Phase 1 deliverable, wired as an input to Phases 2-5 (app type, entry points, module boundaries)"
+
+  - id: baseline-drift
+    name: Phase 2 · Drift from Baseline
+    depends_on: [discovery]
+    agents:
+      - product-owner
+      - solution-architect
+    outputs:
+      - artefacts/build/derived-spec-working/drift-from-baseline.md
+    validation:
+      - "drift candidates listed (existing-doc vs code deltas) as the Phase 7 question queue, ordered first"
+      - "no existing docs → annotated empty-extraction (code-derived only)"
+      - "canonical docs read but never modified"
+      - "consumes repo-index.json + spec-scan.md + repo-profile.md; tool_scope = index + cited line ranges"
+    notes:
+      - "Inputs: artefacts/build/derived-spec-working/repo-index.json (schema/symbols), artefacts/build/derived-spec-working/spec-scan.md, artefacts/build/derived-spec-working/repo-profile.md (app type, entry points, module boundaries)"
+
+  - id: evidence
+    name: Phase 3 · Evidence Gathering
+    depends_on: [baseline-drift]
+    agents:
+      - product-owner
+      - solution-architect
+    outputs:
+      - artefacts/build/derived-spec-working/repo-index.json   # refreshed by the evidence-pass scan
+    validation:
+      - "evidence-pass scan rerun (symbols · routes · UI · schema · tests) per analyse-repo §1.3"
+      - "cross-index reasoning over repo-index.json; no bulk source reads"
+    notes:
+      - "tool_scope restricted to the index + cited line ranges (T-013)"
+      - "Consumes repo-profile.md for orientation (app type, entry points, module boundaries) alongside the index"
+
+  - id: derivation-product
+    name: Phase 4a · Product Derivation
+    depends_on: [evidence]
+    agents:
+      - product-owner  # modes product | both
+    outputs:
+      - artefacts/build/spec-drafts/   # product inventory → candidate features → roles/actors → UX flows
+    validation:
+      - "UI inventory → candidate features → roles/actors → UX flows"
+      - "actor/role named per UX flow; roles derived from auth/permission evidence"
+      - "unsupported by the index → open question, not assertion"
+    notes:
+      - "Inputs: repo-index.json + repo-profile.md — features/roles/UX flows grounded in the profile"
+
+  - id: derivation-technical
+    name: Phase 4b · Technical Derivation
+    depends_on: [evidence]
+    agents:
+      - solution-architect  # modes technical | both — drafts only
+    outputs:
+      - artefacts/build/spec-drafts/   # architecture · api-catalogue · data-model drafts
+    validation:
+      - "architecture + api-catalogue draft + data-model draft staged"
+      - "drafts only — canonical architecture docs never rewritten"
+    notes:
+      - "Inputs: repo-index.json + repo-profile.md — module boundaries from the profile seed the architecture draft"
+
+  - id: draft
+    name: Phase 5 · Draft with Confidence
+    depends_on: [derivation-product, derivation-technical]
+    agents:
+      - product-owner
+      - solution-architect
+    outputs:
+      - artefacts/build/derived-spec-working/product-spec-draft.md  # modes product | both
+      - artefacts/build/derived-spec-working/architecture-draft.md  # modes technical | both
+      - artefacts/build/derived-spec-working/api-catalogue-draft.md # modes technical | both
+      - artefacts/build/derived-spec-working/data-model-draft.md    # modes technical | both
+    validation:
+      - "every subsection carries tier + banded % + file:line evidence (Verified 85-100 · Needs Confirmation 50-85 · Assumed <50)"
+      - "content-first layout: content subsections open the doc; boilerplate (run metadata, confidence schema, subsection format, open questions, review record) is in the Appendices container (B-008)"
+      - "open-questions appendix present (per subsection, priority, MC options)"
+      - "drift section present (canonical docs vs derived behaviour)"
+    notes:
+      - "Mode-conditional: depends_on resolves to the derivation phase(s) active for the recorded mode — inactive branches are skipped at intake"
+      - "staged in artefacts/build/spec-drafts/ — one file per artefacts category; never touch canonical docs"
+      - "Inputs: repo-index.json + repo-profile.md + drift-from-baseline.md — draft subsections cite from the index, never from memory"
+
+  - id: verification
+    name: Phase 6 · Verification Pass
+    depends_on: [draft]
+    gate: true
+    agents:
+      - product-owner
+      - solution-architect
+    outputs:
+      - artefacts/build/verification-report.md
+    validation:
+      - "spec_indexer.py verify --index → OK (every cited file:line resolves)"
+      - "spec_indexer.py verify --doc --require-coverage on the staged drafts → OK (every content subsection carries tier · NN% · file:line)"
+      - "re-scan rule: index refreshed before verify after any edit (analyse-repo §8)"
+      - "question coverage: every subsection has tier + % + citations; unresolved claims fixed or downgraded"
+      - "approval required: APPROVED → confirmation; CHANGES REQUIRED → return to draft (or evidence)"
+    notes:
+      - "Phase 6 is a gate — an explicit APPROVED verdict is required before proceeding"
+
+  - id: confirmation
+    name: Phase 7 · Batched Human Confirmation
+    depends_on: [verification]
+    agents:
+      - product-owner  # one batched MC round (reverse-spec Step 3 format)
+    outputs:
+      - artefacts/build/derived-spec-working/confirmation-answers-draft.md
+    validation:
+      - "one batched round; drift candidates asked first, then pure code facts"
+      - "numbered MC with 'Other', each option citing files"
+      - "skip → stated assumption recorded; unanswered → stays Assumed (still-open appendix)"
+    notes:
+      - "Use the requirements-elicitation skill confirmation mode (T-005)"
+
+  - id: finalise
+    name: Phase 8 · Finalise & Review Gate
+    depends_on: [confirmation]
+    gate: true
+    agents:
+      - product-owner
+      - solution-architect
+    outputs:
+      - artefacts/{product,architecture}/derived/   # promoted on APPROVED
+    validation:
+      - "drafts updated: questions resolved, confirmed bands raised, drift reported"
+      - "spec_indexer.py verify --doc on final drafts → all citations resolve"
+      - "human review gate: APPROVED → promote drafts to artefacts/{category}/derived/ and commit (per the Promotion DoD); CHANGES REQUIRED → return to the specified phase"
+      - "canonical docs never rewritten"
+
+quality_gates:
+  - phase: verification
+    gate: true
+    description: "Verification pass — verify --index resolves and every subsection carries tier + banded % + citations; the orchestrator records the APPROVED verdict"
+  - phase: finalise
+    gate: true
+    approval: human
+    description: "Final review gate — human APPROVED promotes drafts to artefacts/{category}/derived/; CHANGES REQUIRED returns to the specified phase"
+
+workflow_rules:
+  - "Modes product | technical | both are set at intake and recorded in index.meta.mode; shared phases (0-3, 5-8) run once; 4a/4b branch after evidence gathering"
+  - "Run one derive-spec per repo/service — --repo <service-root> scopes the scan; one HANDOFF per run; cross-repo questions go to the elicitation round"
+  - "Invoke the indexer through the analyse-repo skill (scan → out; verify --index / --doc); agent tool_scope = repo-index.json + cited line ranges only"
+  - "Existing-spec discovery is human-confirmed, never silent; drift candidates (doc vs code deltas) are asked before pure code facts"
+  - "Every subsection carries tier + banded % + file:line; confirmed answers raise the band/%, unanswered questions stay Assumed in the still-open appendix"
+  - "Drafts stage in artefacts/build/derived-spec-working/; APPROVED copies to artefacts/{category}/derived/; canonical docs are never rewritten"
+  - "Re-scan before verify after any edit — the index is a snapshot and verify fails stale citations"
+  - "Phase 6 (verification) and Phase 8 (final review) are gates: an explicit APPROVED verdict is required to proceed"
+
+state_recovery:
+  after_compaction:
+    - "Read artefacts/build/HANDOFF.md — the Workflow: derive-spec and Phase: fields identify the active phase"
+    - "Read artefacts/build/derived-spec-working/repo-index.json + artefacts/build/derived-spec-working/spec-scan.md for the indexed evidence (Phase ≥ 1)"
+    - "Read artefacts/build/derived-spec-working/repo-profile.md for the Phase 1 deliverable (app type, entry points, module boundaries)"
+    - "Read artefacts/build/derived-spec-working/drift-from-baseline.md for the Phase 2/7 question queue; read artefacts/build/derived-spec-working/ for staged drafts (Phase ≥ 5)"
+  critical_files:
+    - artefacts/build/HANDOFF.md
+    - artefacts/build/derived-spec-working/repo-index.json
+    - artefacts/build/derived-spec-working/spec-scan.md
+    - artefacts/build/derived-spec-working/repo-profile.md

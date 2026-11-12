@@ -1,13 +1,13 @@
 import shutil
 from pathlib import Path
+
 import pytest
 
+from context.scripts.generators.adapters.core.loader import load_canonical_context
 from context.scripts.generators.generate_adapters import (
     run_generation,
-    get_adapter_projections,
 )
 from context.scripts.validators.adapter_drift import check_adapter_drift
-from context.scripts.generators.adapters.core.loader import load_canonical_context
 
 
 def test_e2e_full_compilation_all_targets(tmp_path: Path):
@@ -16,9 +16,7 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     context_dir = repo_root / "context"
 
     # Copy context/ into sandbox tmp_path
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     # Run full compilation across all targets
     result = run_generation(
@@ -41,8 +39,14 @@ def test_e2e_full_compilation_all_targets(tmp_path: Path):
     assert (tmp_path / "AGENTS.md").is_file()
     agents_content = (tmp_path / "AGENTS.md").read_text()
     assert "# AGENTS.md" in agents_content
-    assert "## Workflows" in agents_content
-    assert "## Agents" in agents_content
+    # AGENTS.md is prose-only by design: the workflow/agent registry was dropped in
+    # favour of the sections declared in context/workflows/agents-md.yaml, plus the
+    # generator-owned Runtime Context section.
+    assert "## Runtime Context" in agents_content
+    assert "## Harness Context" in agents_content
+    assert "## Project Context" in agents_content
+    assert "## Workflows" not in agents_content
+    assert "## Agents" not in agents_content
 
     # 2. Gemini / Antigravity verification
     assert (tmp_path / "GEMINI.md").is_file()
@@ -105,9 +109,7 @@ def test_e2e_deterministic_reproducibility(tmp_path: Path):
     """Verify that repeated compilation produces byte-for-byte identical output."""
     repo_root = Path(__file__).resolve().parent.parent.parent.parent
     context_dir = repo_root / "context"
-    shutil.copytree(
-        context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True
-    )
+    shutil.copytree(context_dir, tmp_path / "context", symlinks=True, ignore_dangling_symlinks=True)
 
     # Run 1
     run_generation(
@@ -138,9 +140,7 @@ def test_e2e_deterministic_reproducibility(tmp_path: Path):
     assert first_run_hashes.keys() == second_run_hashes.keys()
     for rel_path, content1 in first_run_hashes.items():
         content2 = second_run_hashes[rel_path]
-        assert content1 == content2, (
-            f"File {rel_path} differed between compilation runs"
-        )
+        assert content1 == content2, f"File {rel_path} differed between compilation runs"
 
 
 def test_e2e_synthetic_context_compilation(tmp_path: Path):
@@ -178,6 +178,20 @@ def test_e2e_synthetic_context_compilation(tmp_path: Path):
         "    agent: custom-bot\n"
     )
 
+    # AGENTS.md content source — mandatory input for the generator since
+    # context/workflows/agents-md.yaml became the single source of AGENTS.md prose.
+    (workflows_dir / "agents-md.yaml").write_text(
+        "title: AGENTS.md\n"
+        "description: Synthetic AGENTS.md source.\n"
+        "sections:\n"
+        "  - name: Harness Context\n"
+        "    content: |\n"
+        "      - Synthetic harness bullet.\n"
+        "  - name: Project Context\n"
+        "    content: |\n"
+        "      - Synthetic project bullet.\n"
+    )
+
     # 1 synthetic standard with applyTo
     (standards_dir / "custom-standards.md").write_text(
         "# Custom Standards\n\n"
@@ -202,6 +216,9 @@ def test_e2e_synthetic_context_compilation(tmp_path: Path):
 
     assert len(result["created"]) > 0
     assert (output_dir / "AGENTS.md").is_file()
+    synthetic_agents_content = (output_dir / "AGENTS.md").read_text()
+    assert "## Harness Context" in synthetic_agents_content
+    assert "Synthetic harness bullet." in synthetic_agents_content
     assert (output_dir / "GEMINI.md").is_file()
     assert (output_dir / "CLAUDE.md").is_file()
     assert (output_dir / "CLINE.md").is_file()
@@ -210,3 +227,33 @@ def test_e2e_synthetic_context_compilation(tmp_path: Path):
     assert (output_dir / ".claude" / "prompts" / "custom-bot.md").is_file()
     assert (output_dir / ".github" / "prompts" / "custom-bot.prompt.md").is_file()
     assert (output_dir / ".openai" / "prompts" / "custom-bot.txt").is_file()
+
+
+def test_e2e_synthetic_context_without_agents_md_source_fails_loudly(tmp_path: Path):
+    """AGENTS.md generation must fail loudly when the declared source file is absent.
+
+    ``context/workflows/agents-md.yaml`` is a mandatory input, not a fallback: a
+    missing source would otherwise silently emit an AGENTS.md with no sections.
+    """
+    synth_context = tmp_path / "context"
+    for subdir in ("agents", "workflows", "rules", "standards"):
+        (synth_context / subdir).mkdir(parents=True)
+
+    (synth_context / "agents" / "custom-bot.md").write_text(
+        "---\n"
+        "name: custom-bot\n"
+        "description: Performs automated custom tasks.\n"
+        "---\n\n"
+        "# Custom Bot\n\nCustom bot body.\n"
+    )
+
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+
+    with pytest.raises(FileNotFoundError, match="agents-md.yaml"):
+        run_generation(
+            repo_root=output_dir,
+            context_dir=synth_context,
+            targets={"all"},
+            force=True,
+        )

@@ -14,19 +14,19 @@ Covers:
      c) Installed with sessions but broken/drifted schema (fails test with alert)
 """
 
+import importlib.util
 import json
 import os
 import sqlite3
-import tempfile
-import pytest
 from pathlib import Path
 
-import importlib.util
+import pytest
 
 _script_path = Path(__file__).resolve().parent.parent / "prepare-commit-msg.py"
 _spec = importlib.util.spec_from_file_location("prepare_commit_msg", _script_path)
 _mod = importlib.util.module_from_spec(_spec)
 import sys
+
 sys.modules[_spec.name] = _mod
 _spec.loader.exec_module(_mod)
 
@@ -46,10 +46,10 @@ EXTRACTORS = _mod.EXTRACTORS
 short_model = _mod.short_model
 
 
-
 # =============================================================================
 # 1. Synthetic Unit Tests
 # =============================================================================
+
 
 def test_format_tokens():
     """Verify human-readable token formatting."""
@@ -229,7 +229,10 @@ def test_commit_message_updating(tmp_path):
     )
     assert update_commit_message(str(msg_file), "tokens=15.0K/1.2K")
     content = msg_file.read_text()
-    assert "Agent-Session: tool=antigravity model=gemini-flash agents=coder tokens=15.0K/1.2K" in content
+    assert (
+        "Agent-Session: tool=antigravity model=gemini-flash agents=coder tokens=15.0K/1.2K"
+        in content
+    )
 
     # 3. Existing tokens replacement
     assert update_commit_message(str(msg_file), "tokens=error(schema_drift)")
@@ -241,9 +244,10 @@ def test_commit_message_updating(tmp_path):
 # 2. Live Runtime Location Sanity Checks
 # =============================================================================
 
+
 def test_live_antigravity_storage_sanity():
     """Verify local Antigravity IDE storage structure if installed.
-    
+
     Discriminates:
     - Skipped if Antigravity is not installed.
     - Skipped if installed but no conversation DBs exist.
@@ -260,7 +264,9 @@ def test_live_antigravity_storage_sanity():
             dbs.extend(Path(s_dir).glob("*.db"))
 
     if not dbs:
-        pytest.skip("Antigravity is installed, but no conversation databases were found to validate.")
+        pytest.skip(
+            "Antigravity is installed, but no conversation databases were found to validate."
+        )
 
     # Validate that at least one DB has the expected schema
     tested = 0
@@ -279,12 +285,14 @@ def test_live_antigravity_storage_sanity():
             pytest.fail(f"Antigravity database {db_path} could not be read: {e}")
 
     if tested == 0:
-        pytest.fail("Antigravity databases exist, but none contained the expected gen_metadata table (schema drift).")
+        pytest.fail(
+            "Antigravity databases exist, but none contained the expected gen_metadata table (schema drift)."
+        )
 
 
 def test_live_copilot_storage_sanity():
     """Verify local VS Code Copilot Chat storage structure if installed.
-    
+
     Discriminates:
     - Skipped if VS Code workspaceStorage is not installed.
     - Skipped if installed but no chat session files exist.
@@ -300,7 +308,9 @@ def test_live_copilot_storage_sanity():
             session_files.extend(Path(s_dir).glob("*/chatSessions/*.jsonl"))
 
     if not session_files:
-        pytest.skip("VS Code workspaceStorage exists, but no Copilot chat sessions were found to validate.")
+        pytest.skip(
+            "VS Code workspaceStorage exists, but no Copilot chat sessions were found to validate."
+        )
 
     # Validate JSON parsing on found sessions
     tested = 0
@@ -321,7 +331,7 @@ def test_live_copilot_storage_sanity():
 
 def test_live_claude_storage_sanity():
     """Verify local Claude Code storage structure if installed.
-    
+
     Discriminates:
     - Skipped if ~/.claude/projects is not installed.
     - Skipped if installed but no project sessions exist.
@@ -357,7 +367,15 @@ def test_live_claude_storage_sanity():
 # Cline extractor
 # =============================================================================
 
-def _make_cline_session(root: Path, session_id: str, cwd: str, messages, model="deepseek/test-model", provider="openrouter"):
+
+def _make_cline_session(
+    root: Path,
+    session_id: str,
+    cwd: str,
+    messages,
+    model="deepseek/test-model",
+    provider="openrouter",
+):
     """Create a synthetic Cline session tree under <root>/sessions/<session_id>/."""
     sdir = root / "sessions" / session_id
     sdir.mkdir(parents=True)
@@ -385,13 +403,31 @@ def test_cline_extract_delta_counts_assistant_metrics(tmp_path, monkeypatch):
     repo.mkdir()
     messages = [
         {"role": "user", "content": [{"type": "text", "text": "u1"}], "ts": 1},
-        {"role": "assistant", "content": [{"type": "text", "text": "a1"}], "ts": 2,
-         "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
-         "metrics": {"inputTokens": 100, "cacheReadTokens": 200, "cacheWriteTokens": 0, "outputTokens": 25}},
+        {
+            "role": "assistant",
+            "content": [{"type": "text", "text": "a1"}],
+            "ts": 2,
+            "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
+            "metrics": {
+                "inputTokens": 100,
+                "cacheReadTokens": 200,
+                "cacheWriteTokens": 0,
+                "outputTokens": 25,
+            },
+        },
         {"role": "user", "content": [{"type": "text", "text": "u2"}], "ts": 3},
-        {"role": "assistant", "content": [{"type": "text", "text": "a2"}], "ts": 4,
-         "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
-         "metrics": {"inputTokens": 30, "cacheReadTokens": 0, "cacheWriteTokens": 40, "outputTokens": 10}},
+        {
+            "role": "assistant",
+            "content": [{"type": "text", "text": "a2"}],
+            "ts": 4,
+            "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
+            "metrics": {
+                "inputTokens": 30,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 40,
+                "outputTokens": 10,
+            },
+        },
     ]
     _make_cline_session(fake_home, "sess001", str(repo), messages)
 
@@ -420,9 +456,18 @@ def test_cline_extract_delta_accepts_wrapped_messages(tmp_path, monkeypatch):
     payload = {
         "sessionId": "sess001",
         "messages": [
-            {"role": "assistant", "content": [], "ts": 1,
-             "modelInfo": {"id": "deepseek/x", "provider": "openrouter"},
-             "metrics": {"inputTokens": 20, "cacheReadTokens": 5, "cacheWriteTokens": 0, "outputTokens": 3}},
+            {
+                "role": "assistant",
+                "content": [],
+                "ts": 1,
+                "modelInfo": {"id": "deepseek/x", "provider": "openrouter"},
+                "metrics": {
+                    "inputTokens": 20,
+                    "cacheReadTokens": 5,
+                    "cacheWriteTokens": 0,
+                    "outputTokens": 3,
+                },
+            },
         ],
     }
     sdir = _make_cline_session(fake_home, "sess001", str(repo), [])
@@ -442,9 +487,18 @@ def test_cline_extract_delta_session_switch_resets(tmp_path, monkeypatch):
     repo = tmp_path / "repo"
     repo.mkdir()
     messages = [
-        {"role": "assistant", "content": [{"type": "text", "text": "a1"}], "ts": 1,
-         "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
-         "metrics": {"inputTokens": 50, "cacheReadTokens": 0, "cacheWriteTokens": 0, "outputTokens": 5}},
+        {
+            "role": "assistant",
+            "content": [{"type": "text", "text": "a1"}],
+            "ts": 1,
+            "modelInfo": {"id": "deepseek/test-model", "provider": "openrouter"},
+            "metrics": {
+                "inputTokens": 50,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0,
+                "outputTokens": 5,
+            },
+        },
     ]
     _make_cline_session(fake_home, "sess001", str(repo), messages)
 
@@ -466,8 +520,17 @@ def test_cline_extract_delta_falls_back_to_session_model(tmp_path, monkeypatch):
     repo = tmp_path / "repo"
     repo.mkdir()
     messages = [
-        {"role": "assistant", "content": [{"type": "text", "text": "a1"}], "ts": 1,
-         "metrics": {"inputTokens": 10, "cacheReadTokens": 0, "cacheWriteTokens": 0, "outputTokens": 5}},
+        {
+            "role": "assistant",
+            "content": [{"type": "text", "text": "a1"}],
+            "ts": 1,
+            "metrics": {
+                "inputTokens": 10,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0,
+                "outputTokens": 5,
+            },
+        },
     ]
     _make_cline_session(fake_home, "sess001", str(repo), messages, model="deepseek/fallback-model")
 
@@ -552,7 +615,9 @@ def test_update_commit_message_injects_tool_and_model(tmp_path):
         "Agent-Session: tool=cursor model=sonnet agents=python-coder\n\n"
         "Co-Authored-By: Agent <a@b.c>\n"
     )
-    assert update_commit_message(str(msg), "tokens=10.0K/1.0K", tool="cline", model="deepseek-v4-flash-0731")
+    assert update_commit_message(
+        str(msg), "tokens=10.0K/1.0K", tool="cline", model="deepseek-v4-flash-0731"
+    )
     content = msg.read_text()
     assert "tool=cline" in content
     assert "model=deepseek-v4-flash-0731" in content
@@ -614,6 +679,3 @@ def test_live_cline_storage_sanity():
             pytest.fail(f"Cline session file {sj} failed schema sanity: {e}")
 
     assert tested > 0, "No valid Cline session files could be parsed."
-
-
-

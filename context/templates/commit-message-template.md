@@ -29,9 +29,12 @@ fix(data): prevent negative balance on refund
 refactor(api): extract validation middleware
 ```
 
-### Body (optional)
+### Body (required)
 
-Brief context if subject is insufficient. Focus on "why" not "what".
+Explanatory paragraph describing what changed and why, wrapped at ~72 chars. The
+`commit-msg` validator rejects any commit without at least one explanatory body
+line — trailers (`Tasks` / `Agent-Session` / `Co-Authored-By`) are metadata, not a
+body. It does not need to follow this template exactly; it just must exist.
 
 ```
 Implements exponential backoff for webhook retries.
@@ -91,6 +94,8 @@ Match the tool (and optionally model) to what is in Agent-Session. Do not use a 
 ```
 feat(auth): add token refresh endpoint
 
+Implements a token refresh endpoint for the auth service.
+
 Tasks: AUTH-001
 Agent-Session: tool=cursor model=sonnet agents=python-coder duration=32m dispatch=orchestrator interactions=0 approvals=1
 
@@ -128,6 +133,8 @@ Co-Authored-By: Claude Opus <opus@anthropic.com>
 
 ```
 docs: update API documentation
+
+Documents the new webhook retry behaviour and configuration options.
 
 Tasks: DOC-001
 ```
