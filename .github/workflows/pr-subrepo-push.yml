@@ -106,6 +106,12 @@ jobs:
           git config --local --unset-all "http.https://github.com/.extraheader" || true
           git config --global url."https://x-access-token:${PUSH_TOKEN}@github.com/".insteadOf "https://github.com/"
 
+          # The rewrite above puts the PAT into every github.com URL that git reports.
+          # git-subrepo records `git remote -v` for its own installation repo in the
+          # commit messages it generates, which this job then pushes back to origin.
+          # Every `git subrepo pull|push` below therefore passes -m: an explicit message
+          # bypasses message generation entirely, so no remote URL is ever read. Do not
+          # drop -m, or the PAT returns to this repository's public history.
           SYNC_FAILED=false
 
           sync_subrepo() {
@@ -127,7 +133,7 @@ jobs:
             if [ "$upstream_head" != "$tracked_commit" ]; then
               echo "Upstream has new commits ($tracked_commit -> $upstream_head)."
               echo "Attempting automated 3-way reconciliation (pull before push)..."
-              if ! git subrepo pull "$subdir"; then
+              if ! git subrepo pull "$subdir" -m "chore(subrepo): pull upstream into $subdir"; then
                 echo "::error::Automated pull for '$subdir' failed due to merge conflicts. Manual reconciliation required."
                 echo "${subdir}_sync_status=conflict" >> "$GITHUB_ENV"
                 SYNC_FAILED=true
@@ -139,7 +145,11 @@ jobs:
 
             # 3. Push local changes upstream
             echo "Pushing $subdir/ upstream..."
-            if ! git subrepo push "$subdir"; then
+            local remote_label
+            remote_label=$(git config -f "$subdir/.gitrepo" subrepo.remote)
+            remote_label=${remote_label#https://github.com/}
+            remote_label=${remote_label%.git}
+            if ! git subrepo push "$subdir" -m "chore(subrepo): push $subdir to $remote_label"; then
               echo "::error::git subrepo push '$subdir' failed."
               echo "${subdir}_sync_status=failed" >> "$GITHUB_ENV"
               SYNC_FAILED=true
